@@ -1,7 +1,24 @@
 import { initializeConfig, AppConfig } from './js/modules/config.js';
+import { ensureSession, getLocalParticipantId, saveLocalParticipantId } from '/js/services/session_service.js';
 
 window.addEventListener('DOMContentLoaded', async () => {
-  await initializeConfig();
-  // 此处可安全使用 AppConfig.model_name_for_display
-  console.log('当前模型：', AppConfig.model_name_for_display);
+  try {
+   
+    await initializeConfig();
+
+   
+    let pid = getLocalParticipantId();
+    if (!pid) {
+      const tmpId = (window.crypto && window.crypto.randomUUID)
+        ? window.crypto.randomUUID()
+        : `pid-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      saveLocalParticipantId(tmpId);
+    }
+    await ensureSession();
+
+   
+    console.log('当前模型：', AppConfig.model_name_for_display);
+  } catch (err) {
+    console.error('应用初始化失败：', err);
+  }
 });

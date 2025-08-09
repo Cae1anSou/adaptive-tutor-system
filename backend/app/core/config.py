@@ -1,6 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 import os
-from typing import List
+from typing import List, Dict
 
 class Settings(BaseSettings):
     """
@@ -56,6 +56,19 @@ class Settings(BaseSettings):
     ENABLE_RAG_SERVICE: bool = True
     ENABLE_SENTIMENT_ANALYSIS: bool = True
     ENABLE_TRANSLATION_SERVICE: bool = True
+
+    # Frontend endpoints mapping (relative to API_V1_STR)
+    # Can be overridden via environment (e.g., ENDPOINTS__chat="/custom/chat")
+    ENDPOINTS: Dict[str, str] = {
+        "chat": "/chat/ai/chat",
+        "learningContent": "/learning-content",
+        "testTasks": "/test-tasks",
+        "knowledgeGraph": "/knowledge-graph",
+        "progress": "/progress/participants",
+        "progressUpdate": "/progress/participants",
+        "sessionInitiate": "/session/initiate",
+        "submissionSubmit": "/submission/submit-test",
+    }
 
 # Create a single, globally accessible instance of the settings.
 # This will raise a validation error on startup if required settings are missing.
