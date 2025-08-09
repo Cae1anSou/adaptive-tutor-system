@@ -18,6 +18,9 @@ window.addEventListener('DOMContentLoaded', async () => {
 
    
     console.log('当前模型：', AppConfig.model_name_for_display);
+
+    // 初始化完成后跳转到学习页面（可改为其它页面）
+    window.location.href = '/pages/learning_page.html';
   } catch (err) {
     console.error('应用初始化失败：', err);
   }
