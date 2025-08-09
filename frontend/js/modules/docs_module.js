@@ -18,52 +18,20 @@ let docsModuleState = {
     advancedInterval: null
 };
 
-// API客户端
-const ApiClient = {
-    async get(endpoint) {
-        try {
-            // 使用配置中的API基础URL
-            const response = await fetch(`${window.FrontendConfig.getApiBaseUrl()}${endpoint}`);
-            if (!response.ok) throw new Error(`API错误: ${response.status}`);
-            return await response.json();
-        } catch (error) {
-            console.error(`请求失败: ${endpoint}`, error);
-            throw error;
-        }
-    },
-    
-    async post(endpoint, data) {
-        try {
-            // 使用配置中的API基础URL
-            const response = await fetch(`${window.FrontendConfig.getApiBaseUrl()}${endpoint}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            if (!response.ok) throw new Error(`API错误: ${response.status}`);
-            return await response.json();
-        } catch (error) {
-            console.error(`请求失败: ${endpoint}`, error);
-            throw error;
-        }
-    }
-};
+// API客户端 - 使用统一的 api_client
+import ApiClient, { resolveEndpoint } from '../api_client.js';
 
 // 加载文档内容
 async function loadDocumentForTag(tagName) {
     try {
-        // 使用后端API获取学习内容
-        const response = await ApiClient.get(`/learning-content/${tagName}`);
-        
-        if (response.status !== 'success') {
-            throw new Error(response.message || '未找到内容');
-        }
+        // 使用 content_service 获取学习内容
+        const { getLearningContent } = await import('../services/content_service.js');
+        const contentData = await getLearningContent(tagName);
         
         docsModuleState.currentTag = { id: tagName, title: `${tagName} 组件` };
         docsModuleState.currentLevelIndex = 0;
         
         // 将学习内容转换为原来的格式
-        const contentData = response.data;
         docsModuleState.contents = {
             basic: contentData.content || `${tagName} 标签是HTML中常用的元素。`,
             intermediate: contentData.content || `${tagName} 标签的基本语法：<${tagName}>内容</${tagName}>`,

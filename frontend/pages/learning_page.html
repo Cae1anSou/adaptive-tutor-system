@@ -165,31 +165,15 @@
                 // 添加用户消息到聊天界面
                 addMessageToChat('user', message);
                 
-                                        // 发送消息到后端API
-                        const response = await fetch(`${window.FrontendConfig.getApiBaseUrl()}/chat/ai/chat`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        participant_id: 'user123', // 临时用户ID
-                        user_message: message,
-                        conversation_history: []
-                    })
+                // 使用 chat_service 发送消息
+                const { sendMessage } = await import('../js/services/chat_service.js');
+                const result = await sendMessage({
+                    userMessage: message,
+                    conversationHistory: []
                 });
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const result = await response.json();
-                
-                if (result.code === 200 && result.data) {
-                    // 添加AI回复到聊天界面
-                    addMessageToChat('ai', result.data.ai_response);
-                } else {
-                    throw new Error(result.message || 'AI回复失败');
-                }
+                // 添加AI回复到聊天界面
+                addMessageToChat('ai', result.ai_response);
                 
             } catch (error) {
                 console.error('发送消息失败:', error);

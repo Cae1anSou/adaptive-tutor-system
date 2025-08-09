@@ -9,15 +9,33 @@ class LLMGateway:
     """LLM网关服务"""
     
     def __init__(self):
-        # 从环境变量或配置中获取API配置
+        # 从环境变量或配置中获取API配置，支持多种命名方式
         self.api_key = os.getenv('TUTOR_OPENAI_API_KEY', settings.TUTOR_OPENAI_API_KEY)
-        self.api_base = os.getenv('TUTOR_OPENAI_API_BASE', settings.TUTOR_OPENAI_API_BASE)
-        self.model = os.getenv('TUTOR_OPENAI_MODEL', settings.TUTOR_OPENAI_MODEL)
+        
+        # 支持多种配置键名
+        self.api_base = (
+            os.getenv('TUTOR_OPENAI_API_BASE') or 
+            os.getenv('OPENAI_API_BASE') or 
+            settings.TUTOR_OPENAI_API_BASE
+        )
+        
+        self.model = (
+            os.getenv('TUTOR_OPENAI_MODEL') or 
+            os.getenv('OPENAI_MODEL') or 
+            settings.TUTOR_OPENAI_MODEL
+        )
 
         self.max_tokens = int(os.getenv('LLM_MAX_TOKENS', settings.LLM_MAX_TOKENS))
         self.temperature = float(os.getenv('LLM_TEMPERATURE', settings.LLM_TEMPERATURE))
         
         # 初始化OpenAI客户端（兼容魔搭API）
+        print(f"[DEBUG] LLM Gateway 配置:")
+        print(f"  API Key: {self.api_key[:10]}...")
+        print(f"  API Base: {self.api_base}")
+        print(f"  Model: {self.model}")
+        print(f"  Max Tokens: {self.max_tokens}")
+        print(f"  Temperature: {self.temperature}")
+        
         self.client = OpenAI(
             api_key=self.api_key,
             base_url=self.api_base

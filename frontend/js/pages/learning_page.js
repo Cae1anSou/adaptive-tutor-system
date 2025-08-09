@@ -24,19 +24,20 @@ function initMainApp() {
     startButton.disabled = true;
     
     // 获取用户学习进度
-    if (window.DocsModule && window.DocsModule.ApiClient) {
-        window.DocsModule.ApiClient.get(`/progress/participants/user123/progress`).then(data => {
-            allowedTags = data.data.completed_topics || [];
-            iframe.src = iframe.src;
-            startButton.disabled = false;
-        }).catch(error => {
-            console.error('获取用户学习进度失败:', error);
-            // 如果获取失败，使用默认标签
-            allowedTags = ['div', 'span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a', 'img', 'table', 'tr', 'td', 'th', 'ul', 'ol', 'li', 'form', 'input', 'button', 'textarea', 'select', 'option'];
-            startButton.disabled = false;
-        });
-    } else {
-        // 如果DocsModule未加载，使用默认标签
+    try {
+        const { getUserProgress } = await import('../services/progress_service.js');
+        const { ensureSession } = await import('../services/session_service.js');
+        
+        // 确保会话已建立
+        await ensureSession();
+        
+        const progressData = await getUserProgress();
+        allowedTags = progressData.completed_topics || [];
+        iframe.src = iframe.src;
+        startButton.disabled = false;
+    } catch (error) {
+        console.error('获取用户学习进度失败:', error);
+        // 如果获取失败，使用默认标签
         allowedTags = ['div', 'span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a', 'img', 'table', 'tr', 'td', 'th', 'ul', 'ol', 'li', 'form', 'input', 'button', 'textarea', 'select', 'option'];
         startButton.disabled = false;
     }

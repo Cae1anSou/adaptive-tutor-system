@@ -10,10 +10,15 @@ class Settings(BaseSettings):
     # Server
     BACKEND_PORT: int = 8000
 
-    # OpenAI (for chat completions) - required for chat feature
+    # LLM API (for chat completions) - required for chat feature
+    # Supports OpenAI, Modelscope, and other OpenAI-compatible APIs
     TUTOR_OPENAI_API_KEY: str 
-    TUTOR_OPENAI_MODEL: str = "gpt-4-turbo"
-    TUTOR_OPENAI_API_BASE: str = "https://api.openai.com/v1"
+    TUTOR_OPENAI_MODEL: str = "Qwen/Qwen2.5-7B-Instruct"  # Default to Qwen for Modelscope
+    TUTOR_OPENAI_API_BASE: str = "https://ms-fc-1d889e1e-d2ad.api-inference.modelscope.cn/v1"  # Modelscope API base
+    
+    # Alternative config keys for compatibility
+    OPENAI_MODEL: Optional[str] = None
+    OPENAI_API_BASE: Optional[str] = None
 
     # Embedding API (optional)
     TUTOR_EMBEDDING_API_KEY: Optional[str] = None
