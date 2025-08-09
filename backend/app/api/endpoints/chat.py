@@ -36,6 +36,13 @@ async def chat_with_ai(
         
         # 获取动态控制器实例并调用生成回复
         controller = get_dynamic_controller()
+        # 友好提示：当缺少聊天网关配置时，直接返回可读信息
+        if not getattr(controller, 'llm_gateway', None):
+            return StandardResponse(
+                code=503,
+                message="AI 对话未启用或未正确配置（缺少 API Key）",
+                data=None
+            )
         response = await controller.generate_adaptive_response(
             request=request,
             db=db

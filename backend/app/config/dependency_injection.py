@@ -94,6 +94,10 @@ def get_llm_gateway():
     """
     获取LLM网关服务实例
     """
+    from app.core.config import settings
+    if not settings.TUTOR_OPENAI_API_KEY:
+        print("[WARN] 缺少 TUTOR_OPENAI_API_KEY，LLM 网关未启用。")
+        return None
     return llm_gateway
 
 
@@ -111,12 +115,14 @@ def get_rag_service():
     from app.core.config import settings
     if not settings.ENABLE_RAG_SERVICE:
         return None
+    if not settings.TUTOR_EMBEDDING_API_KEY:
+        return None
     
     try:
         from app.services.rag_service import RAGService
         # 根据配置决定是否提供翻译服务
         translation_service = None
-        if settings.ENABLE_TRANSLATION_SERVICE:
+        if settings.ENABLE_TRANSLATION_SERVICE and settings.TUTOR_TRANSLATION_API_KEY:
             try:
                 from app.services.translation_service import TranslationService
                 translation_service = TranslationService()

@@ -1,6 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 import os
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 class Settings(BaseSettings):
     """
@@ -10,18 +10,18 @@ class Settings(BaseSettings):
     # Server
     BACKEND_PORT: int = 8000
 
-    # OpenAI (for chat completions)
-    TUTOR_OPENAI_API_KEY: str
+    # OpenAI (for chat completions) - required for chat feature
+    TUTOR_OPENAI_API_KEY: str 
     TUTOR_OPENAI_MODEL: str = "gpt-4-turbo"
     TUTOR_OPENAI_API_BASE: str = "https://api.openai.com/v1"
 
-    # Embedding API (can be different from OpenAI)
-    TUTOR_EMBEDDING_API_KEY: str
+    # Embedding API (optional)
+    TUTOR_EMBEDDING_API_KEY: Optional[str] = None
     TUTOR_EMBEDDING_API_BASE: str = "https://ms-fc-1d889e1e-d2ad.api-inference.modelscope.cn/v1"
     TUTOR_EMBEDDING_MODEL: str = "Qwen/Qwen3-Embedding-4B-GGUF"
     
-    # Translation API (can be different from OpenAI)
-    TUTOR_TRANSLATION_API_KEY: str
+    # Translation API (optional)
+    TUTOR_TRANSLATION_API_KEY: Optional[str] = None
     TUTOR_TRANSLATION_API_BASE: str = "https://api.openai.com/v1"
     TUTOR_TRANSLATION_MODEL: str = "gpt-4-turbo"
 
@@ -70,6 +70,13 @@ class Settings(BaseSettings):
         "submissionSubmit": "/submission/submit-test",
     }
 
-# Create a single, globally accessible instance of the settings.
-# This will raise a validation error on startup if required settings are missing.
 settings = Settings()
+# Aeolyn: 由于翻译和embedding对于用户而言不是必要的，因此这两个功能我改成了可选加载但弹出警告
+# Print non-blocking warnings after initialization
+try:
+    if settings.ENABLE_RAG_SERVICE and not settings.TUTOR_EMBEDDING_API_KEY:
+        print("[WARN] ENABLE_RAG_SERVICE=True 但未提供 TUTOR_EMBEDDING_API_KEY，RAG 将被禁用。")
+    if settings.ENABLE_TRANSLATION_SERVICE and not settings.TUTOR_TRANSLATION_API_KEY:
+        print("[WARN] ENABLE_TRANSLATION_SERVICE=True 但未提供 TUTOR_TRANSLATION_API_KEY，翻译将被禁用。")
+except Exception:
+    pass
