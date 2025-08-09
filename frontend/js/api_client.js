@@ -2,7 +2,7 @@
 import { getParticipantId } from './modules/session.js';
 import { AppConfig } from './modules/config.js';
 
-async function post(endpoint, body) {
+export async function post(endpoint, body) {
   const participantId = getParticipantId();
   if (!participantId) {
         // 如果没有ID，说明会话已丢失，应强制返回注册页
@@ -21,7 +21,7 @@ async function post(endpoint, body) {
   return response.json();
 }
 // ... 实现 get, put, delete 等方法
-async function get(endpoint) {
+export async function get(endpoint) {
   const participantId = getParticipantId();
   if (!participantId) {
         // 如果没有ID，说明会话已丢失，应强制返回注册页
@@ -35,3 +35,18 @@ async function get(endpoint) {
   return response.json();
 }
 // TODO:实现put, delete等方法
+
+/**
+ * 解析端点映射，避免硬编码路径。
+ * 优先从 AppConfig.endpoints[key] 获取，缺失时回退到 fallback。
+ * 返回相对路径（不拼接 api_base_url），由 ApiClient 负责拼接基址。
+ * @param {string} key
+ * @param {string} fallback
+ * @returns {string}
+ */
+export function resolveEndpoint(key, fallback) {
+  const endpoints = (AppConfig && AppConfig.endpoints) || {};
+  return endpoints[key] || fallback;
+}
+
+export default { get, post, resolveEndpoint };
