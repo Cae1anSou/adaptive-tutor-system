@@ -2,7 +2,6 @@
  * Knowledge Graph Service
  *
  * 提供知识图谱相关的对接函数签名
- *    Aeolyn:虽然我记得知识图谱是纯前端实现，但是以防万一后面要换逻辑所以我把这个也加上了
  */
 
 import ApiClient, { resolveEndpoint } from '/js/api_client.js';

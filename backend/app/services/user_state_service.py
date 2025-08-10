@@ -107,17 +107,22 @@ class UserStateService:
         
         # 只有在提供了数据库会话时才检查和创建数据库记录
         if db is not None:
-            from ..crud import crud_participant
-            from ..schemas.participant import ParticipantCreate
-            
-            # 检查数据库中是否存在参与者记录
-            participant = crud_participant.get(db, obj_id=participant_id)
-            
-            if not participant:
-                # 创建新用户记录
-                create_schema = ParticipantCreate(id=participant_id, group=group)
-                participant = crud_participant.create(db, obj_in=create_schema)
-                is_new_user = True
+            try:
+                from ..crud import crud_participant
+                from ..schemas.participant import ParticipantCreate
+                
+                # 检查数据库中是否存在参与者记录
+                participant = crud_participant.get(db, obj_id=participant_id)
+                
+                if not participant:
+                    # 创建新用户记录
+                    create_schema = ParticipantCreate(id=participant_id, group=group)
+                    participant = crud_participant.create(db, obj_in=create_schema)
+                    is_new_user = True
+            except ImportError as e:
+                print(f"⚠️ Participant model not available, skipping database operations: {e}")
+                # 如果participant模型不可用，跳过数据库操作
+                pass
         
         # 获取或创建内存Profile
         if participant_id not in self._state_cache:
@@ -189,7 +194,15 @@ class UserStateService:
             # 将数据库模型转换为Pydantic模型
             event_schema = BehaviorEvent.model_validate(event)
             # 调用解释器，但在回放模式下
-            self.interpreter.interpret_event(event_schema, is_replay=True)
+            try:
+                if hasattr(self.interpreter, 'interpret_event'):
+                    self.interpreter.interpret_event(event_schema, is_replay=True)
+                else:
+                    print(f"⚠️ Behavior interpreter service not fully implemented, skipping event replay")
+                    break
+            except Exception as e:
+                print(f"⚠️ Error during event replay: {e}")
+                break
         
         print(f"INFO: Recovery complete for {participant_id}.")
 

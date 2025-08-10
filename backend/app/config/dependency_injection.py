@@ -77,13 +77,16 @@ def get_sentiment_analysis_service():
 
 def get_llm_gateway():
     """
-    获取LLM网关服务实例
+    获取LLM网关服务实例（动态创建，确保配置正确加载）
     """
     from app.core.config import settings
     if not settings.TUTOR_OPENAI_API_KEY:
         print("[WARN] 缺少 TUTOR_OPENAI_API_KEY，LLM 网关未启用。")
         return None
-    return llm_gateway
+    
+    # 动态创建LLM Gateway实例，确保配置正确加载
+    from app.services.llm_gateway import LLMGateway
+    return LLMGateway()
 
 
 def get_prompt_generator():
