@@ -1,12 +1,10 @@
-# backend/app/api/endpoints/chat.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import Dict, Any
 
-from ...database import get_db
-from ...schemas.chat import ChatRequest, ChatResponse
-from ...schemas.response import StandardResponse
-from ...config.dependency_injection import get_dynamic_controller
+from app.config.dependency_injection import get_db, get_dynamic_controller
+from app.schemas.chat import ChatRequest, ChatResponse
+from app.schemas.response import StandardResponse
+from app.services.dynamic_controller import DynamicController
 
 router = APIRouter()
 
@@ -14,7 +12,8 @@ router = APIRouter()
 @router.post("/ai/chat", response_model=StandardResponse[ChatResponse])
 async def chat_with_ai(
     request: ChatRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    controller: DynamicController = Depends(get_dynamic_controller)
 ) -> StandardResponse[ChatResponse]:
     """
     与AI进行对话
@@ -22,6 +21,7 @@ async def chat_with_ai(
     Args:
         request: 聊天请求
         db: 数据库会话
+        controller: 动态控制器
         
     Returns:
         StandardResponse[ChatResponse]: AI回复
@@ -36,13 +36,6 @@ async def chat_with_ai(
         
         # 获取动态控制器实例并调用生成回复
         controller = get_dynamic_controller()
-        # 友好提示：当缺少聊天网关配置时，直接返回可读信息
-        if not getattr(controller, 'llm_gateway', None):
-            return StandardResponse(
-                code=503,
-                message="AI 对话未启用或未正确配置（缺少 API Key）",
-                data=None
-            )
         response = await controller.generate_adaptive_response(
             request=request,
             db=db

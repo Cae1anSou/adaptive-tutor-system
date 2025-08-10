@@ -1,15 +1,12 @@
-# backend/app/crud/crud_progress.py
-
 from typing import List
 from sqlalchemy.orm import Session
-
 from app.crud.base import CRUDBase
 from app.models.user_progress import UserProgress
 from app.schemas.user_progress import UserProgressCreate, UserProgressUpdate
 
-
 class CRUDProgress(CRUDBase[UserProgress, UserProgressCreate, UserProgressUpdate]):
-    def get_completed_topics_by_user(self, db: Session, *, participant_id: str) -> List[str]:
+    @staticmethod
+    def get_completed_topics_by_user(db: Session, *, participant_id: str) -> List[str]:
         """
         查询指定用户已完成的 topic_id 列表
         """

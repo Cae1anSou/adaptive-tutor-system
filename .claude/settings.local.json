@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(cat:*)",
+      "Bash(echo:*)",
+      "WebFetch(domain:docs.sqlalchemy.org)",
+      "Bash(find:*)",
+      "Bash(sqlite3:*)"
     ],
     "deny": []
   }

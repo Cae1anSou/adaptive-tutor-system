@@ -1,9 +1,4 @@
-import json
-import html
-from pathlib import Path
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import HTMLResponse
-from jinja2 import Environment, BaseLoader
 from app.schemas.response import StandardResponse
 from app.schemas.content import LearningContent, TestTask
 from app.services.content_loader import load_json_content
@@ -15,7 +10,7 @@ router = APIRouter()
 @router.get("/learning-content/{topic_id}", response_model=StandardResponse[LearningContent])
 def get_learning_content(topic_id: str):
     """
-    Retrieves learning materials for a specific topic.
+    获取指定主题的学习材料。
     """
     try:
         content_data = load_json_content("learning_content", topic_id)
@@ -29,7 +24,7 @@ def get_learning_content(topic_id: str):
 @router.get("/test-tasks/{topic_id}", response_model=StandardResponse[TestTask])
 def get_test_task(topic_id: str):
     """
-    Retrieves the test task for a specific topic.
+    获取指定主题的测试任务。
     """
     try:
         content_data = load_json_content("test_tasks", topic_id)

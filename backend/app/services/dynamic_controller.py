@@ -51,7 +51,7 @@ class DynamicController:
         """
         try:
             # 步骤1: 获取或创建用户档案（使用UserStateService）
-            profile = self.user_state_service.get_or_create_profile(request.participant_id, db)
+            profile, _ = self.user_state_service.get_or_create_profile(request.participant_id, db)
             
             # 步骤2: 情感分析
             if self.sentiment_service:
@@ -203,17 +203,17 @@ class DynamicController:
             # 准备用户聊天记录
             user_chat = ChatHistoryCreate(
                 participant_id=request.participant_id,
-                user_message=request.user_message,
-                ai_response="",  # 用户消息时AI回复为空
-                conversation_context=response.system_prompt
+                role="user",
+                message=request.user_message,
+                raw_prompt_to_llm=None  # 用户消息没有raw_prompt_to_llm
             )
 
             # 准备AI聊天记录
             ai_chat = ChatHistoryCreate(
                 participant_id=request.participant_id,
-                user_message="",  # AI回复时用户消息为空
-                ai_response=response.ai_response,
-                conversation_context=response.system_prompt
+                role="ai",
+                message=response.ai_response,
+                raw_prompt_to_llm=response.system_prompt
             )
 
             if background_tasks:

@@ -1,7 +1,6 @@
-# backend/app/core/document_loader.py
 from abc import ABC, abstractmethod
 from typing import List, Iterator
-from .document import Document
+from app.core.document import Document
 
 class DocumentLoader(ABC):
     """文档加载器接口"""

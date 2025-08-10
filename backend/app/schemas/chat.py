@@ -1,4 +1,3 @@
-# backend/app/schemas/chat.py
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone
@@ -6,14 +5,33 @@ from app.schemas.content import CodeContent, TestTask
 
 
 class ConversationMessage(BaseModel):
-    """对话消息模型"""
+    """对话消息模型
+    
+    对话中的单条消息记录，包含角色、内容和时间戳。
+    
+    Attributes:
+        role: 消息角色，'user'表示用户消息，'assistant'表示AI助手消息
+        content: 消息内容，文本格式的对话内容
+        timestamp: 时间戳，记录消息发送时间，可选字段
+    """
     role: str  # "user" 或 "assistant"
     content: str
     timestamp: Optional[datetime] = None
 
 
 class ChatRequest(BaseModel):
-    """聊天请求模型"""
+    """聊天请求模型
+    
+    用户发送的聊天请求，包含消息内容和上下文信息。
+    
+    Attributes:
+        participant_id: 参与者ID，用于标识特定用户
+        user_message: 用户消息内容，当前发送的消息文本
+        conversation_history: 对话历史，包含之前的所有对话消息
+        code_context: 代码上下文，用户当前正在编辑的代码内容
+        task_context: 任务上下文，用户当前正在进行的测试任务
+        topic_id: 知识点ID，标识当前讨论的知识点
+    """
     participant_id: str
     user_message: str
     conversation_history: Optional[List[ConversationMessage]] = []
@@ -23,7 +41,17 @@ class ChatRequest(BaseModel):
 
 
 class ChatResponse(BaseModel):
-    """聊天响应模型"""
+    """聊天响应模型
+    
+    AI助手的聊天响应，包含回复内容和相关上下文信息。
+    
+    Attributes:
+        ai_response: AI回复内容，助手生成的回复文本
+        user_state_summary: 用户状态摘要，包含用户的学习状态信息
+        retrieved_context: 检索到的上下文，从知识库中检索到的相关信息
+        system_prompt: 系统提示词，用于生成回复的系统指令
+        timestamp: 时间戳，记录响应生成时间
+    """
     ai_response: str
     user_state_summary: Optional[Dict[str, Any]] = None
     retrieved_context: Optional[List[str]] = None
@@ -32,14 +60,33 @@ class ChatResponse(BaseModel):
 
 
 class SentimentAnalysisResult(BaseModel):
-    """情感分析结果模型"""
+    """情感分析结果模型
+    
+    用户消息的情感分析结果，用于理解用户情绪状态。
+    
+    Attributes:
+        label: 情感标签，如 'NEUTRAL', 'CONFUSED', 'FRUSTRATED', 'EXCITED' 等
+        confidence: 置信度，0到1之间的浮点数，表示情感分析的准确程度
+        details: 详细信息，包含情感分析的其他相关数据
+    """
     label: str  # "NEUTRAL", "CONFUSED", "FRUSTRATED", "EXCITED", etc.
     confidence: float
     details: Optional[Dict[str, Any]] = None
 
 
 class UserStateSummary(BaseModel):
-    """用户状态摘要模型"""
+    """用户状态摘要模型
+    
+    用户学习状态的完整摘要，包含情感、行为和知识掌握情况。
+    
+    Attributes:
+        participant_id: 参与者ID，用于标识特定用户
+        emotion_state: 情感状态，包含用户当前的情绪分析结果
+        behavior_counters: 行为计数器，记录用户的各种行为统计
+        bkt_models: BKT模型数据，包含贝叶斯知识追踪模型的状态
+        is_new_user: 是否为新用户，用于判断是否需要特殊处理
+        last_updated: 最后更新时间，记录状态摘要的生成时间
+    """
     participant_id: str
     emotion_state: Dict[str, Any]
     behavior_counters: Dict[str, Any]
@@ -49,18 +96,17 @@ class UserStateSummary(BaseModel):
 
 
 class ChatHistoryCreate(BaseModel):
-    """创建聊天历史记录模型"""
+    """聊天历史创建模型
+    
+    用于创建新的聊天历史记录的数据结构，对应数据库模型 ChatHistory。
+    
+    Attributes:
+        participant_id: 参与者ID，用于标识特定用户
+        role: 消息角色，'user'表示用户消息，'ai'表示AI助手消息
+        message: 消息内容，文本格式的对话内容
+        raw_prompt_to_llm: 发送给LLM的完整Prompt，仅对AI消息有效
+    """
     participant_id: str
-    user_message: str
-    ai_response: str
-    conversation_context: Optional[str] = None
-
-
-class ChatHistoryResponse(BaseModel):
-    """聊天历史记录响应模型"""
-    id: int
-    participant_id: str
-    timestamp: datetime
-    user_message: str
-    ai_response: str
-    conversation_context: Optional[str] = None
+    role: str  # "user" 或 "ai"
+    message: str
+    raw_prompt_to_llm: Optional[str] = None

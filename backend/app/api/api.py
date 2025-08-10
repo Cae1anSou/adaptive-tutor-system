@@ -1,6 +1,5 @@
 from fastapi import APIRouter
-
-from ..api.endpoints import session, chat, submission, content, config, progress, knowledge_graph
+from app.api.endpoints import session, chat, submission, content, config, progress, knowledge_graph
 
 api_router = APIRouter()
 api_router.include_router(session.router, prefix="/session", tags=["session"])

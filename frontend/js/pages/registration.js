@@ -16,7 +16,7 @@ startButton.addEventListener('click', async () => {
 
   if (result.code === 200 || result.code === 201) {
         saveLocalParticipantId(result.data.participant_id);
-        // 注册成功后，跳转到“前测问卷”页面，这是科研流程的一部分
+        // 注册成功后，跳转到"前测问卷"页面，这是科研流程的一部分
         window.location.href = `/survey.html?type=pre-test`;
   } else {
         alert(result.message);

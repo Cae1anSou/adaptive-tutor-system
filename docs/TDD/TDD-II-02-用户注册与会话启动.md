@@ -9,12 +9,12 @@
 
 #### **1. 功能概述 (Feature Overview)**
 
-**目标:** 为新参与者提供一个简单、直观的注册入口，并为返回的参与者提供无缝的会话恢复机制。用户通过输入一个自定义的`username`来创建或恢复他们的实验会话。系统将为每个`username`在后台关联一个唯一的、系统生成的`participant_id`，并使用此ID进行后续所有的数据追踪。
+**目标:** 为新参与者提供一个简单、直观的会话启动入口，并为返回的参与者提供无缝的会话恢复机制。用户通过提供一个他们自己生成或系统分配的`participant_id`来创建或恢复他们的实验会话。系统将使用此ID进行后续所有的数据追踪和状态管理。
 
 **核心原则:**
 *   **无状态后端 (Stateless Backend):** 后端不通过Cookie或服务器端Session来维护用户状态。用户的身份完全由前端在每次请求中提供的`participant_id`决定。
 *   **持久化前端会话 (Persistent Frontend Session):** `participant_id` 在首次获取后，必须被安全地存储在客户端（`localStorage`），以支持浏览器刷新或关闭后的会话恢复。
-*   **幂等操作 (Idempotent Operation):** 多次使用相同的`username`注册，应返回相同的结果（相同的`participant_id`），而不会重复创建用户。
+*   **幂等操作 (Idempotent Operation):** 多次使用相同的`participant_id`启动会话，应返回相同的结果，而不会重复创建用户。
 
 **范围:**
 1.  设计`POST /api/v1/session/initiate`端点的详细前后端逻辑。
@@ -33,13 +33,13 @@ sequenceDiagram
     participant UserState as UserStateService
     participant DB as SQLite DB
     
-    User->>Page0: 1. 输入username并点击"开始"
-    Page0->>BE: 2. 发起API请求 {username: "..."}
+    User->>Page0: 1. 输入participant_id并点击"开始"
+    Page0->>BE: 2. 发起API请求 {participant_id: "..."}
     
-    BE->>UserState: 3. get_or_create_profile(username)
+    BE->>UserState: 3. get_or_create_profile(participant_id)
     activate UserState
     
-    UserState->>DB: 4. 查询 participants 表 where username = "..."
+    UserState->>DB: 4. 查询 participants 表 where id = "..."
     
     alt 用户已存在 (老用户)
         DB-->>UserState: 5a. 返回 participant 记录
@@ -72,14 +72,28 @@ sequenceDiagram
 from pydantic import BaseModel, Field
 
 class SessionInitiateRequest(BaseModel):
-	username: str = Field(..., min_length=2, max_length=50, description="User-provided name")
-	# group字段可以由前端指定，或由后端逻辑分配
-	group: str = Field("experimental", description="Assigned experiment group")
+    """会话初始化请求模型
+    
+    用于初始化用户会话，包含参与者ID和分组信息。
+    
+    Attributes:
+        participant_id: 参与者唯一标识符（UUID格式）
+        group: 实验分组，默认为'experimental'实验组
+    """
+    participant_id: str = Field(..., description="System-generated unique ID (UUID) for the participant")
+    group: str = Field("experimental", description="Assigned experiment group")
 
 class SessionInitiateResponse(BaseModel):
-	participant_id: str = Field(..., description="System-generated unique ID (UUID) for the participant")
-	username: str
-	is_new_user: bool
+    """会话初始化响应模型
+    
+    返回会话初始化结果，包含参与者ID和新用户状态。
+    
+    Attributes:
+        participant_id: 参与者唯一标识符（UUID格式）
+        is_new_user: 是否为新用户，用于判断是否需要显示引导内容
+    """
+    participant_id: str = Field(..., description="System-generated unique ID (UUID) for the participant")
+    is_new_user: bool
 ```
 这部分代码使用了 [Pydantic](https://www.google.com/search?q=https://docs.pydantic.dev/) 库来定义数据模型（Schemas）。在 FastAPI 应用中，Pydantic主要有三大作用：
 1. **数据校验 (Data Validation):** 自动检查传入的请求数据是否符合预定义的格式、类型和约束（比如长度限制）。如果数据不合法，FastAPI 会自动返回一个清晰的错误信息。
@@ -87,12 +101,11 @@ class SessionInitiateResponse(BaseModel):
 3. **API文档生成 (API Documentation):** FastAPI 会根据这些模型自动生成交互式的 API 文档（如 Swagger UI），让前后端开发者都能清楚地知道接口需要什么数据、返回什么数据。
 简单来说，Pydantic 模型就像是前后端之间签订的**数据协议**，规定了数据交换的格式和规则。
 
-`essionInitiateRequest(BaseModel)`这个类定义了 `POST /api/v1/session/initiate` 端点 **期望接收的请求体 (Request Body) 的格式**。当前端调用这个API时，发送的 JSON 数据必须符合这个结构。
-- **`username: str = Field(..., min_length=2, max_length=50, ...)`**
-    - `username: str`: 定义了一个名为 `username` 的字段，它的类型必须是字符串 (`str`)。
+`SessionInitiateRequest(BaseModel)`这个类定义了 `POST /api/v1/session/initiate` 端点 **期望接收的请求体 (Request Body) 的格式**。当前端调用这个API时，发送的 JSON 数据必须符合这个结构。
+- **`participant_id: str = Field(..., ...)`**
+    - `participant_id: str`: 定义了一个名为 `participant_id` 的字段，它的类型必须是字符串 (`str`)。
     - `Field(...)`: 这是 Pydantic 提供的一个功能，允许你为字段添加额外的配置和元数据。
-    - 第一个参数 `...` (Ellipsis): 表示这个字段是**必需的 (required)**。前端在请求中必须提供 `username` 字段，否则会报错。
-    - `min_length=2, max_length=50`: 这是一个约束条件，规定了 `username` 字符串的长度必须在 2 到 50 个字符之间。
+    - 第一个参数 `...` (Ellipsis): 表示这个字段是**必需的 (required)**。前端在请求中必须提供 `participant_id` 字段，否则会报错。
     - `description="..."`: 为这个字段提供了一段描述，这段描述会显示在自动生成的API文档中，非常有用。
 - **`group: str = Field("experimental", ...)`**
     - `group: str`: 定义了一个名为 `group` 的字段，类型为字符串。
@@ -103,12 +116,10 @@ class SessionInitiateResponse(BaseModel):
 - **`participant_id: str = Field(..., ...)`**
     - 定义了响应中必须包含一个名为 `participant_id` 的字符串字段。这就是系统为每个用户生成的、独一无二的 UUID，是后续所有操作的身份凭证。
     - `...` 同样表示这个字段是必需的。
-- **`username: str`**
-    - 响应中会包含用户自己的 `username`。
 - **`is_new_user: bool`**
     - 响应中会包含一个布尔值 (`true` 或 `false`)。
-    - `true` 表示该 `username` 是首次被使用，系统为他创建了一个新的参与者记录。
-    - `false` 表示该 `username` 已经存在，系统找到了之前的记录，实现了会话恢复。
+    - `true` 表示该参与者是首次使用系统，系统为他创建了一个新的参与者记录。
+    - `false` 表示该参与者已存在，系统找到了之前的记录，实现了会话恢复。
 
 这部分代码是整个API设计的基石。
 
@@ -136,9 +147,12 @@ def initiate_session(
     db: Session = Depends(get_db)
 ):
     try:
-        # 调用 get_or_create_profile
         # 这个方法会处理新用户创建和老用户状态恢复的所有复杂性
-        profile = user_state_service.get_or_create_profile(session_in.username, db)
+        profile, is_new_user = user_state_service.get_or_create_profile(
+            participant_id=session_in.participant_id, 
+            db=db, 
+            group=session_in.group
+        )
         
         # 检查这是否是一个真正的新用户
         # 注意：需要UserStateService返回is_new标志，或者通过其他方式判断
@@ -148,7 +162,6 @@ def initiate_session(
         # 构建响应数据
         response_data = SessionInitiateResponse(
             participant_id=profile.participant_id,
-            username=profile.username,
             is_new_user=is_new_user
         )
         
@@ -183,24 +196,23 @@ def initiate_session(
 
 ```python
 # backend/app/services/user_state_service.py 中的增强版本
-def get_or_create_profile(self, username: str, db: Session) -> (StudentProfile, bool):
+def get_or_create_profile(self, participant_id: str, db: Session, group: str) -> (StudentProfile, bool):
     """
     获取或创建用户配置
     
     Returns:
         tuple: (profile, is_new_user)
     """
-    # 检查用户是否已存在
-    from ..crud.crud_participant import get_by_username, create
+    from ..crud import crud_participant
     from ..schemas.session import SessionInitiateRequest
     
-    participant = get_by_username(db, username=username)
+    participant = crud_participant.get(db, id=participant_id)
     is_new_user = False
     
     if not participant:
         # 创建新用户
-        session_request = SessionInitiateRequest(username=username)
-        participant = create(db, obj_in=session_request)
+        create_schema = SessionInitiateRequest(participant_id=participant_id, group=group)
+        participant = crud_participant.create(db, obj_in=create_schema)
         is_new_user = True
     
     # 获取或创建内存Profile
@@ -215,7 +227,6 @@ def get_or_create_profile(self, username: str, db: Session) -> (StudentProfile, 
     # 为Profile添加is_new_user属性
     profile = self._state_cache[participant.id]
     profile.is_new_user = is_new_user
-    profile.username = participant.username
     
     return profile, is_new_user
 ```
@@ -241,7 +252,7 @@ def initiate_session(
 	session_in: SessionInitiateRequest,
 	db: Session = Depends(get_db)
 ):
-	participant = crud_participant.get_by_username(db, username=session_in.username)
+	participant = crud_participant.get(db, id=session_in.participant_id)
 	is_new = False
   
 	if not participant:
@@ -251,7 +262,6 @@ def initiate_session(
   
 	response_data = SessionInitiateResponse(
 		participant_id=participant.id,
-		username=participant.username,
 		is_new_user=is_new
 	)
 	return StandardResponse(data=response_data)
@@ -309,7 +319,7 @@ import { saveParticipantId, checkAndRedirect } from '../modules/session.js';
 checkAndRedirect();
 
 const startButton = document.getElementById('start-button');
-const usernameInput = document.getElementById('username-input');
+const participantIdInput = document.getElementById('participant-id-input');
 
 startButton.addEventListener('click', async () => {
   // ... (按钮禁用、输入校验等UI逻辑) ...

@@ -225,7 +225,6 @@ adaptive-tutor-system/
 erDiagram
     PARTICIPANT {
         string id PK "UUID"
-        string username UK "Unique Name"
         string group
         datetime created_at
     }
@@ -274,7 +273,6 @@ erDiagram
     *   **用途:** 存储每个实验参与者的基本信息。
     *   **字段:**
         *   `id` (TEXT, PRIMARY KEY): 系统生成的唯一ID (UUID)。
-        *   `username` (TEXT, UNIQUE, NOT NULL): 用户提供的可读名称。
         *   `group` (TEXT, NOT NULL): 实验分组，'experimental' 或 'control'。
         *   `created_at` (DATETIME): 记录创建时间。
 
@@ -322,7 +320,7 @@ erDiagram
 
 | 方法 | 路径 | 简要描述 |
 | :--- | :--- | :--- |
-| `POST` | `/session/initiate` | **会话启动/注册**。根据`username`创建或登录用户。 |
+| `POST` | `/session/initiate` | **会话启动/注册**。根据`participant_id`创建或登录用户。 |
 | `GET` | `/knowledge-graph` | 获取**静态知识图谱**结构（节点和依赖边）。 |
 | `GET` | `/participants/{id}/progress` | 获取指定用户的**学习进度**（已完成的知识点列表）。 |
 | `GET` | `/learning-content/{topic_id}` | 获取指定知识点的**学习材料**（代码、Markdown等）。 |

@@ -13,7 +13,6 @@ BKT模型是一种用于追踪学习者知识点掌握情况的概率模型。
 - 通过观测学习者的答题结果（正确/错误），模型会更新对学习者掌握情况的估计
 """
 
-import json
 from typing import Dict, Any
 
 
@@ -67,26 +66,17 @@ class BKTModel:
         if p_obs == 0:
             p_obs = 1e-10
 
-        # 更新掌握概率
-        # P(掌握 | 答题结果) = P(答题结果 | 掌握) * P(掌握) / P(答题结果)
+        # 贝叶斯更新：根据观测结果更新掌握概率
         if is_correct:
-            # 如果答对，使用贝叶斯更新规则
-            p_knowing_given_correct = self.mastery_prob * (1 - self.p_slip) / p_obs
-            p_not_knowing_given_correct = (1 - self.mastery_prob) * self.p_guess / p_obs
+            # P(掌握 | 答对) = P(答对 | 掌握) * P(掌握) / P(答对)
+            posterior_mastery = (self.mastery_prob * (1 - self.p_slip)) / p_obs
         else:
-            # 如果答错，使用贝叶斯更新规则
-            p_knowing_given_incorrect = self.mastery_prob * self.p_slip / p_obs
-            p_not_knowing_given_incorrect = (1 - self.mastery_prob) * (1 - self.p_guess) / p_obs
+            # P(掌握 | 答错) = P(答错 | 掌握) * P(掌握) / P(答错)
+            posterior_mastery = (self.mastery_prob * self.p_slip) / p_obs
             
-        # 更新状态：学习者可能通过这次练习学到了知识
-        # 新的掌握概率 = 原掌握概率 + (1-原掌握概率) * 学习概率
-        p_knowing_after_learning = self.mastery_prob + (1 - self.mastery_prob) * self.p_transit
-        
-        # 根据观测结果更新最终掌握概率
-        if is_correct:
-            self.mastery_prob = p_knowing_after_learning * p_knowing_given_correct + (1 - p_knowing_after_learning) * p_not_knowing_given_correct
-        else:
-            self.mastery_prob = p_knowing_after_learning * p_knowing_given_incorrect + (1 - p_knowing_after_learning) * p_not_knowing_given_incorrect
+        # 应用学习转移：学习者可能通过这次练习学到了知识
+        # 新的掌握概率 = 后验概率 + (1-后验概率) * 学习转移概率
+        self.mastery_prob = posterior_mastery + (1 - posterior_mastery) * self.p_transit
             
         # 确保概率在有效范围内
         self.mastery_prob = max(0.0, min(1.0, self.mastery_prob))

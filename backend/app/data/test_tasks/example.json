@@ -1,0 +1,76 @@
+{
+  "topic_id":"1_1",
+  "title": "使用h元素和p元素体验标题与段落",
+  "description_md": "# 任务描述：\n## 任务一：\n请使用h1元素创建一个标题，内容为“WCF 猫咪展示 2025”。\n## 任务二：\n请在h1元素下方使用h3元素创建一个副标题，内容为“猫咪偏好调查”。\n## 任务三：\n请在h3元素下方使用p元素创建一个段落，内容为“© 2025 猫咪前端示例页面 - 教学用途”。",
+  "start_code": {
+    "html": "",
+    "css": "",
+    "js": ""
+  },
+  "checkpoints": [
+    {
+      "name": "h1元素存在检查",
+      "type": "assert_attribute",
+      "selector": "h1",
+      "attribute": "",
+      "assertion_type": "exists",
+      "value": "",
+      "feedback": "请在代码中添加一个h1元素。"
+    },
+    {
+      "name": "h1元素内容检查",
+      "type": "assert_text_content",
+      "selector": "h1",
+      "assertion_type": "equals",
+      "value": "WCF 猫咪展示 2025",
+      "feedback": "h1元素的内容应该为'WCF 猫咪展示 2025'。"
+    },
+    {
+      "name": "h3元素存在检查",
+      "type": "assert_attribute",
+      "selector": "h3",
+      "attribute": "",
+      "assertion_type": "exists",
+      "value": "",
+      "feedback": "请在代码中添加一个h3元素。"
+    },
+    {
+      "name": "h3元素位置检查",
+      "type": "custom_script",
+      "script": "return document.querySelector('h1').getBoundingClientRect().top < document.querySelector('h3').getBoundingClientRect().top",
+      "feedback": "h3元素应该在h1元素的下边。"
+    },
+    {
+      "name": "h3元素内容检查",
+      "type": "assert_text_content",
+      "selector": "h3",
+      "assertion_type": "equals",
+      "value": "猫咪偏好调查",
+      "feedback": "h3元素的内容应该为'猫咪偏好调查'。"
+    },
+    {
+      "name": "p元素存在检查",
+      "type": "assert_attribute",
+      "selector": "p",
+      "attribute": "",
+      "assertion_type": "exists",
+      "value": "",
+      "feedback": "请在代码中添加一个p元素。"
+    },
+    {
+      "name": "p元素位置检查",
+      "type": "custom_script",
+      "script": "return document.querySelector('h3').getBoundingClientRect().top < document.querySelector('p').getBoundingClientRect().top",
+      "feedback": "p元素应该在h3元素的下边。"
+    },
+    {
+      "name": "p元素内容检查",
+      "type": "assert_text_content",
+      "selector": "p",
+      "assertion_type": "equals",
+      "value": "© 2025 猫咪前端示例页面 - 教学用途",
+      "feedback": "p元素的内容应该为'© 2025 猫咪前端示例页面 - 教学用途'。"
+    }
+  ]
+}
+

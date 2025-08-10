@@ -1,12 +1,9 @@
-# 依赖注入配置示例
-
 from app.services.sandbox_service_improved import SandboxService, DefaultPlaywrightManager
 from app.services.user_state_service import UserStateService
 from app.services.sentiment_analysis_service import sentiment_analysis_service
 from app.services.llm_gateway import llm_gateway
 from app.services.prompt_generator import prompt_generator
-# dynamic_controller 现在通过 create_dynamic_controller() 函数创建
-from app.services.rag_service import RAGService  # 暂时注释，等待RAG模块修复
+from app.db.database import get_db
 
 
 class ProductionConfig:
@@ -53,18 +50,6 @@ def get_sandbox_service():
         return None  # 实际测试中会传入模拟对象
     else:
         return ProductionConfig.create_sandbox_service()
-
-
-# 使用示例
-if __name__ == "__main__":
-    # 生产环境使用
-    sandbox_service = get_sandbox_service()
-    
-    # 开发环境使用 (设置环境变量)
-    # os.environ['APP_ENV'] = 'development'
-    # sandbox_service = get_sandbox_service()
-
-# --- UserStateService 依赖注入 ---
 
 
 # 在应用启动时创建 UserStateService 的单例

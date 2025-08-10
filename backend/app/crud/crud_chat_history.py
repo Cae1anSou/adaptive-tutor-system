@@ -1,4 +1,3 @@
-# backend/app/crud/crud_chat_history.py
 from sqlalchemy.orm import Session
 from app.models.chat_history import ChatHistory
 from app.schemas.chat import ChatHistoryCreate
@@ -10,9 +9,9 @@ def create_chat_history(db: Session, *, obj_in: ChatHistoryCreate) -> ChatHistor
     """
     db_obj = ChatHistory(
         participant_id=obj_in.participant_id,
-        user_message=obj_in.user_message,
-        ai_response=obj_in.ai_response,
-        conversation_context=obj_in.conversation_context,
+        role=obj_in.role,
+        message=obj_in.message,
+        raw_prompt_to_llm=obj_in.raw_prompt_to_llm,
     )
     db.add(db_obj)
     db.commit()
@@ -21,7 +20,8 @@ def create_chat_history(db: Session, *, obj_in: ChatHistoryCreate) -> ChatHistor
 
 # 将其组织到一个对象中以便于导入
 class CRUDChatHistory:
-    def create(self, db: Session, *, obj_in: ChatHistoryCreate) -> ChatHistory:
+    @staticmethod
+    def create(db: Session, *, obj_in: ChatHistoryCreate) -> ChatHistory:
         return create_chat_history(db, obj_in=obj_in)
 
 chat_history = CRUDChatHistory()

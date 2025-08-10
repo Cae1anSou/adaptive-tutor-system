@@ -4,8 +4,11 @@ from typing import List, Dict, Optional
 
 class Settings(BaseSettings):
     """
-    Loads all application settings from environment variables or a .env file.
-    The validation is handled by Pydantic.
+    应用程序配置设置类，从环境变量或.env文件加载所有配置项。
+    使用Pydantic进行数据验证和类型检查。
+    
+    包含服务器配置、API密钥、模型设置、数据库连接、文件路径等配置项。
+    在应用启动时会自动验证必需的配置项是否存在。
     """
     # Server
     BACKEND_HOST: str = "localhost"
@@ -45,7 +48,7 @@ class Settings(BaseSettings):
     # TODO: 到时候可能需要约束，不能放所有都进来
     BACKEND_CORS_ORIGINS: List[str] = ["*"]
 
-    DATABASE_URL: str = "sqlite:///./database.db"
+    DATABASE_URL: str = "sqlite:///./backend/app/db/database.db"
     
     # File paths
     DATA_DIR: str = "./backend/data"
@@ -75,6 +78,9 @@ class Settings(BaseSettings):
         "sessionInitiate": "/session/initiate",
         "submissionSubmit": "/submission/submit-test",
     }
+
+    # Frontend display configuration
+    MODEL_NAME_FOR_DISPLAY: str = "Qwen-Turbo (魔搭)"
 
 settings = Settings()
 # Aeolyn: 由于翻译和embedding对于用户而言不是必要的，因此这两个功能我改成了可选加载但弹出警告

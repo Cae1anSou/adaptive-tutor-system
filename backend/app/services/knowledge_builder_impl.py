@@ -5,7 +5,7 @@ from typing import List, Iterator
 from openai import OpenAI
 from annoy import AnnoyIndex
 from app.core.document import Document
-from app.core.knowledge_builder import KnowledgeBaseBuilder
+from app.core.rag_knowledge_builder import KnowledgeBaseBuilder
 from app.core.config import settings
 from app.services.markdown_loader import MarkdownLoader
 

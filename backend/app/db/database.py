@@ -9,7 +9,6 @@ from app.models.user_progress import UserProgress
 from app.models.event import EventLog
 from app.models.bkt import BKTModel
 from app.models.chat_history import ChatHistory
-from app.core.models import UserKnowledge, Tag, UserTime
 
 # 创建数据库引擎
 # connect_args 是SQLite特有的，用于允许多线程访问

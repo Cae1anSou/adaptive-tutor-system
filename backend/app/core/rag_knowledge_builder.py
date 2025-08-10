@@ -1,7 +1,6 @@
-# backend/app/core/knowledge_builder.py
 from abc import ABC, abstractmethod
 from typing import List
-from .document import Document
+from app.core.document import Document
 
 class KnowledgeBaseBuilder(ABC):
     """知识库构建器接口"""

@@ -1,0 +1,36 @@
+[1mdiff --git a/backend/app/api/endpoints/progress.py b/backend/app/api/endpoints/progress.py[m
+[1mindex e91391f..6f31c68 100644[m
+[1m--- a/backend/app/api/endpoints/progress.py[m
+[1m+++ b/backend/app/api/endpoints/progress.py[m
+[36m@@ -1,21 +1,19 @@[m
+[31m-# backend/app/api/endpoints/progress.py[m
+[31m-[m
+ from fastapi import APIRouter, Depends, HTTPException[m
+ from sqlalchemy.orm import Session[m
+[31m-[m
+[31m-from app.database import get_db[m
+[32m+[m[32mfrom app.config.dependency_injection import get_db[m
+ from app.schemas.response import StandardResponse[m
+ from app.schemas.user_progress import UserProgressResponse[m
+[31m-[m
+[31m-[m
+ from app.crud.crud_progress import progress[m
+[31m-[m
+ router = APIRouter()[m
+ [m
+[31m-[m
+ @router.get("/participants/{participant_id}/progress", response_model=StandardResponse[UserProgressResponse])[m
+ def get_user_progress(participant_id: str, db: Session = Depends(get_db)):[m
+[31m-    completed_topics = progress.get_completed_topics_by_user([m
+[31m-        db, participant_id=participant_id[m
+[31m-    )[m
+[31m-    return StandardResponse(data=UserProgressResponse(completed_topics=completed_topics))[m
+[32m+[m[32m    try:[m
+[32m+[m[32m        completed_topics = progress.get_completed_topics_by_user([m
+[32m+[m[32m            db, participant_id=participant_id[m
+[32m+[m[32m        )[m
+[32m+[m[32m        # 正确包装响应数据，确保符合TDD要求的格式[m
+[32m+[m[32m        response_data = UserProgressResponse(completed_topics=completed_topics)[m
+[32m+[m[32m        return StandardResponse(data=response_data)[m
+[32m+[m[32m    except Exception as e:[m
+[32m+[m[32m        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")[m

@@ -1,11 +1,30 @@
 {
-    "topic_id": "div_span",
-    "title": "div和span标签详解",
+    "topic_id": "1_1",
+    "title": "构建页面头部结构",
     "levels": [
-        {"level": 0, "description": "等级1的讲解"},
-        {"level": 1, "description": "等级2的讲解"},
-        {"level": 2, "description": "等级3的讲解"},
-        {"level": 3, "description": "等级4的讲解"}
+        {"level": 1, "description": "等级1的讲解"},
+        {"level": 2, "description": "等级2的讲解"},
+        {"level": 3, "description": "等级3的讲解"},
+        {"level": 4, "description": "等级4的讲解"}
     ],
-    "select_element": ["<!DOCTYPE>", "html", "head", "body","footer"]
+    "sc_all": [
+        {"topic_id": "1_1", "select_element": ["h1", "h2", "h3", "h4", "h5", "h6", "p"]},
+        {"topic_id": "1_2", "select_element": []},
+        {"topic_id": "1_3", "select_element": ["<!DOCTYPE>", "html", "head", "body","meta", "title","footer"]},
+        {"topic_id": "2_1", "select_element": ["div"]},
+        {"topic_id": "2_2", "select_element": ["ol","li"]},
+        {"topic_id": "2_3", "select_element": ["ul"]},
+        {"topic_id": "3_1", "select_element": ["input", "button"]},
+        {"topic_id": "3_2", "select_element": ["label"]},
+        {"topic_id": "3_3", "select_element": ["form"]},
+        {"topic_id": "4_1", "select_element": []},
+        {"topic_id": "4_2", "select_element": []},
+        {"topic_id": "4_3", "select_element": []},
+        {"topic_id": "5_1", "select_element": ["audio","source"]},
+        {"topic_id": "5_2", "select_element": []},
+        {"topic_id": "5_3", "select_element": ["video"]},
+        {"topic_id": "6_1", "select_element": []},
+        {"topic_id": "6_2", "select_element": []},
+        {"topic_id": "6_3", "select_element": []}
+    ]
 }
