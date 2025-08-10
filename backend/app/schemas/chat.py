@@ -46,3 +46,21 @@ class UserStateSummary(BaseModel):
     bkt_models: Dict[str, Any]
     is_new_user: bool
     last_updated: datetime = datetime.now(timezone.utc)
+
+
+class ChatHistoryCreate(BaseModel):
+    """创建聊天历史记录模型"""
+    participant_id: str
+    user_message: str
+    ai_response: str
+    conversation_context: Optional[str] = None
+
+
+class ChatHistoryResponse(BaseModel):
+    """聊天历史记录响应模型"""
+    id: int
+    participant_id: str
+    timestamp: datetime
+    user_message: str
+    ai_response: str
+    conversation_context: Optional[str] = None

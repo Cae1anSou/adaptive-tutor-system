@@ -4,7 +4,7 @@
 let allowedTags = [];
 let bridge = null;
 
-function initMainApp() {
+async function initMainApp() {
     const startButton = document.getElementById('startSelector');
     const stopButton = document.getElementById('stopSelector');
     const statusBadge = document.getElementById('statusBadge');
@@ -26,12 +26,12 @@ function initMainApp() {
     // 获取用户学习进度
     try {
         const { getUserProgress } = await import('../services/progress_service.js');
-        const { ensureSession } = await import('../services/session_service.js');
+        const { ensureSession, getLocalParticipantId } = await import('../services/session_service.js');
         
         // 确保会话已建立
         await ensureSession();
         
-        const progressData = await getUserProgress();
+        const progressData = await getUserProgress(getLocalParticipantId());
         allowedTags = progressData.completed_topics || [];
         iframe.src = iframe.src;
         startButton.disabled = false;

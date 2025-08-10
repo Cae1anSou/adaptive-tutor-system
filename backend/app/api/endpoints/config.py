@@ -16,7 +16,7 @@ async def get_config() -> StandardResponse[FrontendConfig]:
         StandardResponse[Dict[str, Any]]: 前端配置
     """
     config: Dict[str, Any] = {
-        "api_base_url": settings.API_V1_STR,
+        "api_base_url": f"http://{settings.BACKEND_HOST}:{settings.BACKEND_PORT}{settings.API_V1_STR}",
         "model_name_for_display": "Qwen-Turbo (魔搭)",
         # 前端服务使用的端点映射（相对 api_base_url 的路径），来源于环境/配置
         "endpoints": settings.ENDPOINTS,

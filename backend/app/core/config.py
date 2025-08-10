@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     The validation is handled by Pydantic.
     """
     # Server
+    BACKEND_HOST: str = "localhost"
     BACKEND_PORT: int = 8000
 
     # LLM API (for chat completions) - required for chat feature

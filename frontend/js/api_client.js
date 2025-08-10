@@ -1,9 +1,9 @@
 // frontend/js/api_client.js
-import { getParticipantId } from './modules/session.js';
+import { getLocalParticipantId } from './services/session_service.js';
 import { AppConfig } from './modules/config.js';
 
 export async function post(endpoint, body) {
-  const participantId = getParticipantId();
+  const participantId = getLocalParticipantId();
   if (!participantId) {
         // 如果没有ID，说明会话已丢失，应强制返回注册页
         window.location.href = '/index.html';
@@ -13,7 +13,9 @@ export async function post(endpoint, body) {
   // 自动在请求体中注入participant_id
   const fullBody = { ...body, participant_id: participantId };
 
-  const response = await fetch(`${AppConfig.api_base_url}${endpoint}`, {
+  // 构建完整的后端API地址
+  const backendUrl = `${AppConfig.api_base_url}${endpoint}`;
+  const response = await fetch(backendUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(fullBody),
@@ -22,13 +24,15 @@ export async function post(endpoint, body) {
 }
 // ... 实现 get, put, delete 等方法
 export async function get(endpoint) {
-  const participantId = getParticipantId();
+  const participantId = getLocalParticipantId();
   if (!participantId) {
         // 如果没有ID，说明会话已丢失，应强制返回注册页
         window.location.href = '/index.html';
         throw new Error("Session not found. Redirecting to login.");
   }
-  const response = await fetch(`${AppConfig.api_base_url}${endpoint}?participant_id=${participantId}`, {
+  // 构建完整的后端API地址
+  const backendUrl = `${AppConfig.api_base_url}${endpoint}?participant_id=${participantId}`;
+  const response = await fetch(backendUrl, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
   });

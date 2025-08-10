@@ -41,7 +41,7 @@ class LLMGateway:
             base_url=self.api_base
         )
     
-    def get_completion(
+    async def get_completion(
         self, 
         system_prompt: str, 
         messages: List[Dict[str, str]],

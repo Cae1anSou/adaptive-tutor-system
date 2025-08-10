@@ -1,5 +1,5 @@
 import {createLivePreview} from '../modules/live_preview.js'; // 假设该模块已存在
-import {getParticipantId} from '../modules/session.js'; // 导入会话管理模块
+import {getLocalParticipantId} from '../services/session_service.js'; // 导入会话管理模块
 
 // ... 在获取到数据并设置好编辑器后 ...
 // TODO: cxz 需要获取HTML中的DOM
@@ -14,7 +14,7 @@ livePreviewManager.triggerUpdate();
 const submitButton = document.getElementById('submit-button');
 const topicId = new URLSearchParams(window.location.search).get('topic');
 
-const participant_id = getParticipantId(); // 从localStorage获取用户ID
+const participant_id = getLocalParticipantId(); // 从localStorage获取用户ID
 
 submitButton.addEventListener('click', async () => {
     submitButton.disabled = true;

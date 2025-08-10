@@ -203,16 +203,17 @@ class DynamicController:
             # 准备用户聊天记录
             user_chat = ChatHistoryCreate(
                 participant_id=request.participant_id,
-                role="user",
-                message=request.user_message
+                user_message=request.user_message,
+                ai_response="",  # 用户消息时AI回复为空
+                conversation_context=response.system_prompt
             )
 
             # 准备AI聊天记录
             ai_chat = ChatHistoryCreate(
                 participant_id=request.participant_id,
-                role="ai",
-                message=response.ai_response,
-                raw_prompt_to_llm=response.system_prompt
+                user_message="",  # AI回复时用户消息为空
+                ai_response=response.ai_response,
+                conversation_context=response.system_prompt
             )
 
             if background_tasks:

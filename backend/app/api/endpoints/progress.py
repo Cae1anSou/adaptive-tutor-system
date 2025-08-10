@@ -18,4 +18,4 @@ def get_user_progress(participant_id: str, db: Session = Depends(get_db)):
     completed_topics = progress.get_completed_topics_by_user(
         db, participant_id=participant_id
     )
-    return StandardResponse(data=completed_topics)
+    return StandardResponse(data=UserProgressResponse(completed_topics=completed_topics))

@@ -1,8 +1,6 @@
 # backend/app/core/models.py
 from sqlalchemy import Column, Integer, String, Enum, Text, UniqueConstraint
-from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
+from app.models import Base
 
 class UserKnowledge(Base):
     __tablename__ = "user_knowledge"

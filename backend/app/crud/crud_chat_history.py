@@ -10,9 +10,9 @@ def create_chat_history(db: Session, *, obj_in: ChatHistoryCreate) -> ChatHistor
     """
     db_obj = ChatHistory(
         participant_id=obj_in.participant_id,
-        role=obj_in.role,
-        message=obj_in.message,
-        raw_prompt_to_llm=obj_in.raw_prompt_to_llm,
+        user_message=obj_in.user_message,
+        ai_response=obj_in.ai_response,
+        conversation_context=obj_in.conversation_context,
     )
     db.add(db_obj)
     db.commit()
