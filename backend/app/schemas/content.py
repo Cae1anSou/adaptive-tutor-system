@@ -80,7 +80,7 @@ class SelectElementInfo(BaseModel):
         select_element: 选择元素列表
     """
     topic_id: str = Field(..., min_length=1, description="主题ID")
-    select_element: List[str] = Field(..., min_length=1, description="选择元素列表")
+    select_element: List[str] = Field(..., min_length=0, description="选择元素列表")
 
 
 class LearningContent(BaseModel):
