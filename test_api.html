@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 连接测试</title>
+</head>
+<body>
+    <h1>API 连接测试</h1>
+    <button id="testBtn">测试 API 连接</button>
+    <div id="result"></div>
+
+    <script type="module">
+        import { post } from './frontend/js/api_client.js';
+        import { AppConfig, initializeConfig } from './frontend/js/modules/config.js';
+        
+        // 初始化配置
+        await initializeConfig();
+        
+        document.getElementById('testBtn').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '测试中...';
+            
+            try {
+                // 先设置一个测试用的participant_id
+                localStorage.setItem('participant_id', 'test-user-123');
+                
+                // 测试API连接
+                const result = await post('/chat/ai/chat', {
+                    user_message: 'Hello, this is a test message',
+                    conversation_history: []
+                });
+                
+                resultDiv.innerHTML = `
+                    <h3>✅ API 连接成功！</h3>
+                    <p>响应状态: ${result.code}</p>
+                    <p>响应消息: ${result.message}</p>
+                    <p>AI回复: ${result.data?.ai_response || '无回复'}</p>
+                    <p>使用的端口: ${AppConfig.backend_port}</p>
+                `;
+            } catch (error) {
+                console.error('API测试失败:', error);
+                resultDiv.innerHTML = `
+                    <h3>❌ API 连接失败</h3>
+                    <p>错误信息: ${error.message}</p>
+                    <p>配置的端口: ${AppConfig.backend_port}</p>
+                    <p>请确保后端服务器在 http://localhost:${AppConfig.backend_port} 运行</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>配置测试</title>
+</head>
+<body>
+    <h1>配置测试</h1>
+    <button id="testBtn">测试配置加载</button>
+    <div id="result"></div>
+
+    <script type="module">
+        import { AppConfig, initializeConfig } from './frontend/js/modules/config.js';
+        
+        document.getElementById('testBtn').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '测试中...';
+            
+            try {
+                // 初始化配置
+                await initializeConfig();
+                
+                resultDiv.innerHTML = `
+                    <h3>✅ 配置加载成功！</h3>
+                    <p><strong>API基础URL:</strong> ${AppConfig.api_base_url}</p>
+                    <p><strong>后端端口:</strong> ${AppConfig.backend_port}</p>
+                    <p><strong>当前主机名:</strong> ${window.location.hostname}</p>
+                    <p><strong>完整配置:</strong></p>
+                    <pre>${JSON.stringify(AppConfig, null, 2)}</pre>
+                `;
+            } catch (error) {
+                console.error('配置测试失败:', error);
+                resultDiv.innerHTML = `
+                    <h3>❌ 配置加载失败</h3>
+                    <p>错误信息: ${error.message}</p>
+                    <p>默认配置:</p>
+                    <pre>${JSON.stringify(AppConfig, null, 2)}</pre>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

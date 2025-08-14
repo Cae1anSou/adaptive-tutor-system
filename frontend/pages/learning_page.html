@@ -21,7 +21,7 @@
           <div class="preview-panel">
                              <iframe
                  id="element-selector-iframe"
-                 src="../../backend/app/data/example_page/index01.html"
+                 src="../backend/app/data/example_page/index01.html"
                  style="width:100%;height:100%;border:none;flex:1 1 auto;min-height:0;"
                ></iframe>
           </div>
@@ -112,6 +112,7 @@
     <!-- 页面初始化脚本 -->
     <script type="module">
         import { initializeConfig, AppConfig } from '../js/modules/config.js';
+        import { post } from '../js/api_client.js';
         
         // 等待所有模块和AIHTMLPlatform加载完成
         function waitForModules() {
@@ -129,6 +130,15 @@
             // 首先初始化配置
             await initializeConfig();
             console.log('当前模型：', AppConfig.model_name_for_display);
+            
+            // 等待learning_page.js加载完成后再调用loadTracker
+            setTimeout(async () => {
+                if (window.loadTracker) {
+                    await window.loadTracker();
+                } else {
+                    console.warn('loadTracker function not found');
+                }
+            }, 100);
             
             // 添加回车键发送功能
             const messageInput = document.getElementById('user-message');
@@ -165,24 +175,11 @@
                 // 添加用户消息到聊天界面
                 addMessageToChat('user', message);
                 
-                                        // 发送消息到后端API
-                        const response = await fetch(`${window.FrontendConfig.getApiBaseUrl()}/chat/ai/chat`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        participant_id: 'user123', // 临时用户ID
-                        user_message: message,
-                        conversation_history: []
-                    })
+                // 使用api_client.post方法，自动处理participant_id
+                const result = await post('/chat/ai/chat', {
+                    user_message: message,
+                    conversation_history: []
                 });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const result = await response.json();
                 
                 if (result.code === 200 && result.data) {
                     // 添加AI回复到聊天界面
@@ -193,7 +190,22 @@
                 
             } catch (error) {
                 console.error('发送消息失败:', error);
-                addMessageToChat('ai', '抱歉，我暂时无法回复，请稍后再试。');
+                
+                // 根据错误类型显示不同的错误信息
+                let errorMessage = '抱歉，我暂时无法回复，请稍后再试。';
+                if (error.message.includes('Session not found')) {
+                    errorMessage = '会话已过期，请重新登录。';
+                } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                    errorMessage = '网络连接失败，请检查后端服务器是否运行。';
+                } else if (error.message.includes('Unexpected token')) {
+                    errorMessage = '服务器返回格式错误，请检查后端服务。';
+                } else if (error.message.includes('501')) {
+                    errorMessage = 'API方法不支持，请检查后端服务配置。';
+                } else if (error.message.includes('404')) {
+                    errorMessage = 'API端点不存在，请检查后端服务。';
+                }
+                
+                addMessageToChat('ai', errorMessage);
             } finally {
                 // 恢复发送按钮状态
                 sendButton.disabled = false;

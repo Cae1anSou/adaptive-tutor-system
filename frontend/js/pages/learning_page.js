@@ -1,10 +1,24 @@
 
-//导入tracker，初始化，为了记录元素选择的行为ceq
-import tracker from '../js/modules/behavior_tracker.js';
-
 // ==================== 主应用逻辑 ====================
 let allowedTags = [];
 let bridge = null;
+
+// 动态导入tracker，避免模块导入错误
+let tracker = null;
+
+async function loadTracker() {
+    try {
+        const module = await import('../js/modules/behavior_tracker.js');
+        tracker = module.default;
+        console.log('Behavior tracker loaded successfully');
+    } catch (error) {
+        console.warn('Failed to load behavior tracker:', error);
+        tracker = null;
+    }
+}
+
+// 将loadTracker函数暴露到全局，供HTML页面调用
+window.loadTracker = loadTracker;
 
 function initMainApp() {
     const startButton = document.getElementById('startSelector');
@@ -76,28 +90,29 @@ function initMainApp() {
         console.log('预览框架已加载:', iframe.src);
         showStatus('info', '预览页面已加载，选择器已就绪');
         initBridge();
-        // ===== 静态导入的 tracker（如果会影响可调整前为动态 import） =====
+        
+        // ===== 使用动态导入的 tracker =====
         try {
             if (!window.participantId) {
-                // TODO：ceq这里id临时占位测试，需要替换（后端导入/session）
-                window.participantId = 'user123';
+                // 从localStorage获取participant_id
+                window.participantId = localStorage.getItem('participant_id') || 'user123';
             }
 
-            if (typeof tracker.initDOMSelector === 'function') {
+            if (tracker && typeof tracker.initDOMSelector === 'function') {
                 tracker.initDOMSelector('startSelector', 'stopSelector', 'element-selector-iframe');
             } else {
-                console.warn('[BehaviorTracker] initDOMSelector 方法不存在。');
+                console.warn('[BehaviorTracker] tracker未加载或initDOMSelector方法不存在。');
             }
 
-            if (typeof tracker.initChat === 'function') {
+            if (tracker && typeof tracker.initChat === 'function') {
                 tracker.initChat('send-message', '#user-message');
             }
 
-            if (typeof tracker.initIdleAndFocus === 'function') {
+            if (tracker && typeof tracker.initIdleAndFocus === 'function') {
                 tracker.initIdleAndFocus();
             }
         } catch (err) {
-            console.warn('[BehaviorTracker] 使用静态导入的 tracker 初始化失败：', err);
+            console.warn('[BehaviorTracker] tracker初始化失败：', err);
         }
 
 

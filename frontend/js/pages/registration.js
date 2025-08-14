@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             startButton.textContent = '处理中...';
 
             try {
-                // 确保backend_port有默认值
+                // 使用配置中的端口号
                 const backendPort = AppConfig.backend_port || 8000;
                 // 构建完整的后端API URL
                 const backendUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')

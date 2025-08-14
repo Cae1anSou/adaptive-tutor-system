@@ -4,13 +4,15 @@ const FrontendConfig = {
     // 开发环境配置（使用默认值，会被后端配置覆盖）
     development: {
         backendUrl: 'http://localhost:8000',
-        apiBaseUrl: 'http://localhost:8000/api/v1'
+        apiBaseUrl: 'http://localhost:8000/api/v1',
+        backendPort: 8000
     },
     
     // 生产环境配置
     production: {
         backendUrl: '', // 生产环境URL
-        apiBaseUrl: '/api/v1'
+        apiBaseUrl: '/api/v1',
+        backendPort: null // 生产环境通常不需要端口
     },
     
     // 获取当前环境配置
@@ -32,6 +34,11 @@ const FrontendConfig = {
     // 获取API基础URL（已废弃，请使用 modules/config.js 中的 AppConfig.api_base_url）
     getApiBaseUrl() {
         return this.getCurrentConfig().apiBaseUrl;
+    },
+    
+    // 获取后端端口
+    getBackendPort() {
+        return this.getCurrentConfig().backendPort;
     }
 };
 

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Page 修复测试</title>
+</head>
+<body>
+    <h1>Learning Page 修复测试</h1>
+    <div id="testResults"></div>
+
+    <script type="module">
+        const results = document.getElementById('testResults');
+        
+        async function runTests() {
+            const tests = [];
+            
+            // 测试1: 检查api_client导入
+            try {
+                const { post } = await import('./frontend/js/api_client.js');
+                tests.push('✅ API Client 导入成功');
+            } catch (error) {
+                tests.push('❌ API Client 导入失败: ' + error.message);
+            }
+            
+            // 测试2: 检查config模块导入
+            try {
+                const { AppConfig, initializeConfig } = await import('./frontend/js/modules/config.js');
+                tests.push('✅ Config 模块导入成功');
+            } catch (error) {
+                tests.push('❌ Config 模块导入失败: ' + error.message);
+            }
+            
+            // 测试3: 检查behavior_tracker模块
+            try {
+                const tracker = await import('./frontend/js/modules/behavior_tracker.js');
+                tests.push('✅ Behavior Tracker 模块导入成功');
+            } catch (error) {
+                tests.push('❌ Behavior Tracker 模块导入失败: ' + error.message);
+            }
+            
+            // 测试4: 检查localStorage中的participant_id
+            const participantId = localStorage.getItem('participant_id');
+            if (participantId) {
+                tests.push('✅ 找到 participant_id: ' + participantId);
+            } else {
+                tests.push('⚠️ 未找到 participant_id，需要先注册用户');
+            }
+            
+            // 显示测试结果
+            results.innerHTML = tests.map(test => `<div>${test}</div>`).join('');
+        }
+        
+        runTests();
+    </script>
+</body>
+</html>

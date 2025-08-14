@@ -16,7 +16,13 @@ export async function post(endpoint, body) {
   const fullBody = { ...body, participant_id: participantId };
 
   // 构建完整的后端API地址
-  const backendUrl = `${AppConfig.api_base_url}${endpoint}`;
+  const hostname = window.location.hostname;
+  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+  const backendPort = AppConfig.backend_port || 8000;
+  const backendUrl = isLocalhost 
+    ? `http://localhost:${backendPort}${AppConfig.api_base_url}${endpoint}`
+    : `${AppConfig.api_base_url}${endpoint}`;
+    
   const response = await fetch(backendUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -32,8 +38,15 @@ export async function get(endpoint) {
     window.location.href = '/index.html';
     throw new Error("Session not found. Redirecting to login.");
   }
+  
   // 构建完整的后端API地址
-  const backendUrl = `${AppConfig.api_base_url}${endpoint}?participant_id=${participantId}`;
+  const hostname = window.location.hostname;
+  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+  const backendPort = AppConfig.backend_port || 8000;
+  const backendUrl = isLocalhost 
+    ? `http://localhost:${backendPort}${AppConfig.api_base_url}${endpoint}?participant_id=${participantId}`
+    : `${AppConfig.api_base_url}${endpoint}?participant_id=${participantId}`;
+    
   const response = await fetch(backendUrl, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
