@@ -94,7 +94,7 @@ class ChatHistoryCreate(BaseModel):
 
     Attributes:
         participant_id: 参与者ID，用于标识特定用户
-        role: 消息角色，'user'表示用户消息，'ai'表示AI助手消息
+        role: 消息角色，'user'表示用户消息，'assistant'表示AI助手消息
         message: 消息内容，文本格式的对话内容
         raw_prompt_to_llm: 发送给LLM的完整Prompt，仅对AI消息有效
         timestamp: 时间戳，记录消息发送时间，默认为当前时间

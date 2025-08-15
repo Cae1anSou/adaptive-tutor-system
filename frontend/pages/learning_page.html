@@ -60,8 +60,7 @@
               <button id="startSelector" class="btn btn-select">选取元素</button>
               <button id="stopSelector" class="btn btn-select btn-stop-selector">停止选择</button>
               <textarea id="user-message" placeholder="请输入信息"></textarea>
-              <button type="button" id="send-message" class="btn btn-primary"
-                onclick="directSendMessage()">发送信息</button>
+              <button type="button" id="send-message" class="btn btn-primary">发送信息</button>
             </div>
             <div style="padding: 0 32px 12px 32px;">
               <span id="statusBadge" style="display:none;font-size:13px;margin-right:12px;"></span>
@@ -106,6 +105,8 @@
     <script src="../js/modules/select_modules.js"></script>
     <!-- 引入文档模块 -->
     <script type="module" src="../js/modules/docs_module.js"></script>
+    <!-- 引入聊天集成模块 -->
+    <script type="module" src="../js/modules/chat_integration.js"></script>
     <!-- 引入learning_page.js -->
     <script src="../js/pages/learning_page.js"></script>
     
@@ -131,6 +132,15 @@
             await initializeConfig();
             console.log('当前模型：', AppConfig.model_name_for_display);
             
+            // 初始化聊天集成模块
+            try {
+                const chatModule = await import('../js/modules/chat_integration.js');
+                chatModule.initChatIntegration();
+                console.log('Chat integration initialized successfully');
+            } catch (error) {
+                console.error('Failed to initialize chat integration:', error);
+            }
+            
             // 等待learning_page.js加载完成后再调用loadTracker
             setTimeout(async () => {
                 if (window.loadTracker) {
@@ -140,108 +150,14 @@
                 }
             }, 100);
             
-            // 添加回车键发送功能
-            const messageInput = document.getElementById('user-message');
-            if (messageInput) {
-                messageInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        directSendMessage();
-                    }
-                });
-            }
-            
             // 然后开始等待模块加载
             waitForModules();
         });
         
-        // 发送消息函数（用于onclick事件）
-        window.directSendMessage = async function() {
-            const messageInput = document.getElementById('user-message');
-            const message = messageInput.value.trim();
-            
-            if (!message) {
-                alert('请输入消息内容');
-                return;
-            }
-            
-            // 禁用发送按钮，显示加载状态
-            const sendButton = document.getElementById('send-message');
-            const originalText = sendButton.textContent;
-            sendButton.disabled = true;
-            sendButton.textContent = '发送中...';
-            
-            try {
-                // 添加用户消息到聊天界面
-                addMessageToChat('user', message);
-                
-                // 使用api_client.post方法，自动处理participant_id
-                const result = await post('/chat/ai/chat', {
-                    user_message: message,
-                    conversation_history: []
-                });
-                
-                if (result.code === 200 && result.data) {
-                    // 添加AI回复到聊天界面
-                    addMessageToChat('ai', result.data.ai_response);
-                } else {
-                    throw new Error(result.message || 'AI回复失败');
-                }
-                
-            } catch (error) {
-                console.error('发送消息失败:', error);
-                
-                // 根据错误类型显示不同的错误信息
-                let errorMessage = '抱歉，我暂时无法回复，请稍后再试。';
-                if (error.message.includes('Session not found')) {
-                    errorMessage = '会话已过期，请重新登录。';
-                } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-                    errorMessage = '网络连接失败，请检查后端服务器是否运行。';
-                } else if (error.message.includes('Unexpected token')) {
-                    errorMessage = '服务器返回格式错误，请检查后端服务。';
-                } else if (error.message.includes('501')) {
-                    errorMessage = 'API方法不支持，请检查后端服务配置。';
-                } else if (error.message.includes('404')) {
-                    errorMessage = 'API端点不存在，请检查后端服务。';
-                }
-                
-                addMessageToChat('ai', errorMessage);
-            } finally {
-                // 恢复发送按钮状态
-                sendButton.disabled = false;
-                sendButton.textContent = originalText;
-                
-                // 清空输入框
-                messageInput.value = '';
-            }
-        }
+        // 发送消息函数将由chat_integration.js模块提供
+        // 这里不再重复定义，避免冲突
         
-        // 添加消息到聊天界面
-        function addMessageToChat(role, content) {
-            const chatMessages = document.getElementById('ai-chat-messages');
-            if (!chatMessages) return;
-            
-            const messageDiv = document.createElement('div');
-            messageDiv.className = role === 'user' ? 'user-message' : 'ai-message';
-            
-            const contentDiv = document.createElement('div');
-            contentDiv.className = role === 'user' ? 'user-content' : 'ai-content';
-            
-            if (role === 'ai') {
-                const markdownDiv = document.createElement('div');
-                markdownDiv.className = 'markdown-content';
-                markdownDiv.innerHTML = content.replace(/\n/g, '<br>');
-                contentDiv.appendChild(markdownDiv);
-            } else {
-                contentDiv.textContent = content;
-            }
-            
-            messageDiv.appendChild(contentDiv);
-            chatMessages.appendChild(messageDiv);
-            
-            // 滚动到底部
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
+        // 移除重复的addMessageToChat函数定义，使用chat_utils.js中的版本
     </script>
 </body>
 </html>

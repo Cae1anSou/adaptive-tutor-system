@@ -13,18 +13,18 @@ class Settings(BaseSettings):
     BACKEND_PORT: int = 8000
 
     # OpenAI (for chat completions)
-    TUTOR_OPENAI_API_KEY: str = "ms-9ab1cd11-fc6c-4163-9813-d3d0b51bc9e8"
+    TUTOR_OPENAI_API_KEY: str = ""
     TUTOR_OPENAI_MODEL: str = "Qwen/Qwen3-Coder-480B-A35B-Instruct"
     TUTOR_OPENAI_API_BASE: str = "https://api-inference.modelscope.cn/v1"
 
 
     # Embedding API (can be different from OpenAI)
-    TUTOR_EMBEDDING_API_KEY: str = "ms-e9cb1ee1-d248-4f05-87d1-fbc2083c41ae"
+    TUTOR_EMBEDDING_API_KEY: str = ""
     TUTOR_EMBEDDING_API_BASE: str = "https://ms-fc-1d889e1e-d2ad.api-inference.modelscope.cn/v1"
     TUTOR_EMBEDDING_MODEL: str = "Qwen/Qwen3-Embedding-4B-GGUF"
 
     # Translation API (can be different from OpenAI)
-    TUTOR_TRANSLATION_API_KEY: str = "ms-e9cb1ee1-d248-4f05-87d1-fbc2083c41ae"
+    TUTOR_TRANSLATION_API_KEY: str = ""
     TUTOR_TRANSLATION_API_BASE: str = "https://api-inference.modelscope.cn/v1"
     TUTOR_TRANSLATION_MODEL: str = "Qwen/Qwen3-30B-A3B-Instruct-2507"
 

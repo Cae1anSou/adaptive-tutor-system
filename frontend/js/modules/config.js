@@ -3,8 +3,32 @@
 // A globally accessible object to hold configuration.
 export const AppConfig = {
   api_base_url: "/api/v1",
-  backend_port: 8000  // 默认端口，会被后端配置覆盖
-  //  model_name_for_display:null
+  backend_port: 8000,  // 默认端口，会被后端配置覆盖
+  endpoints: {
+    chat: '/chat/ai/chat',
+    chatHistory: '/chat/history',
+    sessionInitiate: '/session/initiate',
+    config: '/config/'
+  },
+  // API响应状态码
+  statusCodes: {
+    SUCCESS: 200,
+    BAD_REQUEST: 400,
+    UNAUTHORIZED: 401,
+    FORBIDDEN: 403,
+    NOT_FOUND: 404,
+    INTERNAL_SERVER_ERROR: 500,
+    NOT_IMPLEMENTED: 501
+  },
+  // 错误消息配置，避免硬编码
+  errorMessages: {
+    sessionNotFound: '会话已过期，请重新登录。',
+    networkError: '网络连接失败，请检查后端服务器是否运行。',
+    serverError: '服务器内部错误，请稍后重试。',
+    invalidRequest: '请求参数错误，请检查输入内容。',
+    accessDenied: '访问被拒绝，请检查权限设置。',
+    unknownError: '抱歉，我暂时无法回复，请稍后再试。'
+  }
 };
 
 /**

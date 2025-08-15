@@ -140,7 +140,7 @@ def sample_chat_request():
         user_message="我需要帮助理解CSS选择器",
         conversation_history=[
             ConversationMessage(role="user", content="什么是CSS？"),
-            ConversationMessage(role="ai", content="CSS是层叠样式表...")
+            ConversationMessage(role="assistant", content="CSS是层叠样式表...")
         ],
         code_context=None,  # 暂时设为None，避免CodeContent验证问题
         task_context=None,  # 暂时设为None，避免TestTask验证问题
@@ -751,7 +751,7 @@ class TestDynamicController:
         large_history = []
         for i in range(50):  # 50轮对话
             large_history.append(ConversationMessage(role="user", content=f"用户消息{i}"))
-            large_history.append(ConversationMessage(role="ai", content=f"AI回复{i}"))
+            large_history.append(ConversationMessage(role="assistant", content=f"AI回复{i}"))
         
         request = ChatRequest(
             participant_id="test_user_123",
@@ -909,7 +909,7 @@ class TestDynamicController:
             user_message="如何实现响应式布局？",
             conversation_history=[
                 ConversationMessage(role="user", content="什么是Flexbox？"),
-                ConversationMessage(role="ai", content="Flexbox是CSS布局模块...")
+                ConversationMessage(role="assistant", content="Flexbox是CSS布局模块...")
             ],
             code_context=None,  # 避免验证问题
             task_context=None,  # 避免验证问题
@@ -977,7 +977,7 @@ class TestDynamicController:
         conversation_history = call_kwargs['conversation_history']
         assert len(conversation_history) == 2
         assert conversation_history[0]['role'] == "user"
-        assert conversation_history[1]['role'] == "ai"
+        assert conversation_history[1]['role'] == "assistant"
         
         # 验证其他上下文
         assert call_kwargs['user_message'] == "如何实现响应式布局？"

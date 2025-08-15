@@ -108,6 +108,15 @@ class DynamicController:
             elif request.conversation_history is None:
                 # 确保即使conversation_history为None也传递空列表
                 conversation_history_dicts = []
+            
+            # 添加调试日志
+            print(f"🔍 调试信息 - 对话历史长度: {len(conversation_history_dicts)}")
+            if conversation_history_dicts:
+                print(f"🔍 调试信息 - 对话历史内容:")
+                for i, msg in enumerate(conversation_history_dicts):
+                    print(f"  {i+1}. {msg['role']}: {msg['content'][:100]}...")
+            else:
+                print("🔍 调试信息 - 没有对话历史")
 
             retrieved_knowledge_content = [item['content'] for item in retrieved_knowledge if isinstance(item, dict) and 'content' in item]
             system_prompt, messages = self.prompt_generator.create_prompts(
