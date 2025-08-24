@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket 用户通信</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 800px;
+            overflow: hidden;
+        }
+        .header {
+            background: #6e8efb;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f1f5ff;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .user-id {
+            font-weight: bold;
+            color: #6e8efb;
+        }
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e74c3c;
+        }
+        .status-dot.connected {
+            background: #2ecc71;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .connect-btn {
+            background: #2ecc71;
+            color: white;
+        }
+        .connect-btn:hover {
+            background: #27ae60;
+        }
+        .disconnect-btn {
+            background: #e74c3c;
+            color: white;
+        }
+        .disconnect-btn:hover {
+            background: #c0392b;
+        }
+        .send-btn {
+            background: #3498db;
+            color: white;
+        }
+        .send-btn:hover {
+            background: #2980b9;
+        }
+        .message-form {
+            display: flex;
+            gap: 10px;
+        }
+        input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .messages {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .message {
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        .message.received {
+            background: #e3f2fd;
+            align-self: flex-start;
+        }
+        .message.sent {
+            background: #d1ecf1;
+            align-self: flex-end;
+        }
+        .message.ai {
+            background: #e8f5e9;
+            align-self: flex-start;
+        }
+        .message-info {
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 5px;
+        }
+        .message-content {
+            word-break: break-word;
+        }
+        .system-message {
+            text-align: center;
+            color: #777;
+            font-style: italic;
+            margin: 10px 0;
+        }
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .typing-indicator span {
+            height: 10px;
+            width: 10px;
+            float: left;
+            margin: 0 2px;
+            background-color: #9E9EA1;
+            display: block;
+            border-radius: 50%;
+            opacity: 0.4;
+        }
+        .typing-indicator span:nth-of-type(1) {
+            animation: typing 1s infinite;
+        }
+        .typing-indicator span:nth-of-type(2) {
+            animation: typing 1s infinite 0.2s;
+        }
+        .typing-indicator span:nth-of-type(3) {
+            animation: typing 1s infinite 0.4s;
+        }
+        @keyframes typing {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>WebSocket 用户通信</h1>
+            <p>每个用户独立ID的实时通信演示</p>
+        </div>
+        <div class="content">
+            <div class="user-info">
+                <span>用户ID:</span>
+                <span class="user-id" id="userId">未生成</span>
+                <div class="connection-status">
+                    <div class="status-dot" id="statusDot"></div>
+                    <span id="statusText">未连接</span>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="connect-btn" id="connectBtn">连接WebSocket</button>
+                <button class="disconnect-btn" id="disconnectBtn">断开连接</button>
+            </div>
+            
+            <div class="message-form">
+                <input type="text" id="messageInput" placeholder="输入要发送的消息..." disabled>
+                <button class="send-btn" id="sendBtn" disabled>发送</button>
+            </div>
+            
+            <div class="messages" id="messagesContainer">
+                <div class="system-message">消息将显示在这里</div>
+            </div>
+            <!-- <div class="typing-indicator" id="typingIndicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div> -->
+        </div>
+    </div>
+
+    <script type="module">
+        import './test.js';
+        // 添加消息到消息容器
+            
+        
+    </script>
+</body>
+</html>

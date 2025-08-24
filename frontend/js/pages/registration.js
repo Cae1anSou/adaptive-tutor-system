@@ -2,6 +2,7 @@
 import { saveParticipantId, checkAndRedirect } from '../modules/session.js';
 import { AppConfig, initializeConfig } from '../modules/config.js';
 import { setupHeaderTitle } from '../modules/navigation.js';
+import websocket from '../modules/socket.js';
 // 页面加载时先检查是否已有会话
 // checkAndRedirect(); // 暂时注释掉，避免在注册页面直接跳转
 
@@ -17,7 +18,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (startButton && usernameInput) {
         startButton.addEventListener('click', async () => {
             const username = usernameInput.value.trim();
-            
+            //websocket.userId = username; // 设置WebSocket的用户ID
+            //websocket.connect(); // 尝试连接WebSocket
             // 简单的输入校验
             if (!username) {
                 alert('请输入用户ID');
