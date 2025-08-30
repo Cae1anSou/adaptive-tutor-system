@@ -389,7 +389,7 @@
 
 ## 7. 部署和运维考虑
 
--   **专门化 Worker**: 为了优化资源，应至少启动两种类型的 Worker：
+-   **专门化 Worker**: 为了优化资源，应至少启动三种类型的 Worker：
     -   **AI Worker**: 处理计算密集型任务，只监听 `chat_queue`。
         ```bash
         # 从项目根目录运行
@@ -399,6 +399,11 @@
         ```bash
         # 从项目根目录运行
         celery -A backend.app.celery_app worker -l info -Q db_writer_queue -n db_worker@%h
+        ```
+    -   **Beat Scheduler**: 用于调度定时任务（如唤醒 embedding 模型）。
+        ```bash
+        # 从项目根目录运行
+        celery -A backend.app.celery_app beat -l info
         ```
 -   **监控**: 需要引入对 Redis 和 Celery 的监控。Flower 是一个优秀的 Celery 监控工具。需要监控队列长度、任务执行时间、失败率等指标。
 -   **日志**: Celery Worker 的日志需要集中管理，以便于调试。

@@ -56,6 +56,11 @@ cd backend
 celery -A app.celery_app worker -l info -Q behavior_queue --pool=prefork -n behavior_worker@%h -c 2
 ```
 
+```zsh
+cd backend
+celery -A app.celery_app beat -l info
+```
+
 ### Windows
 
 ```zsh
@@ -85,4 +90,9 @@ celery -A app.celery_app worker -l info -Q db_writer_queue --pool=solo -n db_wor
 ```zsh
 cd backend
 celery -A app.celery_app worker -l info -Q behavior_queue --pool=solo -n behavior_worker@%h
+```
+
+```zsh
+cd backend
+celery -A backend.app.celery_app beat --pool=solo -l info
 ```

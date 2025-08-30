@@ -17,7 +17,8 @@ celery_app = Celery(
         "app.tasks.chat_tasks",
         "app.tasks.behavior_tasks",
         "app.tasks.db_tasks",
-        "app.tasks.submission_tasks"
+        "app.tasks.submission_tasks",
+        "app.tasks.wakeup_embedding_task"
     ]
 )
 
@@ -71,24 +72,24 @@ def init_worker_process(sender=None, **kwargs):
             # 注意：create_dynamic_controller 内部会创建自己的 UserStateService 实例
             redis_client = get_redis_client()
             _dynamic_controller_instance = create_dynamic_controller(redis_client=redis_client)
-
-            # 预加载RAG服务（如果启用）
-            try:
-                from app.config.dependency_injection import get_rag_service
-                rag_service = get_rag_service()
-                if rag_service:
-                    logger.info("RAG service preloaded in worker")
-                    # 预热embedding模型，避免第一次调用时的冷启动延迟
-                    try:
-                        logger.info("Warming up embedding model...")
-                        rag_service._get_embedding("warm-up")
-                        logger.info("Embedding model is warm.")
-                    except Exception as warmup_error:
-                        logger.warning(f"Failed to warm up embedding model: {warmup_error}")
-            except Exception as e:
-                logger.error(f"Failed to preload RAG service: {e}")
-
             logger.info("DynamicController initialized.")
+
+            # 预加载RAG服务（如果启用）现在不需要，因为我们有一个专门的beat来完成这个
+            # try:
+            #     from app.config.dependency_injection import get_rag_service
+            #     rag_service = get_rag_service()
+            #     if rag_service:
+            #         logger.info("RAG service preloaded in worker")
+            #         # 预热embedding模型，避免第一次调用时的冷启动延迟
+            #         try:
+            #             logger.info("Warming up embedding model...")
+            #             rag_service._get_embedding("warm-up")
+            #             logger.info("Embedding model is warm.")
+            #         except Exception as warmup_error:
+            #             logger.warning(f"Failed to warm up embedding model: {warmup_error}")
+            # except Exception as e:
+            #     logger.error(f"Failed to preload RAG service: {e}")
+
     else:
         logger.info(f"Worker (PID: {os.getpid()}) is not serving 'chat_queue'. Skipping DynamicController initialization.")
 
@@ -135,6 +136,15 @@ celery_app.conf.update(
         'app.tasks.db_tasks.save_behavior_task': {'queue': 'db_writer_queue'},
         'app.tasks.db_tasks.log_ai_event_task': {'queue': 'db_writer_queue'},
         'app.tasks.db_tasks.save_chat_message_task': {'queue': 'db_writer_queue'},
+        'app.tasks.wakeup_embedding_task.wakeup_embedding_model': {'queue': 'db_writer_queue'},
     },
     task_default_queue='default',
+    
+    # 定时任务配置
+    beat_schedule={
+        'wakeup-embedding-model': {
+            'task': 'app.tasks.wakeup_embedding_task.wakeup_embedding_model',
+            'schedule': 300.0,  # 每300秒（5分钟）执行一次
+        },
+    },
 )
