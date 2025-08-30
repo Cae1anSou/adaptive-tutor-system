@@ -101,30 +101,39 @@ class StudentProfile:
                 deserialized_bkt_models[topic_id] = bkt_data
         profile.bkt_model = deserialized_bkt_models
         
-        profile.emotion_state = data.get('emotion_state', {
-            'sentiment_confidence': {'positive': 0.0, 'negative': 0.0, 'neutral': 1.0},
-            'frustration_level': 0.0,
-            'engagement_level': 0.5,
-            'confidence_level': 0.5
-        })
+        # 处理情感状态，如果缺失则使用默认值并记录日志
+        if 'emotion_state' not in data:
+            logger.warning(f"StudentProfile: 用户 {participant_id} 缺少 emotion_state 字段，使用默认值")
+            profile.emotion_state = {
+                'sentiment_confidence': {'positive': 0.0, 'negative': 0.0, 'neutral': 1.0},
+                'frustration_level': 0.0,
+                'engagement_level': 0.5,
+                'confidence_level': 0.5
+            }
+        else:
+            profile.emotion_state = data['emotion_state']
         
-        # 反序列化行为模式
-        behavior_patterns = data.get('behavior_patterns', {
-            'error_frequency': 0.0,
-            'help_seeking_tendency': 0.0,
-            'persistence_score': 0.5,
-            'learning_velocity': 0.5,
-            'attention_stability': 0.5,
-            'submission_timestamps': [],
-            'recent_events': [],
-            'knowledge_level_history': {}
-        })
+        # 反序列化行为模式，如果缺失则使用默认值并记录日志
+        if 'behavior_patterns' not in data:
+            logger.warning(f"StudentProfile: 用户 {participant_id} 缺少 behavior_patterns 字段，使用默认值")
+            profile.behavior_patterns = {
+                'error_frequency': 0.0,
+                'help_seeking_tendency': 0.0,
+                'persistence_score': 0.5,
+                'learning_velocity': 0.5,
+                'attention_stability': 0.5,
+                'submission_timestamps': [],
+                'recent_events': [],
+                'knowledge_level_history': {}
+            }
+        else:
+            profile.behavior_patterns = data['behavior_patterns']
         
         # 反序列化时间戳
-        if 'submission_timestamps' in behavior_patterns:
+        if 'submission_timestamps' in profile.behavior_patterns:
             # 将ISO字符串转换回datetime对象
             submission_timestamps = []
-            for ts in behavior_patterns['submission_timestamps']:
+            for ts in profile.behavior_patterns['submission_timestamps']:
                 if isinstance(ts, str):
                     try:
                         submission_timestamps.append(datetime.fromisoformat(ts))
@@ -133,12 +142,12 @@ class StudentProfile:
                         submission_timestamps.append(datetime.now(UTC))
                 else:
                     submission_timestamps.append(ts or datetime.now(UTC))
-            behavior_patterns['submission_timestamps'] = submission_timestamps
+            profile.behavior_patterns['submission_timestamps'] = submission_timestamps
         
-        if 'recent_events' in behavior_patterns:
+        if 'recent_events' in profile.behavior_patterns:
             # 反序列化recent_events中的时间戳
             recent_events = []
-            for event in behavior_patterns['recent_events']:
+            for event in profile.behavior_patterns['recent_events']:
                 deserialized_event = event.copy()
                 if 'timestamp' in deserialized_event and isinstance(deserialized_event['timestamp'], str):
                     try:
@@ -147,9 +156,8 @@ class StudentProfile:
                         # 如果解析失败，使用当前时间
                         deserialized_event['timestamp'] = datetime.now(UTC)
                 recent_events.append(deserialized_event)
-            behavior_patterns['recent_events'] = recent_events
+            profile.behavior_patterns['recent_events'] = recent_events
         
-        profile.behavior_patterns = behavior_patterns
         return profile
 
 
@@ -324,10 +332,25 @@ class UserStateService:
         if not topic_id or not level or not action:
             return
 
-        # 按 topic_id 对 history 进行分组
-        history = profile.behavior_patterns.setdefault('knowledge_level_history', {})
-        topic_history = history.setdefault(topic_id, {})
-        level_stats = topic_history.setdefault(str(level), {'visits': 0, 'total_duration_ms': 0})
+        # 按 topic_id 对 history 进行分组，如果不存在则初始化
+        if 'knowledge_level_history' not in profile.behavior_patterns:
+            logger.warning(f"UserStateService: 用户 {participant_id} 缺少 knowledge_level_history 字段，初始化为空字典")
+            profile.behavior_patterns['knowledge_level_history'] = {}
+            
+        history = profile.behavior_patterns['knowledge_level_history']
+        
+        if topic_id not in history:
+            logger.warning(f"UserStateService: 用户 {participant_id} 的知识点 {topic_id} 不存在，初始化为空字典")
+            history[topic_id] = {}
+            
+        topic_history = history[topic_id]
+        
+        level_key = str(level)
+        if level_key not in topic_history:
+            logger.warning(f"UserStateService: 用户 {participant_id} 的知识点 {topic_id} 等级 {level} 不存在，初始化默认统计")
+            topic_history[level_key] = {'visits': 0, 'total_duration_ms': 0}
+            
+        level_stats = topic_history[level_key]
 
         if action == 'enter':
             level_stats['visits'] += 1
@@ -520,7 +543,7 @@ class UserStateService:
             snapshot_event = BehaviorEvent(
                 participant_id=participant_id,
                 event_type=EventType.STATE_SNAPSHOT,
-                event_data=StateSnapshotData(profile_data=profile_data),
+                event_data=StateSnapshotData(profile_data=profile_data).model_dump(),
                 timestamp=datetime.now(UTC)
             )
             
@@ -723,8 +746,17 @@ class UserStateService:
         try:
             profile, _ = self.get_or_create_profile(participant_id, None)
             
-            # 获取当前情感状态
-            current_sentiment = profile.emotion_state['sentiment_confidence']
+            # 获取当前情感状态，如果不存在则使用默认值
+            default_sentiment = {
+                'positive': 0.0,
+                'negative': 0.0,
+                'neutral': 1.0
+            }
+            if 'sentiment_confidence' not in profile.emotion_state:
+                logger.warning(f"UserStateService: 用户 {participant_id} 缺少 sentiment_confidence 字段，使用默认值")
+                current_sentiment = default_sentiment
+            else:
+                current_sentiment = profile.emotion_state['sentiment_confidence']
             
             # 应用指数移动平均更新
             new_sentiment = {}
@@ -769,16 +801,20 @@ class UserStateService:
         """
         try:
             profile, _ = self.get_or_create_profile(participant_id, None)
-            key = f"user_profile:{participant_id}"
             
             # 添加事件时间戳
             current_time = datetime.now(UTC)
             
-            # 更新最近事件列表（保留最近100个事件）
-            recent_events = profile.behavior_patterns['recent_events']
+            # 更新最近事件列表（保留最近100个事件），如果不存在则初始化为空列表
+            if 'recent_events' not in profile.behavior_patterns:
+                logger.warning(f"UserStateService: 用户 {participant_id} 缺少 recent_events 字段，使用空列表初始化")
+                recent_events = []
+                profile.behavior_patterns['recent_events'] = recent_events
+            else:
+                recent_events = profile.behavior_patterns['recent_events']
             recent_events.append({
-                'event_type': event_type,
-                'timestamp': current_time,
+                'event_type': event_type.value if hasattr(event_type, 'value') else event_type,
+                'timestamp': current_time,  # 保持为datetime对象，稍后统一转换
                 'event_data': event_data or {}
             })
             
@@ -788,7 +824,27 @@ class UserStateService:
             
             # 计算滑动窗口指标
             window_start = current_time - timedelta(minutes=10)  # 10分钟窗口
-            window_events = [e for e in recent_events if e['timestamp'] >= window_start]
+            # 确保recent_events中的时间戳是datetime对象
+            processed_recent_events = []
+            for e in recent_events:
+                event_copy = e.copy()
+                if isinstance(event_copy['timestamp'], str):
+                    try:
+                        event_copy['timestamp'] = datetime.fromisoformat(event_copy['timestamp'])
+                    except ValueError:
+                        # 如果解析失败，使用当前时间
+                        event_copy['timestamp'] = current_time
+                processed_recent_events.append(event_copy)
+            
+            window_events = [e for e in processed_recent_events if e['timestamp'] >= window_start]
+            
+            # 在添加到set_dict之前，将recent_events中的所有datetime对象转换为字符串
+            serialized_recent_events = []
+            for event in recent_events:
+                serialized_event = event.copy()
+                if 'timestamp' in serialized_event and isinstance(serialized_event['timestamp'], datetime):
+                    serialized_event['timestamp'] = serialized_event['timestamp'].isoformat()
+                serialized_recent_events.append(serialized_event)
             
             # 计算错误频率
             error_events = [e for e in window_events if e['event_type'] == 'test_submission' 
@@ -801,7 +857,7 @@ class UserStateService:
             
             # 更新行为模式
             set_dict = {
-                'behavior_patterns.recent_events': recent_events,
+                'behavior_patterns.recent_events': serialized_recent_events,
                 'behavior_patterns.error_frequency': error_frequency,
                 'behavior_patterns.help_seeking_tendency': help_frequency
             }
@@ -815,7 +871,11 @@ class UserStateService:
                 if len(submission_timestamps) > 50:
                     submission_timestamps = submission_timestamps[-50:]
                 
-                set_dict['behavior_patterns.submission_timestamps'] = submission_timestamps
+                # 在存入 set_dict 之前，将所有 datetime 对象转换为字符串
+                set_dict['behavior_patterns.submission_timestamps'] = [
+                    ts.isoformat() if isinstance(ts, datetime) else ts
+                    for ts in submission_timestamps
+                ]
                 
                 # 计算学习速度（基于提交间隔）
                 if len(submission_timestamps) >= 2:
@@ -850,18 +910,52 @@ class UserStateService:
         try:
             profile, _ = self.get_or_create_profile(participant_id, None)
             
-            # 获取各个指标
-            emotional_frustration = profile.emotion_state['frustration_level']
-            error_frequency = profile.behavior_patterns['error_frequency']
-            help_seeking = profile.behavior_patterns['help_seeking_tendency']
+            # 获取各个指标，如果不存在则使用默认值并记录日志
+            if 'frustration_level' not in profile.emotion_state:
+                logger.warning(f"UserStateService: 用户 {participant_id} 缺少 frustration_level 字段，使用默认值 0.0")
+                emotional_frustration = 0.0
+            else:
+                emotional_frustration = profile.emotion_state['frustration_level']
+                
+            if 'error_frequency' not in profile.behavior_patterns:
+                logger.warning(f"UserStateService: 用户 {participant_id} 缺少 error_frequency 字段，使用默认值 0.0")
+                error_frequency = 0.0
+            else:
+                error_frequency = profile.behavior_patterns['error_frequency']
+                
+            if 'help_seeking_tendency' not in profile.behavior_patterns:
+                logger.warning(f"UserStateService: 用户 {participant_id} 缺少 help_seeking_tendency 字段，使用默认值 0.0")
+                help_seeking = 0.0
+            else:
+                help_seeking = profile.behavior_patterns['help_seeking_tendency']
             
             # 计算时间压力（基于提交频率）
-            submission_timestamps = profile.behavior_patterns['submission_timestamps']
+            if 'submission_timestamps' not in profile.behavior_patterns:
+                logger.warning(f"UserStateService: 用户 {participant_id} 缺少 submission_timestamps 字段，使用空列表初始化")
+                submission_timestamps = []
+                profile.behavior_patterns['submission_timestamps'] = submission_timestamps
+            else:
+                submission_timestamps = profile.behavior_patterns['submission_timestamps']
+            
+            # 确保submission_timestamps中的时间戳是datetime对象
+            processed_submission_timestamps = []
+            current_time = datetime.now(UTC)
+            for t in submission_timestamps:
+                if isinstance(t, str):
+                    try:
+                        processed_submission_timestamps.append(datetime.fromisoformat(t))
+                    except ValueError:
+                        # 如果解析失败，使用当前时间
+                        processed_submission_timestamps.append(current_time)
+                else:
+                    processed_submission_timestamps.append(t)
+            submission_timestamps = processed_submission_timestamps
+            
             time_pressure = 0.0
             
             if len(submission_timestamps) >= 2:
                 recent_submissions = [t for t in submission_timestamps 
-                                    if t >= datetime.now(UTC) - timedelta(minutes=5)]
+                                    if t >= current_time - timedelta(minutes=5)]
                 
                 if len(recent_submissions) >= 2:
                     intervals = []

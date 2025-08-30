@@ -55,7 +55,8 @@ class BehaviorInterpreterService:
             "knowledge_level_access": self._handle_knowledge_level_access,
         }
         # 添加轻量级事件的处理
-        for event_type in ("dom_element_select", "code_edit", "page_focus_change", "user_idle"):
+        for event_type in ("dom_element_select", "code_edit", "page_focus_change", "user_idle", "page_click", "significant_edits", "large_addition", "coding_problem", "coding_session_summary", "idle_hint_displayed"):
+
             self._event_handlers[event_type] = self._handle_lightweight_event
 
     def interpret_event(self, event, user_state_service=None, db_session=None, is_replay: bool = False):

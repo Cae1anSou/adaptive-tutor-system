@@ -234,7 +234,8 @@ class DynamicController:
             event = BehaviorEvent(
                 participant_id=request.participant_id,
                 event_type=EventType.AI_HELP_REQUEST,
-                event_data=AiHelpRequestData(message=request.user_message),
+                event_data=AiHelpRequestData(message=request.user_message).model_dump(),
+                # TODO：这里的时区需要改成上海
                 timestamp=datetime.now(UTC)
             )
 

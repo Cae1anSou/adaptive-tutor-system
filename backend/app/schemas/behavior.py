@@ -19,6 +19,12 @@ class EventType(str, Enum):
     KNOWLEDGE_LEVEL_ACCESS = "knowledge_level_access"
     STATE_SNAPSHOT = "state_snapshot"
     PAGE_CLICK="page_click"
+    SIGNIFICANT_EDITS = "significant_edits"
+    LARGE_ADDITION = "large_addition"
+    CODING_PROBLEM = "coding_problem"
+    CODING_SESSION_SUMMARY = "coding_session_summary"
+    IDLE_HINT_DISPLAYED = "idle_hint_displayed"
+    PAGE_FOCUS_CHANGE = "page_focus_change"
 
 
 

@@ -26,6 +26,7 @@ def log_behavior(
     - **快速响应**: 立即返回 `202 Accepted`，不等待后台任务完成。
     """
     # 任务1: 异步持久化原始事件 (fire-and-forget)
+
     save_behavior_task.apply_async(
         args=[event_in.model_dump()], 
         queue='db_writer_queue'

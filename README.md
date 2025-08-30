@@ -38,22 +38,22 @@ docker run -d --name redis-stack -p 6380:6379 redis/redis-stack:latest
 
 ```zsh
 cd backend
-celery -A app.celery_app worker -l info -Q chat_queue --pool=prefork -n ai_worker@%h
+celery -A app.celery_app worker -l info -Q chat_queue --pool=prefork -n ai_worker@%h -c 2
 ```
 
 ```zsh
 cd backend
-celery -A app.celery_app worker -l info -Q submit_queue --pool=prefork -n submit_worker@%h
+celery -A app.celery_app worker -l info -Q submit_queue --pool=prefork -n submit_worker@%h -c 2
 ```
 
 ```zsh
 cd backend
-celery -A app.celery_app worker -l info -Q db_writer_queue --pool=gevent -n db_worker@%h
+celery -A app.celery_app worker -l info -Q db_writer_queue --pool=gevent -n db_worker@%h -c 10
 ```
 
 ```zsh
 cd backend
-celery -A app.celery_app worker -l info -Q behavior_queue --pool=prefork -n behavior_worker@%h
+celery -A app.celery_app worker -l info -Q behavior_queue --pool=prefork -n behavior_worker@%h -c 2
 ```
 
 ### Windows
