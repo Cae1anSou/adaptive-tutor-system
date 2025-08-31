@@ -51,7 +51,7 @@
     {
       "name": "button按钮位置检查",
       "type": "custom_script",
-      "script": "const inputTop = document.querySelector('input').getBoundingClientRect().top; const buttonTop = document.querySelector('button').getBoundingClientRect().top; return inputTop < buttonTop;",
+      "script": "const elements = Array.from(document.querySelectorAll('input, button')); const inputIndex = elements.indexOf(document.querySelector('input')); const buttonIndex = elements.indexOf(document.querySelector('button')); return inputIndex < buttonIndex;",
       "feedback": "请确保button元素位于input元素下方。"
     }
   ],

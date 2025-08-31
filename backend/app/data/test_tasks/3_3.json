@@ -32,6 +32,18 @@
       "assertion_type": "equals",
       "value": "submit",
       "feedback": "请确保提交按钮的type属性为submit。"
+    },
+    {
+      "name": "handleRegister函数存在检查",
+      "type": "custom_script",
+      "script": "return typeof handleRegister === 'function'",
+      "feedback": "请定义handleRegister函数来处理表单提交事件。"
+    },
+    {
+      "name": "handleRegister函数功能检查",
+      "type": "custom_script",
+      "script": "if (typeof handleRegister !== 'function') return false; const event = { preventDefault: () => {} }; let consoleOutput = ''; const originalLog = console.log; console.log = (msg) => { consoleOutput = msg; }; try { handleRegister(event); } finally { console.log = originalLog; } return consoleOutput === '注册信息已处理';",
+      "feedback": "请确保handleRegister函数阻止默认行为并在控制台输出'注册信息已处理'。"
     }
   ],
   "answer": {
