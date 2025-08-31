@@ -9,104 +9,92 @@
   },
   "checkpoints": [
     {
-      "name": "复选框type属性检查",
-      "type": "assert_attribute",
-      "selector": "input[type=\"checkbox\"]",
-      "attribute": "type",
-      "assertion_type": "equals",
-      "value": "checkbox",
-      "feedback": "复选框的type属性应该为checkbox"
+   "name": "复选框type属性检查",
+   "type": "custom_script",
+   "script": "return document.querySelectorAll('input[type=\"checkbox\"]').length > 0 &&Array.from(document.querySelectorAll('input[type=\"checkbox\"]')).every(el => el.type === 'checkbox')",
+  "feedback": "所有复选框的type属性都应该为checkbox"
     },
     {
-      "name": "复选框name属性检查",
-      "type": "assert_attribute",
-      "selector": "input[type=\"checkbox\"]",
-      "attribute": "name",
-      "assertion_type": "equals",
-      "value": "skills",
-      "feedback": "name属性应该为skills"
+   "name": "复选框type属性检查",
+   "type": "custom_script",
+   "script": "return document.querySelectorAll('input[type=\"checkbox\"]').length > 0 &&Array.from(document.querySelectorAll('input[type=\"checkbox\"]')).every(el => el.name === 'skills')",
+  "feedback": "所有复选框的type属性都应该为checkbox"
     },
     {
       "name": "复选框数量检查",
       "type": "custom_script",
-      "script": "document.querySelectorAll('input[name=\"skills\"][type=\"checkbox\"]').length === 2",
+      "script": "return document.querySelectorAll('input[name=\"skills\"][type=\"checkbox\"]').length === 2",
       "feedback": "复选框数量应该为2"
     },
     {
       "name": "第一个复选框value属性检查",
       "type": "custom_script",
-      "script": "document.querySelector('input[name=\"skills\"][type=\"checkbox\"]:nth-of-type(1)').value === 'HTML'",
+      "script": "return document.querySelectorAll('input[name=\"skills\"][type=\"checkbox\"]')[0].value === 'HTML'",
       "feedback": "第一个复选框的value属性应该为：HTML"
     },
     {
       "name": "第一个复选框内容检查",
       "type": "custom_script",
-      "script": "document.querySelector('input[name=\"skills\"][type=\"checkbox\"]:nth-of-type(1) + label').innerText === '掌握HTML'",
+      "script": "return document.querySelectorAll('input[name=\"skills\"][type=\"checkbox\"]')[0].parentElement.textContent.trim() === '掌握HTML'",
       "feedback": "第一个复选框内容应该为：掌握HTML"
     },
     {
       "name": "第二个复选框value属性检查",
       "type": "custom_script",
-      "script": "document.querySelector('input[name=\"skills\"][type=\"checkbox\"]:nth-of-type(2)').value === 'CSS'",
+      "script": "return document.querySelectorAll('input[name=\"skills\"][type=\"checkbox\"]')[1].value === 'CSS'",
       "feedback": "第二个复选框的value属性应该为：CSS"
     },
     {
       "name": "第二个复选框内容检查",
       "type": "custom_script",
-      "script": "document.querySelector('input[name=\"skills\"][type=\"checkbox\"]:nth-of-type(2) + label').innerText === '掌握CSS'",
+      "script": "return document.querySelectorAll('input[name=\"skills\"][type=\"checkbox\"]')[1].parentElement.textContent.trim() === '掌握CSS'",
       "feedback": "第二个复选框内容应该为：掌握CSS"
     },
     {
       "name": "单选框type属性检查",
-      "type": "assert_attribute",
-      "selector": "input[type=\"radio\"]",
-      "attribute": "type",
-      "assertion_type": "equals",
-      "value": "radio",
+      "type": "custom_script",
+      "script": "return document.querySelectorAll('input[type=\"radio\"]').length > 0 &&Array.from(document.querySelectorAll('input[type=\"radio\"]')).every(el => el.type === 'radio')",
       "feedback": "单选框的type属性应该为radio"
     },
     {
       "name": "单选框name属性检查",
-      "type": "assert_attribute",
-      "selector": "input[type=\"radio\"]",
-      "attribute": "name",
-      "assertion_type": "equals",
-      "value": "level",
+      "type": "custom_script",
+      "script": "return document.querySelectorAll('input[type=\"radio\"]').length > 0 &&Array.from(document.querySelectorAll('input[type=\"radio\"]')).every(el => el.name === 'level')",
       "feedback": "name属性应该为level"
     },
     {
       "name": "单选框数量检查",
       "type": "custom_script",
-      "script": "document.querySelectorAll('input[name=\"level\"][type=\"radio\"]').length === 2",
+      "script": "return document.querySelectorAll('input[name=\"level\"][type=\"radio\"]').length === 2",
       "feedback": "单选框数量应为2"
     },
     {
       "name": "第一个单选框value属性检查",
       "type": "custom_script",
-      "script": "document.querySelector('input[name=\"level\"][type=\"radio\"]:nth-of-type(1)').value === '初级'",
+      "script": "return document.querySelectorAll('input[name=\"level\"][type=\"radio\"]')[0].value === '初级'",
       "feedback": "第一个单选框的value属性应该为：初级"
     },
     {
       "name": "第一个单选框内容检查",
       "type": "custom_script",
-      "script": "document.querySelector('input[name=\"level\"][type=\"radio\"]:nth-of-type(1) + label').innerText === '初级程序员'",
+      "script": "return document.querySelectorAll('input[name=\"level\"][type=\"radio\"]')[0].parentElement.textContent.trim() === '初级程序员'",
       "feedback": "第一个单选框的内容应该为：初级程序员"
     },
     {
       "name": "第二个单选框value属性检查",
       "type": "custom_script",
-      "script": "document.querySelector('input[name=\"level\"][type=\"radio\"]:nth-of-type(2)').value === '高级'",
+      "script": "return document.querySelectorAll('input[name=\"level\"][type=\"radio\"]')[1].value === '高级'",
       "feedback": "第二个单选框的value属性应该为：高级"
     },
     {
       "name": "第二个单选框内容检查",
       "type": "custom_script",
-      "script": "document.querySelector('input[name=\"level\"][type=\"radio\"]:nth-of-type(2) + label').innerText === '高级程序员'",
+      "script": "return document.querySelectorAll('input[name=\"level\"][type=\"radio\"]')[1].parentElement.textContent.trim() === '高级程序员'",
       "feedback": "第二个单选框的内容应该为：高级程序员"
     }
   ],
   "answer": {
-    "html": "<div>\n  <label><input type=\"checkbox\" name=\"skills\" value=\"HTML\">掌握HTML</label>\n</div>\n<div>\n  <label><input type=\"checkbox\" name=\"skills\" value=\"CSS\">掌握CSS</label>\n</div>\n<div>\n  <label><input type=\"radio\" name=\"level\" value=\"初级\">初级程序员</label>\n</div>\n<div>\n  <label><input type=\"radio\" name=\"level\" value=\"高级\">高级程序员</label>\n</div>",
+    "html": "<label><input type=\"checkbox\" name=\"skills\" value=\"HTML\">掌握HTML</label>\n<label><input type=\"checkbox\" name=\"skills\" value=\"CSS\">掌握CSS</label>\n<label><input type=\"radio\" name=\"level\" value=\"初级\">初级程序员</label>\n<label><input type=\"radio\" name=\"level\" value=\"高级\">高级程序员</label>",
     "css": "",
     "js": ""
   }

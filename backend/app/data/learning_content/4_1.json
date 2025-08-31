@@ -2,25 +2,25 @@
     "topic_id": "4_1",
     "title": "设置颜色与字体",
     "levels": [
-        {
-            "level": 1,
-            "description": "CSS字体设置用于定义文本的字体族，提升可读性和美观性；颜色属性控制文本颜色，增强视觉层次；背景属性设置元素背景，渐变背景可创建平滑色彩过渡，是网页风格统一的核心。"
-        },
-        {
-            "level": 2,
-            "description": "font-family语法：`font-family: \"字体名\", 回退字体;`，如`\"Times New Roman\", serif`。color语法：`color: 颜色值;`，支持十六进制（#ff0000）、RGB或颜色名。background语法：`background: linear-gradient(方向, 起始色, 结束色);`，方向如`to right`表示从左到右渐变。"
-        },
-        {
-            "level": 3,
-            "description": "应用场景：为导航栏设置字体和背景。示例代码：HTML中`<nav class=\"navbar\">导航链接</nav>`，CSS中`.navbar { font-family: \"Georgia\", serif; color: #333; background: linear-gradient(to right, #ff7e5f, #feb47b); }`。这使导航栏更醒目，避免与测试题重复。"
-        },
-        {
-            "level": 4,
-            "description": "原理：字体渲染依赖用户系统字体库，颜色基于RGB模型，渐变通过CSS图像处理。注意事项：使用字体回退链确保兼容性；颜色对比度需满足WCAG可访问性标准；渐变在旧浏览器需添加前缀如`-webkit-linear-gradient`。"
-        }
-    ],
+            {
+                "level": 1,
+                "description": "在网页开发中，颜色和字体是决定页面视觉效果的两个最基本也是最重要的因素。颜色不仅影响美观，还能传达情感和引导用户注意力。CSS 中的颜色可以通过多种方式表示，比如十六进制（如 #ff0000 表示红色）、rgb(255, 0, 0)、或者颜色名称（如 red）。字体则决定了文字的外观风格，常见的字体如 Arial、Times New Roman 等。在 CSS 中，我们通过 font-family 属性来设置字体，可以指定多个字体形成字体回退机制，例如 'Arial, sans-serif' 表示优先使用 Arial，如果用户设备没有安装该字体，则使用系统默认的无衬线字体。文字颜色通过 color 属性设置，而背景颜色或背景图像则通过 background 属性控制。这些样式通常被应用在 body 标签上，以便为整个页面设定统一的基调。初学者应理解这些属性的基本写法和作用范围，这是构建美观网页的第一步。"
+            },
+            {
+                "level": 2,
+                "description": "在实际开发中，设置颜色和字体不仅仅是写几个属性那么简单，还需要考虑跨设备兼容性和用户体验。例如，不同操作系统对字体的渲染方式不同，Windows 和 macOS 上的 Arial 显示效果可能略有差异，因此开发者常会定义字体栈（font stack），如 'Helvetica, Arial, sans-serif'，以确保在各种设备上都能呈现相对一致的效果。颜色方面，除了纯色，CSS 还支持透明度（rgba 或 hsla）、渐变色等高级特性。线性渐变 linear-gradient 可以创建从一种颜色平滑过渡到另一种颜色的效果，常用于背景设计。例如 linear-gradient(to bottom, #006400, #00aa00) 表示从深绿到亮绿的垂直渐变。这些样式通常写在 CSS 文件中，并通过选择器绑定到 HTML 元素上，比如 body 选择器会影响整个页面的默认文字和背景样式。合理搭配颜色与字体，能显著提升页面的专业感和可读性。"
+            },
+            {
+                "level": 3,
+                "description": "深入理解颜色与字体的渲染机制有助于优化性能和提升可访问性。浏览器在解析 CSS 时会根据继承规则将父元素的样式传递给子元素，例如在 body 上设置 color 后，其内部所有文本元素默认会继承该颜色，除非被显式覆盖。这种继承机制减少了重复代码，但也可能导致意外的样式冲突，因此需要掌握层叠（cascading）和优先级规则。字体加载是一个潜在的性能瓶颈，尤其是使用网络字体（@font-face）时，浏览器需额外请求字体文件，可能造成文本闪烁（FOIT/FOUT）。为避免此问题，可使用 font-display: swap 等策略优化加载行为。颜色方面，渐变背景虽然美观，但过度使用可能增加 GPU 渲染负担，尤其是在移动设备上。此外，颜色对比度需符合无障碍标准（如 WCAG），确保色盲或视力不佳用户也能清晰阅读内容。系统级偏好（如 prefers-color-scheme）还可用于实现深色/浅色模式切换，提升用户体验。"
+            },
+            {
+                "level": 4,
+                "description": "为了巩固对颜色与字体设置的理解，我们设计一个综合练习：创建一个介绍植物知识的网页，要求整体风格清新自然。首先，在 CSS 中为 body 设置字体为 'Georgia, serif'，营造一种文艺感；文字颜色设为深灰色 #333，提高可读性；背景使用线性渐变，从浅绿色 #e8f5e8 过渡到白色 #ffffff，模拟草地到天空的视觉效果。然后，在页面中添加一个 h1 标题，设置其颜色为森林绿 #2e7d32，并加粗显示。接着，为段落 p 元素设置行高 1.6，提升阅读舒适度。最后，添加一个类名为 .highlight 的样式，用于标记重点内容，设置背景为浅黄色 #fff9c4，边框为 1px 实线 #ffeb3b。示例代码如下：body { font-family: 'Georgia, serif'; color: #333; background: linear-gradient(to bottom, #e8f5e8, #ffffff); } h1 { color: #2e7d32; font-weight: bold; } p { line-height: 1.6; } .highlight { background-color: #fff9c4; border: 1px solid #ffeb3b; padding: 2px 4px; }。通过这个练习，你将掌握如何系统地应用颜色与字体，打造风格统一且美观的网页。"
+            }
+        ],
     "sc_all": [
-        {"topic_id": "1_1", "select_element": ["h1", "h2", "h3", "h4", "h5", "h6", "p"]},
+        {"topic_id": "1_1", "select_element": ["h1", "h2", "h3", "h4", "h5", "h6", "p","span"]},
         {"topic_id": "1_2", "select_element": []},
         {"topic_id": "1_3", "select_element": ["<!DOCTYPE>", "html", "head", "body","meta", "title","footer"]},
         {"topic_id": "2_1", "select_element": ["div"]},

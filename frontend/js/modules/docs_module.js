@@ -64,69 +64,7 @@ function renderTopicContent() {
     console.log('[DocsModule] 主题内容渲染完成，事件绑定由主应用处理');
 }
 
-// 初始化知识点内容
-function initKnowledgeContent() {
-    // 防止重复初始化
-    if (ModuleState.isInitialized) {
-        console.log('[DocsModule] 知识点内容已经初始化过，跳过重复初始化');
-        return;
-    }
-    
-    const knowledgeContent = document.getElementById('knowledge-content');
-    if (!knowledgeContent) {
-        console.warn('[DocsModule] knowledge-content 元素不存在');
-        return;
-    }
-    
-    // 创建默认知识点内容
-    knowledgeContent.innerHTML = `
-        <div class="levels-flow">
-            <div class="level-card collapsed" data-level="1">
-                <div class="level-header">
-                    <h3>Level 1 · 基础</h3>
-                </div>
-                <div class="level-content">
-                    <p class="content-text">适合零基础入门，掌握核心概念与基本语法。这个等级主要关注基础知识的建立，为后续学习打下坚实基础。</p>
-                </div>
-                <div class="click-hint">点击进入学习</div>
-            </div>
-            <div class="arrow" aria-hidden="true">➜</div>
-            <div class="level-card collapsed" data-level="2">
-                <div class="level-header">
-                    <h3>Level 2 · 进阶</h3>
-                </div>
-                <div class="level-content">
-                    <p class="content-text">理解常见场景与组合用法，提升实践能力。在这个等级中，学习者将接触到更复杂的应用场景。</p>
-                </div>
-                <div class="click-hint">点击进入学习</div>
-            </div>
-            <div class="arrow" aria-hidden="true">➜</div>
-            <div class="level-card collapsed" data-level="3">
-                <div class="level-header">
-                    <h3>Level 3 · 高级</h3>
-                </div>
-                <div class="level-content">
-                    <p class="content-text">深入机制与性能优化，形成系统化认知。高级等级专注于深层次理解和性能优化技巧。</p>
-                </div>
-                <div class="click-hint">点击进入学习</div>
-            </div>
-            <div class="arrow" aria-hidden="true">➜</div>
-            <div class="level-card collapsed" data-level="4">
-                <div class="level-header">
-                    <h3>Level 4 · 挑战</h3>
-                </div>
-                <div class="level-content">
-                    <p class="content-text">综合实战与拓展题，检验与突破现有水平。挑战等级包含复杂的综合应用和高级技巧。</p>
-                </div>
-                <div class="click-hint">点击进入学习</div>
-            </div>
-        </div>
-    `;
-    
-    // 标记为已初始化
-    ModuleState.isInitialized = true;
-    console.log('[DocsModule] 默认知识点内容初始化完成');
-}
+
 
 // 设置主题数据
 function setTopicData(topicData) {
@@ -150,7 +88,6 @@ function resetModuleState() {
 // 导出模块
 export {
     renderTopicContent,
-    initKnowledgeContent,
     setTopicData,
     getTopicData,
     resetModuleState,
@@ -160,7 +97,6 @@ export {
 // 同时保持向后兼容的window对象
 window.DocsModule = {
     renderTopicContent,
-    initKnowledgeContent,
     setTopicData,
     getTopicData,
     resetModuleState,
