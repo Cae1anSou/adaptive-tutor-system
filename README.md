@@ -25,74 +25,27 @@
 
 ## 启动
 
-### Mac/Linux
-
 ```zsh
-cd backend
-python -m app.main
+docker-compose up -d --build
 ```
 
-```zsh
-docker run -d --name redis-stack -p 6380:6379 redis/redis-stack:latest
-```
+## 关闭docker
 
 ```zsh
-cd backend
-celery -A app.celery_app worker -l info -Q chat_queue --pool=prefork -n ai_worker@%h -c 2
+docker-compose down
 ```
+
+## 查看日志
 
 ```zsh
-cd backend
-celery -A app.celery_app worker -l info -Q submit_queue --pool=prefork -n submit_worker@%h -c 2
+docker-compose logs <这里写具体的name>
 ```
 
+具体的name可以看docker-compose.yml
+
+比如我现在需要看celery-chat-worker的日志
+那么我可以这样做：
 ```zsh
-cd backend
-celery -A app.celery_app worker -l info -Q db_writer_queue --pool=gevent -n db_worker@%h -c 10
+docker-compose logs celery-chat-worker
 ```
 
-```zsh
-cd backend
-celery -A app.celery_app worker -l info -Q behavior_queue --pool=prefork -n behavior_worker@%h -c 2
-```
-
-```zsh
-cd backend
-celery -A app.celery_app beat -l info
-```
-
-### Windows
-
-```zsh
-cd backend
-python -m app.main
-```
-
-```zsh
-docker run -d --name redis-stack -p 6380:6379 redis/redis-stack:latest
-```
-
-```zsh
-cd backend
-celery -A app.celery_app worker -l info -Q chat_queue --pool=solo -n ai_worker@%h
-```
-
-```zsh
-cd backend
-celery -A app.celery_app worker -l info -Q submit_queue --pool=solo -n submit_worker@%h
-```
-
-```zsh
-cd backend
-celery -A app.celery_app worker -l info -Q db_writer_queue --pool=solo -n db_worker@%h
-```
-
-```zsh
-cd backend
-celery -A app.celery_app worker -l info -Q behavior_queue --pool=solo -n behavior_worker@%h
-```
-
-```zsh
-cd backend
-celery -A backend.app.celery_app beat --pool=solo -l info
-```
