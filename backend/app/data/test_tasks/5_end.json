@@ -1,44 +1,79 @@
 {
   "topic_id": "5_end",
-  "title": "第五章媒体与资源管理",
-  "description_md": "综合练习：创建一个猫咪多媒体展示页面。\n\n- 添加图片展示猫咪头像；\n- 添加音频播放猫咪叫声；\n- 添加视频播放猫咪日常；\n\n确保所有媒体标签使用合理的属性，支持播放并可回退提示。",
+  "title": "第5章媒体与资源管理综合测试",
+  "description_md": "# 综合测试\n\n## 测试任务：\n请综合运用本章所学知识点，继续构建“WCF Best Cat Exhibition”（WCF最佳猫咪展览）介绍页面，完成媒体元素部分的添加。\n\n### 任务一：添加猫咪图片廊\n- 在页面中添加一个图片廊容器，包含3个猫咪缩略图\n- 每张图片使用`<img>`标签，设置合适的`src`和`alt`属性\n- 使用CSS设置图片样式：宽度100%，高度150px，使用`object-fit: cover`保持比例并裁剪居中\n- 为图片添加圆角效果（border-radius: 8px）\n\n### 任务二：添加背景音乐播放器\n- 在页面中添加一个音频播放器\n- 使用`<audio>`标签，并添加`controls`属性显示控件\n- 提供两个音频源：MP3和OGG格式，使用`<source>`标签指定\n- 添加后备文本提示浏览器不支持音频播放\n\n### 任务三：添加展览视频介绍\n- 在页面中添加一个视频播放器\n- 使用`<video>`标签，设置`controls`属性和`width=\"100%\"`\n- 添加视频源，指定为MP4格式\n- 添加后备文本提示浏览器不支持视频播放\n\n### 任务四：完善样式和布局\n- 为所有媒体元素添加适当的外边距，使其在页面中合理分布\n- 确保页面在不同设备上都能良好显示",
   "start_code": {
-    "html": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>猫咪多媒体页</title>\n</head>\n<body>\n  <h1>欢迎来到猫咪多媒体展示</h1>\n\n  <section>\n    <h2>猫咪头像</h2>\n    <img src=\"cat.jpg\" alt=\"一只可爱的猫咪\" width=\"300\">\n  </section>\n\n  <section>\n    <h2>猫咪叫声</h2>\n    <audio controls>\n      <source src=\"meow.mp3\" type=\"audio/mpeg\">\n      浏览器不支持音频播放。\n    </audio>\n  </section>\n\n  <section>\n    <h2>猫咪日常视频</h2>\n    <video controls width=\"400\">\n      <source src=\"cat-video.mp4\" type=\"video/mp4\">\n      浏览器不支持视频播放。\n    </video>\n  </section>\n</body>\n</html>",
-    "css": "",
+    "html": "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>WCF Best Cat Exhibition</title>\n    <style>\n        body {\n            font-family: 'Roboto', sans-serif;\n            background: linear-gradient(to bottom, #fff8f0, #ffe6cc);\n            margin: 0;\n            padding: 20px;\n        }\n        \n        h1 {\n            text-align: center;\n            color: #8B4513;\n            font-size: 2.5em;\n            margin-bottom: 10px;\n        }\n        \n        .subtitle {\n            text-align: center;\n            color: #A0522D;\n            font-size: 1.2em;\n            margin-bottom: 30px;\n        }\n        \n        .exhibition-info {\n            background-color: rgba(255, 255, 255, 0.8);\n            border-radius: 15px;\n            padding: 20px;\n            margin-bottom: 30px;\n            box-shadow: 0 4px 8px rgba(0,0,0,0.1);\n        }\n        \n        .info-item {\n            margin-bottom: 15px;\n        }\n        \n        .info-label {\n            font-weight: bold;\n            color: #8B4513;\n        }\n    </style>\n</head>\n<body>\n    <h1>WCF Best Cat Exhibition</h1>\n    <div class=\"subtitle\">世界猫咪联合会年度最佳展览</div>\n    \n    <div class=\"exhibition-info\">\n        <div class=\"info-item\">\n            <span class=\"info-label\">展览时间：</span>\n            <span>2023年10月15日 - 11月15日</span>\n        </div>\n        <div class=\"info-item\">\n            <span class=\"info-label\">展览地点：</span>\n            <span>国际宠物展览中心</span>\n        </div>\n        <div class=\"info-item\">\n            <span class=\"info-label\">参展品种：</span>\n            <span>波斯猫、暹罗猫、英国短毛猫等30+品种</span>\n        </div>\n        <div class=\"info-item\">\n            <span class=\"info-label\">特别活动：</span>\n            <span>猫咪选美大赛、养护知识讲座、领养公益活动</span>\n        </div>\n    </div>\n</body>\n</html>",
+    "css": "body {\n    font-family: 'Roboto', sans-serif;\n    background: linear-gradient(to bottom, #fff8f0, #ffe6cc);\n    margin: 0;\n    padding: 20px;\n}\n\nh1 {\n    text-align: center;\n    color: #8B4513;\n    font-size: 2.5em;\n    margin-bottom: 10px;\n}\n\n.subtitle {\n    text-align: center;\n    color: #A0522D;\n    font-size: 1.2em;\n    margin-bottom: 30px;\n}\n\n.exhibition-info {\n    background-color: rgba(255, 255, 255, 0.8);\n    border-radius: 15px;\n    padding: 20px;\n    margin-bottom: 30px;\n    box-shadow: 0 4px 8px rgba(0,0,0,0.1);\n}\n\n.info-item {\n    margin-bottom: 15px;\n}\n\n.info-label {\n    font-weight: bold;\n    color: #8B4513;\n}",
     "js": ""
   },
   "checkpoints": [
     {
-      "name": "图片检查",
+      "name": "图片廊容器存在检查",
+      "type": "assert_element",
+      "selector": ".cat-gallery",
+      "assertion_type": "exists",
+      "feedback": "请添加一个类名为cat-gallery的图片廊容器"
+    },
+    {
+      "name": "图片元素存在检查",
+      "type": "assert_element",
+      "selector": ".cat-gallery img",
+      "assertion_type": "exists",
+      "feedback": "请在图片廊中添加img元素"
+    },
+    {
+      "name": "图片alt属性检查",
       "type": "assert_attribute",
-      "selector": "img",
+      "selector": ".cat-gallery img:first-child",
       "attribute": "alt",
       "assertion_type": "exists",
-      "feedback": "请为图片设置有效的 alt 属性，提升可访问性。"
+      "feedback": "请为图片添加alt属性以确保无障碍访问"
     },
     {
-      "name": "音频标签播放检查",
+      "name": "音频元素存在检查",
+      "type": "assert_element",
+      "selector": "audio",
+      "assertion_type": "exists",
+      "feedback": "请添加audio元素用于播放背景音乐"
+    },
+    {
+      "name": "视频元素存在检查",
+      "type": "assert_element",
+      "selector": "video",
+      "assertion_type": "exists",
+      "feedback": "请添加video元素用于播放展览介绍视频"
+    },
+    {
+      "name": "图片样式检查",
+      "type": "assert_style",
+      "selector": ".cat-gallery img",
+      "css_property": "object-fit",
+      "assertion_type": "equals",
+      "value": "cover",
+      "feedback": "请为图片设置object-fit: cover样式"
+    },
+    {
+      "name": "音频控件属性检查",
       "type": "assert_attribute",
       "selector": "audio",
       "attribute": "controls",
       "assertion_type": "exists",
-      "feedback": "请为音频标签添加 controls 属性以允许播放控制。"
+      "feedback": "请为audio元素添加controls属性以显示播放控件"
     },
     {
-      "name": "视频标签播放检查",
+      "name": "视频宽度属性检查",
       "type": "assert_attribute",
       "selector": "video",
-      "attribute": "controls",
-      "assertion_type": "exists",
-      "feedback": "请为视频标签添加 controls 属性以允许播放控制。"
-    },
-    {
-      "name": "资源路径与回退文本",
-      "type": "assert_text_content",
-      "selector": "audio",
-      "assertion_type": "contains",
-      "value": "浏览器不支持音频播放",
-      "feedback": "请为 audio 标签添加浏览器不支持提示文字。"
+      "attribute": "width",
+      "assertion_type": "equals",
+      "value": "100%",
+      "feedback": "请为video元素设置width=\"100%\"属性"
     }
-  ]
+  ],
+  "answer": {
+    "html": "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>WCF Best Cat Exhibition</title>\n    <style>\n        body {\n            font-family: 'Roboto', sans-serif;\n            background: linear-gradient(to bottom, #fff8f0, #ffe6cc);\n            margin: 0;\n            padding: 20px;\n        }\n        \n        h1 {\n            text-align: center;\n            color: #8B4513;\n            font-size: 2.5em;\n            margin-bottom: 10px;\n        }\n        \n        .subtitle {\n            text-align: center;\n            color: #A0522D;\n            font-size: 1.2em;\n            margin-bottom: 30px;\n        }\n        \n        .exhibition-info {\n            background-color: rgba(255, 255, 255, 0.8);\n            border-radius: 15px;\n            padding: 20px;\n            margin-bottom: 30px;\n            box-shadow: 0 4px 8px rgba(0,0,0,0.1);\n        }\n        \n        .info-item {\n            margin-bottom: 15px;\n        }\n        \n        .info-label {\n            font-weight: bold;\n            color: #8B4513;\n        }\n        \n        .cat-gallery {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n            gap: 20px;\n            margin-bottom: 30px;\n        }\n        \n        .cat-gallery img {\n            width: 100%;\n            height: 150px;\n            object-fit: cover;\n            border-radius: 8px;\n            box-shadow: 0 2px 4px rgba(0,0,0,0.1);\n        }\n        \n        .media-section {\n            background-color: rgba(255, 255, 255, 0.8);\n            border-radius: 15px;\n            padding: 20px;\n            margin-bottom: 30px;\n            box-shadow: 0 4px 8px rgba(0,0,0,0.1);\n        }\n        \n        .media-section h2 {\n            color: #8B4513;\n            margin-top: 0;\n        }\n        \n        audio, video {\n            width: 100%;\n            margin-top: 10px;\n        }\n    </style>\n</head>\n<body>\n    <h1>WCF Best Cat Exhibition</h1>\n    <div class=\"subtitle\">世界猫咪联合会年度最佳展览</div>\n    \n    <div class=\"exhibition-info\">\n        <div class=\"info-item\">\n            <span class=\"info-label\">展览时间：</span>\n            <span>2023年10月15日 - 11月15日</span>\n        </div>\n        <div class=\"info-item\">\n            <span class=\"info-label\">展览地点：</span>\n            <span>国际宠物展览中心</span>\n        </div>\n        <div class=\"info-item\">\n            <span class=\"info-label\">参展品种：</span>\n            <span>波斯猫、暹罗猫、英国短毛猫等30+品种</span>\n        </div>\n        <div class=\"info-item\">\n            <span class=\"info-label\">特别活动：</span>\n            <span>猫咪选美大赛、养护知识讲座、领养公益活动</span>\n        </div>\n    </div>\n    \n    <div class=\"cat-gallery\">\n        <img src=\"https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80\" alt=\"可爱的橙色猫咪\">\n        <img src=\"https://images.unsplash.com/photo-1543852786-1cf6624b9987?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80\" alt=\"优雅的灰色波斯猫\">\n        <img src=\"https://images.unsplash.com/photo-1533738363-b7f9aef128ce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80\" alt=\"活泼的黑白相间猫咪\">\n    </div>\n    \n    <div class=\"media-section\">\n        <h2>展览背景音乐</h2>\n        <audio controls>\n            <source src=\"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3\" type=\"audio/mpeg\">\n            <source src=\"https://www.soundhelix.com/examples/ogg/SoundHelix-Song-1.ogg\" type=\"audio/ogg\">\n            您的浏览器不支持音频播放。\n        </audio>\n    </div>\n    \n    <div class=\"media-section\">\n        <h2>展览介绍视频</h2>\n        <video controls width=\"100%\">\n            <source src=\"https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4\" type=\"video/mp4\">\n            您的浏览器不支持视频播放。\n        </video>\n    </div>\n</body>\n</html>",
+    "css": "body {\n    font-family: 'Roboto', sans-serif;\n    background: linear-gradient(to bottom, #fff8f0, #ffe6cc);\n    margin: 0;\n    padding: 20px;\n}\n\nh1 {\n    text-align: center;\n    color: #8B4513;\n    font-size: 2.5em;\n    margin-bottom: 10px;\n}\n\n.subtitle {\n    text-align: center;\n    color: #A0522D;\n    font-size: 1.2em;\n    margin-bottom: 30px;\n}\n\n.exhibition-info {\n    background-color: rgba(255, 255, 255, 0.8);\n    border-radius: 15px;\n    padding: 20px;\n    margin-bottom: 30px;\n    box-shadow: 0 4px 8px rgba(0,0,0,0.1);\n}\n\n.info-item {\n    margin-bottom: 15px;\n}\n\n.info-label {\n    font-weight: bold;\n    color: #8B4513;\n}\n\n.cat-gallery {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n    gap: 20px;\n    margin-bottom: 30px;\n}\n\n.cat-gallery img {\n    width: 100%;\n    height: 150px;\n    object-fit: cover;\n    border-radius: 8px;\n    box-shadow: 0 2px 4px rgba(0,0,0,0.1);\n}\n\n.media-section {\n    background-color: rgba(255, 255, 255, 0.8);\n    border-radius: 15px;\n    padding: 20px;\n    margin-bottom: 30px;\n    box-shadow: 0 4px 8px rgba(0,0,0,0.1);\n}\n\n.media-section h2 {\n    color: #8B4513;\n    margin-top: 0;\n}\n\naudio, video {\n    width: 100%;\n    margin-top: 10px;\n}",
+    "js": ""
+  }
 }
