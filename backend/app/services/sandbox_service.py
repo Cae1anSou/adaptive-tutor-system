@@ -67,7 +67,18 @@ class SandboxService:
         page = None
         try:
             with self._playwright_manager as p:
-                browser = p.chromium.launch(headless=self._headless)
+                browser = p.chromium.launch(
+                    headless=self._headless,
+                    args=[
+                        '--no-sandbox',
+                        '--disable-setuid-sandbox',
+                        '--disable-dev-shm-usage',
+                        '--disable-accelerated-2d-canvas',
+                        '--no-first-run',
+                        '--no-zygote',
+                        '--disable-gpu'
+                    ]
+                )
                 page = browser.new_page()
 
                 # 构建更标准的HTML结构

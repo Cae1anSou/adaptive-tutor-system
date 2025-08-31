@@ -1,5 +1,22 @@
-# 使用Nginx作为基础镜像
-FROM nginx:alpine
+# 使用Node.js作为基础镜像来安装Playwright
+FROM node:18-alpine
+
+# 安装必要的依赖
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    nginx
+
+# 安装Playwright
+RUN npm install -g playwright
+
+# 设置Playwright使用系统Chromium
+ENV PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
+ENV PLAYWRIGHT_BROWSERS_PATH=/usr/bin/chromium-browser
 
 # 设置工作目录
 WORKDIR /usr/share/nginx/html
