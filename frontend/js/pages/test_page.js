@@ -20,29 +20,29 @@ async function initializePage() {
         }
     }
     // 获取并解密URL参数
-     // 获取URL参数（带错误处理）
-        const topicData = getUrlParam('topic');
-        
-        if (topicData && topicData.id) {
-            console.log('测试主题ID:', topicData.id, '有效期:', topicData.isValid ? '有效' : '已过期');
-                
-            // 更新页面标题
-            document.getElementById('headerTitle').textContent = `测试 - ${topicData.id}`;
-            
-            // 即使过期也继续加载内容，但提示用户
-            if (!topicData.isValid) {
-               console.warn('参数已过期，但仍继续加载内容');
-            }
-                
-            // 加载对应的测试内容
-            chatModule.init('test', topicData.id);
-        } else {
-            console.warn('未找到有效的主题参数，使用默认内容');
-            console.log('加载默认测试内容');
+    // 获取URL参数（带错误处理）
+    const topicData = getUrlParam('topic');
+
+    if (topicData && topicData.id) {
+        console.log('测试主题ID:', topicData.id, '有效期:', topicData.isValid ? '有效' : '已过期');
+
+        // 更新页面标题
+        document.getElementById('headerTitle').textContent = `测试 - ${topicData.id}`;
+
+        // 即使过期也继续加载内容，但提示用户
+        if (!topicData.isValid) {
+            console.warn('参数已过期，但仍继续加载内容');
         }
-    
+
+        // 加载对应的测试内容
+        chatModule.init('test', topicData.id);
+    } else {
+        console.warn('未找到有效的主题参数，使用默认内容');
+        console.log('加载默认测试内容');
+    }
+
     let topicId = topicData.id;
-    
+
     // 如果没有topic参数，且查询字符串只有一个值，则使用该值
     if (!topicId) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -82,11 +82,11 @@ async function initializePage() {
         alert('无法加载测试任务: ' + (error.message || '未知错误'));
     }
 
-    try{
+    try {
         websocket.connect();
         console.log('[MainApp] WebSocket模块初始化完成');
     }
-    catch(error){
+    catch (error) {
         console.error('[MainApp] WebSocket模块初始化失败:', error);
     }
 }
@@ -183,51 +183,10 @@ function showProblemHintInChat(message, editorType, editCount) {
         <iconify-icon icon="mdi:robot" width="20" height="20"></iconify-icon>
       </div>
       <div class="ai-content">
-        <div class="markdown-content">
-          <div class="problem-hint-container">
-            <div class="problem-hint-header">
-              <iconify-icon icon="mdi:lightbulb-on" width="16" height="16" style="color: #ff9800;"></iconify-icon>
-              <span>学习提示</span>
-            </div>
-            <div class="problem-hint-content">
-              ${message}
-            </div>
-          </div>
+        <p>${message}</p>
         </div>
       </div>
     `;
-
-    // 添加提示消息样式（如果尚未添加）
-    if (!document.getElementById('hint-styles')) {
-        const styles = document.createElement('style');
-        styles.id = 'hint-styles';
-        styles.textContent = `
-        .problem-hint-container {
-          background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
-          border: 1px solid #ffd54f;
-          border-radius: 8px;
-          padding: 16px;
-          margin: 12px 0;
-          box-shadow: 0 2px 8px rgba(255, 179, 0, 0.15);
-        }
-        .problem-hint-header {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin-bottom: 12px;
-          font-weight: 600;
-          color: #ff6f00;
-          font-size: 15px;
-        }
-        .problem-hint-content {
-          color: #5d4037;
-          line-height: 1.5;
-          margin-bottom: 16px;
-          font-size: 14px;
-        }
-      `;
-        document.head.appendChild(styles);
-    }
 
     // ✅ ceq关键：永远追加到末尾（保持时间顺序）
     chatMessages.appendChild(aiMessage);
@@ -273,11 +232,6 @@ function setupSubmitLogic() {
             const behaviorAnalysis = tracker.getCodingBehaviorAnalysis();
             console.log('测试时的编程行为分析:', behaviorAnalysis);
 
-            // 提交测试事件（包含当前行为分析）
-            tracker.logEvent('test_run', {
-                timestamp: new Date().toISOString(),
-                behavior_snapshot: behaviorAnalysis
-            });
         });
     }
     submitButton.addEventListener('click', async () => {
@@ -327,7 +281,7 @@ function setupSubmitLogic() {
                     problem_count: finalBehaviorAnalysis.problemEventsCount || 0
                 }
             };
-            
+
             // 提交测试并等待响应
             const result = await window.apiClient.post('/submission/submit-test2', submissionData);
 
@@ -337,7 +291,7 @@ function setupSubmitLogic() {
                 // 恢复按钮状态
                 restoreButton();
                 displayTestResult(msg);
-                if(msg.passed) {
+                if (msg.passed) {
                     alert("测试完成！即将跳转回到知识图谱界面");
                     setTimeout(() => { window.location.href = '/pages/knowledge_graph.html'; }, 3000);
                 } else {

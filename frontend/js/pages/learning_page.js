@@ -65,25 +65,25 @@ const AppDataStore = {
         allowedElements: null,   // 可选元素数据
         userProgress: null       // 用户进度数据
     },
-    
+
     // 设置数据
     setData(key, data) {
         this.apiData[key] = data;
         console.log(`[AppDataStore] 设置数据 ${key}:`, data);
     },
-    
+
     // 获取数据
     getData(key) {
         const data = this.apiData[key];
         console.log(`[AppDataStore] 获取数据 ${key}:`, data);
         return data;
     },
-    
+
     // 检查数据是否已加载
     isDataLoaded(key) {
         return this.apiData[key] !== null;
     },
-    
+
     // 清空数据
     clearData() {
         this.apiData = {
@@ -116,27 +116,27 @@ async function initMainApp() {
         console.log('主应用已经初始化过，跳过重复初始化');
         return;
     }
-    
+
     // 如果正在初始化，等待完成
     if (AppState.initPromise) {
         console.log('主应用正在初始化中，等待完成');
         return AppState.initPromise;
     }
-    
+
     // 创建初始化Promise
     AppState.initPromise = (async () => {
         try {
             // 标记为已初始化（立即设置，防止重复执行）
             AppState.isInitialized = true;
-            
+
             console.log('开始初始化主应用...');
-            
+
             // 获取必要的DOM元素
             const { startButton, stopButton, iframe } = getRequiredDOMElements();
             if (!startButton || !stopButton || !iframe) {
                 throw new Error('必要的DOM元素未找到');
             }
-            
+
             // 初始化按钮状态
             startButton.disabled = true;
 
@@ -278,11 +278,11 @@ async function initializeModules(topicId) {
     }
 
     //初始化websocket模块
-    try{
+    try {
         websocket.connect();
         console.log('[MainApp] WebSocket模块初始化完成');
     }
-    catch(error){
+    catch (error) {
         console.error('[MainApp] WebSocket模块初始化失败:', error);
     }
 
@@ -329,13 +329,13 @@ function initializeUIEvents(iframe) {
 //     knowledgeModule = new KnowledgeModule();
 //     console.log('[MainApp] 知识点模块初始化完成（失败后）');
 
-    // 初始化聊天模块 - 已注释
-    // try {
-    //     chatModule.init('learning', topicId);
-    //     console.log('[MainApp] 聊天模块初始化完成（失败后）');
-    // } catch (error) {
-    //     console.error('[MainApp] 聊天模块初始化失败（失败后）:', error);
-    // }
+// 初始化聊天模块 - 已注释
+// try {
+//     chatModule.init('learning', topicId);
+//     console.log('[MainApp] 聊天模块初始化完成（失败后）');
+// } catch (error) {
+//     console.error('[MainApp] 聊天模块初始化失败（失败后）:', error);
+// }
 // }
 
 // ==================== 功能模块 ====================
@@ -709,50 +709,11 @@ function showProblemHintInChat(message, editorType, editCount) {
       </div>
       <div class="ai-content">
         <div class="markdown-content">
-          <div class="problem-hint-container">
-            <div class="problem-hint-header">
-              <iconify-icon icon="mdi:lightbulb-on" width="16" height="16" style="color: #ff9800;"></iconify-icon>
-              <span>学习提示</span>
-            </div>
-            <div class="problem-hint-content">
-              ${message}
-            </div>
-          </div>
+          <p>${message}</p>
         </div>
       </div>
     `;
 
-    // 添加提示消息样式（如果尚未添加）
-    if (!document.getElementById('hint-styles')) {
-        const styles = document.createElement('style');
-        styles.id = 'hint-styles';
-        styles.textContent = `
-        .problem-hint-container {
-          background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
-          border: 1px solid #ffd54f;
-          border-radius: 8px;
-          padding: 16px;
-          margin: 12px 0;
-          box-shadow: 0 2px 8px rgba(255, 179, 0, 0.15);
-        }
-        .problem-hint-header {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin-bottom: 12px;
-          font-weight: 600;
-          color: #ff6f00;
-          font-size: 15px;
-        }
-        .problem-hint-content {
-          color: #5d4037;
-          line-height: 1.5;
-          margin-bottom: 16px;
-          font-size: 14px;
-        }
-      `;
-        document.head.appendChild(styles);
-    }
 
     // ✅ ceq关键：永远追加到末尾（保持时间顺序）
     chatMessages.appendChild(aiMessage);

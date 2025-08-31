@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Dict, Any,Literal, Optional, Union, Literal
+from typing import Dict, Any,Literal, Optional, Union, Literal,List
 from datetime import datetime
 from enum import Enum
 
@@ -19,14 +19,60 @@ class EventType(str, Enum):
     KNOWLEDGE_LEVEL_ACCESS = "knowledge_level_access"
     STATE_SNAPSHOT = "state_snapshot"
     PAGE_CLICK="page_click"
-    SIGNIFICANT_EDITS = "significant_edits"
+    # SIGNIFICANT_EDITS = "significant_edits"
     LARGE_ADDITION = "large_addition"
-    CODING_PROBLEM = "coding_problem"
+    # CODING_PROBLEM = "coding_problem"
     CODING_SESSION_SUMMARY = "coding_session_summary"
     IDLE_HINT_DISPLAYED = "idle_hint_displayed"
-    PAGE_FOCUS_CHANGE = "page_focus_change"
+    # PAGE_FOCUS_CHANGE = "page_focus_change"
 
+class ProblemHintDisplayedData(BaseModel):
+    """问题提示显示事件数据"""
+    editor: str = Field(..., description="编辑器类型")
+    edit_count: int = Field(..., ge=0, description="编辑次数")
+    message: str = Field(..., description="提示消息内容")
+    timestamp: Optional[datetime] = Field(None, description="提示时间")
 
+class SignificantEditsBatchData(BaseModel):
+    """重要编辑批量事件数据"""
+    batch_id: str = Field(..., description="批次ID")
+    count: int = Field(..., ge=0, description="编辑数量")
+    edits: List[Dict[str, Any]] = Field(..., description="编辑记录列表")
+    timestamp: Optional[datetime] = Field(None, description="批次时间")
+
+class IdleHintDisplayedData(BaseModel):
+    """闲置提示显示事件数据"""
+    message: str = Field(..., description="提示消息内容")
+    idle_ms: int = Field(..., ge=0, description="闲置时长(毫秒)")
+    page_url: str = Field(..., description="页面URL")
+    timestamp: Optional[datetime] = Field(None, description="提示时间")
+
+class CodeProblemData(BaseModel):
+    """代码问题事件数据 - 修正字段"""
+    editor: str = Field(..., description="编辑器类型: html/css/js")
+    consecutive_edits: int = Field(..., ge=1, description="连续编辑次数")
+    severity: str = Field(..., description="问题严重程度: low/medium/high")
+    net_change: Optional[int] = Field(0, description="净代码变化量")  # 改为可选
+    duration_ms: Optional[int] = Field(0, description="编辑周期持续时间(毫秒)")  # 改为可选
+class CodeProblemData(BaseModel):
+    """代码问题事件数据"""
+    editor: str = Field(..., description="编辑器类型: html/css/js")
+    consecutive_edits: int = Field(..., ge=1, description="连续编辑次数")
+    severity: str = Field(..., description="问题严重程度: low/medium/high")
+    net_change: int = Field(..., description="净代码变化量")
+    duration_ms: int = Field(..., ge=0, description="编辑周期持续时间(毫秒)")
+
+class SignificantEditData(BaseModel):
+    """重要编辑事件数据"""
+    editor: str = Field(..., description="编辑器类型: html/css/js")
+    edit_type: str = Field(..., description="编辑类型: edit_cycle/addition")
+    net_change: int = Field(..., description="净代码变化量")
+    absolute_change: int = Field(..., ge=0, description="绝对变化量")
+    duration_ms: int = Field(..., ge=0, description="编辑持续时间(毫秒)")
+    consecutive_edits: int = Field(0, description="连续编辑次数")
+    deleted_chars: Optional[int] = Field(None, description="删除的字符数")
+    added_chars: Optional[int] = Field(None, description="新增的字符数")
+    total_modified: Optional[int] = Field(None, description="总共修改的字符数")
 
 class CodeEditData(BaseModel):
     """代码编辑事件数据
@@ -111,6 +157,12 @@ EventDataType = Union[
     UserIdleData,
     KnowledgeLevelAccessData,
     StateSnapshotData,
+    CodeProblemData,          # 新增
+    SignificantEditData,      # 新增
+    ProblemHintDisplayedData,      # 新增
+    SignificantEditsBatchData,     # 新增  
+    IdleHintDisplayedData,         # 新增
+    Dict[str, Any]            # 兼容其他类型
     # todo:
 
 ]

@@ -53,11 +53,23 @@ class BehaviorInterpreterService:
             "test_submission": self._handle_test_submission,
             "ai_help_request": self._handle_ai_help_request,
             "knowledge_level_access": self._handle_knowledge_level_access,
+            "coding_problem": self._handle_coding_problem,          # 新增
+            "significant_edit": self._handle_significant_edit,
         }
         # 添加轻量级事件的处理
         for event_type in ("dom_element_select", "code_edit", "page_focus_change", "user_idle", "page_click", "significant_edits", "large_addition", "coding_problem", "coding_session_summary", "idle_hint_displayed"):
 
             self._event_handlers[event_type] = self._handle_lightweight_event
+     # 新增处理方法
+    def _handle_coding_problem(self, participant_id, event_data, timestamp, user_state_service, is_replay):
+        """处理代码问题事件"""
+        if user_state_service is not None and not is_replay:
+            user_state_service.handle_coding_problem(participant_id, event_data)
+
+    def _handle_significant_edit(self, participant_id, event_data, timestamp, user_state_service, is_replay):
+        """处理重要编辑事件"""
+        if user_state_service is not None and not is_replay:
+            user_state_service.handle_significant_edit(participant_id, event_data)
 
     def interpret_event(self, event, user_state_service=None, db_session=None, is_replay: bool = False):
         """

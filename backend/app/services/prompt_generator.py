@@ -130,6 +130,166 @@ Please provide a comprehensive, engaging learning experience that helps the stud
         )
 
         return system_prompt, messages
+    
+    def _get_coding_behavior_analysis(self, user_state: UserStateSummary) -> str:
+        """生成编程行为分析提示"""
+        if not hasattr(user_state, 'behavior_patterns'):
+            return ""
+
+        patterns = user_state.behavior_patterns
+        analysis_parts = []
+
+        # 编辑统计信息
+        edit_stats = patterns.get('edit_statistics', {})
+        if edit_stats:
+            analysis_parts.append("## 代码编辑统计")
+            analysis_parts.append(f"- **总编辑次数**: {edit_stats.get('total_edits', 0)}")
+            analysis_parts.append(f"- **HTML编辑**: {edit_stats.get('html_edits', 0)}次")
+            analysis_parts.append(f"- **CSS编辑**: {edit_stats.get('css_edits', 0)}次") 
+            analysis_parts.append(f"- **JS编辑**: {edit_stats.get('js_edits', 0)}次")
+            analysis_parts.append(f"- **平均编辑规模**: {edit_stats.get('avg_edit_size', 0):.1f}字符")
+            analysis_parts.append(f"- **问题频率**: {edit_stats.get('problem_frequency', 0):.1%}")
+
+        # 分析具体编辑模式（使用新字段）
+        significant_edits = patterns.get('significant_edits', [])
+        if significant_edits:
+            analysis_parts.append("\n## 编辑模式分析")
+
+            # 分析最近20次编辑的删除和添加模式
+            recent_edits = significant_edits[-20:]
+            total_deleted = sum(edit.get('deleted_chars', abs(edit.get('net_change', 0)) if edit.get('net_change', 0) < 0 else 0) 
+                            for edit in recent_edits)
+            total_added = sum(edit.get('added_chars', edit.get('net_change', 0)) if edit.get('net_change', 0) > 0 else 0 
+                            for edit in recent_edits)
+            net_change = total_added - total_deleted
+
+            analysis_parts.append(f"- **最近{len(recent_edits)}次编辑**: 删除 {total_deleted} 字符, 新增 {total_added} 字符")
+            analysis_parts.append(f"- **净变化**: {net_change} 字符")
+
+            # 分析编辑类型分布
+            edit_types = {}
+            for edit in recent_edits:
+                edit_type = edit.get('edit_type', 'unknown')
+                edit_types[edit_type] = edit_types.get(edit_type, 0) + 1
+
+            if edit_types:
+                type_desc = ", ".join([f"{k}: {v}次" for k, v in edit_types.items()])
+                analysis_parts.append(f"- **编辑类型分布**: {type_desc}")
+
+        # 最近问题分析
+        coding_problems = patterns.get('coding_problems', [])
+        if coding_problems:
+            analysis_parts.append("\n## 最近编程问题")
+            recent_problems = coding_problems[-5:]  # 最近5个问题
+
+            for i, problem in enumerate(recent_problems, 1):
+                editor = problem.get('editor', 'unknown')
+                consecutive_edits = problem.get('consecutive_edits', 0)
+                severity = problem.get('severity', 'unknown')
+                net_change = problem.get('net_change', 0)
+
+                # 使用新字段如果可用
+                deleted_chars = problem.get('deleted_chars')
+                added_chars = problem.get('added_chars')
+
+                if deleted_chars is not None and added_chars is not None:
+                    problem_desc = (
+                        f"{i}. **{editor}编辑器**: {consecutive_edits}次连续编辑, "
+                        f"严重程度: {severity}, 删除: {deleted_chars}字符, 新增: {added_chars}字符"
+                    )
+                else:
+                    problem_desc = (
+                        f"{i}. **{editor}编辑器**: {consecutive_edits}次连续编辑, "
+                        f"严重程度: {severity}, 净变化: {net_change}字符"
+                    )
+
+                analysis_parts.append(problem_desc)
+
+        # 编辑模式详细分析
+        if significant_edits:
+            analysis_parts.append("\n## 详细编辑分析")
+
+            # 分析各编辑器的编辑习惯
+            editor_stats = {}
+            for edit in significant_edits[-20:]:  # 分析最近20个编辑
+                editor = edit.get('editor', 'unknown')
+                if editor not in editor_stats:
+                    editor_stats[editor] = {
+                        'count': 0, 
+                        'total_deleted': 0, 
+                        'total_added': 0,
+                        'types': {}
+                    }
+
+                editor_stats[editor]['count'] += 1
+
+                # 使用新字段如果可用，否则回退到旧字段
+                deleted = edit.get('deleted_chars')
+                if deleted is None and edit.get('net_change', 0) < 0:
+                    deleted = abs(edit.get('net_change', 0))
+
+                added = edit.get('added_chars') 
+                if added is None and edit.get('net_change', 0) > 0:
+                    added = edit.get('net_change', 0)
+
+                if deleted is not None:
+                    editor_stats[editor]['total_deleted'] += deleted
+                if added is not None:
+                    editor_stats[editor]['total_added'] += added
+
+                edit_type = edit.get('edit_type', 'unknown')
+                editor_stats[editor]['types'][edit_type] = editor_stats[editor]['types'].get(edit_type, 0) + 1
+
+            for editor, stats in editor_stats.items():
+                if stats['count'] > 0:
+                    avg_deleted = stats['total_deleted'] / stats['count'] if stats['total_deleted'] > 0 else 0
+                    avg_added = stats['total_added'] / stats['count'] if stats['total_added'] > 0 else 0
+                    type_desc = ", ".join([f"{k}:{v}次" for k, v in stats['types'].items()])
+
+                    analysis_parts.append(
+                        f"- **{editor}**: {stats['count']}次编辑, "
+                        f"平均删除: {avg_deleted:.1f}字符, 平均新增: {avg_added:.1f}字符, {type_desc}"
+                    )
+
+        # 学习行为建议
+        if analysis_parts:
+            analysis_parts.append("\n## 教学建议")
+
+            # 基于问题频率的建议
+            problem_freq = edit_stats.get('problem_frequency', 0)
+            if problem_freq > 0.3:
+                analysis_parts.append("- 📉 学生遇到较多编程问题，需要更多基础概念讲解和分步指导")
+            elif problem_freq > 0.1:
+                analysis_parts.append("- ⚠️ 学生遇到一些编程问题，建议提供针对性提示和示例")
+            else:
+                analysis_parts.append("- ✅ 学生编程进展顺利，可以适当增加挑战性内容")
+
+            # 基于编辑器使用情况的建议
+            html_edits = edit_stats.get('html_edits', 0)
+            css_edits = edit_stats.get('css_edits', 0) 
+            js_edits = edit_stats.get('js_edits', 0)
+
+            if js_edits > (html_edits + css_edits) * 2:
+                analysis_parts.append("- 🔍 学生专注于JavaScript逻辑，可能需要HTML/CSS基础支持")
+            elif html_edits > (css_edits + js_edits) * 2:
+                analysis_parts.append("- 🎨 学生专注于HTML结构，可能需要CSS样式和JavaScript交互指导")
+
+            # 基于编辑模式的分析
+            if any('edit_cycle' in str(edit.get('edit_type')) for edit in significant_edits[-10:]):
+                analysis_parts.append("- 💪 学生有调试和重写行为，表明在尝试解决问题，应鼓励这种 persistence")
+
+            # 基于删除/添加比例的建议
+            if significant_edits:
+                recent_edits = significant_edits[-10:]
+                total_deleted_recent = sum(edit.get('deleted_chars', 0) for edit in recent_edits)
+                total_added_recent = sum(edit.get('added_chars', 0) for edit in recent_edits)
+
+                if total_deleted_recent > total_added_recent * 1.5:
+                    analysis_parts.append("- 🗑️ 学生大量删除代码，可能遇到设计问题或理解困难")
+                elif total_added_recent > total_deleted_recent * 2:
+                    analysis_parts.append("- ✍️ 学生积极编写代码，学习动力较强，可以给予更多创造性任务")
+
+        return "\n".join(analysis_parts) if analysis_parts else ""
 
     def _build_system_prompt(
         self,
@@ -143,6 +303,11 @@ Please provide a comprehensive, engaging learning experience that helps the stud
     ) -> str:
         """构建系统提示词"""
         prompt_parts = [self.base_system_prompt]
+
+         # 添加编程行为分析提示
+        coding_behavior_analysis = self._get_coding_behavior_analysis(user_state)
+        if coding_behavior_analysis:
+            prompt_parts.append(f"CODING BEHAVIOR ANALYSIS:\n{coding_behavior_analysis}")
 
         # 添加情感策略
         emotion = user_state.emotion_state.get('current_sentiment', 'NEUTRAL')

@@ -17,7 +17,7 @@ from ..models.bkt import BKTModel
 logger = logging.getLogger(__name__)
 
 class StudentProfile:
-    def __init__(self, participant_id, is_new_user=True):
+    def __init__(self, participant_id, is_new_user=True,):
         self.participant_id = participant_id  # TODO: cxz 需要从会话或参数中获取participant_id
         self.is_new_user = is_new_user
         # 认知状态
@@ -40,11 +40,294 @@ class StudentProfile:
             'persistence_score': 0.5,      # [0,1] 坚持度
             'learning_velocity': 0.5,      # [0,1] 学习速度
             'attention_stability': 0.5,    # [0,1] 注意力稳定性
-            'submission_timestamps': [],    # 保留时间戳用于计算频率
-            'recent_events': [],             # 保留最近事件用于滑动窗口计算
-            'knowledge_level_history': {}  # { 'level_id': {'visits': 0, 'total_duration_ms': 0} }
+             'submission_timestamps': [],   # 保留时间戳用于计算频率
+            'recent_events': [],           # 保留最近事件用于滑动窗口计算
+            'knowledge_level_history': {}, # { 'topic_id': { 'level': {'visits': 0, 'total_duration_ms': 0} } }
+
+            # 代码问题记录 - 增强数据结构
+            'coding_problems': [],         # 存储代码问题记录
+            'recent_problems_window': [],  # 近期问题窗口用于实时分析
+
+            # 重要编辑记录 - 增强数据结构
+            'significant_edits': [],       # 存储重要编辑记录
+            'recent_edits_window': [],     # 近期编辑窗口用于计算
+
+            # 编辑统计信息 - 增强统计字段
+            'edit_statistics': {
+                'total_edits': 0,
+                'html_edits': 0,
+                'css_edits': 0,
+                'js_edits': 0,
+                'avg_edit_size': 0,
+                'problem_frequency': 0.0,
+                'total_deleted_chars': 0,   # 新增：总共删除字符数
+                'total_added_chars': 0,     # 新增：总共新增字符数
+                'net_change_chars': 0,      # 新增：净变化字符数
+                'max_consecutive_edits': 0, # 新增：最大连续编辑次数
+                'recent_edit_intensity': 0.0, # 新增：近期编辑强度
+            },
+
+            # 行为计数器 - 新增
+            'behavior_counters': {
+                'help_requests': 0,        # AI求助次数
+                'focus_changes': 0,        # 页面焦点变化次数
+                'idle_count': 0,           # 空闲次数
+                'dom_selects': 0,          # DOM元素选择次数
+                'code_edits': 0,           # 代码编辑次数
+                'test_submissions': 0,     # 测试提交次数
+                'test_passes': 0,          # 测试通过次数
+                'test_fails': 0,           # 测试失败次数
+            },
+
+            # 时间窗口统计 - 新增
+            'time_window_stats': {
+                'last_hour': {
+                    'edits': 0,
+                    'problems': 0,
+                    'help_requests': 0,
+                    'submissions': 0
+                },
+                'last_30min': {
+                    'edits': 0,
+                    'problems': 0,
+                    'help_requests': 0,
+                    'submissions': 0
+                },
+                'last_15min': {
+                    'edits': 0,
+                    'problems': 0,
+                    'help_requests': 0,
+                    'submissions': 0
+                }
+            },
+
+            # 编辑器特定统计 - 新增
+            'editor_specific_stats': {
+                'html': {
+                    'total_edits': 0,
+                    'avg_edit_size': 0,
+                    'deleted_chars': 0,
+                    'added_chars': 0,
+                    'problem_count': 0
+                },
+                'css': {
+                    'total_edits': 0,
+                    'avg_edit_size': 0,
+                    'deleted_chars': 0,
+                    'added_chars': 0,
+                    'problem_count': 0
+                },
+                'js': {
+                    'total_edits': 0,
+                    'avg_edit_size': 0,
+                    'deleted_chars': 0,
+                    'added_chars': 0,
+                    'problem_count': 0
+                }
+            },
+
+            # 学习模式指标 - 新增
+            'learning_metrics': {
+                'concept_grasp_rate': 0.5,    # 概念掌握速率
+                'error_recovery_rate': 0.5,   # 错误恢复速率
+                'attention_span': 300,        # 注意力时长（秒）
+                'preferred_learning_style': 'visual',  # 偏好学习风格
+                'difficulty_tolerance': 0.5   # 困难容忍度
+            },
+
+            # 会话状态 - 新增
+            'session_state': {
+                'current_topic': None,        # 当前学习主题
+                'current_mode': 'learning',   # 当前模式：learning/test
+                'session_start_time': None,   # 会话开始时间
+                'active_duration': 0,         # 活跃时长（秒）
+                'idle_duration': 0,           # 空闲时长（秒）
+                'last_activity_time': None    # 最后活动时间
+            }
         }
     
+    # user_state_service.py - 添加批量处理方法
+    def _handle_significant_edits_batch(self, participant_id, event_data, timestamp, user_state_service, is_replay):
+        """处理批量重要编辑事件"""
+        if user_state_service is not None and not is_replay:
+            user_state_service.handle_significant_edits_batch(participant_id, event_data)
+
+    # 在 UserStateService 中添加处理方法
+    def handle_significant_edits_batch(self, participant_id: str, batch_data: Dict[str, Any]):
+        """处理批量重要编辑事件"""
+        try:
+            edits = batch_data.get('edits', [])
+            if not edits:
+                return
+
+            profile, _ = self.get_or_create_profile(participant_id, None)
+
+            # 批量处理编辑记录
+            for edit in edits:
+                self._process_single_edit(profile, edit)
+
+            logger.info(f"处理了 {len(edits)} 个批量编辑事件")
+
+        except Exception as e:
+            logger.error(f"处理批量编辑事件时发生错误: {e}")
+
+    def _process_single_edit(self, profile, edit_data: Dict[str, Any]):
+        """处理单个编辑记录"""
+        edit_record = {
+            'timestamp': edit_data.get('timestamp', datetime.now(UTC).isoformat()),
+            'editor': edit_data.get('editor'),
+            'edit_type': edit_data.get('edit_type'),
+            'net_change': edit_data.get('net_change', 0),
+            'deleted_chars': edit_data.get('deleted_chars', 0),
+            'added_chars': edit_data.get('added_chars', 0),
+            'total_modified': edit_data.get('total_modified', 0),
+            'duration_ms': edit_data.get('duration_ms', 0),
+            'consecutive_edits': edit_data.get('consecutive_edits', 0)
+        }
+
+        # 更新到 Redis
+        key = f"user_profile:{profile.participant_id}"
+
+        # 获取现有编辑记录
+        try:
+            current_edits = self.redis_client.json().get(key, '.behavior_patterns.significant_edits') or []
+        except Exception:
+            current_edits = []
+
+        # 添加新记录（保持最近100个编辑）
+        current_edits.append(edit_record)
+        if len(current_edits) > 100:
+            current_edits = current_edits[-100:]
+            # 更新编辑统计
+        edit_stats = profile.behavior_patterns.get('edit_statistics', {})
+        total_edits = edit_stats.get('total_edits', 0) + 1
+
+        # 按编辑器类型统计
+        editor_type = edit_data.get('editor', 'unknown')
+        editor_key = f"{editor_type}_edits"
+        edit_stats[editor_key] = edit_stats.get(editor_key, 0) + 1
+
+        # 计算平均编辑大小
+        current_avg = edit_stats.get('avg_edit_size', 0)
+        edit_size = edit_data.get('total_modified', abs(edit_data.get('net_change', 0)))
+        new_avg = (current_avg * (total_edits - 1) + edit_size) / total_edits
+
+        edit_stats['total_edits'] = total_edits
+        edit_stats['avg_edit_size'] = new_avg
+
+        # 批量更新
+        set_dict = {
+            '.behavior_patterns.significant_edits': current_edits,
+            '.behavior_patterns.edit_statistics': edit_stats
+        }
+
+        self.set_profile(profile, set_dict)
+
+def handle_significant_edit(self, participant_id: str, edit_data: Dict[str, Any]):
+    """处理重要编辑事件"""
+    try:
+        profile, _ = self.get_or_create_profile(participant_id, None)
+
+        # 添加到编辑记录
+        edit_record = {
+            'timestamp': datetime.now(UTC).isoformat(),
+            'editor': edit_data.get('editor'),
+            'edit_type': edit_data.get('edit_type'),
+            'net_change': edit_data.get('net_change', 0),
+            'absolute_change': edit_data.get('absolute_change', 0),
+            'duration_ms': edit_data.get('duration_ms', 0),
+            'consecutive_edits': edit_data.get('consecutive_edits', 0)
+        }
+
+        key = f"user_profile:{participant_id}"
+
+        # 获取现有编辑记录
+        try:
+            current_edits = self.redis_client.json().get(key, '.behavior_patterns.significant_edits') or []
+        except Exception:
+            current_edits = []
+
+        # 添加新记录（保持最近100个编辑）
+        current_edits.append(edit_record)
+        if len(current_edits) > 100:
+            current_edits = current_edits[-100:]
+
+        # 更新编辑统计
+        edit_stats = profile.behavior_patterns.get('edit_statistics', {})
+        total_edits = edit_stats.get('total_edits', 0) + 1
+
+        # 计算平均编辑大小
+        current_avg = edit_stats.get('avg_edit_size', 0)
+        new_avg = (current_avg * (total_edits - 1) + abs(edit_data.get('net_change', 0))) / total_edits
+
+        edit_stats['total_edits'] = total_edits
+        edit_stats['avg_edit_size'] = new_avg
+
+        # 批量更新
+        set_dict = {
+            '.behavior_patterns.significant_edits': current_edits,
+            '.behavior_patterns.edit_statistics': edit_stats
+        }
+
+        self.set_profile(profile, set_dict)
+        logger.info(f"记录用户 {participant_id} 的重要编辑: {edit_data}")
+
+    except Exception as e:
+        logger.error(f"处理重要编辑时发生错误: {e}")
+
+def handle_significant_edit(self, participant_id: str, edit_data: Dict[str, Any]):
+    """处理重要编辑事件"""
+    try:
+        profile, _ = self.get_or_create_profile(participant_id, None)
+
+        # 添加到编辑记录
+        edit_record = {
+            'timestamp': datetime.now(UTC).isoformat(),
+            'editor': edit_data.get('editor'),
+            'edit_type': edit_data.get('edit_type'),
+            'net_change': edit_data.get('net_change', 0),
+            'absolute_change': edit_data.get('absolute_change', 0),
+            'duration_ms': edit_data.get('duration_ms', 0),
+            'consecutive_edits': edit_data.get('consecutive_edits', 0)
+        }
+
+        key = f"user_profile:{participant_id}"
+
+        # 获取现有编辑记录
+        try:
+            current_edits = self.redis_client.json().get(key, '.behavior_patterns.significant_edits') or []
+        except Exception:
+            current_edits = []
+
+        # 添加新记录（保持最近100个编辑）
+        current_edits.append(edit_record)
+        if len(current_edits) > 100:
+            current_edits = current_edits[-100:]
+
+        # 更新编辑统计
+        edit_stats = profile.behavior_patterns.get('edit_statistics', {})
+        total_edits = edit_stats.get('total_edits', 0) + 1
+
+        # 计算平均编辑大小
+        current_avg = edit_stats.get('avg_edit_size', 0)
+        new_avg = (current_avg * (total_edits - 1) + abs(edit_data.get('net_change', 0))) / total_edits
+
+        edit_stats['total_edits'] = total_edits
+        edit_stats['avg_edit_size'] = new_avg
+
+        # 批量更新
+        set_dict = {
+            '.behavior_patterns.significant_edits': current_edits,
+            '.behavior_patterns.edit_statistics': edit_stats
+        }
+
+        self.set_profile(profile, set_dict)
+        logger.info(f"记录用户 {participant_id} 的重要编辑: {edit_data}")
+
+    except Exception as e:
+        logger.error(f"处理重要编辑时发生错误: {e}")
+
+
     # TODO: 需要检查实现to_dict和from_dict方法
     def to_dict(self) -> Dict[str, Any]:
         """将StudentProfile序列化为字典"""
