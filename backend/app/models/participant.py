@@ -1,5 +1,6 @@
 from sqlalchemy import Column, String, DateTime
-from datetime import datetime, UTC
+from datetime import datetime
+import pytz
 from app.db.base_class import Base
 
 class Participant(Base):
@@ -16,4 +17,4 @@ class Participant(Base):
     
     id = Column(String, primary_key=True)
     group = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.now(UTC))
+    created_at = Column(DateTime, default=lambda: datetime.now(pytz.timezone('Asia/Shanghai')))

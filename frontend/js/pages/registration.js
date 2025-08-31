@@ -2,6 +2,8 @@
 import { saveParticipantId, checkAndRedirect } from '../modules/session.js';
 import { AppConfig, initializeConfig } from '../modules/config.js';
 import { setupHeaderTitle } from '../modules/navigation.js';
+import websocket from '../modules/websocket_client.js';
+import apiClient from '../api_client.js';
 // 页面加载时先检查是否已有会话
 // checkAndRedirect(); // 暂时注释掉，避免在注册页面直接跳转
 
@@ -17,7 +19,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (startButton && usernameInput) {
         startButton.addEventListener('click', async () => {
             const username = usernameInput.value.trim();
-            
             // 简单的输入校验
             if (!username) {
                 alert('请输入用户ID');
@@ -29,26 +30,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             startButton.textContent = '处理中...';
 
             try {
-                // 确保backend_port有默认值
-                const backendPort = AppConfig.backend_port || 8000;
-                // 构建完整的后端API URL
-                const backendUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-                    ? `http://localhost:${backendPort}${AppConfig.api_base_url}/session/initiate`
-                    : `${AppConfig.api_base_url}/session/initiate`;
-                    
-                const response = await fetch(backendUrl, { 
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ participant_id: username }),
+                // 使用统一的apiClient方法发送请求
+                const result = await apiClient.postWithoutAuth('/session/initiate', {
+                    participant_id: username
                 });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const result = await response.json();
 
                 if (result.code === 200 || result.code === 201) {
                     saveParticipantId(result.data.participant_id);

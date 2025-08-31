@@ -124,7 +124,7 @@ class KnowledgeBaseBuilderImpl(KnowledgeBaseBuilder):
     def _get_embeddings_batch(self, texts: List[str]) -> List[List[float]]:
         """批量获取文本的embeddings"""
         embeddings = []
-        batch_size = 10  # 与原脚本保持一致
+        batch_size = 100  # 与原脚本保持一致
         
         # 如果有可恢复的检查点，从检查点恢复进度
         start_index = 0
@@ -148,39 +148,52 @@ class KnowledgeBaseBuilderImpl(KnowledgeBaseBuilder):
             
             print(f"正在处理批次 {batch_index}/{total_batches} (包含 {len(batch_texts)} 个文本块)...")
             
-            for j, text in enumerate(batch_texts):
-                try:
-                    # print(f"  正在处理批次 {batch_index} 中的第 {j+1}/{len(batch_texts)} 个文本块...")
-                    response = self.client.embeddings.create(
-                        model=self.embedding_model,
-                        input=text,
-                        encoding_format="float"
-                    )
-                    batch_embeddings.append(response.data[0].embedding)
-                    
-                    # 在每次API调用成功后更新进度
-                    if self.state:
-                        # 临时将当前批次的embeddings加入总列表以保存检查点
-                        temp_embeddings = embeddings + batch_embeddings
-                        processed_chunks = len(temp_embeddings)
-                        # current_batch现在表示已处理的文本块数，而不是批次索引
-                        self.state.update_progress(
-                            processed_chunks=processed_chunks,
-                            total_chunks=len(texts),
-                            current_batch=processed_chunks,  # 使用已处理的文本块数
-                            total_batches=total_batches
+            try:
+                # 使用真正的批量API调用，一次性处理整个批次
+                response = self.client.embeddings.create(
+                    model=self.embedding_model,
+                    input=batch_texts,
+                    encoding_format="float"
+                )
+                batch_embeddings = [item.embedding for item in response.data]
+                
+            except KeyboardInterrupt:
+                print("\n捕获到中断信号，正在保存当前进度...")
+                # 重新抛出异常，以便上层脚本可以捕获并优雅退出
+                raise
+            except Exception as e:
+                print(f"API调用错误: {e}")
+                # 如果批量调用失败，回退到单个处理
+                print("回退到单个文本块处理...")
+                for text in batch_texts:
+                    try:
+                        response = self.client.embeddings.create(
+                            model=self.embedding_model,
+                            input=text,
+                            encoding_format="float"
                         )
-                        self._save_partial_embeddings(temp_embeddings)
-
-                except KeyboardInterrupt:
-                    print("\n捕获到中断信号，正在保存当前进度...")
-                    # 重新抛出异常，以便上层脚本可以捕获并优雅退出
-                    raise
-                except Exception as e:
-                    print(f"API调用错误: '{text[:50]}...': {e}")
-                    batch_embeddings.append([0.0] * self.embedding_dimension)
+                        batch_embeddings.append(response.data[0].embedding)
+                    except Exception as single_e:
+                        print(f"单个文本块处理错误: '{text[:50]}...': {single_e}")
+                        batch_embeddings.append([0.0] * self.embedding_dimension)
             
             embeddings.extend(batch_embeddings)
+            
+            # 更新进度并定期保存检查点（每5个批次保存一次）
+            if self.state:
+                processed_chunks = len(embeddings)
+                self.state.update_progress(
+                    processed_chunks=processed_chunks,
+                    total_chunks=len(texts),
+                    current_batch=processed_chunks,
+                    total_batches=total_batches
+                )
+                
+                # 每5个批次保存一次检查点，减少I/O开销
+                if batch_index % 5 == 0:
+                    self._save_partial_embeddings(embeddings)
+                    print(f"检查点已保存 (批次 {batch_index})")
+            
             print(f"批次 {batch_index}/{total_batches} 处理完成")
         
         print(f"所有批次处理完成，共处理 {len(embeddings)} 个文本块的embeddings")

@@ -21,3 +21,78 @@
 操作完成后，`backend` 目录的图标会变为蓝色，表示PyCharm已经将其识别为源代码的起点。从此以后，所有从 `app` 开始的绝对路径导入都将正常工作。
 
 ---
+
+
+## 启动
+
+### Mac/Linux
+
+```zsh
+cd backend
+python -m app.main
+```
+
+```zsh
+docker run -d --name redis-stack -p 6380:6379 redis/redis-stack:latest
+```
+
+```zsh
+cd backend
+celery -A app.celery_app worker -l info -Q chat_queue --pool=prefork -n ai_worker@%h -c 2
+```
+
+```zsh
+cd backend
+celery -A app.celery_app worker -l info -Q submit_queue --pool=prefork -n submit_worker@%h -c 2
+```
+
+```zsh
+cd backend
+celery -A app.celery_app worker -l info -Q db_writer_queue --pool=gevent -n db_worker@%h -c 10
+```
+
+```zsh
+cd backend
+celery -A app.celery_app worker -l info -Q behavior_queue --pool=prefork -n behavior_worker@%h -c 2
+```
+
+```zsh
+cd backend
+celery -A app.celery_app beat -l info
+```
+
+### Windows
+
+```zsh
+cd backend
+python -m app.main
+```
+
+```zsh
+docker run -d --name redis-stack -p 6380:6379 redis/redis-stack:latest
+```
+
+```zsh
+cd backend
+celery -A app.celery_app worker -l info -Q chat_queue --pool=solo -n ai_worker@%h
+```
+
+```zsh
+cd backend
+celery -A app.celery_app worker -l info -Q submit_queue --pool=solo -n submit_worker@%h
+```
+
+```zsh
+cd backend
+celery -A app.celery_app worker -l info -Q db_writer_queue --pool=solo -n db_worker@%h
+```
+
+```zsh
+cd backend
+celery -A app.celery_app worker -l info -Q behavior_queue --pool=solo -n behavior_worker@%h
+```
+
+```zsh
+cd backend
+celery -A backend.app.celery_app beat --pool=solo -l info
+```

@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, JSON
-from datetime import datetime, UTC
+from datetime import datetime
+import pytz
 from app.db.base_class import Base
 
 class SurveyResult(Base):
@@ -20,4 +21,4 @@ class SurveyResult(Base):
     participant_id = Column(String, nullable=False)
     survey_type = Column(String, nullable=False)
     answers = Column(JSON, nullable=False)
-    submitted_at = Column(DateTime, default=datetime.now(UTC))
+    submitted_at = Column(DateTime, default=lambda: datetime.now(pytz.timezone('Asia/Shanghai')))

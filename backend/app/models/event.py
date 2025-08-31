@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, JSON
-from datetime import datetime, UTC
+from datetime import datetime
+import pytz
 from app.db.base_class import Base
 
 class EventLog(Base):
@@ -18,6 +19,6 @@ class EventLog(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     participant_id = Column(String, index=True, nullable=False)
-    timestamp = Column(DateTime, default=datetime.now(UTC), nullable=False)
+    timestamp = Column(DateTime, default=lambda: datetime.now(pytz.timezone('Asia/Shanghai')), nullable=False)
     event_type = Column(String, nullable=False)
     event_data = Column(JSON)

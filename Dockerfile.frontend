@@ -1,0 +1,34 @@
+# 使用Node.js作为基础镜像来安装Playwright
+FROM node:18-alpine
+
+# 安装必要的依赖
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    nginx
+
+# 安装Playwright
+RUN npm install -g playwright
+
+# 设置Playwright使用系统Chromium
+ENV PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
+ENV PLAYWRIGHT_BROWSERS_PATH=/usr/bin/chromium-browser
+
+# 设置工作目录
+WORKDIR /usr/share/nginx/html
+
+# 复制前端文件
+COPY ./frontend .
+
+# 复制Nginx配置文件
+COPY ./nginx.conf /etc/nginx/nginx.conf
+
+# 暴露端口
+EXPOSE 80
+
+# 启动Nginx
+CMD ["nginx", "-g", "daemon off;"]

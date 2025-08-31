@@ -22,6 +22,66 @@ Be an approachable-yet-dynamic teacher, who helps the user learn by guiding them
 
 Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions - help the user find the answer, by working with them collaboratively and building from what they already know.
 """
+        
+        # 统一提示词模版
+        self.debug_prompt_template = """
+# Role
+You are an experienced programming tutor who uses the Socratic teaching method. Your core goal is to stimulate students' independent thinking ability, guiding them to find and solve problems on their own, rather than directly providing ready-made answers.
+
+# Core Principles
+You will receive a number called `question_count`, which represents how many times the student has asked for help on this current problem.
+Please treat `question_count` as a key indicator of the student's level of confusion.
+
+Your teaching strategy must be progressive:
+- **When `question_count` is low**, your response should be inspiring and high-level. Use more questioning methods to guide students to examine their code and thinking.
+- **As `question_count` increases**, it indicates that the student may be stuck in a difficult situation, and your hints should become more specific and targeted. You can guide students to focus on specific code areas or logic.
+- **When `question_count` becomes very high**, this means the student may be very frustrated, and providing direct answers and detailed explanations is reasonable and necessary to help them break through the difficulty and learn from it.
+
+# Task
+Now, the student is working on the "{content_title}" task. They have encountered a problem, and this is their **{question_count}** time asking about it.
+Here is their code and the error they encountered:
+
+**Student Code:**
+```python
+{user_code}
+```
+
+**Error Message:**
+```
+{error_message}
+```
+
+Please generate the most appropriate response for the student based on your role as a tutor and the core principles above.
+"""
+
+        # 学习模式提示词模版
+        self.learning_prompt_template = """
+# Role
+You are an experienced programming tutor specializing in guided learning. Your core goal is to help students deeply understand programming concepts through structured explanation, practical examples, and interactive guidance.
+
+# Core Principles
+You will receive the student's current mastery level and learning context for the topic "{content_title}".
+Your teaching approach should be adaptive and comprehensive:
+
+- **For beginner students** (mastery ≤ 0.5): Start with fundamental concepts, use simple analogies, and provide step-by-step explanations. Focus on building confidence and foundational understanding.
+- **For intermediate students** (0.5 < mastery ≤ 0.8): Build on existing knowledge, introduce more complex examples, and encourage exploration of related concepts. Connect new ideas to what they already know.
+- **For advanced students** (mastery > 0.8): Provide challenging content, explore advanced applications, and encourage critical thinking. Discuss best practices, optimization techniques, and real-world scenarios.
+
+# Teaching Strategy
+1. **Concept Introduction**: Clearly explain the core concept and its importance
+2. **Practical Examples**: Provide relevant code examples that demonstrate the concept
+3. **Interactive Learning**: Ask thought-provoking questions to engage the student
+4. **Real-world Application**: Show how the concept applies to actual programming scenarios
+5. **Common Pitfalls**: Highlight frequent mistakes and how to avoid them
+6. **Practice Suggestions**: Recommend exercises or projects to reinforce learning
+
+# Current Context
+**Topic**: {content_title}
+**Student's Current Mastery Level**: {mastery_level} (probability: {mastery_prob:.2f})
+**Learning Mode**: The student is actively studying and seeking to understand this concept
+
+Please provide a comprehensive, engaging learning experience that helps the student master this topic at their appropriate level.
+"""
 
     def create_prompts(
         self,
@@ -58,7 +118,8 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
             mode=mode,
             content_title=content_title,
             content_json=content_json,
-            test_results=test_results
+            test_results=test_results,
+            code_content=code_content
         )
 
         # 构建消息列表
@@ -77,7 +138,8 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
         mode: str = None,
         content_title: str = None,
         content_json: str = None,
-        test_results: List[Dict[str, Any]] = None
+        test_results: List[Dict[str, Any]] = None,
+        code_content: CodeContent = None
     ) -> str:
         """构建系统提示词"""
         prompt_parts = [self.base_system_prompt]
@@ -116,24 +178,55 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
                 if mastery_info:
                     student_info_parts.append(f"LEARNING PROGRESS: Student's mastery levels - {', '.join(mastery_info)}")
 
-            # 添加行为计数器信息
-            if hasattr(user_state, 'behavior_counters') and user_state.behavior_counters:
-                behavior_info = []
-                counters = user_state.behavior_counters
+            # 添加行为模式信息
+            if hasattr(user_state, 'behavior_patterns') and user_state.behavior_patterns:
+                patterns = user_state.behavior_patterns
+                pattern_info = []
+                
+                if 'error_frequency' in patterns:
+                    pattern_info.append(f"error frequency: {patterns.get('error_frequency', 0):.2f}")
+                if 'help_seeking_tendency' in patterns:
+                    pattern_info.append(f"help-seeking tendency: {patterns.get('help_seeking_tendency', 0):.2f}")
+                if 'learning_velocity' in patterns:
+                    pattern_info.append(f"learning velocity: {patterns.get('learning_velocity', 0):.2f}")
 
-                # 错误计数
-                if 'error_count' in counters:
-                    behavior_info.append(f"errors: {counters['error_count']}")
-
-                # 提交时间戳
-                if 'submission_timestamps' in counters and counters['submission_timestamps']:
-                    submission_count = len(counters['submission_timestamps'])
-                    behavior_info.append(f"submissions: {submission_count}")
-
-                if behavior_info:
-                    student_info_parts.append(f"BEHAVIOR: Student has {', '.join(behavior_info)}")
+                if pattern_info:
+                    student_info_parts.append(f"BEHAVIOR METRICS: {', '.join(pattern_info)}")
 
             prompt_parts.append("\n".join(student_info_parts))
+
+            # 添加知识点访问历史
+            if hasattr(user_state, 'behavior_patterns') and user_state.behavior_patterns.get('knowledge_level_history'):
+                history = user_state.behavior_patterns['knowledge_level_history']
+                if history:
+                    topic_summaries = []
+                    # Sort topics for consistent ordering
+                    sorted_topics = sorted(history.keys())
+                    
+                    for topic_id in sorted_topics:
+                        topic_history = history[topic_id]
+                        if not topic_history:
+                            continue
+                        
+                        topic_details = [f"  For Topic '{topic_id}':"]
+                        # Sort levels for consistent ordering, filtering out non-numeric keys
+                        sorted_levels = sorted([k for k in topic_history.keys() if k.isdigit()], key=lambda x: int(x))
+                        
+                        for level in sorted_levels:
+                            stats = topic_history[level]
+                            visits = stats.get('visits', 0)
+                            duration_sec = stats.get('total_duration_ms', 0) / 1000
+                            topic_details.append(f"  - Level {level}: Visited {visits} time(s), total duration {duration_sec:.1f} seconds.")
+                        
+                        if len(topic_details) > 1:
+                            topic_summaries.append("\\n".join(topic_details))
+
+                    if topic_summaries:
+                        full_history_summary = "\\n".join(topic_summaries)
+                        prompt_parts.append(f"""
+LEARNING FOCUS: Please pay close attention to the student's behavior patterns to better understand their learning state. Remember that higher knowledge levels are more difficult.
+- **Knowledge Level Exploration**: The student has explored the following knowledge levels. Use their visit order, frequency, and dwell time to infer their interests and potential difficulties.
+{full_history_summary}""")
 
         # 添加RAG上下文 (在用户状态信息之后，任务上下文之前)
         if retrieved_context:
@@ -143,25 +236,69 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
             prompt_parts.append("REFERENCE KNOWLEDGE: No relevant knowledge was retrieved from the knowledge base. Answer based on your general knowledge.")
 
         # 添加任务上下文和分阶段debug逻辑
-        if mode == "learning":
-            prompt_parts.append("MODE: The student is in learning mode. Provide detailed explanations and examples to help them understand the concepts.")
-        elif mode == "test":
+        if mode == "test":
             prompt_parts.append("MODE: The student is in test mode. Guide them to find the answer themselves. Do not give the answer directly.")
-            # 分阶段debug逻辑
-            question_count = user_state.behavior_counters.get(f"question_count_{content_title}", 0)
-            if question_count == 0:
-                prompt_parts.append("DEBUGGING STRATEGY: This is the first time the student is asking about this. Provide a small hint.")
-            elif question_count == 1:
-                prompt_parts.append("DEBUGGING STRATEGY: The student is asking again. Provide a more specific hint or a guiding question.")
-            elif question_count == 2:
-                prompt_parts.append("DEBUGGING STRATEGY: The student is still stuck. Provide a code snippet with a small modification, but not the complete answer.")
-            else:
-                prompt_parts.append("DEBUGGING STRATEGY: The student is asking multiple times. It's time to provide the correct answer, but also explain why it is correct.")
-        
-        # 添加内容标题
-        if content_title:
-            prompt_parts.append(f"TOPIC: The current topic is '{content_title}'. Focus your explanations on this specific topic.")
             
+            # 使用统一提示词模版
+            question_count = 0
+            user_code = ""
+            error_message = ""
+            
+            if hasattr(user_state, 'behavior_patterns'):
+                question_count = user_state.behavior_patterns.get(f"question_count_{content_title}", 0)
+            
+            # 获取代码和错误信息
+            if code_content and hasattr(code_content, 'js'):
+                user_code = code_content.js
+            
+            if test_results:
+                # 将测试结果转换为错误信息字符串
+                error_message = json.dumps(test_results, indent=2, ensure_ascii=False)
+            
+            # 格式化调试提示词
+            debug_prompt = self.debug_prompt_template.format(
+                content_title=content_title or "Unknown",
+                question_count=question_count,
+                user_code=user_code,
+                error_message=error_message
+            )
+            prompt_parts.append(debug_prompt)
+        else:
+            if mode == "learning":
+                prompt_parts.append("MODE: The student is in learning mode. Provide detailed explanations and examples to help them understand the concepts.")
+                
+                # 使用学习模式提示词模版
+                mastery_level = "beginner"
+                mastery_prob = 0.0
+                
+                # 获取当前主题的掌握度信息
+                if hasattr(user_state, 'bkt_models') and user_state.bkt_models and content_title:
+                    for topic_key, bkt_model in user_state.bkt_models.items():
+                        if content_title.lower() in topic_key.lower():
+                            if isinstance(bkt_model, dict) and 'mastery_prob' in bkt_model:
+                                mastery_prob = bkt_model['mastery_prob']
+                            elif hasattr(bkt_model, 'mastery_prob'):
+                                mastery_prob = bkt_model.mastery_prob
+                            break
+                    
+                    # 确定掌握度等级
+                    if mastery_prob > 0.8:
+                        mastery_level = "advanced"
+                    elif mastery_prob > 0.5:
+                        mastery_level = "intermediate"
+                
+                # 格式化学习提示词
+                learning_prompt = self.learning_prompt_template.format(
+                    content_title=content_title or "Unknown",
+                    mastery_level=mastery_level,
+                    mastery_prob=mastery_prob
+                )
+                prompt_parts.append(learning_prompt)
+            else:
+                # 添加内容标题（非学习模式）
+                if content_title:
+                    prompt_parts.append(f"TOPIC: The current topic is '{content_title}'. Focus your explanations on this specific topic.")
+        
         # 添加内容JSON（如果提供）
         if content_json:
             # 确保JSON内容正确编码，避免Unicode转义序列问题
@@ -174,12 +311,6 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
             except json.JSONDecodeError:
                 # 如果解析失败，使用原始内容
                 prompt_parts.append(f"CONTENT DATA: Here is the detailed content data for the current topic. Use this to provide more specific and accurate guidance.\n{content_json}")
-            
-        # 添加测试结果（如果提供且在测试模式下）
-        if mode == "test" and test_results:
-            # 将测试结果转换为格式化的字符串
-            test_results_str = json.dumps(test_results, indent=2, ensure_ascii=False)
-            prompt_parts.append(f"TEST RESULTS: Here are the test results for the student's current code. Use this information to help diagnose problems and provide targeted guidance.\n{test_results_str}")
 
         return "\n\n".join(prompt_parts)
 

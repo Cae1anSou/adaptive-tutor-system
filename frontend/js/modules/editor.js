@@ -588,7 +588,10 @@ window.setInitialCode = function(startCode) {
             js: 'document.getElementById("demo-button").addEventListener("click", function() {\n  alert("按钮被点击了！");\n});',
             sessionId: null,
             isRunning: false,
-            backendUrl: 'http://localhost:8000/api/ide'
+            // 使用动态构建的后端URL
+            get backendUrl() {
+                return buildBackendUrl('/api/ide');
+            }
         };
 
         // 更新编辑器内容
