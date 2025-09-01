@@ -1,0 +1,2 @@
+*.ann filter=lfs diff=lfs merge=lfs -text
+backend/app/data/vector_store/kb.ann filter=lfs diff=lfs merge=lfs -text

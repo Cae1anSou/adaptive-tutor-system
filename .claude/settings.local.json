@@ -9,7 +9,9 @@
       "Bash(find:*)",
       "Bash(sqlite3:*)",
       "Bash(dir:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(docker exec:*)",
+      "Bash(docker logs:*)"
     ],
     "deny": []
   }

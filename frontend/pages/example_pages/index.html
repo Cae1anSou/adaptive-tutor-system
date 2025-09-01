@@ -66,7 +66,7 @@
         p {
             line-height: 1.6;
         }
-
+        
         .bold-text {
             font-weight: bold;
         }
@@ -74,7 +74,7 @@
         .italic-text {
             font-style: italic;
         }
-        
+
         .gallery {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -214,12 +214,21 @@
             </aside>
         </div>
     </div>
+
+    <!-- 加载选择器模块 -->
+    <script type="module" src="../../js/modules/iframe-selector.js"></script>
+
     <script>
         document.querySelector('form').addEventListener('submit', (e) => {
             e.preventDefault();
             const name = document.getElementById('form_input_name').value;
             const email = document.getElementById('form_input_email').value;
             alert(`Thank you, ${name}, for joining us! We've sent a confirmation to ${email}.`);
+        });
+
+        // 页面加载完成后记录日志
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('示例页面加载完成，元素选择器已准备就绪');
         });
     </script>
 </body>

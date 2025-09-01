@@ -22,91 +22,336 @@ export class GraphRenderer {
             'label': 'data(label)',
             'text-valign': 'center',
             'text-halign': 'center',
-            'color': '#000',
-            'background-color': '#ddd',
+            'color': '#1e293b',
+            'background-color': '#f1f5f9',
             'width': 120,
             'height': 120,
-            'font-size': 14,
-            'text-wrap': 'wrap',
+            'font-size': '14px',
+            'font-family': 'Inter, sans-serif',
+            'font-weight': 500,
+            'font-weight': 'bold',
             'text-max-width': '100px',
-            'shape': 'ellipse'
+            'shape': 'ellipse',
+            'border-width': 2,
+            'border-color': '#e2e8f0',
+            'overlay-opacity': 0,
+            'overlay-color': '#4f46e5',
+            'overlay-padding': '10px',
+            'transition-property': 'background-color, border-color, width, height',
+            'transition-duration': '0.3s',
+            'transition-timing-function': 'ease'
           }
         },
         {
           selector: 'node[type="chapter"]',
           style: {
             'shape': 'roundrectangle',
-            'font-weight': 'bold'
+            'font-weight': 'bold',
+            'width': 200,
+            'height': 80,
+            'background-color': '#4f46e5',
+            'color': '#1e293b',
+            'border-width': 3,
+            'border-color': '#3730a3',
+            'font-size': '16px'
+          }
+        },
+        {
+          selector: 'node.learned',
+          style: {
+            'background-color': '#10b981',
+            'border-color': '#059669'
+          }
+        },
+        {
+          selector: 'node.unlocked',
+          style: {
+            'background-color': '#3b82f6',
+            'border-color': '#2563eb'
+          }
+        },
+        {
+          selector: 'node.locked',
+          style: {
+            'background-color': '#9ca3af',
+            'border-color': '#6b7280'
+          }
+        },
+        {
+          selector: 'node.current',
+          style: {
+            'background-color': '#f59e0b',
+            'border-color': '#d97706'
           }
         },
         {
           selector: 'edge',
           style: {
-            'width': 2,
-            'line-color': '#bbb',
+            'width': 3,
+            'line-color': '#2563eb',
             'target-arrow-shape': 'triangle',
-            'target-arrow-color': '#bbb',
-            'curve-style': 'bezier'
+            'target-arrow-color': '#2563eb',
+            'curve-style': 'unbundled-bezier',
+            'control-point-step-size': 80,
+            'control-point-distance': 60,
+            'control-point-weight': 0.4,
+            'arrow-scale': 1.8,
+            'line-style': 'solid',
+            'transition-property': 'line-color, width, target-arrow-color',
+            'transition-duration': '0.3s',
+            'transition-timing-function': 'ease'
           }
         }
       ],
-      layout: { name: 'preset' }
+      layout: { name: 'preset' },
+      minZoom: 0.2,
+      maxZoom: 2.0,
+      wheelSensitivity: 0.2
     });
     this.graphState = graphState;
     this.layoutParams = LAYOUT_PARAMS;
     this.debounceTimer = null; // 初始化防抖计时器
+    // 存储节点的原始尺寸
+    this.originalSizes = new Map();
+    
+    // 添加鼠标事件监听器来模拟悬停效果
+    this.setupHoverEffects();
+  }
+
+  // 添加网格背景
+  addGridBackground() {
+    const container = this.cy.container();
+    if (container) {
+      container.classList.add('cy-grid');
+    }
   }
 
   // 添加元素到图谱
   addElements(elements) {
     this.cy.add(elements);
-  }
 
-  // 设置章节固定位置
-  setFixedChapterPositions() {
-    const chapters = this.cy.nodes().filter(n => n.data('type') === 'chapter')
-      .sort((a, b) => {
-        const ai = parseInt(a.id().replace('chapter', '')) || 0;
-        const bi = parseInt(b.id().replace('chapter', '')) || 0;
-        return ai - bi;
-      });
-
-    chapters.forEach((node, idx) => {
-      const x = this.layoutParams.CHAPTER_START_X + idx * this.layoutParams.CHAPTER_GAP_X;
-      const y = (idx % 2 === 0) ? this.layoutParams.TOP_ROW_Y : (this.layoutParams.TOP_ROW_Y + this.layoutParams.ROW_DELTA_Y);
-      node.position({ x, y });
-      node.lock();
-      this.graphState.fixedPositions[node.id()] = { x, y };
+    // 存储新添加节点的原始尺寸
+    this.cy.nodes().forEach(node => {
+      if (!this.originalSizes.has(node.id())) {
+        this.originalSizes.set(node.id(), {
+          width: parseFloat(node.style('width')),
+          height: parseFloat(node.style('height'))
+        });
+      }
     });
   }
+
+    // 设置悬停效果
+  setupHoverEffects() {
+    // 存储所有节点的原始尺寸
+    this.cy.nodes().forEach(node => {
+      this.originalSizes.set(node.id(), {
+        width: parseFloat(node.style('width')),
+        height: parseFloat(node.style('height'))
+      });
+    });
+
+    // 节点悬停效果
+    this.cy.on('mouseover', 'node', (evt) => {
+      const node = evt.target;
+      const originalSize = this.originalSizes.get(node.id()) || { width: 120, height: 120 };
+      const scaleFactor = node.data('type') === 'chapter' ? 1.15 : 1.1;
+      
+      node.style({
+        'background-color': node.data('type') === 'chapter' ? '#3730a3' : '#c7d2fe',
+        'color': node.data('type') === 'chapter' ? '#ffffff' : '#1e293b',
+        'border-color': '#4f46e5',
+        'width': originalSize.width * scaleFactor,
+        'height': originalSize.height * scaleFactor
+      });
+      
+    });
+
+    this.cy.on('mouseout', 'node', (evt) => {
+      const node = evt.target;
+      node.style({
+        'color': '#1e293b',
+      });
+      this.restoreNodeStyle(node);
+      
+    });
+
+    // 边悬停效果
+    this.cy.on('mouseover', 'edge', (evt) => {
+      const edge = evt.target;
+      edge.style({
+        'line-color': '#4f46e5',
+        'target-arrow-color': '#4f46e5',
+        'width': 4
+      });
+    });
+
+    this.cy.on('mouseout', 'edge', (evt) => {
+      const edge = evt.target;
+      edge.style({
+        'line-color': '#2563eb',
+        'target-arrow-color': '#2563eb',
+        'width': 3
+      });
+    });
+  }
+
+// 恢复节点样式到正确状态
+  restoreNodeStyle(node) {
+    const id = node.id();
+    const type = node.data('type');
+    const originalSize = this.originalSizes.get(id);
+    
+    // 先恢复到原始尺寸
+    if (originalSize) {
+      node.style({
+        'width': originalSize.width,
+        'height': originalSize.height
+      });
+    }
+    
+    // 然后根据状态设置正确的颜色
+    if (type === 'chapter') {
+      if (this.graphState.currentLearningChapter === id) {
+        node.style({
+          'background-color': '#f59e0b',
+          'border-color': '#d97706'
+        });
+      } else if (this.graphState.isChapterCompleted(id)) {
+        node.style({
+          'background-color': '#10b981',
+          'border-color': '#059669'
+        });
+      } else if (this.graphState.canLearnChapter(id)) {
+        node.style({
+          'background-color': '#3b82f6',
+          'border-color': '#2563eb'
+        });
+      } else {
+        node.style({
+          'background-color': '#9ca3af',
+          'border-color': '#6b7280'
+        });
+      }
+    } else {
+      if (this.graphState.learnedNodes.includes(id)) {
+        node.style({
+          'background-color': '#10b981',
+          'border-color': '#059669'
+        });
+      } else if (this.graphState.isKnowledgeUnlocked(id)) {
+        node.style({
+          'background-color': '#3b82f6',
+          'border-color': '#2563eb'
+        });
+      } else {
+        node.style({
+          'background-color': '#9ca3af',
+          'border-color': '#6b7280'
+        });
+      }
+    }
+  }
+  
+  // 在graph_renderer.js中添加更多工具栏功能
+addToolbarFunctionality() {
+  // 缩放功能
+  document.getElementById('zoomIn').addEventListener('click', () => {
+    this.cy.zoom(this.cy.zoom() * 1.2);
+  });
+  
+  document.getElementById('zoomOut').addEventListener('click', () => {
+    this.cy.zoom(this.cy.zoom() / 1.2);
+  });
+  
+  // 居中功能
+  document.getElementById('centerGraph').addEventListener('click', () => {
+    this.centerAndZoomGraph();
+  });
+  
+  // 添加键盘快捷键
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key === '+' || e.key === '=') {
+        this.cy.zoom(this.cy.zoom() * 1.1);
+        e.preventDefault();
+      } else if (e.key === '-') {
+        this.cy.zoom(this.cy.zoom() / 1.1);
+        e.preventDefault();
+      } else if (e.key === '0') {
+        this.centerAndZoomGraph();
+        e.preventDefault();
+      }
+    }
+  });
+  
+  // 添加平移功能
+  let panStart = { x: 0, y: 0 };
+  let isPanning = false;
+  
+  this.cy.on('mousedown', (e) => {
+    if (e.originalEvent.button === 1 || (e.originalEvent.button === 0 && e.originalEvent.shiftKey)) {
+      isPanning = true;
+      panStart = { x: e.originalEvent.clientX, y: e.originalEvent.clientY };
+      this.cy.container().style.cursor = 'grabbing';
+      e.originalEvent.preventDefault();
+    }
+  });
+  
+  document.addEventListener('mousemove', (e) => {
+    if (isPanning) {
+      const dx = e.clientX - panStart.x;
+      const dy = e.clientY - panStart.y;
+      const currentPan = this.cy.pan();
+      this.cy.pan({
+        x: currentPan.x - dx / this.cy.zoom(),
+        y: currentPan.y - dy / this.cy.zoom()
+      });
+      panStart = { x: e.clientX, y: e.clientY };
+    }
+  });
+  
+  document.addEventListener('mouseup', () => {
+    if (isPanning) {
+      isPanning = false;
+      this.cy.container().style.cursor = 'default';
+    }
+  });
+}
 
   // 确保知识点位置
   ensurePositionsForChapterKnowledge(chapterId) {
-    const sampleKids = this.graphState.collectKnowledgeDescendantsForDisplay(chapterId);
-    if (!sampleKids || sampleKids.length === 0) return;
-    
-    const anySet = sampleKids.some(id => this.graphState.fixedPositions[id]);
+  const kids = this.graphState.collectKnowledgeDescendantsForDisplay(chapterId);
+    if (!kids || kids.length === 0) return;
+    const anySet = kids.some(id => this.graphState.fixedPositions[id]);
     if (anySet) return;
 
-    const chapterPos = this.graphState.fixedPositions[chapterId] || this.cy.getElementById(chapterId).position();
-    const chapterY = chapterPos.y;
-    const isChapterTop = (Math.abs(chapterY - this.layoutParams.KNOWLEDGE_TOP_ROW_Y) < 
-                         Math.abs(chapterY - (this.layoutParams.KNOWLEDGE_TOP_ROW_Y + this.layoutParams.KNOWLEDGE_ROW_DELTA_Y)));
-    
-    const targetY = isChapterTop ? 
-      (this.layoutParams.KNOWLEDGE_TOP_ROW_Y + this.layoutParams.KNOWLEDGE_ROW_DELTA_Y) : 
-      this.layoutParams.KNOWLEDGE_TOP_ROW_Y;
+    const chapterNode = this.cy.getElementById(chapterId);
+    if (!chapterNode || chapterNode.length === 0) return;
 
-    const kids = this.graphState.collectKnowledgeDescendantsForDisplay(chapterId);
-    const cx = chapterPos.x;
+    const chapterPos = chapterNode.position();
+    const idx = chapterNode.data('rowIndex') || 0;
+    const isTop = idx % 2 === 0;
+
+    // 上排章节 → 知识点在下方；下排章节 → 知识点在上方
+    const baseY = isTop 
+      ? chapterPos.y + this.layoutParams.KNOWLEDGE_ROW_DELTA_Y
+      : chapterPos.y - this.layoutParams.KNOWLEDGE_ROW_DELTA_Y;
+
     const n = kids.length;
+    const maxWidth = this.cy.container().clientWidth * 0.7;
+    const gap = Math.min(this.layoutParams.KNOWLEDGE_GAP_X, maxWidth / Math.max(n, 4));
     const half = (n - 1) / 2;
-    
+    const slopeStep = this.layoutParams.KNOWLEDGE_HEIGHT_STEP || 25;
+
     kids.forEach((id, i) => {
-      const x = cx + (i - half) * this.layoutParams.KNOWLEDGE_GAP_X;
-      this.graphState.fixedPositions[id] = { x, y: targetY };
+      const x = chapterPos.x + (i - half) * gap;
+      // 给知识点加一个倾斜偏移
+      const y = baseY + (i - half) * slopeStep * (isTop ? 1 : -1);
+
+      this.graphState.fixedPositions[id] = { x, y };
     });
-  }
+}
 // ========== 新增：绑定布局事件 ==========
   bindLayoutEvents() {
     // 窗口大小改变时重新布局
@@ -119,33 +364,92 @@ export class GraphRenderer {
       this.debounceCenterAndZoom();
     });
   }
-
+  // 添加自动布局调整功能
+  adjustLayoutToAvoidOverlap() {
+    const visibleNodes = this.cy.nodes().filter(node => node.visible());
+    
+    // 简单的重叠检测和调整
+    visibleNodes.forEach((node, i) => {
+      const pos1 = node.position();
+      const width1 = parseFloat(node.style('width')) || 0;
+      const height1 = parseFloat(node.style('height')) || 0;
+      
+      for (let j = i + 1; j < visibleNodes.length; j++) {
+        const otherNode = visibleNodes[j];
+        const pos2 = otherNode.position();
+        const width2 = parseFloat(otherNode.style('width')) || 0;
+        const height2 = parseFloat(otherNode.style('height')) || 0;
+        
+        // 检测重叠
+        const dx = Math.abs(pos1.x - pos2.x);
+        const dy = Math.abs(pos1.y - pos2.y);
+        const minDistance = (width1 + width2) / 2 + 20;
+        
+        if (dx < minDistance && dy < minDistance) {
+          // 轻微调整位置避免重叠
+          const adjustX = (minDistance - dx) * (pos1.x > pos2.x ? 1 : -1) * 0.5;
+          const adjustY = (minDistance - dy) * (pos1.y > pos2.y ? 1 : -1) * 0.5;
+          
+          node.position({
+            x: pos1.x + adjustX,
+            y: pos1.y + adjustY
+          });
+          
+          otherNode.position({
+            x: pos2.x - adjustX,
+            y: pos2.y - adjustY
+          });
+        }
+      }
+    });
+  }
   // ========== 新增：防抖函数避免频繁调用 ==========
   debounceCenterAndZoom() {
     if (this.debounceTimer) clearTimeout(this.debounceTimer);
     this.debounceTimer = setTimeout(() => {
+      /* this.adjustLayoutToAvoidOverlap(); */// 添加自动布局调整功能
       this.centerAndZoomGraph();
     }, 100);
   }
 
   // 展开章节
   expandChapter(chapterId) {
-    this.ensurePositionsForChapterKnowledge(chapterId);
+     this.ensurePositionsForChapterKnowledge(chapterId);
     const kids = this.graphState.collectKnowledgeDescendantsForDisplay(chapterId);
     
+    // 使用动画展开
     kids.forEach(id => {
       const node = this.cy.getElementById(id);
       if (node && node.length) {
         const pos = this.graphState.fixedPositions[id];
-        if (pos) node.position(pos);
-        node.show();
+        if (pos) {
+          node.position(pos);
+          node.style({
+            'opacity': 0
+          });
+          node.show();
+          
+          // 淡入动画
+          node.animate({
+            style: {
+              'opacity': 1
+            }
+          }, {
+            duration: 300,
+            complete: () => {
+              this.updateEdgesVisibility();
+            }
+          });
+        }
       }
     });
 
     this.updateEdgesVisibility();
     this.graphState.expandedSet.add(chapterId);
     this.updateNodeColors();
-    this.debounceCenterAndZoom(); // 新增：展开后调整布局
+    
+    // 延迟调整布局，确保动画完成
+    setTimeout(() => this.debounceCenterAndZoom(), 350);
   }
 
   // 收起章节
@@ -167,38 +471,60 @@ export class GraphRenderer {
     this.cy.edges().forEach(e => {
       const s = e.data('source'), t = e.data('target');
       const sn = this.cy.getElementById(s), tn = this.cy.getElementById(t);
-      if (sn && tn && sn.length && tn.length && sn.visible() && tn.visible()) e.show();
-      else e.hide();
+      if (sn && tn && sn.length && tn.length && sn.visible() && tn.visible()) {
+        e.style({
+          'opacity': 0
+        });
+        e.show();
+        
+        // 淡入动画
+        e.animate({
+          style: {
+            'opacity': 1
+          }
+        }, {
+          duration: 300
+        });
+      } else {
+        e.hide();
+      }
     });
   }
 
   // 更新节点颜色
   updateNodeColors() {
-    this.cy.nodes().forEach(n => {
-      const id = n.id();
-      const type = n.data('type');
-
-      if (type === 'chapter') {
-        if (this.graphState.currentLearningChapter === id) {
-          n.style('background-color', '#f1c40f'); // 黄色 - 正在学习
-        } else if (this.graphState.isChapterCompleted(id)) {
-          n.style('background-color', '#2ecc71'); // 绿色 - 已完成
-        } else if (this.graphState.canLearnChapter(id)) {
-          n.style('background-color', '#3498db'); // 蓝色 - 可学习
-        } else {
-          n.style('background-color', '#ddd'); // 灰色 - 未解锁
-        }
-      } else {
-        if (this.graphState.learnedNodes.includes(id)) {
-          n.style('background-color', '#2ecc71'); // 绿色 - 已完成
-        } else if (this.graphState.isKnowledgeUnlocked(id)) {
-          n.style('background-color', '#3498db'); // 蓝色 - 可学习
-        } else {
-          n.style('background-color', '#ddd'); // 灰色 - 未解锁
-        }
-      }
+    this.cy.nodes().forEach(node => {
+      this.restoreNodeStyle(node);
     });
   }
+
+  // 设置章节固定位置 - 优化布局
+  setFixedChapterPositions() {
+    const chapterNodes = this.cy.nodes('[type="chapter"]');
+    const containerWidth = this.cy.container().clientWidth;
+
+      // 增加间距系数，1.2表示比原来宽20%
+    const spacingFactor = 1.2;
+    const baseSpacing = containerWidth / (chapterNodes.length + 1);
+    const actualSpacing = baseSpacing * spacingFactor;
+
+    chapterNodes.forEach((node, idx) => {
+      // 使用调整后的间距
+      const x = (idx + 1) * actualSpacing;
+      const isTop = idx % 2 === 0;  // 偶数序号放上排，奇数序号放下排
+      const y = isTop 
+        ? this.layoutParams.TOP_ROW_Y 
+        : this.layoutParams.TOP_ROW_Y + this.layoutParams.ROW_DELTA_Y;
+
+      node.position({ x, y });
+      node.lock();
+      this.graphState.fixedPositions[node.id()] = { x, y };
+
+      // 给每个章节存一个标记，后面知识点布局直接用
+      node.data('rowIndex', idx);
+    });
+  }
+
 
   // 隐藏所有知识点
   hideAllKnowledgeNodes() {
@@ -209,8 +535,8 @@ export class GraphRenderer {
   }
 
   // 居中缩放图谱
-  centerAndZoomGraph() {
-    const nodes = this.cy.nodes().filter(node => node.visible());
+centerAndZoomGraph() {
+     const nodes = this.cy.nodes().filter(node => node.visible());
     if (nodes.length === 0) return;
     
     let minX = Infinity, maxX = -Infinity;
@@ -218,14 +544,18 @@ export class GraphRenderer {
     
     nodes.forEach(node => {
       const pos = node.position();
-      minX = Math.min(minX, pos.x);
-      maxX = Math.max(maxX, pos.x);
-      minY = Math.min(minY, pos.y);
-      maxY = Math.max(maxY, pos.y);
+      const width = parseFloat(node.style('width')) || 0;
+      const height = parseFloat(node.style('height')) || 0;
+      
+      minX = Math.min(minX, pos.x - width/2);
+      maxX = Math.max(maxX, pos.x + width/2);
+      minY = Math.min(minY, pos.y - height/2);
+      maxY = Math.max(maxY, pos.y + height/2);
     });
     
-    const margin = 100;
-    minX -= margin;
+    // 减少边距，创建更紧凑的布局
+    const margin = 20; // 减少边距
+    minX -= margin+20;
     maxX += margin;
     minY -= margin;
     maxY += margin;
@@ -240,12 +570,15 @@ export class GraphRenderer {
     
     const scaleX = containerWidth / width;
     const scaleY = containerHeight / height;
-    const scale = Math.min(scaleX, scaleY) * 0.9;
+    const scale = Math.min(scaleX, scaleY, 1.5) * 0.9; // 稍微增加缩放比例
     
     const panX = -centerX * scale + containerWidth / 2;
     const panY = -centerY * scale + containerHeight / 2;
     
-    this.cy.zoom(scale);
-    this.cy.pan({ x: panX, y: panY });
+    this.cy.animate({
+      zoom: scale,
+      pan: { x: panX, y: panY },
+      duration: 300
+    });
   }
 }

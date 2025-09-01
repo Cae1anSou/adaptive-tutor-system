@@ -78,7 +78,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     graphRenderer.setFixedChapterPositions();
     graphRenderer.hideAllKnowledgeNodes();
     graphRenderer.updateNodeColors();
-
+    // 添加工具栏功能
+    graphRenderer.addToolbarFunctionality();
     // 初始居中
     setTimeout(() => graphRenderer.centerAndZoomGraph(), 100);
 

@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+
+# Virtual environment
+.venv
+venv/
+env/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Celery temp files
+celerybeat-schedule
+celerybeat.pid
+
+# Docker
+Dockerfile*
+docker-compose.yml
+
+# Documentation and local configs
+docs/
+*.md
+CLAUDE.local.md

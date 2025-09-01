@@ -30,6 +30,25 @@
               <h2>学习情况 </h2>
             </div>
             <div class="group" id="cy">
+              <!-- 工具栏 -->
+              <div class="cy-toolbar">
+                <button id="zoomIn" title="放大" class="btn btn-small">
+                  <iconify-icon icon="mdi:magnify-plus" width="16" height="16"></iconify-icon>
+                </button>
+                <button id="zoomOut" title="缩小" class="btn btn-small">
+                  <iconify-icon icon="mdi:magnify-minus" width="16" height="16"></iconify-icon>
+                </button>
+                <button id="centerGraph" title="居中" class="btn btn-small">
+                  <iconify-icon icon="mdi:select-search" width="16" height="16"></iconify-icon>
+                  居中
+                </button>
+              </div>
+              
+              <!-- 提示信息 -->
+              <div class="cy-tip">
+                <iconify-icon icon="mdi:information" width="16" height="16"></iconify-icon>
+                <span>提示: 单击节点展开/收起，双击节点查看详情</span>
+              </div>
               <!-- 知识点详情弹窗 -->
               <div id="knowledgeModal" class="modal">
                 <div class="modal-content">

@@ -1,177 +1,74 @@
 {
-  "topic_id":"3_end",
-  "title": "第三章表单与交互控件综合测试",
-  "description_md": "# 综合测试\n\n ## 测试任务：\n请完成页面内表单与交互控件。\n### 任务一：请先实现一个文本搜索框，提示文本是：搜索猫咪名称。\n### 任务二：\n在文本框下方创建一个按钮，按钮的文本是：搜索。\n### 任务三：请创建一个复选框，name值是：likes，value值分别是是：晒太阳和抓老鼠，选择内容是：喜欢晒太阳和爱抓老鼠。\n### 任务四：在复选框下方创建一个单选框，name值是：gender，value值分别是公和母，选择内容分别为公猫和母猫。\n### 任务五：为任务三和任务四的表单创建一个表单提交机制，使用onsubmit属性，赋值handleForm(event)函数。\n",
+  "topic_id": "3_end",
+  "title": "第3章表单与交互控件综合测试",
+  "description_md": "# 综合测试\n\n## 测试任务：\n请综合运用本章所学知识点，继续构建“WCF Best Cat Exhibition”（WCF最佳猫咪展览）介绍页面，完成页面表单部分的添加。\n\n### 任务一：创建表单容器\n- 在右侧边栏（id=\"sidebar\"）内添加一个form元素\n- 为form元素设置onsubmit事件处理函数handleSubmit(event)\n\n### 任务二：添加表单输入控件\n- 在form内添加一个文本输入框，用于输入姓名，placeholder为\"Your Name\"\n- 在form内添加一个邮箱输入框，用于输入邮箱，placeholder为\"Your Email\"\n- 在form内添加一个复选框，用于订阅邮件，关联label文本为\"Subscribe to newsletter\"\n\n### 任务三：添加提交按钮\n- 在form内添加一个提交按钮，按钮文本为\"Join the Cat Family\"\n- 设置按钮的type属性为submit\n\n### 任务四：添加JavaScript处理函数\n- 编写handleSubmit函数，阻止表单默认提交行为\n- 在函数中获取表单数据并输出到控制台\n",
   "start_code": {
-    "html": "",
-    "css": "",
+    "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>WCF Best Cat Exhibition</title>\n    <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n    <h1>WCF Best Cat Exhibition</h1>\n    <h2>Welcome to the Cat Exhibition</h2>\n    <p>Join us for a <span class=\"bold-text\">purr-fect</span> celebration of feline beauty and <span class=\"italic-text\">grace</span>. Discover various cat breeds and experience the excitement of the event!</p>\n    \n    <div id=\"main-container\">\n        <div id=\"content\">\n            <h3>Event Highlights</h3>\n            <ol>\n                <li>Opening Ceremony</li>\n                <li>Cat Parades</li>\n                <li>Best in Show Award</li>\n                <li>Cat Care Workshop</li>\n            </ol>\n        </div>\n        \n        <div id=\"sidebar\">\n            <h3>Daily Schedule</h3>\n            <ul>\n                <li>10:00 AM - Doors Open</li>\n                <li>12:00 PM - Lunch Break</li>\n                <li>03:00 PM - Cat Parade</li>\n                <li>04:00 PM - Photography Contest</li>\n                <li>05:00 PM - Award Ceremony</li>\n            </ul>\n        </div>\n    </div>\n</body>\n</html>",
+    "css": ".bold-text {\n    font-weight: bold;\n}\n\n.italic-text {\n    font-style: italic;\n}\n\n#main-container {\n    width: 80%;\n    margin: 0 auto;\n}\n\n#content {\n    float: left;\n    width: 65%;\n}\n\n#sidebar {\n    float: right;\n    width: 30%;\n}",
     "js": ""
   },
   "checkpoints": [
     {
-      "name": "input表单元素检查",
-      "type": "assert_attribute",
-      "selector": "input",
-      "attribute": "",
-      "assertion_type": "exists",
-      "value": "",
-      "feedback": "请检查input元素是否存在。"
-    },
-    {
-        "name" : "input表单元素类型检查",
-        "type" : "assert_attribute",
-        "selector" : "input",
-        "attribute" : "type",
-        "assertion_type" : "matches",
-        "value" : "text",
-        "feedback" : "请检查input元素type属性为text."
-    },
-    {
-      "name": "input表单提示文本检查",
-      "type": "assert_attribute",
-      "selector": "input",
-      "attribute": "placeholder",
-      "assertion_type": "matches",
-      "value": "搜索猫咪名称",
-      "feedback": "请检查input元素的placeholder属性是否与要求不同。"
-    },
-    {
-      "name": "button按钮元素检查",
-      "type": "assert_element",
-      "selector": "button",
-      "assertion_type": "exists",
-      "value": "搜索",
-      "feedback": "请检查button元素是否存在。"
-    },
-    {
-      "name": "button按钮元素位置检查",
-      "type": "custom_script",
-      "script": "return document.querySelector('input').getBoundingClientRect().top < document.querySelector('button').getBoundingClientRect().top",
-      "feedback": "button元素应该在input元素下方。"
-    },
-    {
-      "name": "button按钮文本检查",
-      "type": "assert_attribute",
-      "selector": "button",
-      "attribute": "textContent",
-      "assertion_type": "matches",
-      "value": "搜索",
-      "feedback": "请检查button按钮文本是否为搜索。"
-    },
-    {
-      "name": "复选框type属性检查",
-      "type": "assert_attribute",
-      "selector": "label",
-      "attribute": "type",
-      "assertion_type": "equals",
-      "value": "checkbox",
-      "feedback": "复选框的type属性应该为checkbox"
-    },
-    {
-        "name": "复选框name属性检查",
-        "type": "assert_attribute",
-        "selector": "input",
-        "attribute": "name",
-        "assertion_type": "equals",
-        "value": "likes",
-        "feedback": "name属性应该为likes"
-    },
-    {
-        "name": "复选框数量检查",
-        "type": "custom_script",
-        "script": "document.querySelectorAll('input[name=\"likes\"][type=\"checkbox\"]').length === 2",
-        "feedback": "复选框数量应该为2"
-    },
-    {
-      "name": "第一个复选框value属性检查",
-      "type": "custom_script",
-      "script": "document.querySelector('input[name=\"likes\"][type=\"checkbox\"]:nth-child(1)').value === '晒太阳'",
-      "feedback": "第一个复选框的value属性应该为：晒太阳"
-    },
-    {
-        "name": "第一个复选框内容检查",
-        "type": "custom_script",
-        "script": "document.querySelector('input[name=\"likes\"][type=\"checkbox\"]:nth-child(1)+label').innerText === '喜欢晒太阳'",
-        "feedback": "第一个复选框内容应该为：喜欢晒太阳"
-    },
-    {
-        "name": "第二复选框value属性检查",
-        "type": "custom_script",
-        "script": "document.querySelector('input[name=\"likes\"][type=\"checkbox\"]:nth-child(2)').value === '抓老鼠'",
-        "feedback": "第二个复选框的value属性应该为抓老鼠"
-    },
-    {
-        "name": "第二个复选框内容检查",
-        "type": "custom_script",
-        "script": "document.querySelector('input[name=\"likes\"][type=\"checkbox\"]:nth-child(2)+label').innerText === '抓老鼠'",
-        "feedback": "第二个复选框内容应该为：爱抓老鼠"
-    },
-    {
-        "name": "单选框type属性检查",
-        "type": "assert_attribute",
-        "selector": "label",
-        "attribute": "type",
-        "assertion_type": "equals",
-        "value": "radio",
-        "feedback": "单选框的type属性应该为radio"
-    },
-    {
-        "name": "单选框name属性检查",
-        "type": "assert_attribute",
-        "selector": "input",
-        "attribute": "name",
-        "assertion_type": "equals",
-        "value": "gender",
-        "feedback": "name属性应该为gender"
-    },
-    {
-        "name": "单选框数量检查",
-        "type": "custom_script",
-        "script": "document.querySelectorAll('input[name=\"gender\"][type=\"radio\"]').length === 2",
-        "feedback": "单选框数量应为2"
-    },
-    {
-        "name": "第一个单选框value属性检查",
-        "type": "custom_script",
-        "script": "document.querySelector('input[name=\"gender\"][type=\"radio\"]:nth-child(1)').value === '公'",
-        "feedback": "第一个单选框的value属性应该为：公"
-    },
-    {
-        "name": "第一个单选框内容检查",
-        "type": "custom_script",
-        "script": "document.querySelector('input[name=\"gender\"][type=\"radio\"]:nth-child(1)+label').innerText === '公猫'",
-        "feedback": "第一个单选框的value属性应该为：公猫"
-    },
-    {
-        "name": "第二个单选框value属性检查",
-        "type": "custom_script",
-        "script": "document.querySelector('input[name=\"gender\"][type=\"radio\"]:nth-child(2)').value === '母'",
-        "feedback": "第二个单选框的value属性应该为：母"
-    },
-    {
-        "name": "第二个单选框内容检查",
-        "type": "custom_script",
-        "script": "document.querySelector('input[name=\"gender\"][type=\"radio\"]:nth-child(2)+label').innerText === '母猫'",
-        "feedback": "第二个单选框的value属性应该为：母猫"
-    },
-    {
       "name": "form元素存在检查",
-      "type": "assert_attribute",
-      "selector": "form",
-      "attribute": "",
+      "type": "assert_element",
+      "selector": "#sidebar form",
       "assertion_type": "exists",
-      "value": "",
-      "feedback": "请检查form元素是否存在。"
+      "feedback": "请在右侧边栏内添加一个form元素"
     },
     {
-        "name": "onsubmit属性检查",
-        "type": "assert_attribute",
-        "selector": "form",
-        "attribute": "onsubmit",
-        "assertion_type": "equals",
-        "value": "handleForm(event)",
-        "feedback": "请为form元素添加onsubmit属性，并赋值handleForm(event)函数。"
+      "name": "form的onsubmit属性检查",
+      "type": "assert_attribute",
+      "selector": "#sidebar form",
+      "attribute": "onsubmit",
+      "assertion_type": "exists",
+      "feedback": "请为form元素添加onsubmit属性"
+    },
+    {
+      "name": "姓名输入框存在检查",
+      "type": "assert_element",
+      "selector": "#sidebar input[type='text']",
+      "assertion_type": "exists",
+      "feedback": "请添加一个文本输入框用于输入姓名"
+    },
+    {
+      "name": "邮箱输入框存在检查",
+      "type": "assert_element",
+      "selector": "#sidebar input[type='email']",
+      "assertion_type": "exists",
+      "feedback": "请添加一个邮箱输入框用于输入邮箱"
+    },
+    {
+      "name": "复选框存在检查",
+      "type": "assert_element",
+      "selector": "#sidebar input[type='checkbox']",
+      "assertion_type": "exists",
+      "feedback": "请添加一个复选框用于邮件订阅"
+    },
+    {
+      "name": "提交按钮存在检查",
+      "type": "assert_element",
+      "selector": "#sidebar button[type='submit']",
+      "assertion_type": "exists",
+      "feedback": "请添加一个提交按钮"
+    },
+    {
+      "name": "提交按钮文本检查",
+      "type": "assert_text_content",
+      "selector": "#sidebar button[type='submit']",
+      "assertion_type": "equals",
+      "value": "Join the Cat Family",
+      "feedback": "提交按钮的文本应为'Join the Cat Family'"
+    },
+    {
+      "name": "JavaScript handleSubmit函数检查",
+      "type": "custom_script",
+      "script": "return typeof handleSubmit === 'function';",
+      "feedback": "请定义handleSubmit函数处理表单提交"
     }
-  ]
+  ],
+  "answer": {
+    "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>WCF Best Cat Exhibition</title>\n    <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n    <h1>WCF Best Cat Exhibition</h1>\n    <h2>Welcome to the Cat Exhibition</h2>\n    <p>Join us for a <span class=\"bold-text\">purr-fect</span> celebration of feline beauty and <span class=\"italic-text\">grace</span>. Discover various cat breeds and experience the excitement of the event!</p>\n    \n    <div id=\"main-container\">\n        <div id=\"content\">\n            <h3>Event Highlights</h3>\n            <ol>\n                <li>Opening Ceremony</li>\n                <li>Cat Parades</li>\n                <li>Best in Show Award</li>\n                <li>Cat Care Workshop</li>\n            </ol>\n        </div>\n        \n        <div id=\"sidebar\">\n            <h3>Daily Schedule</h3>\n            <ul>\n                <li>10:00 AM - Doors Open</li>\n                <li>12:00 PM - Lunch Break</li>\n                <li>03:00 PM - Cat Parade</li>\n                <li>04:00 PM - Photography Contest</li>\n                <li>05:00 PM - Award Ceremony</li>\n            </ul>\n            <form onsubmit=\"handleSubmit(event)\">\n                <div>\n                    <label for=\"name\">Your Name:</label>\n                    <input type=\"text\" id=\"name\" placeholder=\"Your Name\" required>\n                </div>\n                <div>\n                    <label for=\"email\">Your Email:</label>\n                    <input type=\"email\" id=\"email\" placeholder=\"Your Email\" required>\n                </div>\n                <div>\n                    <label>\n                        <input type=\"checkbox\" id=\"subscribe\" name=\"subscribe\"> Subscribe to newsletter\n                    </label>\n                </div>\n                <button type=\"submit\">Join the Cat Family</button>\n            </form>\n        </div>\n    </div>\n</body>\n</html>",
+    "css": ".bold-text {\n    font-weight: bold;\n}\n\n.italic-text {\n    font-style: italic;\n}\n\n#main-container {\n    width: 80%;\n    margin: 0 auto;\n}\n\n#content {\n    float: left;\n    width: 65%;\n}\n\n#sidebar {\n    float: right;\n    width: 30%;\n}\n\n#sidebar form {\n    margin-top: 20px;\n}\n\n#sidebar form div {\n    margin-bottom: 15px;\n}\n\n#sidebar input[type=\"text\"],\n#sidebar input[type=\"email\"] {\n    width: 100%;\n    padding: 8px;\n    border: 1px solid #ddd;\n    border-radius: 4px;\n    box-sizing: border-box;\n}\n\n#sidebar button {\n    width: 100%;\n    padding: 10px;\n    background-color: #4CAF50;\n    color: white;\n    border: none;\n    border-radius: 4px;\n    cursor: pointer;\n    font-size: 16px;\n}\n\n#sidebar button:hover {\n    background-color: #45a049;\n}\n\nh1, h2, h3 {\n    color: #333;\n}\n\nul {\n    line-height: 1.6;\n}\n\np {\n    line-height: 1.6;\n    color: #666;\n}",
+    "js": "function handleSubmit(event) {\n    event.preventDefault();\n    \n    const name = document.getElementById('name').value;\n    const email = document.getElementById('email').value;\n    const subscribeElement = document.getElementById('subscribe');\n    const subscribe = subscribeElement && subscribeElement.checked;\n    \n    console.log('Form data:', { name, email, subscribe });\n    \n    // Here you can add actual form processing logic\n    alert('Thank you for joining!');\n}"
+  }
 }
-

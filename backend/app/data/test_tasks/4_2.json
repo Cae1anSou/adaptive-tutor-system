@@ -3,7 +3,7 @@
   "title": "掌握盒模型的核心组成与应用",
   "description_md": "请为一个用户信息卡片添加盒模型相关样式，以增强其视觉表现。\n\n具体要求：\n- 为 `.user-card` 元素设置圆角 `border-radius: 12px`\n- 添加阴影效果 `box-shadow: 0 2px 6px rgba(0,0,0,0.15)`\n- 为 `.user-info` 设置内边距 `padding: 16px`",
   "start_code": {
-    "html": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n  <title>用户信息展示 Demo</title>\n  <style>\n    body {\n      margin: 0;\n      font-family: 'Arial', sans-serif;\n      background: linear-gradient(to bottom, #006400, #00aa00);\n      color: #fff;\n    }\n  </style>\n</head>\n<body>\n  <header>\n    <h2 style=\"font-weight: bold; font-style: italic;\">编程学习平台 - 用户中心</h2>\n  </header>\n  <section class=\"features\">\n    <div class=\"search-bar\">\n      <input type=\"text\" placeholder=\"搜索用户名\" id=\"searchInput\">\n      <select>\n        <option>选择角色</option>\n        <option>学生</option>\n        <option>教师</option>\n        <option>管理员</option>\n      </select>\n      <button>搜索</button>\n    </div>\n    <div class=\"card-container\">\n      <div class=\"user-card\">\n        <img src=\"\" alt=\"用户头像\">\n        <div class=\"user-info\">\n          <h3>张三</h3>\n          <p>角色：学生</p>\n          <p>积分：8765</p>\n        </div>\n      </div>\n      <div class=\"user-card\">\n        <img src=\"\" alt=\"用户头像\">\n        <div class=\"user-info\">\n          <h3>李四</h3>\n          <p>角色：教师</p>\n          <p>积分：12500</p>\n        </div>\n      </div>\n    </div>\n    <div class=\"list-demo\">\n      <h3>学习计划要点</h3>\n      <ol>\n        <li>每日一练</li>\n        <li>每周总结</li>\n        <li>每月测评</li>\n      </ol>\n      <h3>推荐学习路径</h3>\n      <ul>\n        <li>HTML基础</li>\n        <li>CSS进阶</li>\n        <li>JavaScript实战</li>\n      </ul>\n    </div>\n    <div class=\"form-demo\">\n      <h3>学习偏好调查</h3>\n      <form onsubmit=\"handleForm(event)\">\n        <label><input type=\"checkbox\" name=\"likes\" value=\"视频教程\"> 喜欢视频教程</label>\n        <label><input type=\"checkbox\" name=\"likes\" value=\"图文教程\"> 喜欢图文教程</label>\n        <label>学习时间偏好：</label>\n        <label><input type=\"radio\" name=\"time\" value=\"白天\"> 白天</label>\n        <label><input type=\"radio\" name=\"time\" value=\"晚上\"> 晚上</label>\n        <button type=\"submit\">提交</button>\n      </form>\n    </div>\n  </section>\n  <footer>\n    <p>© 2025 编程学习平台 - 教学用途</p>\n  </footer>\n</body>\n</html>",
+    "html": "<div class=\"user-card\">\n  <img src=\"\" alt=\"用户头像\">\n  <div class=\"user-info\">\n    <h3>张三</h3>\n    <p>角色：学生</p>\n    <p>积分：8765</p>\n  </div>\n</div>",
     "css": "",
     "js": ""
   },
@@ -22,8 +22,8 @@
       "type": "assert_style",
       "selector": ".user-card",
       "css_property": "box-shadow",
-      "assertion_type": "equals",
-      "value": "0 2px 6px rgba(0,0,0,0.15)",
+      "assertion_type": "exists",
+      "value": "",
       "feedback": "用户卡片应添加阴影以提升视觉层次感。"
     },
     {
@@ -37,8 +37,8 @@
     }
   ],
   "answer": {
-    "html": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n  <title>用户信息展示 Demo</title>\n  <style>\n    body {\n      margin: 0;\n      font-family: 'Arial', sans-serif;\n      background: linear-gradient(to bottom, #006400, #00aa00);\n      color: #fff;\n    }\n    .user-card {\n      border-radius: 12px;\n      box-shadow: 0 2px 6px rgba(0,0,0,0.15);\n    }\n    .user-info {\n      padding: 16px;\n    }\n  </style>\n</head>\n<body>\n  <header>\n    <h2 style=\"font-weight: bold; font-style: italic;\">编程学习平台 - 用户中心</h2>\n  </header>\n  <section class=\"features\">\n    <div class=\"search-bar\">\n      <input type=\"text\" placeholder=\"搜索用户名\" id=\"searchInput\">\n      <select>\n        <option>选择角色</option>\n        <option>学生</option>\n        <option>教师</option>\n        <option>管理员</option>\n      </select>\n      <button>搜索</button>\n    </div>\n    <div class=\"card-container\">\n      <div class=\"user-card\">\n        <img src=\"\" alt=\"用户头像\">\n        <div class=\"user-info\">\n          <h3>张三</h3>\n          <p>角色：学生</p>\n          <p>积分：8765</p>\n        </div>\n      </div>\n      <div class=\"user-card\">\n        <img src=\"\" alt=\"用户头像\">\n        <div class=\"user-info\">\n          <h3>李四</h3>\n          <p>角色：教师</p>\n          <p>积分：12500</p>\n        </div>\n      </div>\n    </div>\n    <div class=\"list-demo\">\n      <h3>学习计划要点</h3>\n      <ol>\n        <li>每日一练</li>\n        <li>每周总结</li>\n        <li>每月测评</li>\n      </ol>\n      <h3>推荐学习路径</h3>\n      <ul>\n        <li>HTML基础</li>\n        <li>CSS进阶</li>\n        <li>JavaScript实战</li>\n      </ul>\n    </div>\n    <div class=\"form-demo\">\n      <h3>学习偏好调查</h3>\n      <form onsubmit=\"handleForm(event)\">\n        <label><input type=\"checkbox\" name=\"likes\" value=\"视频教程\"> 喜欢视频教程</label>\n        <label><input type=\"checkbox\" name=\"likes\" value=\"图文教程\"> 喜欢图文教程</label>\n        <label>学习时间偏好：</label>\n        <label><input type=\"radio\" name=\"time\" value=\"白天\"> 白天</label>\n        <label><input type=\"radio\" name=\"time\" value=\"晚上\"> 晚上</label>\n        <button type=\"submit\">提交</button>\n      </form>\n    </div>\n  </section>\n  <footer>\n    <p>© 2025 编程学习平台 - 教学用途</p>\n  </footer>\n</body>\n</html>",
-    "css": "",
+    "html": "<div class=\"user-card\">\n  <img src=\"\" alt=\"用户头像\">\n  <div class=\"user-info\">\n    <h3>张三</h3>\n    <p>角色：学生</p>\n    <p>积分：8765</p>\n  </div>\n</div>",
+    "css": ".user-card {\n  border-radius: 12px;\n  box-shadow: 0 2px 6px rgba(0,0,0,0.15);\n}\n\n.user-info {\n  padding: 16px;\n}",
     "js": ""
   }
 }

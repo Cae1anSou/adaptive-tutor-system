@@ -102,7 +102,8 @@ def submit_test(
     # 也可以像user_state_service一样通过Depends注入。
     evaluation_result = sandbox_service.run_evaluation(
         user_code=submission_in.code.model_dump(),
-        checkpoints=checkpoints
+        checkpoints=checkpoints,
+        topic_id=submission_in.topic_id,
     )
 
     # 3. 更新学生模型

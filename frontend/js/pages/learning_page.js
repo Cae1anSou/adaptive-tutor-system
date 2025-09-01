@@ -2,6 +2,8 @@
 // ==================== 导入模块 ====================
 // 导入配置模块
 import { AppConfig, buildBackendUrl, initializeConfig } from '../modules/config.js';
+import { MiniKnowledgeGraph } from '../modules/mini_knowledge_graph.js';
+import { setupHeaderTitle, setupBackButton, getUrlParam, trackReferrer,navigateTo } from '../modules/navigation.js';
 import { setupHeaderTitle, setupBackButton, getUrlParam, trackReferrer, navigateTo } from '../modules/navigation.js';
 // 导入功能模块
 import {
@@ -46,6 +48,7 @@ let allowedElements = {
     current: []
 };
 let currentTopicId = '1_1'; // 默认主题ID
+let selectedElementInfo = null; // 保存当前选中的元素信息
 
 // 模块实例
 let knowledgeModule = null;
@@ -56,6 +59,13 @@ const AppState = {
     isDataLoaded: false,
     initPromise: null
 };
+
+const miniGraph = new MiniKnowledgeGraph('containerId', {
+  height: 200,
+  nodeSize: 20,
+  chapterNodeSize: 30,
+  fontSize: 10
+});
 
 // 应用数据存储，用于管理API数据
 const AppDataStore = {
@@ -269,10 +279,37 @@ async function initializeModules(topicId) {
     knowledgeModule = new KnowledgeModule();
     console.log('[MainApp] 知识点模块初始化完成');
 
+    // 初始化简化知识图谱
+    try {
+        const miniGraph = new MiniKnowledgeGraph('miniGraphContainer', {
+        height: 200,
+        nodeSize: 20,
+        chapterNodeSize: 30,
+        fontSize: 10
+        });
+        await miniGraph.init();
+        console.log('[MainApp] 简化知识图谱初始化完成');
+    } catch (error) {
+        console.error('[MainApp] 简化知识图谱初始化失败:', error);
+    }
+
+
     // 初始化聊天模块
     try {
         chatModule.init('learning', topicId);
         console.log('[MainApp] 聊天模块初始化完成');
+
+        // 统一处理AI头像显示（立即执行）
+        unifyAIAvatars();
+
+        // 设置全局AI头像监控器
+        setupAIAvatarObserver();
+
+        // 再次延迟执行，确保所有元素都已加载
+        setTimeout(() => {
+            console.log('[MainApp] 延迟执行AI头像统一处理');
+            unifyAIAvatars();
+        }, 500);
     } catch (error) {
         console.error('[MainApp] 聊天模块初始化失败:', error);
     }
@@ -339,6 +376,152 @@ function initializeUIEvents(iframe) {
 // }
 
 // ==================== 功能模块 ====================
+
+/**
+ * 统一处理AI头像显示
+ * 确保所有AI头像都使用机器人图标而不是文字
+ */
+function unifyAIAvatars() {
+    console.log('[MainApp] 开始统一处理AI和用户头像显示');
+
+    // 处理AI头像
+    const aiAvatars = document.querySelectorAll('.ai-avatar');
+    console.log(`[MainApp] 找到 ${aiAvatars.length} 个AI头像元素`);
+
+    let aiReplacedCount = 0;
+    aiAvatars.forEach((avatar, index) => {
+        // 检查是否已经包含iconify-icon
+        const existingIcon = avatar.querySelector('iconify-icon');
+        if (existingIcon) {
+            console.log(`[MainApp] AI头像 ${index + 1} 已经使用图标，跳过`);
+            return;
+        }
+
+        // 检查是否包含"AI"文字
+        if (avatar.textContent.trim() === 'AI') {
+            console.log(`[MainApp] 替换AI头像 ${index + 1} 的文字为机器人图标`);
+            avatar.innerHTML = '<iconify-icon icon="mdi:robot" width="20" height="20"></iconify-icon>';
+            aiReplacedCount++;
+        }
+    });
+
+    // 处理用户头像
+    const userAvatars = document.querySelectorAll('.user-avatar');
+    console.log(`[MainApp] 找到 ${userAvatars.length} 个用户头像元素`);
+
+    let userReplacedCount = 0;
+    userAvatars.forEach((avatar, index) => {
+        // 检查是否已经包含iconify-icon
+        const existingIcon = avatar.querySelector('iconify-icon');
+        if (existingIcon) {
+            console.log(`[MainApp] 用户头像 ${index + 1} 已经使用图标，跳过`);
+            return;
+        }
+
+        // 检查是否包含"你"文字
+        if (avatar.textContent.trim() === '你') {
+            console.log(`[MainApp] 替换用户头像 ${index + 1} 的文字为用户图标`);
+            avatar.innerHTML = '<iconify-icon icon="mdi:account" width="20" height="20"></iconify-icon>';
+            userReplacedCount++;
+        }
+    });
+
+    console.log(`[MainApp] 共替换了 ${aiReplacedCount} 个AI头像和 ${userReplacedCount} 个用户头像`);
+
+    // 重写chatModule的addMessageToUI方法以确保新消息也使用图标
+    if (chatModule && typeof chatModule.addMessageToUI === 'function') {
+        const originalAddMessageToUI = chatModule.addMessageToUI.bind(chatModule);
+
+        chatModule.addMessageToUI = function(sender, content) {
+            // 调用原始方法
+            originalAddMessageToUI(sender, content);
+
+            // 处理新生成的头像
+            setTimeout(() => {
+                if (sender === 'ai') {
+                    // 处理AI头像
+                    const newAiAvatars = document.querySelectorAll('.ai-avatar');
+                    newAiAvatars.forEach(avatar => {
+                        if (avatar.textContent.trim() === 'AI' && !avatar.querySelector('iconify-icon')) {
+                            console.log('[MainApp] 替换新生成的AI头像为机器人图标');
+                            avatar.innerHTML = '<iconify-icon icon="mdi:robot" width="20" height="20"></iconify-icon>';
+                        }
+                    });
+                } else if (sender === 'user') {
+                    // 处理用户头像
+                    const newUserAvatars = document.querySelectorAll('.user-avatar');
+                    newUserAvatars.forEach(avatar => {
+                        if (avatar.textContent.trim() === '你' && !avatar.querySelector('iconify-icon')) {
+                            console.log('[MainApp] 替换新生成的用户头像为用户图标');
+                            avatar.innerHTML = '<iconify-icon icon="mdi:account" width="20" height="20"></iconify-icon>';
+                        }
+                    });
+                }
+            }, 0);
+        };
+
+        console.log('[MainApp] 已重写chatModule.addMessageToUI方法以确保头像一致性');
+    } else {
+        console.warn('[MainApp] chatModule不可用，无法重写addMessageToUI方法');
+    }
+
+    console.log('[MainApp] AI和用户头像统一处理完成');
+}
+
+/**
+ * 全局头像监控器
+ * 监控DOM变化，自动处理新添加的AI和用户头像
+ */
+function setupAIAvatarObserver() {
+    console.log('[MainApp] 设置全局头像监控器（AI+用户）');
+
+    // 创建MutationObserver来监控DOM变化
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        // 检查新添加的节点是否包含AI头像
+                        let aiAvatars = node.querySelectorAll ? Array.from(node.querySelectorAll('.ai-avatar')) : [];
+                        if (node.classList && node.classList.contains('ai-avatar')) {
+                            aiAvatars.push(node);
+                        }
+
+                        // 检查新添加的节点是否包含用户头像
+                        let userAvatars = node.querySelectorAll ? Array.from(node.querySelectorAll('.user-avatar')) : [];
+                        if (node.classList && node.classList.contains('user-avatar')) {
+                            userAvatars.push(node);
+                        }
+
+                        // 处理AI头像
+                        aiAvatars.forEach(avatar => {
+                            if (avatar.textContent.trim() === 'AI' && !avatar.querySelector('iconify-icon')) {
+                                console.log('[MainApp] 监控器检测到新的AI头像，自动替换为机器人图标');
+                                avatar.innerHTML = '<iconify-icon icon="mdi:robot" width="20" height="20"></iconify-icon>';
+                            }
+                        });
+
+                        // 处理用户头像
+                        userAvatars.forEach(avatar => {
+                            if (avatar.textContent.trim() === '你' && !avatar.querySelector('iconify-icon')) {
+                                console.log('[MainApp] 监控器检测到新的用户头像，自动替换为用户图标');
+                                avatar.innerHTML = '<iconify-icon icon="mdi:account" width="20" height="20"></iconify-icon>';
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+    // 开始监控整个文档的子节点变化
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+
+    console.log('[MainApp] 全局头像监控器已启动（AI+用户）');
+}
 
 // 知识点管理模块
 class KnowledgeModule {
@@ -556,6 +739,16 @@ function initEventListeners() {
     const tabCode = document.getElementById('tab-code');
     const knowledgeContent = document.getElementById('knowledge-content');
     const codeContent = document.getElementById('code-content');
+    const askAIButton = document.getElementById('askAIButton');
+    const clearSelectionButton = document.getElementById('clearSelectionButton');
+
+    // 初始化按钮状态：确保询问AI按钮默认隐藏
+    if (askAIButton) {
+        askAIButton.style.display = 'none';
+        askAIButton.style.visibility = 'hidden';
+        askAIButton.classList.remove('show');
+        console.log('初始化：询问AI按钮已隐藏');
+    }
 
     // 启动选择器
     if (startButton) {
@@ -564,7 +757,7 @@ function initEventListeners() {
             // 切换按钮状态
             if (startButton && stopButton) {
                 startButton.style.display = 'none';
-                stopButton.style.display = 'inline-block';
+                stopButton.style.display = 'flex';
             }
         });
     }
@@ -575,15 +768,55 @@ function initEventListeners() {
             stopSelector(bridge);
             // 切换按钮状态
             if (startButton && stopButton) {
-                startButton.style.display = 'inline-block';
+                startButton.style.display = 'flex';
                 stopButton.style.display = 'none';
+            }
+            // 注意：不隐藏AI询问按钮，让它保持显示状态
+            // AI按钮的显示状态基于是否有选中的元素（selectedElementInfo），而不是选择器状态
+            // 只有点击“清除选择”按钮时才会隐藏AI按钮
+        });
+    }
+
+    // AI询问按钮
+    if (askAIButton) {
+        askAIButton.addEventListener('click', () => {
+            askAIAboutElement();
+        });
+    }
+
+    // 清除选择按钮
+    if (clearSelectionButton) {
+        clearSelectionButton.addEventListener('click', () => {
+            // 清除选中的元素信息
+            selectedElementInfo = null;
+
+            // 隐藏AI询问按钮（重置为默认隐藏状态）
+            if (askAIButton) {
+                askAIButton.classList.remove('show');
+                askAIButton.style.display = 'none';
+                askAIButton.style.visibility = 'hidden';
+                console.log('清除选择：询问AI按钮已隐藏');
+            }
+
+            // 隐藏清除选择按钮
+            clearSelectionButton.style.display = 'none';
+            clearSelectionButton.style.visibility = 'hidden';
+
+            // 清空代码面板
+            const codeContent = document.getElementById('code-content');
+            if (codeContent) {
+                codeContent.innerHTML = '<h2>选中元素代码</h2><pre id="selectedElementCode"></pre>';
             }
         });
     }
 
     // 初始化开关事件监听器
     if (cumulativeToggle) {
-        cumulativeToggle.addEventListener('change', () => handleCumulativeToggle(allowedElements, showStatus));
+        cumulativeToggle.addEventListener('change', () => handleCumulativeToggle(allowedElements, showStatus, bridge));
+
+        // 设置开关的初始状态信息显示
+        const isInitiallyChecked = cumulativeToggle.checked;
+        console.log('[MainApp] 开关初始状态:', isInitiallyChecked);
     }
 
     // Tab切换
@@ -644,19 +877,45 @@ function initBehaviorTracker() {
 
 // 创建带行为追踪的元素选择处理函数
 function createElementSelectedWithTracking() {
-    return function (elementInfo, showStatus) {
-        // 不再显示选中的元素信息
-        // const statusMessage = `已选择: ${elementInfo.tagName}${elementInfo.id ? '#' + elementInfo.id : ''}${elementInfo.className ? '.' + elementInfo.className.split(' ')[0] : ''}`;
-        // if (showStatus && typeof showStatus === 'function') {
-        //     showStatus('success', statusMessage);
-        // }
+    return function(elementInfo, showStatus) {
+        console.log('元素选择处理函数被调用，选中的元素信息:', elementInfo);
 
+        // 保存选中的元素信息
+        selectedElementInfo = elementInfo;
+        console.log('[DEBUG] selectedElementInfo 已更新为:', selectedElementInfo);
+        
         // 自动切换按钮状态
         const startButton = document.getElementById('startSelector');
         const stopButton = document.getElementById('stopSelector');
+        const askAIButton = document.getElementById('askAIButton');
+        const clearSelectionButton = document.getElementById('clearSelectionButton');
+
+        console.log('获取到的按钮元素:', {startButton, stopButton, askAIButton, clearSelectionButton});
+
         if (startButton && stopButton) {
-            startButton.style.display = 'inline-block';
+            startButton.style.display = 'flex';
             stopButton.style.display = 'none';
+        }
+
+        // 显示AI询问按钮（只有在选中元素后才显示）
+        if (askAIButton) {
+            console.log('元素已选中，准备显示AI询问按钮');
+            askAIButton.classList.add('show');
+            // 强制设置样式
+            askAIButton.style.display = 'flex';
+            askAIButton.style.opacity = '1';
+            askAIButton.style.transform = 'translateY(0)';
+            // 确保按钮可见
+            askAIButton.style.visibility = 'visible';
+            console.log('AI询问按钮显示完成，当前类名:', askAIButton.className);
+        }
+
+        // 显示清除选择按钮
+        if (clearSelectionButton) {
+            console.log('显示清除选择按钮');
+            clearSelectionButton.style.display = 'flex';
+            // 确保按钮可见
+            clearSelectionButton.style.visibility = 'visible';
         }
 
         // 获取选中元素的源代码并显示到代码面板
@@ -863,9 +1122,9 @@ function displaySelectedElementCode(elementInfo) {
             <div class="code-header">
                 <h4>选中的元素代码</h4>
                 <div class="element-info">
-                    <span class="tag-name">${elementInfo.tagName}</span>
-                    ${elementInfo.id ? `<span class="element-id">#${elementInfo.id}</span>` : ''}
-                    ${elementInfo.className ? `<span class="element-class">.${elementInfo.className.split(' ')[0]}</span>` : ''}
+                    <span class="tag-name" title="<${elementInfo.tagName}>">&lt;${elementInfo.tagName}&gt;</span>
+                    ${elementInfo.id ? `<span class="element-id" title="ID: ${elementInfo.id}">#${elementInfo.id}</span>` : ''}
+                    ${elementInfo.className ? generateClassSpans(elementInfo.className) : ''}
                 </div>
             </div>
             <pre class="code-block"><code class="language-html">${formattedHTML}</code></pre>
@@ -882,6 +1141,30 @@ function displaySelectedElementCode(elementInfo) {
             <pre class="code-block"><code class="language-text">无法获取元素代码: ${error.message}</code></pre>
         `;
     }
+}
+
+// 生成class标签的HTML
+function generateClassSpans(className) {
+    if (!className) return '';
+
+    // 将class字符串分割为数组，过滤空值
+    const classes = className.split(' ').filter(cls => cls.trim());
+
+    // 最多显示3个class，防止界面过于拥挤
+    const maxClasses = 3;
+    const displayClasses = classes.slice(0, maxClasses);
+
+    let result = displayClasses.map(cls =>
+        `<span class="element-class" title="Class: ${cls}">.${cls}</span>`
+    ).join('');
+
+    // 如果还有更多的class，显示省略号
+    if (classes.length > maxClasses) {
+        const remainingCount = classes.length - maxClasses;
+        result += `<span class="element-class element-class-more" title="还有 ${remainingCount} 个类名: ${classes.slice(maxClasses).join(', ')}">+${remainingCount}</span>`;
+    }
+
+    return result;
 }
 
 // 切换到代码标签页
@@ -928,19 +1211,105 @@ function formatHTML(html) {
     return escapeHtml(formatted);
 }
 
+// ==================== 调试工具函数 ====================
+
+// 显示当前保存的元素信息（调试用）
+window.showElementInfo = function() {
+    console.log('==== 当前保存的元素信息 ====');
+    console.log('selectedElementInfo:', selectedElementInfo);
+    console.log('window.pendingElementContext:', window.pendingElementContext);
+
+    if (selectedElementInfo) {
+        console.log('\n=== 详细元素信息 ===');
+        console.log('标签名 (tagName):', selectedElementInfo.tagName);
+        console.log('元素ID (id):', selectedElementInfo.id || '(无)');
+        console.log('类名 (className):', selectedElementInfo.className || '(无)');
+        console.log('类列表 (classList):', selectedElementInfo.classList || '(无)');
+        console.log('文本内容 (textContent):', selectedElementInfo.textContent || '(无)');
+        console.log('外部HTML (outerHTML):', selectedElementInfo.outerHTML || '(无)');
+        console.log('选择器 (selector):', selectedElementInfo.selector || '(无)');
+        console.log('位置信息 (bounds):', selectedElementInfo.bounds || '(无)');
+        console.log('样式信息 (styles):', selectedElementInfo.styles || '(无)');
+        console.log('页面URL (pageURL):', selectedElementInfo.pageURL || '(无)');
+
+        // 如果有更多字段，也显示出来
+        const knownFields = ['tagName', 'id', 'className', 'classList', 'textContent', 'outerHTML', 'selector', 'bounds', 'styles', 'pageURL'];
+        const additionalFields = Object.keys(selectedElementInfo).filter(key => !knownFields.includes(key));
+        if (additionalFields.length > 0) {
+            console.log('\n=== 其他字段 ===');
+            additionalFields.forEach(field => {
+                console.log(`${field}:`, selectedElementInfo[field]);
+            });
+        }
+    } else {
+        console.log('当前没有选中任何元素');
+    }
+
+    console.log('========================');
+};
+
 // ==================== 工具函数 ====================
 
 // 显示状态信息
 function showStatus(type, message) {
-    const statusBadge = document.getElementById('statusBadge');
-    if (statusBadge) {
-        statusBadge.textContent = message;
-        statusBadge.className = `status-badge status-${type}`;
-        statusBadge.style.display = 'inline-block';
+    // 不再显示任何状态信息
+    return;
+}
 
-        setTimeout(() => {
-            statusBadge.style.display = 'none';
-        }, 3000);
+// 询问AI关于选中元素的功能
+function askAIAboutElement() {
+    if (!selectedElementInfo) {
+        console.warn('请先选择一个元素');
+        return;
+    }
+
+    console.log('[DEBUG] askAIAboutElement 被调用，当前 selectedElementInfo:', selectedElementInfo);
+
+    // 构建包含元素详细信息的上下文
+    const elementDetails = [
+        `关于我选中的 <${selectedElementInfo.tagName.toLowerCase()}> 元素：`,
+        selectedElementInfo.id ? `- ID: #${selectedElementInfo.id}` : null,
+        selectedElementInfo.className ? `- 类名: ${selectedElementInfo.className}` : null,
+        selectedElementInfo.textContent ? `- 文本内容: "${selectedElementInfo.textContent.substring(0, 100)}${selectedElementInfo.textContent.length > 100 ? '...' : ''}"` : null,
+        selectedElementInfo.outerHTML ? `- HTML代码:\n\`\`\`html\n${selectedElementInfo.outerHTML}\n\`\`\`` : null
+    ].filter(Boolean).join('\n');
+
+    // 构建AI主动询问的消息（使用Markdown格式以便正确渲染）
+    const tagNameDisplay = `\`<${selectedElementInfo.tagName.toLowerCase()}>\``;
+    const aiInitialMessage = `我看到您选中了一个 ${tagNameDisplay} 元素${selectedElementInfo.id ? ` (ID: \`#${selectedElementInfo.id}\`)` : ''}。
+
+**您想要了解这个HTML元素的功能和用法吗？** 我可以为您详细介绍它的作用、属性和使用场景。
+
+💡 *提示：请在下方输入您想了解的内容，例如"这个元素有什么作用？"或"如何使用这个元素？"*`;
+
+    console.log('构建的AI消息:', aiInitialMessage);
+
+    // 将格式化后的元素信息保存为待发送的用户消息
+    window.pendingElementContext = {
+        message: elementDetails,
+        originalElementInfo: {
+            tagName: selectedElementInfo.tagName,
+            id: selectedElementInfo.id,
+            className: selectedElementInfo.className,
+            outerHTML: selectedElementInfo.outerHTML,
+            textContent: selectedElementInfo.textContent
+        }
+    };
+
+    console.log('[DEBUG] window.pendingElementContext 已设置为:', window.pendingElementContext);
+
+    // 发送消息到AI
+    if (chatModule) {
+        // 切换到AI聊天标签页（如果存在）
+        const tabChat = document.getElementById('tab-chat');
+        if (tabChat) {
+            tabChat.click();
+        }
+
+        // AI主动发送询问消息
+        chatModule.addMessageToUI('ai', aiInitialMessage);
+    } else {
+        console.error('AI聊天模块未初始化');
     }
 }
 
@@ -960,9 +1329,93 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 然后初始化主应用
         initMainApp();
+
+        // 扩展聊天模块以支持元素上下文
+        extendChatModuleForElementContext();
     } catch (error) {
         console.error('[MainApp] 配置初始化失败:', error);
         // 即使配置失败，也尝试初始化主应用
         initMainApp();
+        extendChatModuleForElementContext();
     }
-}); 
+});
+
+// 扩展聊天模块以支持元素上下文
+function extendChatModuleForElementContext() {
+    if (!chatModule) return;
+
+    // 保存原始的sendMessage方法
+    const originalSendMessage = chatModule.sendMessage.bind(chatModule);
+
+    // 重写sendMessage方法
+    chatModule.sendMessage = async function(mode, contentId) {
+        const message = this.inputElement.value.trim();
+        if (!message || this.isLoading) return;
+
+        // 清空输入框
+        this.inputElement.value = '';
+
+        // 添加用户消息到UI
+        this.addMessageToUI('user', message);
+
+        // 设置加载状态
+        this.setLoadingState(true);
+
+        try {
+            // 构建请求体
+            let finalUserMessage = message;
+
+            // 如果存在待处理的元素上下文，将元素信息和用户消息结合
+            if (window.pendingElementContext && window.pendingElementContext.message) {
+                console.log('[DEBUG] 检测到待处理的元素上下文，将结合用户消息和元素信息');
+                console.log('用户消息:', message);
+                console.log('元素上下文信息:', window.pendingElementContext.message);
+
+                // 将用户消息和元素信息结合起来
+                finalUserMessage = `${window.pendingElementContext.message}
+
+用户问题: ${message}`;
+
+                // 用户回应后清除上下文（避免后续消息继续携带）
+                window.pendingElementContext = null;
+                console.log('[DEBUG] window.pendingElementContext 已清除');
+            }
+
+            const requestBody = {
+                user_message: finalUserMessage,
+                conversation_history: this.getConversationHistory(),
+                code_context: this.getCodeContext(),
+                mode: mode,
+                content_id: contentId
+            };
+
+            console.log('[DEBUG] 最终请求体:', JSON.stringify(requestBody, null, 2));
+
+            // 如果是测试模式，添加测试结果
+            if (mode === 'test') {
+                const testResults = this._getTestResults();
+                if (testResults) {
+                    requestBody.test_results = testResults;
+                }
+            }
+
+            // 使用封装的 apiClient 发送请求
+            const data = await window.apiClient.post('/chat/ai/chat', requestBody);
+
+            if (data.code === 200 && data.data && typeof data.data.ai_response === 'string') {
+                // 添加AI回复到UI
+                this.addMessageToUI('ai', data.data.ai_response);
+            } else {
+                throw new Error(data.message || 'AI回复内容为空或格式不正确');
+            }
+        } catch (error) {
+            console.error('[ChatModule] 发送消息时出错:', error);
+            this.addMessageToUI('ai', `抱歉，我无法回答你的问题。错误信息: ${error.message}`);
+        } finally {
+            // 取消加载状态
+            this.setLoadingState(false);
+        }
+    };
+
+    console.log('[Learning] 聊天模块已扩展以支持元素上下文');
+}

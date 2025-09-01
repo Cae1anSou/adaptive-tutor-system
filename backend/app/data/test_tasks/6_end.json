@@ -1,51 +1,86 @@
 {
   "topic_id": "6_end",
-  "title": "第六章基础交互逻辑",
-  "description_md": "综合练习：实现一个可以记录用户输入与点击行为的交互页面。\n\n要求：\n- 用户可以输入猫咪名字；\n- 点击按钮后，页面展示输入的名字；\n- 点击次数也会在页面中显示并递增；\n\n通过本题，你将使用按钮监听、输入获取与 DOM 内容更新等 JS 操作。",
+  "title": "第6章基础交互逻辑综合测试",
+  "description_md": "# 综合测试\n\n## 测试任务：\n请综合运用本章所学知识点，继续构建“WCF Best Cat Exhibition”（WCF最佳猫咪展览）介绍页面，完成交互功能部分的添加。\n\n### 任务一：添加展览报名表单\n- 创建一个包含姓名输入框和邮箱输入框的报名表单\n- 添加一个提交按钮\n- 为提交按钮添加点击事件监听器\n\n### 任务二：处理用户输入并显示反馈\n- 在点击提交按钮时，获取用户输入的姓名和邮箱\n- 阻止表单的默认提交行为\n- 显示个性化的感谢信息给用户\n\n### 任务三：动态更新页面内容\n- 在页面中添加一个用于显示反馈信息的区域\n- 当用户提交表单后，动态更新该区域的内容和样式\n- 使用DOM操作技术实现内容更新",
   "start_code": {
-    "html": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>猫咪命名器</title>\n</head>\n<body>\n  <h1>给你的猫咪取个名字吧</h1>\n  <input type=\"text\" id=\"cat-name-input\" placeholder=\"输入名字...\">\n  <button id=\"submit-btn\">提交名字</button>\n  <p id=\"result\"></p>\n  <p id=\"click-count\">点击次数：0</p>\n\n  <script>\n    let count = 0;\n    document.getElementById('submit-btn').addEventListener('click', function () {\n      const name = document.getElementById('cat-name-input').value;\n      document.getElementById('result').textContent = `你的猫咪名是：${name}`;\n      count++;\n      document.getElementById('click-count').textContent = `点击次数：${count}`;\n    });\n  </script>\n</body>\n</html>",
-    "css": "",
-    "js": ""
+    "html": "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>WCF Best Cat Exhibition</title>\n    <style>\n        body {\n            font-family: Arial, sans-serif;\n            max-width: 800px;\n            margin: 0 auto;\n            padding: 20px;\n            background-color: #f5f5f5;\n        }\n        .exhibition-header {\n            text-align: center;\n            color: #333;\n            margin-bottom: 30px;\n        }\n        .cat-gallery {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\n            gap: 20px;\n            margin-bottom: 30px;\n        }\n        .cat-item {\n            background: white;\n            border-radius: 8px;\n            overflow: hidden;\n            box-shadow: 0 2px 10px rgba(0,0,0,0.1);\n        }\n        .cat-item img {\n            width: 100%;\n            height: 150px;\n            object-fit: cover;\n        }\n        .cat-item .cat-name {\n            padding: 10px;\n            text-align: center;\n            font-weight: bold;\n        }\n    </style>\n</head>\n<body>\n    <header class=\"exhibition-header\">\n        <h1>WCF Best Cat Exhibition</h1>\n        <p>世界猫咪联合会最佳猫咪展览</p>\n    </header>\n    \n    <section class=\"cat-gallery\">\n        <div class=\"cat-item\">\n            <img src=\"https://placekitten.com/200/150?image=1\" alt=\"英国短毛猫\">\n            <div class=\"cat-name\">英国短毛猫</div>\n        </div>\n        <div class=\"cat-item\">\n            <img src=\"https://placekitten.com/200/150?image=2\" alt=\"波斯猫\">\n            <div class=\"cat-name\">波斯猫</div>\n        </div>\n        <div class=\"cat-item\">\n            <img src=\"https://placekitten.com/200/150?image=3\" alt=\"暹罗猫\">\n            <div class=\"cat-name\">暹罗猫</div>\n        </div>\n    </section>\n    \n    <script>\n        // 在此处添加你的JavaScript代码\n    </script>\n</body>\n</html>",
+    "css": "body {\n    font-family: Arial, sans-serif;\n    max-width: 800px;\n    margin: 0 auto;\n    padding: 20px;\n    background-color: #f5f5f5;\n}\n.exhibition-header {\n    text-align: center;\n    color: #333;\n    margin-bottom: 30px;\n}\n.cat-gallery {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\n    gap: 20px;\n    margin-bottom: 30px;\n}\n.cat-item {\n    background: white;\n    border-radius: 8px;\n    overflow: hidden;\n    box-shadow: 0 2px 10px rgba(0,0,0,0.1);\n}\n.cat-item img {\n    width: 100%;\n    height: 150px;\n    object-fit: cover;\n}\n.cat-item .cat-name {\n    padding: 10px;\n    text-align: center;\n    font-weight: bold;\n}",
+    "js": "// 在此处添加你的JavaScript代码"
   },
   "checkpoints": [
     {
-      "name": "初始点击次数检查",
-      "type": "assert_text_content",
-      "selector": "#click-count",
-      "assertion_type": "contains",
-      "value": "0",
-      "feedback": "页面加载时应显示点击次数为 0。"
+      "name": "表单元素存在性检查",
+      "type": "assert_element",
+      "selector": "#registrationForm",
+      "assertion_type": "exists",
+      "feedback": "请添加id为'registrationForm'的表单元素"
     },
     {
-      "name": "输入文本回显检查",
-      "type": "interaction_and_assert",
-      "feedback": "验证输入框与按钮功能是否正确",
-      "action_selector": "#cat-name-input",
-      "action_type": "type_text",
-      "action_value": "喵喵",
-      "assertion": {
-        "type": "assert_text_content",
-        "name": "验证文本回显",
-        "selector": "#result",
-        "assertion_type": "contains",
-        "value": "喵喵",
-        "feedback": "输入文本后，应在 result 中展示用户输入的名字。"
-      }
+      "name": "姓名输入框检查",
+      "type": "assert_element",
+      "selector": "#userName",
+      "assertion_type": "exists",
+      "feedback": "请添加id为'userName'的姓名输入框"
     },
     {
-      "name": "点击次数更新检查",
+      "name": "邮箱输入框检查",
+      "type": "assert_element",
+      "selector": "#userEmail",
+      "assertion_type": "exists",
+      "feedback": "请添加id为'userEmail'的邮箱输入框"
+    },
+    {
+      "name": "提交按钮检查",
+      "type": "assert_element",
+      "selector": "#submitBtn",
+      "assertion_type": "exists",
+      "feedback": "请添加id为'submitBtn'的提交按钮"
+    },
+    {
+      "name": "反馈区域检查",
+      "type": "assert_element",
+      "selector": "#feedback",
+      "assertion_type": "exists",
+      "feedback": "请添加id为'feedback'的反馈区域"
+    },
+    {
+      "name": "事件监听器功能检查",
       "type": "interaction_and_assert",
-      "feedback": "验证按钮功能是否正确",
-      "action_selector": "#submit-btn",
+      "action_selector": "#submitBtn",
       "action_type": "click",
       "assertion": {
-        "type": "assert_text_content",
-        "name": "验证点击次数更新",
-        "selector": "#click-count",
-        "assertion_type": "contains",
-        "value": "2",
-        "feedback": "连续点击两次后，点击次数应正确更新为 2。"
-      }
+        "type": "assert_element",
+        "selector": "#feedback.show",
+        "assertion_type": "exists",
+        "feedback": "点击提交按钮后应显示反馈信息"
+      },
+      "feedback": "验证提交按钮的点击事件功能"
+    },
+    {
+      "name": "DOM操作功能检查",
+      "type": "interaction_and_assert",
+      "action_selector": "#submitBtn",
+      "action_type": "click",
+      "assertion": {
+        "type": "assert_style",
+        "selector": "#feedback",
+        "css_property": "display",
+        "assertion_type": "equals",
+        "value": "block",
+        "feedback": "反馈区域应正确显示"
+      },
+      "feedback": "验证DOM操作功能"
+    },
+    {
+      "name": "防止默认提交行为检查",
+      "type": "custom_script",
+      "script": "const form = document.getElementById('registrationForm'); let defaultPrevented = false; const testEvent = new Event('submit', { cancelable: true }); form.addEventListener('submit', (e) => { e.preventDefault(); defaultPrevented = true; }); form.dispatchEvent(testEvent); return defaultPrevented;",
+      "feedback": "请确保阻止了表单的默认提交行为"
     }
-  ]
+  ],
+  "answer": {
+    "html": "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>WCF Best Cat Exhibition</title>\n    <style>\n        body {\n            font-family: Arial, sans-serif;\n            max-width: 800px;\n            margin: 0 auto;\n            padding: 20px;\n            background-color: #f5f5f5;\n        }\n        .exhibition-header {\n            text-align: center;\n            color: #333;\n            margin-bottom: 30px;\n        }\n        .cat-gallery {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\n            gap: 20px;\n            margin-bottom: 30px;\n        }\n        .cat-item {\n            background: white;\n            border-radius: 8px;\n            overflow: hidden;\n            box-shadow: 0 2px 10px rgba(0,0,0,0.1);\n        }\n        .cat-item img {\n            width: 100%;\n            height: 150px;\n            object-fit: cover;\n        }\n        .cat-item .cat-name {\n            padding: 10px;\n            text-align: center;\n            font-weight: bold;\n        }\n        #registrationForm {\n            background: white;\n            padding: 20px;\n            border-radius: 8px;\n            box-shadow: 0 2px 10px rgba(0,0,0,0.1);\n            margin-bottom: 30px;\n        }\n        #registrationForm input {\n            width: 100%;\n            padding: 10px;\n            margin: 10px 0;\n            border: 1px solid #ddd;\n            border-radius: 4px;\n            box-sizing: border-box;\n        }\n        #submitBtn {\n            background-color: #4CAF50;\n            color: white;\n            padding: 12px 20px;\n            border: none;\n            border-radius: 4px;\n            cursor: pointer;\n            width: 100%;\n        }\n        #submitBtn:hover {\n            background-color: #45a049;\n        }\n        #feedback {\n            display: none;\n            background-color: #dff0d8;\n            color: #3c763d;\n            padding: 15px;\n            border-radius: 4px;\n            margin-top: 20px;\n        }\n        #feedback.show {\n            display: block;\n        }\n    </style>\n</head>\n<body>\n    <header class=\"exhibition-header\">\n        <h1>WCF Best Cat Exhibition</h1>\n        <p>世界猫咪联合会最佳猫咪展览</p>\n    </header>\n    \n    <section class=\"cat-gallery\">\n        <div class=\"cat-item\">\n            <img src=\"https://placekitten.com/200/150?image=1\" alt=\"英国短毛猫\">\n            <div class=\"cat-name\">英国短毛猫</div>\n        </div>\n        <div class=\"cat-item\">\n            <img src=\"https://placekitten.com/200/150?image=2\" alt=\"波斯猫\">\n            <div class=\"cat-name\">波斯猫</div>\n        </div>\n        <div class=\"cat-item\">\n            <img src=\"https://placekitten.com/200/150?image=3\" alt=\"暹罗猫\">\n            <div class=\"cat-name\">暹罗猫</div>\n        </div>\n    </section>\n    \n    <form id=\"registrationForm\">\n        <h2>展览报名</h2>\n        <input type=\"text\" id=\"userName\" placeholder=\"请输入您的姓名\" required>\n        <input type=\"email\" id=\"userEmail\" placeholder=\"请输入您的邮箱\" required>\n        <button type=\"submit\" id=\"submitBtn\">提交报名</button>\n    </form>\n    \n    <div id=\"feedback\"></div>\n    \n    <script>\n        document.getElementById('registrationForm').addEventListener('submit', function(event) {\n            event.preventDefault(); // 阻止表单默认提交行为\n            \n            // 获取用户输入\n            const userName = document.getElementById('userName').value;\n            const userEmail = document.getElementById('userEmail').value;\n            \n            // 显示个性化反馈信息\n            const feedbackElement = document.getElementById('feedback');\n            feedbackElement.textContent = `感谢您报名参加展览，${userName}！我们已收到您的邮箱：${userEmail}，稍后会发送确认信息。`;\n            feedbackElement.classList.add('show');\n        });\n    </script>\n</body>\n</html>",
+    "css": "body {\n    font-family: Arial, sans-serif;\n    max-width: 800px;\n    margin: 0 auto;\n    padding: 20px;\n    background-color: #f5f5f5;\n}\n.exhibition-header {\n    text-align: center;\n    color: #333;\n    margin-bottom: 30px;\n}\n.cat-gallery {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\n    gap: 20px;\n    margin-bottom: 30px;\n}\n.cat-item {\n    background: white;\n    border-radius: 8px;\n    overflow: hidden;\n    box-shadow: 0 2px 10px rgba(0,0,0,0.1);\n}\n.cat-item img {\n    width: 100%;\n    height: 150px;\n    object-fit: cover;\n}\n.cat-item .cat-name {\n    padding: 10px;\n    text-align: center;\n    font-weight: bold;\n}\n#registrationForm {\n    background: white;\n    padding: 20px;\n    border-radius: 8px;\n    box-shadow: 0 2px 10px rgba(0,0,0,0.1);\n    margin-bottom: 30px;\n}\n#registrationForm input {\n    width: 100%;\n    padding: 10px;\n    margin: 10px 0;\n    border: 1px solid #ddd;\n    border-radius: 4px;\n    box-sizing: border-box;\n}\n#submitBtn {\n    background-color: #4CAF50;\n    color: white;\n    padding: 12px 20px;\n    border: none;\n    border-radius: 4px;\n    cursor: pointer;\n    width: 100%;\n}\n#submitBtn:hover {\n    background-color: #45a049;\n}\n#feedback {\n    display: none;\n    background-color: #dff0d8;\n    color: #3c763d;\n    padding: 15px;\n    border-radius: 4px;\n    margin-top: 20px;\n}\n#feedback.show {\n    display: block;\n}",
+    "js": "document.getElementById('registrationForm').addEventListener('submit', function(event) {\n    event.preventDefault(); // 阻止表单默认提交行为\n    \n    // 获取用户输入\n    const userName = document.getElementById('userName').value;\n    const userEmail = document.getElementById('userEmail').value;\n    \n    // 显示个性化反馈信息\n    const feedbackElement = document.getElementById('feedback');\n    feedbackElement.textContent = `感谢您报名参加展览，${userName}！我们已收到您的邮箱：${userEmail}，稍后会发送确认信息。`;\n    feedbackElement.classList.add('show');\n});"
+  }
 }
