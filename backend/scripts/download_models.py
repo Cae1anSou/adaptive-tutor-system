@@ -83,7 +83,7 @@ def download_model(model_repo: str, save_directory: str) -> bool:
 
 def main():
     # 配置参数
-    MODEL_REPO = "wxt5981/distilbert-base-uncased-emotion"
+    MODEL_REPO = "wxt5981/bert-base-uncased"
     SAVE_DIRECTORY = "models/sentiment_bert"
     
     success = download_model(MODEL_REPO, SAVE_DIRECTORY)
