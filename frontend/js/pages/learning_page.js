@@ -3,7 +3,6 @@
 // 导入配置模块
 import { AppConfig, buildBackendUrl, initializeConfig } from '../modules/config.js';
 import { MiniKnowledgeGraph } from '../modules/mini_knowledge_graph.js';
-import { setupHeaderTitle, setupBackButton, getUrlParam, trackReferrer,navigateTo } from '../modules/navigation.js';
 import { setupHeaderTitle, setupBackButton, getUrlParam, trackReferrer, navigateTo } from '../modules/navigation.js';
 // 导入功能模块
 import {
