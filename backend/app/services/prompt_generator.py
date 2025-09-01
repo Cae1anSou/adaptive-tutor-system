@@ -93,7 +93,8 @@ Please provide a comprehensive, engaging learning experience that helps the stud
         mode: str = None,
         content_title: str = None,
         content_json: str = None,
-        test_results: List[Dict[str, Any]] = None
+        test_results: List[Dict[str, Any]] = None,
+        clustering_result: Dict[str, Any] = None
     ) -> Tuple[str, List[Dict[str, str]]]:
         """
         创建完整的提示词和消息列表
@@ -119,7 +120,8 @@ Please provide a comprehensive, engaging learning experience that helps the stud
             content_title=content_title,
             content_json=content_json,
             test_results=test_results,
-            code_content=code_content
+            code_content=code_content,
+            clustering_result=clustering_result
         )
 
         # 构建消息列表
@@ -299,7 +301,8 @@ Please provide a comprehensive, engaging learning experience that helps the stud
         content_title: str = None,
         content_json: str = None,
         test_results: List[Dict[str, Any]] = None,
-        code_content: CodeContent = None
+        code_content: CodeContent = None,
+        clustering_result: Dict[str, Any] = None
     ) -> str:
         """构建系统提示词"""
         prompt_parts = [self.base_system_prompt]
@@ -477,6 +480,11 @@ LEARNING FOCUS: Please pay close attention to the student's behavior patterns to
                 # 如果解析失败，使用原始内容
                 prompt_parts.append(f"CONTENT DATA: Here is the detailed content data for the current topic. Use this to provide more specific and accurate guidance.\n{content_json}")
 
+        # 添加聚类分析结果（如果提供）
+        if clustering_result and clustering_result.get("named_labels"):
+            progress_info = self._format_clustering_result(clustering_result)
+            prompt_parts.append(progress_info)
+
         return "\n\n".join(prompt_parts)
 
     @staticmethod
@@ -542,6 +550,110 @@ LEARNING FOCUS: Please pay close attention to the student's behavior patterns to
             return "Here is my current code:\n\n" + "\n\n".join(parts)
         else:
             return ""
+
+    def _format_clustering_result(self, clustering_result: Dict[str, Any]) -> str:
+        """格式化聚类分析结果"""
+        try:
+            named_labels = clustering_result.get("named_labels", [])
+            progress_score = clustering_result.get("progress_score", [])
+            window_count = clustering_result.get("window_count", 0)
+            
+            if not named_labels:
+                return ""
+            
+            # 获取最新的进度状态
+            current_state = named_labels[-1] if named_labels else "正常"
+            current_score = progress_score[-1] if progress_score else 0.0
+            
+            # 分析趋势
+            trend_analysis = ""
+            if len(progress_score) >= 3:
+                recent_scores = progress_score[-3:]
+                score_trend = recent_scores[-1] - recent_scores[0]
+                if score_trend > 0.5:
+                    trend_analysis = "The student's progress is improving."
+                elif score_trend < -0.5:
+                    trend_analysis = "The student's progress is declining."
+                else:
+                    trend_analysis = "The student's progress is stable."
+            
+            # 生成教学建议
+            recommendations = self._get_progress_recommendations(current_state, score_trend if 'score_trend' in locals() else 0)
+            
+            progress_info = f"""
+PROGRESS ANALYSIS: Based on conversation pattern analysis, the student's current learning progress state is "{current_state}".
+
+{trend_analysis}
+
+TEACHING RECOMMENDATIONS:
+{chr(10).join([f"- {rec}" for rec in recommendations])}
+
+ANALYSIS DETAILS:
+- Progress Score: {current_score:.3f}
+- Windows Analyzed: {window_count}
+- Confidence: {min(1.0, abs(current_score) / 2.0):.2f}
+
+Please adjust your teaching approach based on this progress analysis. If the student is in "低进度" (low progress), provide more detailed explanations and encouragement. If they are in "超进度" (high progress), offer more challenging content and advanced concepts.
+"""
+            return progress_info
+            
+        except Exception as e:
+            print(f"Error formatting clustering result: {e}")
+            return ""
+    
+    def _get_progress_recommendations(self, current_state: str, trend: float) -> List[str]:
+        """根据进度状态和趋势生成教学建议"""
+        recommendations = []
+        
+        if current_state == "低进度":
+            if trend < -0.5:
+                recommendations.extend([
+                    "Provide more detailed step-by-step explanations",
+                    "Offer simpler examples and analogies",
+                    "Ask specific questions to identify confusion points",
+                    "Give more encouragement and positive reinforcement"
+                ])
+            else:
+                recommendations.extend([
+                    "Continue with current supportive approach",
+                    "Provide gradual difficulty progression",
+                    "Celebrate small improvements"
+                ])
+        elif current_state == "超进度":
+            if trend > 0.5:
+                recommendations.extend([
+                    "Introduce more advanced concepts and challenges",
+                    "Encourage exploration of related topics",
+                    "Ask deeper analytical questions",
+                    "Provide opportunities for peer teaching"
+                ])
+            else:
+                recommendations.extend([
+                    "Maintain engagement with interesting content",
+                    "Offer real-world applications",
+                    "Encourage creative problem-solving"
+                ])
+        else:  # 正常
+            if trend > 0.5:
+                recommendations.extend([
+                    "Continue current effective teaching approach",
+                    "Gradually increase challenge level",
+                    "Maintain good balance of support and challenge"
+                ])
+            elif trend < -0.5:
+                recommendations.extend([
+                    "Monitor for potential difficulties",
+                    "Provide additional practice opportunities",
+                    "Check understanding more frequently"
+                ])
+            else:
+                recommendations.extend([
+                    "Maintain steady teaching pace",
+                    "Regularly assess comprehension",
+                    "Provide balanced support and challenge"
+                ])
+        
+        return recommendations
 
 
 # 创建单例实例

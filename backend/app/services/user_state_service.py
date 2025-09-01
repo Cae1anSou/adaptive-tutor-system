@@ -40,6 +40,7 @@ class StudentProfile:
             'persistence_score': 0.5,      # [0,1] 坚持度
             'learning_velocity': 0.5,      # [0,1] 学习速度
             'attention_stability': 0.5,    # [0,1] 注意力稳定性
+<<<<<<< HEAD
              'submission_timestamps': [],   # 保留时间戳用于计算频率
             'recent_events': [],           # 保留最近事件用于滑动窗口计算
             'knowledge_level_history': {}, # { 'topic_id': { 'level': {'visits': 0, 'total_duration_ms': 0} } }
@@ -144,6 +145,12 @@ class StudentProfile:
                 'idle_duration': 0,           # 空闲时长（秒）
                 'last_activity_time': None    # 最后活动时间
             }
+=======
+            'submission_timestamps': [],    # 保留时间戳用于计算频率
+            'recent_events': [],             # 保留最近事件用于滑动窗口计算
+            'knowledge_level_history': {},  # { 'level_id': {'visits': 0, 'total_duration_ms': 0} }
+            'clustering_state': {}          # 聚类分析状态
+>>>>>>> 302dc2a (添加了聚类)
         }
     
     # user_state_service.py - 添加批量处理方法
@@ -407,10 +414,14 @@ def handle_significant_edit(self, participant_id: str, edit_data: Dict[str, Any]
                 'attention_stability': 0.5,
                 'submission_timestamps': [],
                 'recent_events': [],
-                'knowledge_level_history': {}
+                'knowledge_level_history': {},
+                'clustering_state': {}
             }
         else:
             profile.behavior_patterns = data['behavior_patterns']
+            # 确保clustering_state字段存在
+            if 'clustering_state' not in profile.behavior_patterns:
+                profile.behavior_patterns['clustering_state'] = {}
         
         # 反序列化时间戳
         if 'submission_timestamps' in profile.behavior_patterns:
@@ -1180,6 +1191,92 @@ class UserStateService:
         except Exception as e:
             logger.error(f"更新行为模式时发生错误: {e}")
 
+    def update_clustering_state(self, participant_id: str, clustering_result: Dict[str, Any]):
+        """
+        更新用户聚类分析状态
+        
+        Args:
+            participant_id: 参与者ID
+            clustering_result: 聚类分析结果
+        """
+        try:
+            profile, _ = self.get_or_create_profile(participant_id, None)
+            
+            # 确保clustering_state字段存在
+            if 'clustering_state' not in profile.behavior_patterns:
+                profile.behavior_patterns['clustering_state'] = {}
+            
+            # 更新聚类状态
+            clustering_state = {
+                'last_analysis_timestamp': clustering_result.get('analysis_timestamp'),
+                'current_progress_state': clustering_result.get('named_labels', [])[-1] if clustering_result.get('named_labels') else '正常',
+                'progress_score': clustering_result.get('progress_score', [])[-1] if clustering_result.get('progress_score') else 0.0,
+                'window_count': clustering_result.get('window_count', 0),
+                'message_count': clustering_result.get('message_count', 0),
+                'confidence': min(1.0, abs(clustering_result.get('progress_score', [0])[-1]) / 2.0) if clustering_result.get('progress_score') else 0.0
+            }
+            
+            # 计算趋势
+            progress_scores = clustering_result.get('progress_score', [])
+            if len(progress_scores) >= 3:
+                recent_scores = progress_scores[-3:]
+                score_trend = recent_scores[-1] - recent_scores[0]
+                if score_trend > 0.5:
+                    clustering_state['trend'] = 'improving'
+                elif score_trend < -0.5:
+                    clustering_state['trend'] = 'declining'
+                else:
+                    clustering_state['trend'] = 'stable'
+            else:
+                clustering_state['trend'] = 'stable'
+            
+            # 使用 set_profile 更新聚类状态
+            set_dict = {
+                'behavior_patterns.clustering_state': clustering_state
+            }
+            self.set_profile(profile, set_dict)
+            
+            logger.info(f"Updated clustering state for {participant_id}: {clustering_state['current_progress_state']}")
+            
+        except Exception as e:
+            logger.error(f"Error updating clustering state for {participant_id}: {e}")
+
+    def get_clustering_state(self, participant_id: str) -> Dict[str, Any]:
+        """
+        获取用户聚类分析状态
+        
+        Args:
+            participant_id: 参与者ID
+            
+        Returns:
+            聚类状态信息
+        """
+        try:
+            profile, _ = self.get_or_create_profile(participant_id, None)
+            
+            if 'clustering_state' not in profile.behavior_patterns:
+                return {
+                    'current_progress_state': '正常',
+                    'progress_score': 0.0,
+                    'confidence': 0.0,
+                    'trend': 'stable',
+                    'window_count': 0,
+                    'message_count': 0
+                }
+            
+            return profile.behavior_patterns['clustering_state']
+            
+        except Exception as e:
+            logger.error(f"Error getting clustering state for {participant_id}: {e}")
+            return {
+                'current_progress_state': '正常',
+                'progress_score': 0.0,
+                'confidence': 0.0,
+                'trend': 'stable',
+                'window_count': 0,
+                'message_count': 0
+            }
+
     def calculate_frustration_index(self, participant_id: str) -> float:
         """
         计算综合挫败指数
@@ -1245,14 +1342,13 @@ class UserStateService:
                     for i in range(1, len(recent_submissions)):
                         interval = (recent_submissions[i] - recent_submissions[i-1]).total_seconds()
                         intervals.append(interval)
-                    
                     if intervals:
                         avg_interval = sum(intervals) / len(intervals)
                         # 间隔越短，时间压力越大
                         time_pressure = min(1.0, 60.0 / max(avg_interval, 10.0))
             
             # 加权综合计算挫败指数
-            frustration_index = (
+            frustration_index = (   
                 emotional_frustration * 0.4 +      # 情感挫败权重40%
                 error_frequency * 0.3 +            # 错误频率权重30%
                 help_seeking * 0.2 +              # 求助倾向权重20%

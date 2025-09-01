@@ -9,6 +9,7 @@ from app.services.rag_service import RAGService
 from app.services.prompt_generator import PromptGenerator
 from app.services.llm_gateway import LLMGateway
 from app.services.content_loader import load_json_content  # 导入content_loader
+from app.services.progress_clustering_service import progress_clustering_service  # 导入聚类服务
 from app.crud.crud_event import event as crud_event
 from app.crud.crud_chat_history import chat_history as crud_chat_history
 from app.schemas.chat import ChatHistoryCreate
@@ -27,6 +28,22 @@ class DynamicController:
                  rag_service: RAGService,
                  prompt_generator: PromptGenerator,
                  llm_gateway: LLMGateway,):
+        
+        # 验证必需的服务
+        if user_state_service is None:
+            raise TypeError("user_state_service cannot be None")
+        if prompt_generator is None:
+            raise TypeError("prompt_generator cannot be None")
+        if llm_gateway is None:
+            raise TypeError("llm_gateway cannot be None")
+        
+        self.user_state_service = user_state_service
+        self.sentiment_service = sentiment_service
+        self.rag_service = rag_service
+        self.prompt_generator = prompt_generator
+        self.llm_gateway = llm_gateway
+
+
         """
         初始化动态控制器
 
@@ -123,7 +140,37 @@ class DynamicController:
             else:
                 loaded_content = None
 
-            # 步骤5: 生成提示词
+            # 步骤5: 进度聚类分析
+            clustering_result = None
+            if request.conversation_history and len(request.conversation_history) >= 12:
+                try:
+                    # 将ConversationMessage转换为字典格式用于聚类分析
+                    conversation_history_dicts = []
+                    for msg in request.conversation_history:
+                        conversation_history_dicts.append({
+                            'role': msg.role,
+                            'content': msg.content
+                        })
+                    
+                    # 执行聚类分析
+                    clustering_result = progress_clustering_service.analyze_conversation_progress(
+                        conversation_history_dicts, 
+                        request.participant_id
+                    )
+                    
+                    # 更新用户状态中的聚类信息
+                    self.user_state_service.update_clustering_state(
+                        request.participant_id, 
+                        clustering_result
+                    )
+                    
+                    print(f"🔍 聚类分析完成: {clustering_result.get('named_labels', [])}")
+                    
+                except Exception as e:
+                    print(f"⚠️ 聚类分析失败: {e}")
+                    clustering_result = None
+
+            # 步骤6: 生成提示词
             # 将ConversationMessage转换为字典格式
             conversation_history_dicts = []
             if request.conversation_history:
@@ -135,7 +182,7 @@ class DynamicController:
             elif request.conversation_history is None:
                 # 确保即使conversation_history为None也传递空列表
                 conversation_history_dicts = []
-
+            
             retrieved_knowledge_content = [item['content'] for item in retrieved_knowledge if isinstance(item, dict) and 'content' in item]
             system_prompt, messages = self.prompt_generator.create_prompts(
                 user_state=user_state_summary,
@@ -146,10 +193,11 @@ class DynamicController:
                 mode=request.mode,
                 content_title=content_title,
                 content_json=loaded_content_json,  # 传递加载的内容JSON
-                test_results=request.test_results  # 传递测试结果
+                test_results=request.test_results,  # 传递测试结果
+                clustering_result=clustering_result  # 传递聚类结果
             )
 
-            # 步骤6: 调用LLM
+            # 步骤7: 调用LLM
             #TODO:done表示流式输出是否完成    elapsed:表示当前已经输出多少字
             ai_response = await self.llm_gateway.get_completion(
                 system_prompt=system_prompt,
@@ -356,7 +404,37 @@ class DynamicController:
                     content_title = None
             else:
                 loaded_content = None
-            # 步骤5: 生成提示词
+            # 步骤5: 进度聚类分析
+            clustering_result = None
+            if request.conversation_history and len(request.conversation_history) >= 12:
+                try:
+                    # 将ConversationMessage转换为字典格式用于聚类分析
+                    conversation_history_dicts = []
+                    for msg in request.conversation_history:
+                        conversation_history_dicts.append({
+                            'role': msg.role,
+                            'content': msg.content
+                        })
+                    
+                    # 执行聚类分析
+                    clustering_result = progress_clustering_service.analyze_conversation_progress(
+                        conversation_history_dicts, 
+                        request.participant_id
+                    )
+                    
+                    # 更新用户状态中的聚类信息
+                    self.user_state_service.update_clustering_state(
+                        request.participant_id, 
+                        clustering_result
+                    )
+                    
+                    print(f"🔍 聚类分析完成: {clustering_result.get('named_labels', [])}")
+                    
+                except Exception as e:
+                    print(f"⚠️ 聚类分析失败: {e}")
+                    clustering_result = None
+            
+            # 步骤6: 生成提示词
             # 将ConversationMessage转换为字典格式
             conversation_history_dicts = []
             if request.conversation_history:
@@ -368,6 +446,7 @@ class DynamicController:
             elif request.conversation_history is None:
                 # 确保即使conversation_history为None也传递空列表
                 conversation_history_dicts = []
+            
             retrieved_knowledge_content = [item['content'] for item in retrieved_knowledge if isinstance(item, dict) and 'content' in item]
             system_prompt, messages = self.prompt_generator.create_prompts(
                 user_state=user_state_summary,
@@ -378,9 +457,10 @@ class DynamicController:
                 mode=request.mode,
                 content_title=content_title,
                 content_json=loaded_content_json,  # 传递加载的内容JSON
-                test_results=request.test_results  # 传递测试结果
+                test_results=request.test_results,  # 传递测试结果
+                clustering_result=clustering_result  # 传递聚类结果
             )
-            # 步骤6: 调用LLM（同步方式）
+            # 步骤7: 调用LLM（同步方式）
             ai_response = self.llm_gateway.get_completion_sync(
                 system_prompt=system_prompt,
                 messages=messages
