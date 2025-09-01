@@ -80,6 +80,7 @@ body {
     width: 100%;
     height: 100vh;
     overflow: hidden;
+    position: relative; /* 添加相对定位，使其子元素可以使用绝对定位 */
 }
 
 /* 顶部标题栏样式 */
@@ -102,13 +103,16 @@ body {
     justify-content: space-between;
     align-items: center;
     height: var(--header-height);
-    padding: 0 var(--spacing-xl);;
+    padding: 0 var(--spacing-xl);
     background:var(--head-background);
     color: white;
     box-shadow: var(--shadow-light);
-    position: relative;
+    position: absolute; /* 改为绝对定位 */
+    top: 0;
+    left: 0;
+    right: 0;
     z-index: 50;
-    transform: 0.5s ease-in-out;
+    transition: height 0.5s ease-in-out;
 }
 
 .header-title {
@@ -130,7 +134,10 @@ body {
 
 .top-header-lean:hover{
   height: 200px;
- transform: 0.5s ease-in-out;
+  transition: height 0.5s ease-in-out;
+  position: absolute; /* 使其置于内容容器之上 */
+  width: 100%;
+  z-index: 100; /* 确保它在内容容器之上 */
 }
 
 .mini-knowledge-graph {
@@ -255,10 +262,14 @@ body {
 .content-container {
     display: flex;
     gap: var(--spacing-md); /* 主内容区域与侧边栏之间的间距 */
-    padding: var(--spacing-md);
-    height: calc(100vh - var(--header-height));
+    padding-top: calc(var(--header-height) + var(--spacing-md)); /* 为顶部标题栏留出空间 */
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+    height: 100vh; /* 使用全屏高度 */
     overflow: hidden;
     width: 100%;
+    box-sizing: border-box; /* 确保内边距不会增加元素实际大小 */
 }
 /* 栏目容器样式 */
 .panel {
@@ -551,13 +562,16 @@ body {
     /* 代码展示面板底部区域 */
     .code-panel-footer {
         margin-top: auto;
-        padding: var(--spacing-lg) calc(var(--spacing-lg) - var(--spacing-xs)) var(--spacing-lg) var(--spacing-lg); /* 减少右侧padding，让按钮更靠右 */
+        padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg); /* 使用统一的左右内边距 */
         background: var(--content-background);
         display: flex;
         flex-direction: column;
-        align-items: flex-end;
+        align-items: flex-end; /* 确保按钮靠右对齐 */
         border-top: 1px solid var(--border-color); /* 添加顶部分隔线 */
         gap: var(--spacing-sm); /* 在按钮区域和开关区域之间添加间隔 */
+        width: calc(100% + var(--spacing-xs)); /* 稍微扩宽底部区域，与上面的内容区域一致 */
+        margin-right: -var(--spacing-xs); /* 根据宽度增加调整偏移量 */
+        box-sizing: border-box; /* 确保宝箱模型计算正确 */
     }
 
     .selector-controls {
@@ -566,6 +580,7 @@ body {
         margin-bottom: var(--spacing-md);
         justify-content: flex-end;
         align-items: center; /* 确保按钮垂直对齐 */
+        width: 100%; /* 让容器占满全宽，确保右对齐有效 */
     }
 
     .selector-controls .btn {
@@ -659,8 +674,12 @@ body {
     
     .info-content {
         flex: 1;
-        padding: var(--spacing-lg) var(--spacing-xl);
+        padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg); /* 统一四个方向的内边距 */
         overflow-y: auto;
+        max-height: none; /* 移除高度限制 */
+        width: calc(100% + var(--spacing-xs)); /* 稍微扩宽内容区域，让代码展示框与按钮对齐 */
+        box-sizing: border-box; /* 确保宝箱模型计算正确 */
+        margin-right: -var(--spacing-xs); /* 向右微调，让内容框稍微超出容器 */
     }
     .info-content h2 {
         margin-top: 0;
@@ -729,7 +748,7 @@ body {
         height: 100%;
         min-height: 100px; /* 最小高度保障 */
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease; /* 加快过渡速度到 0.2s */
         position: relative;
         z-index: 50; /* 确保卡片在最上层 */
         /* 强制所有卡片等宽 */
@@ -790,11 +809,11 @@ body {
     }
 
     .level-card.expanded {
-        /* 展开时使用更大的高度和内边距 */
+        /* 展开时使用更紧凑的高度和内边距 */
         height: auto;
-        min-height: 200px;
-        max-height: 400px; /* 限制最大高度 */
-        padding: var(--spacing-lg); /* 展开时使用更大的padding */
+        min-height: auto; /* 完全由内容决定高度 */
+        max-height: 800px; /* 存留最大高度限制 */
+        padding: var(--spacing-xs) var(--spacing-md) 0 var(--spacing-md); /* 移除底部内边距 */
         z-index: 10;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     }
@@ -808,15 +827,18 @@ body {
         flex: 0 0 auto; /* 不让header根据内容拉伸，保持固定大小 */
         text-align: center;
         /* 响应式高度：根据容器大小自适应 */
-        min-height: calc(var(--spacing-lg) * 2);
+        min-height: calc(var(--spacing-xs) * 2); /* 大幅减少标题区域的最小高度 */
         padding: 0; /* 减少内边距 */
+        margin-bottom: 0; /* 移除底部边距 */
     }
 
     .level-content {
         opacity: 1;
-        max-height: 200px;
-        overflow: hidden;
-        transition: all 0.3s ease;
+        max-height: 500px; /* 增加最大高度限制，让内容能够完全显示 */
+        overflow-y: auto; /* 添加垂直滚动条 */
+        transition: all 0.2s ease; /* 加快过渡速度 */
+        word-wrap: break-word; /* 确保文本能换行 */
+        overflow-wrap: break-word;
     }
 
     .level-card.collapsed .level-content {
@@ -828,17 +850,24 @@ body {
 
     .level-card.expanded .level-content {
         opacity: 1;
-        max-height: 200px;
-        margin-top: var(--spacing-md);
+        max-height: none; /* 移除最大高度限制，让内容完全显示 */
+        margin-top: 0; /* 移除顶部边距，使内容紧距标题 */
+        margin-bottom: 0; /* 移除底部边距 */
         transform: translateY(0);
+        overflow-y: auto; /* 添加垂直滚动条，确保过长内容可滚动查看 */
+        word-wrap: break-word; /* 确保文本能够换行 */
+        overflow-wrap: break-word; /* 确保长单词能够换行 */
+        padding-bottom: 0; /* 移除底部内边距 */
     }
 
     .level-card h3 {
         margin: 0;
-        font-size: var(--font-size-base);
+        font-size: var(--font-size-sm); /* 使用稍小的字体大小 */
         color: var(--text-color);
         font-weight: 600;
         color: #2c3e50;
+        line-height: 1.2; /* 减小行高，使标题更紧凑 */
+        padding: 0; /* 移除内边距 */
     }
 
     .level-description {
@@ -885,6 +914,20 @@ body {
         margin: var(--spacing-md) var(--spacing-xl) var(--spacing-md) auto;
     }
   
+
+/* 为防止内容未能完全展示，增加内容区域的自适应宽度设置 */
+.content-text {
+    white-space: pre-wrap;
+    word-wrap: break-word; /* 确保长文本能换行 */
+    overflow-wrap: break-word;
+    max-width: 100%; /* 确保内容不会超出容器宽度 */
+    font-size: var(--font-size-sm);
+    line-height: 1.3; /* 进一步减小行高，使文本更紧凑 */
+    color: var(--text-color);
+    margin: 0; /* 移除内容文本的外边距 */
+    padding: 0; /* 移除内容文本的内边距 */
+    margin-bottom: 0; /* 确保底部无边距 */
+}
 
 /* 测试结果状态样式 */
 .result-item {
@@ -1821,7 +1864,7 @@ body {
     margin-right: 0;
 }
 
-/* 代码展示区域的样式 */
+/* 代码示例样式 */
 #selectedElementCode {
     background: #f7f7f7;
     border-radius: var(--border-radius-md);
@@ -1832,6 +1875,9 @@ body {
     font-family: 'Courier New', monospace;
     line-height: 1.4;
     color: var(--text-color);
+    margin-right: 0; /* 确保与按钮右侧对齐 */
+    width: calc(100% + var(--spacing-xs)); /* 微调宽度，使其与按钮右侧对齐 */
+    box-sizing: border-box; /* 确保宝箱模型正确 */
 }
 
 /* 选择器相关样式 */
@@ -1984,6 +2030,7 @@ html.sw-selector-active .clickable {
     font-weight: 600;
     margin-bottom: var(--spacing-md);
     color: var(--text-color);
+    padding-right: var(--spacing-lg); /* 确保右侧有足够的空间与按钮区域对齐 */
 }
 
 /* 代码示例样式 */
@@ -2014,8 +2061,9 @@ html.sw-selector-active .clickable {
 }
 
 .knowledge-panel.expanded .info-content {
-    padding: var(--spacing-xl);
-    min-height: 200px;
+    padding: var(--spacing-xs) var(--spacing-lg) var(--spacing-xs) var(--spacing-lg); /* 减少底部内边距 */
+    min-height: auto; /* 移除最小高度限制 */
+    max-height: none; /* 移除最大高度限制 */
 }
 
 .knowledge-panel.expanded .levels-flow {
@@ -2040,12 +2088,19 @@ html.sw-selector-active .clickable {
 
 /* 展开时调整内容区域 */
 .knowledge-panel.expanded .level-content {
-    max-height: none;
-    margin-top: var(--spacing-lg);
+    max-height: none; /* 移除最大高度限制，让内容可以完全显示 */
+    margin-top: 0; /* 移除上边距，让内容紧跫标题 */
+    margin-bottom: 0; /* 移除底部边距 */
+    overflow-y: auto; /* 添加垂直滚动条，确保内容可以滚动查看 */
+    padding-bottom: 0; /* 移除底部内边距 */
 }
 
 .knowledge-panel.expanded .level-card.expanded {
-    min-height: 300px;
+    min-height: auto; /* 移除最小高度限制，完全由内容决定高度 */
+    max-height: none; /* 移除最大高度限制，允许卡片自适应内容高度 */
+    height: auto; /* 确保高度自适应内容 */
+    padding: var(--spacing-xs) var(--spacing-md); /* 使用更紧凑的内边距 */
+    margin-bottom: 0; /* 删除底部边距 */
 }
 /* 图标相关样式 */
 iconify-icon {
@@ -2153,5 +2208,36 @@ iconify-icon {
     
     .panel-header iconify-icon {
         margin-right: 6px;
+    }
+    
+    /* 在小屏幕上优化知识点卡片内容显示 */
+    .level-card.expanded {
+        max-height: none;
+        height: auto;
+    }
+    
+    .level-card.expanded .level-content {
+        max-height: none;
+        height: auto;
+        overflow-y: auto;
+    }
+    
+    .knowledge-panel.expanded .level-card.expanded {
+        min-height: auto;
+        max-height: none;
+    }
+}
+
+/* 在宽屏上为扩展知识点卡片提供更幅的内容区域 */
+@media (min-width: 1200px) {
+    .level-card.expanded {
+        max-width: 100%;
+        width: 100%;
+        padding: var(--spacing-xl);
+    }
+    
+    .level-card.expanded .level-content {
+        max-height: 800px;
+        padding: var(--spacing-md);
     }
 }

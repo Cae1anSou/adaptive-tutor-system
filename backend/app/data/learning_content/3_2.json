@@ -2,25 +2,25 @@
     "topic_id": "3.2",
     "title": "复选框与单选框",
     "levels": [
-        {
-            "level": 1,
-            "description": "复选框（Checkbox）允许用户从多个选项中选择一个或多个，常用于多选场景。单选框（Radio Button）要求用户从一组互斥选项中仅选一个，适用于单选场景。核心要点包括：HTML使用<input>元素创建，type属性区分类型（checkbox或radio），name属性定义分组，value属性存储选项值，label元素关联文本提高可访问性。"
-        },
-        {
-            "level": 2,
-            "description": "语法：复选框为<input type=\"checkbox\" name=\"groupName\" value=\"optionValue\">，单选框为<input type=\"radio\" name=\"groupName\" value=\"optionValue\">。基本用法：name相同表示同组单选框互斥；value指定表单提交的值；checked属性设置默认选中；label通过for属性绑定input的id或直接嵌套input。示例：<label for=\"fruit1\"><input type=\"checkbox\" id=\"fruit1\" name=\"fruits\" value=\"apple\">苹果</label>表示一个水果选项。"
-        },
-        {
-            "level": 3,
-            "description": "应用场景：复选框用于多选兴趣（如购物车商品），单选框用于单选分类（如支付方式）。示例代码：用户调查表单中，复选框选择爱好：<div><label><input type=\"checkbox\" name=\"hobby\" value=\"reading\">阅读</label></div><div><label><input type=\"checkbox\" name=\"hobby\" value=\"sports\">运动</label></div>；单选框选择会员类型：<div><label><input type=\"radio\" name=\"membership\" value=\"basic\">基础版</label></div><div><label><input type=\"radio\" name=\"membership\" value=\"premium\">高级版</label></div>。"
-        },
-        {
-            "level": 4,
-            "description": "原理分析：DOM中表示为HTMLInputElement对象，checked属性动态更新状态，事件如onchange处理用户交互。注意事项：单选框组需相同name实现互斥；label提升点击区域和可访问性；CSS样式覆盖默认外观；移动端适配触摸尺寸；避免嵌套复杂结构影响表单提交；使用fieldset和legend分组提升语义化。"
-        }
-    ],
+            {
+                "level": 1,
+                "description": "在网页开发中，表单是用户与网站交互的重要方式之一。复选框（checkbox）和单选框（radio）是表单中常见的控件，用于让用户从多个选项中进行选择。复选框允许用户选择一个或多个选项，比如在兴趣爱好调查中可以选择“阅读”、“运动”、“音乐”等多个项目。而单选框则用于只能选择一个选项的场景，例如性别选择或满意度评分。它们都是通过HTML的input元素实现的，只需要设置不同的type属性即可：type=\"checkbox\"表示复选框，type=\"radio\"表示单选框。每个input元素通常会搭配一个label标签，用来描述选项的含义。label的作用不仅是显示文字，还能提升用户体验，因为点击label文字也能选中对应的控件。为了建立input和label之间的关联，需要使用for属性，其值应与input的id一致。这样，屏幕阅读器等辅助工具也能正确识别控件用途，提升网页的可访问性。初学者应先掌握如何正确书写这两种控件的基本结构，并理解它们在用户交互中的作用。"
+            },
+            {
+                "level": 2,
+                "description": "在实际开发中，复选框和单选框往往不是孤立存在的，而是成组出现并配合label、name属性一起使用。其中，name属性非常关键，它决定了这些控件在表单提交时的数据分组方式。对于单选框来说，同一组内的所有选项必须具有相同的name值，这样才能保证只能选中其中一个；如果name不同，浏览器就会把它们当作独立的控件处理，从而破坏单选逻辑。复选框虽然允许多选，但同样建议为同一类别的选项设置相同的name，以便后端能以数组形式接收数据。此外，value属性用于定义该选项提交时的实际值，而label中的文本则是展示给用户的可读内容，两者可以不同。例如，value可以是英文代码，而label显示中文。在布局上，通常将input和label通过CSS进行样式美化，比如隐藏原始控件并用自定义图形替代，从而实现更美观的界面。同时，利用CSS的:checked伪类可以动态改变选中状态的样式，增强视觉反馈。掌握这些组合用法，能帮助开发者构建更专业、易用的表单界面。"
+            },
+            {
+                "level": 3,
+                "description": "深入理解复选框和单选框的工作机制，有助于优化性能和提升代码可维护性。从DOM角度看，每一个input元素在JavaScript中都对应一个HTMLInputElement对象，该对象提供了checked属性来判断或设置控件的选中状态。通过脚本操作，我们可以动态控制选项的选中与否，例如全选、反选功能就是基于对多个复选框的checked属性批量操作实现的。此外，浏览器在表单提交时会根据控件的name和value生成键值对，未选中的复选框不会被包含在提交数据中，这一点在后端处理时需要注意。对于单选框组，即使有多个选项，也只有被选中的那个会发送value值。在事件处理方面，change事件常用于监听用户的选择变化，从而触发相应逻辑，如更新页面内容或启用禁用其他控件。性能方面，当存在大量此类控件时，应避免频繁的DOM查询，可通过事件委托将监听器绑定到父容器上，提升响应效率。同时，合理使用label关联不仅能提高可访问性，还能减少JavaScript的干预，让交互更加自然流畅。"
+            },
+            {
+                "level": 4,
+                "description": "为了巩固对复选框和单选框的理解，我们设计一个综合练习：创建一个宠物领养问卷，包含兴趣选择和宠物类型选择。首先，使用两个复选框让用户选择感兴趣的活动，name设为\"activities\"，value分别为\"walk\"和\"play\"，对应的label文本为“喜欢散步”和“喜欢玩耍”。接着，在下方添加一组单选框，name设为\"petType\"，value分别为\"dog\"和\"cat\"，label显示“狗狗”和“猫咪”，确保只能选择一种宠物类型。注意每个input都要有唯一的id，并与label的for属性对应。示例代码如下：\n```html\n<label for=\"walk\">喜欢散步</label>\n<input type=\"checkbox\" id=\"walk\" name=\"activities\" value=\"walk\">\n\n<label for=\"play\">喜欢玩耍</label>\n<input type=\"checkbox\" id=\"play\" name=\"activities\" value=\"play\">\n\n<label for=\"dog\">狗狗</label>\n<input type=\"radio\" id=\"dog\" name=\"petType\" value=\"dog\">\n\n<label for=\"cat\">猫咪</label>\n<input type=\"radio\" id=\"cat\" name=\"petType\" value=\"cat\">\n```\n完成后，可通过浏览器开发者工具查看表单数据提交效果，或使用JavaScript监听change事件实时显示用户选择。这个练习涵盖了控件结构、属性配合、语义化标签使用等核心知识点，为后续复杂表单打下坚实基础。"
+            }
+        ],
     "sc_all": [
-        {"topic_id": "1_1", "select_element": ["h1", "h2", "h3", "h4", "h5", "h6", "p"]},
+        {"topic_id": "1_1", "select_element": ["h1", "h2", "h3", "h4", "h5", "h6", "p","span"]},
         {"topic_id": "1_2", "select_element": []},
         {"topic_id": "1_3", "select_element": ["<!DOCTYPE>", "html", "head", "body","meta", "title","footer"]},
         {"topic_id": "2_1", "select_element": ["div"]},

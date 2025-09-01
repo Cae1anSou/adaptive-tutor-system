@@ -2,25 +2,25 @@
     "topic_id": "1_2",
     "title": "应用文本格式（加粗、斜体）",
     "levels": [
-        {
-            "level": 1,
-            "description": "font-weight属性控制文本粗细程度，核心值包括normal（默认）、bold（粗体）等。font-style属性控制文本倾斜样式，核心值包括normal（默认）、italic（斜体）等。两者都是CSS文本样式基础属性，通过改变字体外观增强信息层次感。"
-        },
-        {
-            "level": 2,
-            "description": "font-weight语法：font-weight: normal|bold|bolder|lighter|100-900; 数值越大越粗。font-style语法：font-style: normal|italic|oblique; italic使用字体斜体版本，oblique强制倾斜。可通过类选择器或元素选择器应用，如.bold-text { font-weight: bold; }。"
-        },
-        {
-            "level": 3,
-            "description": "应用场景：新闻摘要中关键信息加粗，技术术语用斜体表示。示例：HTML：<p>这是<span class='emphasis'>重要通知</span>，请<i>立即处理</i>。</p> CSS：.emphasis { font-weight: 700; } i { font-style: italic; }。注意避免过度使用，保持页面可读性。"
-        },
-        {
-            "level": 4,
-            "description": "原理：font-weight通过字体文件的多字重版本实现，数值对应OpenType的weight值。font-style中italic调用字体设计的斜体字形。注意事项：1) 确保字体支持对应字重 2) 数值粗细需字体文件支持 3) 斜体与倾斜体(oblique)渲染差异 4) 移动端考虑字体加载性能。"
-        }
-    ],
+            {
+                "level": 1,
+                "description": "在网页开发中，为了让文字具有不同的视觉效果，比如让某些文字更突出或强调，我们需要对文本进行格式化。CSS（层叠样式表）提供了多种方式来改变文字的外观，其中最常见的就是加粗和斜体。实现加粗效果主要依靠font-weight属性，它的作用是设置字体的粗细程度。当我们将这个属性设置为bold时，文字就会显示为粗体；而normal则表示普通粗细。斜体效果则是通过font-style属性来控制的，将其设置为italic可以让文字呈现倾斜的样式，常用于强调或引用内容。这些样式不会改变HTML结构本身，而是通过CSS附加到元素上，从而影响其显示效果。初学者需要理解的是，HTML负责内容的结构，而CSS负责内容的外观表现，两者分工明确。例如，我们可以选中一个段落标签p，然后通过CSS规则为其设置加粗和斜体，这样页面上的文字就会按照我们的设定展示出来，而不需要修改HTML中的文字内容。掌握这两个基本属性是学习CSS样式的第一步，也是构建美观网页的基础。"
+            },
+            {
+                "level": 2,
+                "description": "在实际开发中，font-weight和font-style属性经常与其他CSS属性组合使用，以实现更丰富的文本样式效果。例如，我们可能会同时设置文字颜色、字体大小和行高等属性，使文本更具可读性和视觉吸引力。font-weight除了常用的bold和normal之外，还支持数值形式，如100到900之间的整百数，数值越大文字越粗，500及以上通常被视为粗体。这种数值方式提供了更精细的控制，尤其在使用现代字体时非常有用。font-style除了italic外，还有一个值oblique，它与italic类似，都是让文字倾斜，但实现方式略有不同：italic通常使用字体自带的斜体字形，而oblique则是由浏览器将正常字形倾斜生成。在大多数情况下，两者视觉差异不大，但了解其区别有助于在特殊需求下做出合适选择。此外，这些属性可以应用于多种HTML元素，如标题h1-h6、段落p、强调标签em或strong等。通过CSS选择器，我们可以精确控制哪些元素应用这些样式，比如使用类选择器或ID选择器来针对特定元素设置格式。这种灵活性使得我们可以在不改变HTML结构的前提下，自由调整页面的视觉表现。"
+            },
+            {
+                "level": 3,
+                "description": "深入理解font-weight和font-style的工作机制，有助于我们更好地优化网页性能和兼容性。首先，font-weight的渲染依赖于字体文件中是否包含对应字重的字形。如果指定的字重不存在，浏览器会进行字体匹配，可能使用最接近的可用字重，这可能导致实际显示效果与预期不符。为了避免这种情况，开发者可以通过@font-face规则显式加载包含所需字重的字体文件，确保样式准确呈现。此外，使用过于复杂的字重组合可能增加页面加载时间，因此在设计时应权衡视觉效果与性能。对于font-style，italic和oblique的选择也涉及字体支持问题。一些字体可能没有真正的italic变体，此时浏览器会自动使用oblique模拟斜体。了解这一点可以帮助我们在设计阶段选择合适的字体，避免样式降级。从继承角度看，这两个属性都具有继承性，意味着它们会从父元素传递给子元素。例如，如果一个div设置了font-style: italic，其内部的所有文本元素默认也会倾斜，除非被显式重置。这种继承机制减少了重复代码，但也要求开发者注意样式的层叠影响。掌握这些底层机制，有助于编写更高效、更可靠的CSS代码，提升整体开发水平。"
+            },
+            {
+                "level": 4,
+                "description": "为了巩固对文本格式化属性的理解，我们可以通过一个综合示例来实践。假设我们要设计一个动物展览的标题，要求主标题加粗，副标题既加粗又倾斜，同时设置不同的颜色和字体大小。我们可以使用以下代码实现：HTML部分包含两个段落，一个用于主标题，一个用于副标题。CSS中，我们为副标题类设置font-weight: bold和font-style: italic，同时调整颜色和字体大小。例如，HTML代码为<p class=\"main-title\">森林动物节</p><p class=\"sub-title\">探索自然的奇妙之旅</p>，CSS代码为.main-title { font-weight: bold; color: green; font-size: 24px; } .sub-title { font-weight: bold; font-style: italic; color: darkblue; font-size: 18px; }。这样，页面会显示一个绿色的加粗主标题和一个深蓝色的加粗斜体副标题。这个练习不仅应用了font-weight和font-style，还结合了颜色和大小设置，帮助理解多个CSS属性的协同工作。通过修改属性值并观察效果变化，学习者可以更直观地掌握文本格式化的实际应用，为后续更复杂的样式设计打下坚实基础。"
+            }
+        ],
     "sc_all": [
-        {"topic_id": "1_1", "select_element": ["h1", "h2", "h3", "h4", "h5", "h6", "p"]},
+        {"topic_id": "1_1", "select_element": ["h1", "h2", "h3", "h4", "h5", "h6", "p","span"]},
         {"topic_id": "1_2", "select_element": []},
         {"topic_id": "1_3", "select_element": ["<!DOCTYPE>", "html", "head", "body","meta", "title","footer"]},
         {"topic_id": "2_1", "select_element": ["div"]},
