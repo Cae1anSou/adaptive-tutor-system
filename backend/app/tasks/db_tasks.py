@@ -1,4 +1,6 @@
 import logging
+from typing import List
+import logging
 
 from app.celery_app import celery_app, get_user_state_service
 from app.db.database import SessionLocal
@@ -34,11 +36,21 @@ def update_bkt_and_snapshot_task(participant_id: str, topic_id: str, is_correct:
 @celery_app.task(name='app.tasks.db_tasks.save_progress_task')
 def save_progress_task(progress_data: dict):
     """一个专门用于保存用户进度数据的轻量级任务"""
+    logger.info(f"[save_progress_task] 接收到的进度数据: {progress_data}")
     db = SessionLocal()
     try:
         # 创建用户进度记录
         progress_in = UserProgressCreate(**progress_data)
-        crud_progress.create(db=db, obj_in=progress_in)
+        logger.info(f"[save_progress_task] 创建进度记录对象: {progress_in}")
+        result = crud_progress.create(db=db, obj_in=progress_in)
+        logger.info(f"[save_progress_task] 进度记录保存成功: {result}")
+        return result
+    except Exception as e:
+        logger.error(f"[save_progress_task] 保存进度记录时出错: {str(e)}")
+        logger.error(f"[save_progress_task] 错误类型: {type(e)}")
+        import traceback
+        logger.error(f"[save_progress_task] 详细错误信息: {traceback.format_exc()}")
+        raise
     finally:
         db.close()
 

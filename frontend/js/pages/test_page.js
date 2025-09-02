@@ -209,21 +209,7 @@ function showProblemHintInChat(message, editorType, editCount) {
 // 提交逻辑
 function setupSubmitLogic() {
     const submitButton = document.getElementById('submit-button');
-    const runButton = document.getElementById('run-button');
     if (!submitButton) return;
-    if (runButton) {
-        runButton.addEventListener('click', () => {
-            // 获取当前的编程行为分析
-            const behaviorAnalysis = tracker.getCodingBehaviorAnalysis();
-            console.log('测试时的编程行为分析:', behaviorAnalysis);
-
-            // 提交测试事件（包含当前行为分析）
-            tracker.logEvent('test_run', {
-                timestamp: new Date().toISOString(),
-                behavior_snapshot: behaviorAnalysis
-            });
-        });
-    }
     submitButton.addEventListener('click', async () => {
         const behaviorAnalysis = tracker.getCodingBehaviorAnalysis();
         console.log('提交时的编程行为分析:', behaviorAnalysis);
