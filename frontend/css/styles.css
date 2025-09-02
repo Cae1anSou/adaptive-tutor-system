@@ -1128,7 +1128,6 @@ body {
 .markdown-content {
     font-family: var(--font-family);
     line-height: 1.6;
-    color: var(--text-color);
     overflow-wrap: break-word;
     font-size: var(--font-size-sm);
 }
