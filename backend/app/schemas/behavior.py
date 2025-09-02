@@ -25,6 +25,8 @@ class EventType(str, Enum):
     CODING_SESSION_SUMMARY = "coding_session_summary"
     IDLE_HINT_DISPLAYED = "idle_hint_displayed"
     PAGE_FOCUS_CHANGE = "page_focus_change"
+    TEST_FAILED = "test_failed"
+    SUBMISSION_ERROR = "submission_error"
 
 
 class CodeEditCycleData(BaseModel):
