@@ -1393,14 +1393,14 @@ function extendChatModuleForElementContext() {
             }
 
             // 使用封装的 apiClient 发送请求
-            const data = await window.apiClient.post('/chat/ai/chat', requestBody);
+            const data = await window.apiClient.post('/chat/ai/chat2', requestBody);
 
-            if (data.code === 200 && data.data && typeof data.data.ai_response === 'string') {
-                // 添加AI回复到UI
-                this.addMessageToUI('ai', data.data.ai_response);
-            } else {
-                throw new Error(data.message || 'AI回复内容为空或格式不正确');
-            }
+            // if (data.code === 200 && data.data && typeof data.data.ai_response === 'string') {
+            //     // 添加AI回复到UI
+            //     this.addMessageToUI('ai', data.data.ai_response);
+            // } else {
+            //     throw new Error(data.message || 'AI回复内容为空或格式不正确');
+            // }
         } catch (error) {
             console.error('[ChatModule] 发送消息时出错:', error);
             this.addMessageToUI('ai', `抱歉，我无法回答你的问题。错误信息: ${error.message}`);
