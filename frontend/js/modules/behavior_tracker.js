@@ -15,7 +15,6 @@
 
 import debounce from 'https://cdn.jsdelivr.net/npm/lodash-es@4.17.21/debounce.js';
 import { getParticipantId } from './session.js';
-
 class BehaviorTracker {
   constructor() {
     // code_edit 防抖时长（ms）
@@ -552,31 +551,31 @@ class BehaviorTracker {
   // // -------------------- AI 求助（聊天） --------------------
   // // sendButtonId: 提问按钮 id；inputSelector: 文本输入选择器
   // // mode: 模式 ('learning' 或 'test')；contentId: 内容ID
-  // initChat(sendButtonId, inputSelector, mode = 'learning', contentId = null) {
-  //   const btn = document.getElementById(sendButtonId);
-  //   const input = document.querySelector(inputSelector);
-  //   if (!btn || !input) return;
+  initChat(sendButtonId, inputSelector, mode = 'learning', contentId = null) {
+    const btn = document.getElementById(sendButtonId);
+    const input = document.querySelector(inputSelector);
+    if (!btn || !input) return;
 
-  //   const sendMessage = () => {
-  //     const message = input.value || '';
-  //     if (!message.trim()) return;
-  //     this.logEvent('ai_help_request', {
-  //       message: message.substring(0, 2000),
-  //       mode: mode,
-  //       content_id: contentId
-  //     });
-  //   };
+    const sendMessage = () => {
+      const message = input.value || '';
+      if (!message.trim()) return;
+      this.logEvent('ai_help_request', {
+        message: message.substring(0, 2000),
+        mode: mode,
+        content_id: contentId
+      });
+    };
 
-  //   btn.addEventListener('click', sendMessage);
+    btn.addEventListener('click', sendMessage);
 
-  //   // 支持 Enter 提交
-  //   input.addEventListener('keydown', (e) => {
-  //     if (e.key === 'Enter' && !e.shiftKey) {
-  //       e.preventDefault();
-  //       sendMessage();
-  //     }
-  //   });
-  // }
+    // 支持 Enter 提交
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+  }
 
   // // -------------------- 测试/提交（包含 code） --------------------
   // // runBtnId / submitBtnId: 按钮 id；editors: 同 initEditors；topicIdGetter: 可选函数返回 topic_id
