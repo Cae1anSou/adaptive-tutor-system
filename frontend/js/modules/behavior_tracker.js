@@ -27,15 +27,15 @@ class BehaviorTracker {
     this._elementClickBound = false;
 
     this.hintConfig = {
-      hintThreshold: 3, // 触发提示的连续修改次数阈值
-      cooldownPeriod: 30000, // 提示冷却时间（30秒）
+      hintThreshold: 5, // 增加触发提示的连续修改次数阈值到5次
+      cooldownPeriod: 60000, // 增加提示冷却时间到60秒
       lastHintTime: 0 // 上次提示时间
     };
     // 智能代码监控配置
     this.codeMonitoringConfig = {
-      minChangeThreshold: 10, // 最小触发字符数变化
-      meaningfulEditTimeout: 3000, // 有意义编辑的超时时间（ms）：防止过度触发：避免将用户的连续输入（如快速打字）误判为多个独立的有意义编辑
-      problemDetectionThreshold: 3, // 问题检测阈值（连续修改次数）：检测反复修改：当用户在短时间内连续修改代码多次（默认3次），认为可能遇到了问题
+      minChangeThreshold: 15, // 增加最小触发字符数变化到15个字符，避免小修改触发
+      meaningfulEditTimeout: 5000, // 增加有意义编辑的超时时间到5秒
+      problemDetectionThreshold: 5, // 增加问题检测阈值到5次连续修改，减少误判
       maxHistoryLength: 100 // 最大历史记录长度
     };
     // 代码监控状态
@@ -220,10 +220,8 @@ class BehaviorTracker {
       this._handleDeletion(editorType, state, now, previousLength);
     } else if (lengthChange > 0) {
       this._handleAddition(editorType, state, lengthChange, currentLength, now, timeSinceLastEdit, previousLength);
-    } else {
-      // 即使没有长度变化，也要更新活动时间以表明用户仍在编辑
-      state.lastMeaningfulEdit = now;
     }
+    // 注意：当lengthChange == 0时不更新lastMeaningfulEdit，避免格式调整等无实质内容变化的操作被计为活动
   }
   /**
    * 处理删除操作
@@ -251,6 +249,10 @@ class BehaviorTracker {
       state.consecutiveEdits++;
       state.lastMeaningfulEdit = timestamp;
       this._recordMeaningfulEdit(editorType, 'addition', lengthChange, currentLength, timestamp);
+    } else if (lengthChange > 0) {
+      // 即使不是有意义的编辑，也要更新活动时间以表明用户仍在编辑
+      // 但不增加连续编辑计数
+      state.lastMeaningfulEdit = timestamp;
     }
   }
 
@@ -266,6 +268,7 @@ class BehaviorTracker {
     const totalModifiedChars = deletedChars + addedChars; // 总共修改的字符数
     const netChange = finalLength - state.deleteStartLength; // 净变化
 
+    // 只有当总修改字符数超过阈值时才认为是重要修改
     if (totalModifiedChars >= this.codeMonitoringConfig.minChangeThreshold) {
       const editRecord = {
         editor: editorType,
@@ -290,13 +293,14 @@ class BehaviorTracker {
 
       console.log(`[${editorType}] 完成修改周期: 删除${deletedChars}字符, 新增${addedChars}字符, 总共修改${totalModifiedChars}字符, 净变化: ${netChange}字符`);
       
-      if (state.consecutiveEdits >= this.codeMonitoringConfig.problemDetectionThreshold) {
+      // 只有当连续编辑次数超过阈值并且净变化不为0时才记录问题事件
+      if (state.consecutiveEdits >= this.codeMonitoringConfig.problemDetectionThreshold && Math.abs(netChange) > 5) {
         this._recordProblemEvent(editorType, state.consecutiveEdits, timestamp);
       }
       
       const unsubmittedEdits = this.significantEdits.filter(edit => !edit.submitted);
       if (unsubmittedEdits.length >= 5 ||
-        state.consecutiveEdits >= this.codeMonitoringConfig.problemDetectionThreshold) {
+        (state.consecutiveEdits >= this.codeMonitoringConfig.problemDetectionThreshold && Math.abs(netChange) > 5)) {
         this._submitSignificantEdits();
       }
     }
@@ -317,22 +321,25 @@ class BehaviorTracker {
     const editsToSubmit = unsubmittedEdits.slice(-5); 
     editsToSubmit.forEach(edit => edit.submitted = true);
 
-    this.logEvent('significant_edits', {
-      batch_id: Date.now().toString(),
-      count: editsToSubmit.length,
-      edits: editsToSubmit.map(edit => ({
-        editor: edit.editor,
-        edit_type: edit.edit_type,
-        deleted_chars: edit.deleted_chars,
-        added_chars: edit.added_chars,
-        total_modified: edit.total_modified,
-        duration_ms: edit.duration,
-        consecutive_edits: edit.consecutive_edits,
-        timestamp: new Date(edit.timestamp).toISOString()
-      })),
-    });
+    // 只有当有足够多的重要编辑或遇到问题时才提交
+    if (editsToSubmit.length >= 3) {
+      this.logEvent('significant_edits', {
+        batch_id: Date.now().toString(),
+        count: editsToSubmit.length,
+        edits: editsToSubmit.map(edit => ({
+          editor: edit.editor,
+          edit_type: edit.edit_type,
+          deleted_chars: edit.deleted_chars,
+          added_chars: edit.added_chars,
+          total_modified: edit.total_modified,
+          duration_ms: edit.duration,
+          consecutive_edits: edit.consecutive_edits,
+          timestamp: new Date(edit.timestamp).toISOString()
+        })),
+      });
 
-    console.log(`批量提交 ${editsToSubmit.length} 个新重要编辑事件`);
+      console.log(`批量提交 ${editsToSubmit.length} 个新重要编辑事件`);
+    }
     
     this.significantEdits = this.significantEdits.filter(edit => 
       !edit.submitted || Date.now() - edit.timestamp < 300000
@@ -395,7 +402,7 @@ class BehaviorTracker {
 
     this.problemEvents.push(problemEvent);
 
-    // 触发问题提示
+    // 只有当连续编辑次数超过提示阈值时才触发问题提示
     if (consecutiveEdits >= this.hintConfig.hintThreshold) {
       this._triggerProblemHint(editorType, consecutiveEdits, timestamp);
     }
