@@ -742,6 +742,40 @@ function initEventListeners() {
     const askAIButton = document.getElementById('askAIButton');
     const clearSelectionButton = document.getElementById('clearSelectionButton');
 
+    // 添加知识图谱展开/收起功能
+    const miniGraphToggle = document.getElementById('miniGraphToggle');
+    const miniKnowledgeGraph = document.getElementById('miniKnowledgeGraph');
+    const toggleIcon = document.getElementById('toggleIcon');
+
+    if (miniGraphToggle && miniKnowledgeGraph && toggleIcon) {
+        // 确保图标默认有颜色和可见性
+        toggleIcon.style.color = '#4f46e5';
+        toggleIcon.style.opacity = '0.8';
+        
+        miniGraphToggle.addEventListener('click', () => {
+            // 切换展开状态
+            const isExpanding = !miniKnowledgeGraph.classList.contains('expanded');
+            miniKnowledgeGraph.classList.toggle('expanded');
+            
+            // 更改图标并切换旋转类
+            if (isExpanding) {
+                // 展开时，将图标更改为向上箭头
+                toggleIcon.setAttribute('icon', 'mdi:chevron-up');
+                // 移除旋转类以防止重复应用
+                miniGraphToggle.classList.remove('rotated');
+                toggleIcon.style.color = '#3730a3'; // 更深的紫色
+                toggleIcon.style.opacity = '1';     // 完全不透明
+            } else {
+                // 收起时，将图标更改为向下箭头
+                toggleIcon.setAttribute('icon', 'mdi:chevron-down');
+                // 移除旋转类以防止重复应用
+                miniGraphToggle.classList.remove('rotated');
+                toggleIcon.style.color = '#4f46e5'; // 恢复默认紫色
+                toggleIcon.style.opacity = '0.8';   // 恢复默认不透明度
+            }
+        });
+    }
+
     // 初始化按钮状态：确保询问AI按钮默认隐藏
     if (askAIButton) {
         askAIButton.style.display = 'none';
