@@ -220,6 +220,9 @@ class BehaviorTracker {
       this._handleDeletion(editorType, state, now, previousLength);
     } else if (lengthChange > 0) {
       this._handleAddition(editorType, state, lengthChange, currentLength, now, timeSinceLastEdit, previousLength);
+    } else {
+      // 即使没有长度变化，也要更新活动时间以表明用户仍在编辑
+      state.lastMeaningfulEdit = now;
     }
   }
   /**
@@ -605,12 +608,12 @@ class BehaviorTracker {
 
   // ---------- user_idle（升级版） ----------
   /**
-   * 进入空闲：到达 idleThreshold，仅“标记空闲开始”（不立即上报）
+   * 进入空闲：到达 idleThreshold，仅"标记空闲开始"（不立即上报）
    * 恢复活动：上报真实空闲（timestamp_start/end + duration_ms）
    * 空闲提示：空闲达到 hintAfterMs → 触发一次主动提示（轮换文案 + 冷却）
    */
-  // 先进入空闲，再提示：hintAfterMs 被视为“从进入空闲起再等多久提示”
-  // 若你仍传老参数（hintAfterMs 表示“总时间”），我们做兼容：effectiveDelay = max(0, hintAfterMs - idleMs)
+  // 先进入空闲，再提示：hintAfterMs 被视为"从进入空闲起再等多久提示"
+  // 若你仍传老参数（hintAfterMs 表示"总时间"），我们做兼容：effectiveDelay = max(0, hintAfterMs - idleMs)
   initIdleAndFocus(idleMs = this.idleThreshold) {
     if (this._focusAndIdleBound) return;
     this._focusAndIdleBound = true;
@@ -625,7 +628,7 @@ class BehaviorTracker {
       if (typeof this.idleHintConfig.delayAfterIdleMs === 'number') {
         return Math.max(0, this.idleHintConfig.delayAfterIdleMs);
       }
-      // 2) 兼容旧语义：hintAfterMs 表示“从上次活动开始到提示的总时间”
+      // 2) 兼容旧语义：hintAfterMs 表示"从上次活动开始到提示的总时间"
       //    => 从进入空闲起再等 (hintAfterMs - idleMs)，不足 0 则 0
       const total = typeof this.idleHintConfig.hintAfterMs === 'number'
         ? this.idleHintConfig.hintAfterMs : idleMs;
@@ -639,7 +642,7 @@ class BehaviorTracker {
       // 记录最近一次活动时刻
       this._lastActivityTs = Date.now();
 
-      // 到达 idle 阈值 → 进入空闲；此刻才启动“提示倒计时”
+      // 到达 idle 阈值 → 进入空闲；此刻才启动"提示倒计时"
       this.idleTimer = setTimeout(() => {
         if (this._idleStartTs == null) {
           this._idleStartTs = this._lastActivityTs; // 空闲起点=上次活动时间
@@ -675,7 +678,7 @@ class BehaviorTracker {
       scheduleIdleAndHint();
     };
 
-    // —— 捕获“活动”更稳：keydown 用捕获阶段，补充 input/composition 事件 —— 
+    // —— 捕获"活动"更稳：keydown 用捕获阶段，补充 input/composition 事件 —— 
     const activityEvents = [
       ['mousemove', { passive: true }],
       ['scroll', { passive: true }],
@@ -731,6 +734,16 @@ class BehaviorTracker {
     const cooldown = this.idleHintConfig?.cooldownMs || 0;
     if (now - last < cooldown) return;
 
+    // 检查代码编辑器活动情况
+    // 如果用户最近有代码编辑活动，则不触发空闲提示
+    const lastEditorActivity = this._getLastEditorActivityTime();
+    const editorIdleThreshold = 10000; // 代码编辑器空闲阈值设为10秒
+    if (lastEditorActivity && (now - lastEditorActivity) < editorIdleThreshold) {
+      // 用户在编辑器中仍然活跃，重置空闲计时器
+      this._resetIdleTimer();
+      return;
+    }
+
     const msgs = (this.idleHintConfig && this.idleHintConfig.messages) || [];
     if (!msgs.length) return;
 
@@ -763,7 +776,64 @@ class BehaviorTracker {
     console.log(`[IdleHint] ${message}（已空闲 ${Math.round(idleSoFar / 1000)}s）`);
   }
 
+  /**
+   * 获取最后一次代码编辑活动的时间
+   * @returns {number|null} 最后一次编辑活动的时间戳，如果没有则返回null
+   */
+  _getLastEditorActivityTime() {
+    // 检查代码监控状态中最新的活动时间
+    let latestActivityTime = null;
+    
+    // 遍历所有编辑器状态
+    Object.values(this.codeMonitorStates).forEach(state => {
+      if (state.lastMeaningfulEdit && 
+          (!latestActivityTime || state.lastMeaningfulEdit > latestActivityTime)) {
+        latestActivityTime = state.lastMeaningfulEdit;
+      }
+    });
+    
+    // 同时检查significantEdits数组中的最新编辑
+    if (this.significantEdits.length > 0) {
+      const lastEdit = this.significantEdits[this.significantEdits.length - 1];
+      if (lastEdit.timestamp && 
+          (!latestActivityTime || lastEdit.timestamp > latestActivityTime)) {
+        latestActivityTime = lastEdit.timestamp;
+      }
+    }
+    
+    return latestActivityTime;
+  }
 
+  /**
+   * 重置空闲计时器
+   */
+  _resetIdleTimer() {
+    // 清除现有的空闲计时器
+    clearTimeout(this.idleTimer);
+    clearTimeout(this._idleHintTimer);
+    
+    // 重置空闲状态
+    this._idleStartTs = null;
+    
+    // 重新启动计时器
+    const scheduleIdleAndHint = () => {
+      // 记录最近一次活动时刻
+      this._lastActivityTs = Date.now();
+      
+      // 重新启动空闲检测计时器
+      this.idleTimer = setTimeout(() => {
+        if (this._idleStartTs == null) {
+          this._idleStartTs = this._lastActivityTs;
+        }
+        // 重新启动提示计时器
+        this._idleHintTimer = setTimeout(() => {
+          if (this._idleStartTs != null) this._maybeShowIdleHint();
+        }, 3000); // 3秒后再次检查
+      }, this.idleThreshold);
+    };
+    
+    scheduleIdleAndHint();
+  }
 
   // -------------------- page_click：统一批量 + 归一化坐标 --------------------
   initPageClick(options = {}) {

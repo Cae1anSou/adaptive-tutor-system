@@ -28,11 +28,11 @@ def log_behavior(
     logger.info(f"[log_behavior] 接收到的事件: {event_in}")
     
     # 任务1: 异步持久化原始事件 (fire-and-forget)
-    """ logger.info("[log_behavior] 分派到 save_behavior_task")
+    logger.info("[log_behavior] 分派到 save_behavior_task")
     save_behavior_task.apply_async(
         args=[event_in.model_dump()], 
         queue='db_writer_queue'
-    ) """
+    )
 
     # 任务2: 异步解释事件 (fire-and-forget)
     logger.info("[log_behavior] 分派到 interpret_behavior_task")
