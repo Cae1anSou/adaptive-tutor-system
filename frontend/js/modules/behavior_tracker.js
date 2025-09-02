@@ -314,7 +314,7 @@ class BehaviorTracker {
     const editsToSubmit = unsubmittedEdits.slice(-5); 
     editsToSubmit.forEach(edit => edit.submitted = true);
 
-    this.logEvent('significant_edits_batch', {
+    this.logEvent('significant_edits', {
       batch_id: Date.now().toString(),
       count: editsToSubmit.length,
       edits: editsToSubmit.map(edit => ({
@@ -323,10 +323,8 @@ class BehaviorTracker {
         deleted_chars: edit.deleted_chars,
         added_chars: edit.added_chars,
         total_modified: edit.total_modified,
-        net_change: edit.netChange,
         duration_ms: edit.duration,
         consecutive_edits: edit.consecutive_edits,
-        participant_id: this._getParticipantId(),
         timestamp: new Date(edit.timestamp).toISOString()
       })),
     });
@@ -372,23 +370,6 @@ class BehaviorTracker {
     };
 
     this.significantEdits.push(editRecord);
-
-    // 添加分级实时上传逻辑
-    if (changeAmount >= 50) {  // 大段代码增加
-      editRecord.submitted = true; // 标记为已提交
-      this.logEvent('large_addition', {
-        editor: editorType,
-        change_amount: changeAmount,
-        current_length: currentLength,
-        timestamp: new Date(timestamp).toISOString()
-      });  // 实时上传大段增加
-    } else {
-       // 检查是否需要批量提交
-      const unsubmittedEdits = this.significantEdits.filter(edit => !edit.submitted);
-      if (unsubmittedEdits.length >= 5) {
-        this._submitSignificantEdits();
-      }
-    }
 
     // 保持记录数量
     if (this.significantEdits.length > this.codeMonitoringConfig.maxHistoryLength) {
