@@ -128,25 +128,27 @@ body {
     align-items: center;
     gap: var(--spacing-sm);
     font-size: var(--font-size-sm);
-    z-index: 10; /* 确保用户信息在最上层 */
-    flex-shrink: 0; /* 防止用户信息被压缩 */
+    z-index: 10;
+    flex-shrink: 0; 
 }
 
 .top-header-lean:hover{
-  height: 200px;
-  transition: height 0.5s ease-in-out;
-  position: absolute; /* 使其置于内容容器之上 */
+  height: 300px; 
+  transition: height 0.3s ease; 
+  position: absolute; 
   width: 100%;
-  z-index: 100; /* 确保它在内容容器之上 */
+  z-index: 100; 
 }
 
 .mini-knowledge-graph {
-    position: absolute;
-    top: 50%; /* 垂直居中 */
-    left: 50%; /* 水平居中 */
-    transform: translate(-50%, -50%); /* 精确居中 */
-    width: 50%; /* 50%宽度 */
-    height: 80%; /* 80%高度 */
+    /* 强制重置对齐方式，确保左对齐 */
+    position: absolute !important;
+    top: 50% !important;
+    left: 0 !important;
+    transform: translateY(-50%) !important;
+    margin-left: 2% !important;
+    width: calc(100% - 250px) !important; /* 进一步减小宽度，为右侧用户信息区域预留更多空间 */
+    height: 90% !important;
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-lg);
@@ -154,6 +156,7 @@ body {
     display: none;
     z-index: 5; /* 在标题和用户信息之下 */
     overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* 加快过渡效果，从0.2s改为0.3s */
 }
 
 .top-header-lean:hover .mini-knowledge-graph {
@@ -233,30 +236,31 @@ body {
 /* 响应式调整 */
 @media (max-width: 1024px) {
     .mini-knowledge-graph {
-        width: 70%; /* 在小屏幕上稍微宽一点 */
-        height: 70%; /* 高度也调整 */
+        width: calc(100% - 250px) !important; /* 进一步减小宽度 */
+        height: 90%; /* 高度保持一致 */
+        margin-left: 2%;
     }
 }
 
 @media (max-width: 768px) {
     .mini-knowledge-graph {
-        width: 85%; /* 在更小的屏幕上更宽 */
-        height: 65%; /* 高度调整 */
+        width: calc(100% - 230px) !important; /* 在小屏幕上预留空间但稍少一点 */
+        height: 90%; /* 高度保持一致 */
+        margin-left: 2%;
     }
     
     .top-header-lean:hover {
-        height: 180px; /* 小屏幕上高度稍微小一点 */
+        height: 200px; /* 保持一致的高度 */
     }
 }
 
 /* 添加悬停时的微动效 */
-.mini-knowledge-graph {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
+/* 当在.mini-knowledge-graph有单独指定时，这里的设置可能会被覆盖 */
 
-.top-header-lean:hover.mini-knowledge-graph:hover {
-    transform: translate(-50%, -50%) scale(1.02);
-    box-shadow: var(--card-shadow);
+/* 知识图谱悬停效果 */
+.mini-knowledge-graph:hover, .top-header-lean:hover .mini-knowledge-graph:hover {
+    transform: translateY(-50%) scale(1.02) !important;
+    box-shadow: var(--card-shadow) !important;
 }
 /* 内容容器样式 */
 .content-container {
@@ -480,7 +484,7 @@ body {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: var(--spacing-xl);
+        padding: var(--spacing-md); /* 减小内边距 */
         color: var(--text-light);
         text-align: center;
     }
@@ -2089,7 +2093,7 @@ html.sw-selector-active .clickable {
 /* 展开时调整内容区域 */
 .knowledge-panel.expanded .level-content {
     max-height: none; /* 移除最大高度限制，让内容可以完全显示 */
-    margin-top: 0; /* 移除上边距，让内容紧跫标题 */
+    margin-top: 0; /* 移除上边距，让内容紧距标题 */
     margin-bottom: 0; /* 移除底部边距 */
     overflow-y: auto; /* 添加垂直滚动条，确保内容可以滚动查看 */
     padding-bottom: 0; /* 移除底部内边距 */
@@ -2240,4 +2244,26 @@ iconify-icon {
         max-height: 800px;
         padding: var(--spacing-md);
     }
+}
+
+/* 测试页面特有样式 - 移除标题栏与内容之间的空白区域 */
+.test-page .main-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.test-page .content-container {
+    padding-top: var(--spacing-xs); /* 添加小型间距，避免太近 */
+}
+
+/* 确保标题栏与内容紧密连接 */
+.test-page .top-header {
+    margin-bottom: 0; /* 移除底部边距 */
+}
+
+/* 在知识图谱展开时隐藏标题文字 */
+.top-header-lean:hover .header-title {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
