@@ -205,8 +205,8 @@ class BehaviorTracker {
   _smartRecordCodeChange(editorType, currentContent) {
     const state = this.codeMonitorStates[editorType];
     const currentLength = currentContent.length;
-    const previousLength = state.lastLength;
-    const lengthChange = currentLength - previousLength;
+    const previousLength = state.lastLength; // 保存变化前的长度
+    const lengthChange = currentLength - previousLength;// 基于变化前的长度
 
     // 更新最后内容
     state.lastContent = currentContent;
@@ -215,108 +215,92 @@ class BehaviorTracker {
     const now = Date.now();
     const timeSinceLastEdit = now - state.lastMeaningfulEdit;
 
-    // 判断编辑类型
+    // 判断编辑类型，传递previousLength
     if (lengthChange < 0) {
-      // 删除操作
-      this._handleDeletion(editorType, state, currentLength, now);
+      this._handleDeletion(editorType, state, now, previousLength);
     } else if (lengthChange > 0) {
-      // 增加操作
-      this._handleAddition(editorType, state, lengthChange, currentLength, now, timeSinceLastEdit);
-    }
-
-    // 缓冲当前编辑信息（用于后续分析）
-    state.editBuffer.push({
-      timestamp: now,
-      length: currentLength,
-      change: lengthChange,
-      content: currentContent
-    });
-
-    // 保持缓冲区大小
-    if (state.editBuffer.length > 20) {
-      state.editBuffer.shift();
+      this._handleAddition(editorType, state, lengthChange, currentLength, now, timeSinceLastEdit, previousLength);
     }
   }
   /**
    * 处理删除操作
    */
-  _handleDeletion(editorType, state, currentLength, timestamp) {
+  _handleDeletion(editorType, state, timestamp, previousLength) {
     if (!state.isDeleting) {
-      // 开始删除
       state.isDeleting = true;
       state.deleteStartTime = timestamp;
-      state.deleteStartLength = state.lastLength;
-      state.consecutiveEdits++;
-
-      console.log(`[${editorType}] 开始删除代码`);
+      state.deleteStartLength = previousLength; // 使用变化前的长度作为开始长度
     }
   }
 
   /**
    * 处理增加操作
    */
-  _handleAddition(editorType, state, lengthChange, currentLength, timestamp, timeSinceLastEdit) {
+  _handleAddition(editorType, state, lengthChange, currentLength, timestamp, timeSinceLastEdit, previousLength) {
     if (state.isDeleting) {
       // 之前是删除状态，现在是增加 → 完成一个修改周期
-      this._completeEditCycle(editorType, state, timestamp, currentLength);
+      state.consecutiveEdits++;
+      state.lastMeaningfulEdit = timestamp;
+      this._completeEditCycle(editorType, state, timestamp, currentLength, previousLength); // 传递previousLength
     } else if (lengthChange >= this.codeMonitoringConfig.minChangeThreshold &&
       timeSinceLastEdit > this.codeMonitoringConfig.meaningfulEditTimeout) {
-      // 有意义的正向编辑（超过阈值且有一定时间间隔）
+      // 有意义的正向编辑
+      state.consecutiveEdits++;
+      state.lastMeaningfulEdit = timestamp;
       this._recordMeaningfulEdit(editorType, 'addition', lengthChange, currentLength, timestamp);
     }
-
-    state.consecutiveEdits++;
-    state.lastMeaningfulEdit = timestamp;
   }
 
   /**
    * 完成编辑周期（删除后重新编写）
    */
-  _completeEditCycle(editorType, state, timestamp, finalLength) {
-    const deleteDuration = timestamp - state.deleteStartTime;// 删除持续时间
-    const netChange = finalLength - state.deleteStartLength;
-    const absoluteChange = Math.abs(netChange);
+  _completeEditCycle(editorType, state, timestamp, finalLength, deleteEndLength) {
+    const deleteDuration = timestamp - state.deleteStartTime;
+    
+    // 使用正确的基准值计算
+    const deletedChars = state.deleteStartLength - deleteEndLength; // 删除的字符数
+    const addedChars = finalLength - deleteEndLength; // 新增的字符数
+    const totalModifiedChars = deletedChars + addedChars; // 总共修改的字符数
+    const netChange = finalLength - state.deleteStartLength; // 净变化
 
-    // 只有变化超过阈值才记录
-    if (absoluteChange >= this.codeMonitoringConfig.minChangeThreshold) {
+    if (totalModifiedChars >= this.codeMonitoringConfig.minChangeThreshold) {
       const editRecord = {
-        type: 'edit_cycle',
         editor: editorType,
-        timestamp: timestamp,
+        edit_type: 'edit_cycle',
         duration: deleteDuration,
+        deleted_chars: deletedChars,
+        added_chars: addedChars,
+        total_modified: totalModifiedChars,
         netChange: netChange,
-        absoluteChange: absoluteChange,
-        startLength: state.deleteStartLength,
-        endLength: finalLength,
-        consecutiveEdits: state.consecutiveEdits
+        consecutive_edits: state.consecutiveEdits,
+        timestamp: timestamp,
+        submitted: false
       };
 
       this.significantEdits.push(editRecord);
 
-      // 保持记录数量
       if (this.significantEdits.length > this.codeMonitoringConfig.maxHistoryLength) {
         this.significantEdits.shift();
       }
 
-      // 输出到控制台
       this._logSignificantEdit(editRecord);
 
-      // 检测是否遇到问题（连续多次修改）
+      console.log(`[${editorType}] 完成修改周期: 删除${deletedChars}字符, 新增${addedChars}字符, 总共修改${totalModifiedChars}字符, 净变化: ${netChange}字符`);
+      
       if (state.consecutiveEdits >= this.codeMonitoringConfig.problemDetectionThreshold) {
         this._recordProblemEvent(editorType, state.consecutiveEdits, timestamp);
       }
-      // 批量提交逻辑：每积累5个重要编辑或遇到问题时提交
-      if (this.significantEdits.length >= 5 ||
+      
+      const unsubmittedEdits = this.significantEdits.filter(edit => !edit.submitted);
+      if (unsubmittedEdits.length >= 5 ||
         state.consecutiveEdits >= this.codeMonitoringConfig.problemDetectionThreshold) {
         this._submitSignificantEdits();
       }
     }
 
-    // 重置状态
     state.isDeleting = false;
-    state.deleteStartTime = 0;// 删除开始时间
-    state.deleteStartLength = 0;// 删除开始时的长度
-    state.consecutiveEdits = 0;
+    state.deleteStartTime = 0;
+    state.deleteStartLength = 0;
   }
 
   // 批量提交重要编辑
@@ -324,16 +308,34 @@ class BehaviorTracker {
   // 冷却周期：无固定冷却，基于数量阈值
   // 提交策略：批量提交
   _submitSignificantEdits() {
-    if (this.significantEdits.length === 0) return;
+    const unsubmittedEdits = this.significantEdits.filter(edit => !edit.submitted);
+    if (unsubmittedEdits.length === 0) return;
+    
+    const editsToSubmit = unsubmittedEdits.slice(-5); 
+    editsToSubmit.forEach(edit => edit.submitted = true);
 
-    const editsToSubmit = this.significantEdits.slice(-5); // 提交最近5个
-    this.logEvent('significant_edits', {
+    this.logEvent('significant_edits_batch', {
+      batch_id: Date.now().toString(),
       count: editsToSubmit.length,
-      edits: editsToSubmit,
-      timestamp: new Date().toISOString()
+      edits: editsToSubmit.map(edit => ({
+        editor: edit.editor,
+        edit_type: edit.edit_type,
+        deleted_chars: edit.deleted_chars,
+        added_chars: edit.added_chars,
+        total_modified: edit.total_modified,
+        net_change: edit.netChange,
+        duration_ms: edit.duration,
+        consecutive_edits: edit.consecutive_edits,
+        participant_id: this._getParticipantId(),
+        timestamp: new Date(edit.timestamp).toISOString()
+      })),
     });
 
-    console.log(`批量提交 ${editsToSubmit.length} 个重要编辑事件`);
+    console.log(`批量提交 ${editsToSubmit.length} 个新重要编辑事件`);
+    
+    this.significantEdits = this.significantEdits.filter(edit => 
+      !edit.submitted || Date.now() - edit.timestamp < 300000
+    );
   }
   // 在页面卸载或会话结束时提交所有数据
   // 触发条件：页面关闭/卸载时
@@ -365,16 +367,27 @@ class BehaviorTracker {
       editor: editorType,
       timestamp: timestamp,
       changeAmount: changeAmount,// 本次修改的字符数
-      currentLength: currentLength//  修改后的代码长度
+      currentLength: currentLength,//  修改后的代码长度
+      submitted: false // 添加提交标记
     };
 
     this.significantEdits.push(editRecord);
 
     // 添加分级实时上传逻辑
     if (changeAmount >= 50) {  // 大段代码增加
-      this.logEvent('large_addition', editRecord);  // 实时上传大段增加
-    } else if (this.significantEdits.length % 5 === 0) {  // 每5个批量上传
-      this._submitSignificantEdits();
+      editRecord.submitted = true; // 标记为已提交
+      this.logEvent('large_addition', {
+        editor: editorType,
+        change_amount: changeAmount,
+        current_length: currentLength,
+        timestamp: new Date(timestamp).toISOString()
+      });  // 实时上传大段增加
+    } else {
+       // 检查是否需要批量提交
+      const unsubmittedEdits = this.significantEdits.filter(edit => !edit.submitted);
+      if (unsubmittedEdits.length >= 5) {
+        this._submitSignificantEdits();
+      }
     }
 
     // 保持记录数量
@@ -441,10 +454,13 @@ class BehaviorTracker {
     };
 
     const messages = [
-      `我注意到您在${editorNames[editorType]}代码中反复修改了${editCount}次，需要帮助吗？`,
-      `检测到${editorNames[editorType]}代码有${editCount}处反复修改，是否需要协助解决？`,
-      `看起来您在${editorNames[editorType]}部分遇到了些困难，需要我提供建议吗？`,
-      `您在${editorNames[editorType]}编辑器中多次调整代码，有什么我可以帮忙的吗？`
+      `我注意到您在${editorNames[editorType]}代码中反复修改了${editCount}次,是不是遇到了什么具体的问题？可以直接告诉我，让我来帮您分析解决～`,
+      `我注意到${editorNames[editorType]}部分有些反复修改，这是在尝试实现什么功能吗？告诉我您的想法，我可以给您一些实现建议或最佳实践！`,
+      `您对${editorNames[editorType]}的这${editCount}处修改我都看到了，是不是在调试某个效果？告诉我目标是什么，我帮您看看怎么实现更简单～`,
+      `代码反复调整说明您在认真思考呢！如果卡在了${editorNames[editorType]}部分，不妨告诉我：您想实现什么？遇到了什么报错？或者哪里觉得不对劲？`,
+      `我发现${editorNames[editorType]}代码还在优化中，需要我帮您看看吗？比如：\n• 语法检查\n• 逻辑优化\n• 效果实现\n告诉我具体需求吧！`,
+      `您对${editorNames[editorType]}的细致调整很用心呢～如果遇到了瓶颈，可以这样问我：\n"如何实现XX功能？"\n"为什么这里报错？"\n"有没有更好的写法？"`,
+      `看到您在${editorNames[editorType]}上花了不少心思！如果有什么不确定的地方，比如：\n• 这样写对不对？\n• 有没有更优雅的方式？\n• 为什么效果出不来？\n随时问我哦～`,
     ];
 
     return messages[Math.floor(Math.random() * messages.length)];
@@ -479,15 +495,13 @@ class BehaviorTracker {
   // 触发条件：完成"删除→重新编写"完整周期 + 净变化≥10字符
   _logSignificantEdit(editRecord) {
     const time = new Date(editRecord.timestamp).toLocaleTimeString();
-    const changeType = editRecord.netChange >= 0 ? '增加' : '减少';
-
     console.log(
-      `%c重要编辑%c [${time}] %c${editRecord.editor.toUpperCase()}%c: ${changeType} ${Math.abs(editRecord.netChange)}字符, 历时 ${editRecord.duration}ms, 连续 ${editRecord.consecutiveEdits}次编辑`,
+      `%c修改周期%c [${time}] %c${editRecord.editor.toUpperCase()}%c: 删除${editRecord.deleted_chars}字符 → 新增${editRecord.added_chars}字符, 总共修改${editRecord.total_modified}字符, 历时 ${editRecord.duration}ms, 连续 ${editRecord.consecutive_edits}次编辑`,
       'background: #4dabf7; color: white; padding: 2px 4px; border-radius: 3px;',
       'color: #666;',
       'color: #339af0; font-weight: bold;',
       'color: default;'
-    );// 只是日志输出，不上传
+    );
   }
 
   /**
