@@ -3,7 +3,8 @@
 // 导入配置模块
 import { AppConfig, buildBackendUrl, initializeConfig } from '../modules/config.js';
 import { MiniKnowledgeGraph } from '../modules/mini_knowledge_graph.js';
-import { setupHeaderTitle, setupBackButton, getUrlParam, trackReferrer, navigateTo } from '../modules/navigation.js';
+import { setupHeaderTitle, setupBackButton, getUrlParam, trackReferrer,navigateTo } from '../modules/navigation.js';
+
 // 导入功能模块
 import {
     renderTopicContent,
@@ -753,7 +754,7 @@ function initEventListeners() {
     if (startButton) {
         startButton.addEventListener('click', () => {
             handleStartSelector(allowedElements, bridge, showStatus);
-            // 切换按钮状态
+            // 切换按钮状态：隐藏选取元素按钮，显示停止选择按钮
             if (startButton && stopButton) {
                 startButton.style.display = 'none';
                 stopButton.style.display = 'flex';
@@ -765,7 +766,7 @@ function initEventListeners() {
     if (stopButton) {
         stopButton.addEventListener('click', () => {
             stopSelector(bridge);
-            // 切换按钮状态
+            // 切换按钮状态：显示选取元素按钮，隐藏停止选择按钮
             if (startButton && stopButton) {
                 startButton.style.display = 'flex';
                 stopButton.style.display = 'none';
@@ -800,6 +801,13 @@ function initEventListeners() {
             // 隐藏清除选择按钮
             clearSelectionButton.style.display = 'none';
             clearSelectionButton.style.visibility = 'hidden';
+            
+            // 显示选取元素按钮
+            const startButton = document.getElementById('startSelector');
+            if (startButton) {
+                startButton.style.display = 'flex';
+                console.log('清除选择：选取元素按钮已显示');
+            }
 
             // 清空代码面板
             const codeContent = document.getElementById('code-content');
@@ -891,8 +899,9 @@ function createElementSelectedWithTracking() {
 
         console.log('获取到的按钮元素:', {startButton, stopButton, askAIButton, clearSelectionButton});
 
+        // 选中元素后，不显示选取元素按钮
         if (startButton && stopButton) {
-            startButton.style.display = 'flex';
+            startButton.style.display = 'none';
             stopButton.style.display = 'none';
         }
 

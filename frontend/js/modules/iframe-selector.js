@@ -104,6 +104,10 @@ class ElementSelector {
             ...options
         };
         
+        console.log('[ElementSelector] 构造函数初始化，allowedElements:', this.options.allowedElements);
+        console.log('[ElementSelector] currentElements:', this.currentElements);
+        console.log('[ElementSelector] cumulativeElements:', this.cumulativeElements);
+        
         // 绑定事件处理器
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.handleMouseLeave = this.handleMouseLeave.bind(this);
@@ -147,19 +151,22 @@ class ElementSelector {
     
     // ==================== 累积模式更新 ====================
     updateCumulativeMode(isCumulative, allowedElements) {
-        console.log('[ElementSelector] 更新累积模式:', isCumulative);
+        console.log('[ElementSelector] 更新累积模式:', isCumulative, '（true=累积模式，false=当前章节模式）');
         
         // 更新允许的元素列表
         if (typeof allowedElements === 'object' && !Array.isArray(allowedElements)) {
             this.currentElements = allowedElements.current || [];
             this.cumulativeElements = allowedElements.cumulative || [];
+            console.log('[ElementSelector] 当前章节元素数量:', this.currentElements.length, '，累积元素数量:', this.cumulativeElements.length);
         }
         
         // 根据累积模式设置实际使用的元素列表
         if (isCumulative) {
             this.options.allowedElements = this.cumulativeElements;
+            console.log('[ElementSelector] 启用累积模式，可选元素数量:', this.cumulativeElements.length);
         } else {
             this.options.allowedElements = this.currentElements;
+            console.log('[ElementSelector] 启用当前章节模式，可选元素数量:', this.currentElements.length);
         }
         
         console.log('[ElementSelector] 当前允许的元素:', this.options.allowedElements);
@@ -169,9 +176,11 @@ class ElementSelector {
             if (this.shouldIgnoreElement(this.lastHoveredElement)) {
                 this.hideHighlight();
                 this.lastHoveredElement = null;
+                console.log('[ElementSelector] 当前高亮元素不再可选，已隐藏高亮');
             } else {
                 // 重新更新高亮显示以反映新的颜色
                 this.updateHighlight(this.lastHoveredElement);
+                console.log('[ElementSelector] 更新当前高亮元素的显示');
             }
         }
     }
@@ -189,7 +198,15 @@ class ElementSelector {
                 return;
             }
             
+            // 首先检查元素是否应该忽略
             if (this.shouldIgnoreElement(refElement)) {
+                this.hideHighlight();
+                return;
+            }
+            
+            // 手动检查元素是否在允许列表中
+            const tagName = refElement.tagName.toLowerCase();
+            if (!this.options.allowedElements.includes(tagName)) {
                 this.hideHighlight();
                 return;
             }
@@ -249,18 +266,26 @@ class ElementSelector {
         
         // 检查是否在允许的元素列表中
         if (this.options.allowedElements && this.options.allowedElements.length > 0) {
-            const isAllowed = this.options.allowedElements.some(allowed => {
-                if (typeof allowed === 'string') {
-                    return tag === allowed.toLowerCase();
+            // 如果是字符串数组，直接检查是否包含当前标签
+            if (Array.isArray(this.options.allowedElements)) {
+                const isAllowed = this.options.allowedElements.includes(tag);
+                if (!isAllowed) {
+                    return true; // 如果不在允许列表中，应该忽略
                 }
-                if (allowed.tagName) {
-                    return tag === allowed.tagName.toLowerCase();
+            } else {
+                const isAllowed = this.options.allowedElements.some(allowed => {
+                    if (typeof allowed === 'string') {
+                        return tag === allowed.toLowerCase();
+                    }
+                    if (allowed.tagName) {
+                        return tag === allowed.tagName.toLowerCase();
+                    }
+                    return false;
+                });
+                
+                if (!isAllowed) {
+                    return true; // 如果不在允许列表中，应该忽略
                 }
-                return false;
-            });
-            
-            if (!isAllowed) {
-                return true;
             }
         }
         
@@ -366,6 +391,15 @@ class ElementSelector {
         // 判断元素类型并设置相应的颜色
         let borderColor, backgroundColor;
         
+        // 首先检查元素是否在当前允许的元素列表中
+        const isAllowed = this.options.allowedElements && this.options.allowedElements.includes(tagName);
+        
+        if (!isAllowed) {
+            // 如果不在允许列表中，则不显示高亮
+            this.hideHighlight();
+            return;
+        }
+        
         // 检查是否是当前章节的元素
         const isCurrentElement = this.currentElements.includes(tagName);
         // 检查是否是之前章节的元素
@@ -379,10 +413,6 @@ class ElementSelector {
             // 之前章节元素 - 红色
             borderColor = '#dc3545';
             backgroundColor = 'rgba(220, 53, 69, 0.1)';
-        } else {
-            // 默认颜色
-            borderColor = '#0079d3';
-            backgroundColor = 'rgba(0, 121, 211, 0.1)';
         }
         
         Object.assign(this.highlightEl.style, {
@@ -446,13 +476,13 @@ function initIframeSelector(options = {}) {
                 if (startMessage.hasOwnProperty('isCumulative')) {
                     if (startMessage.isCumulative) {
                         initialAllowedElements = cumulativeElements;
-                        console.log('[initIframeSelector] 使用累积模式, 元素数量:', cumulativeElements.length);
+                        console.log('[initIframeSelector] 使用累积模式 - 可选择所有累积到当前章节的元素, 元素数量:', cumulativeElements.length);
                     } else {
                         initialAllowedElements = currentElements;
-                        console.log('[initIframeSelector] 使用当前模式, 元素数量:', currentElements.length);
+                        console.log('[initIframeSelector] 使用当前章节模式 - 只能选择当前章节的元素, 元素数量:', currentElements.length);
                     }
                 } else {
-                    console.log('[initIframeSelector] 未指定模式，使用当前模式');
+                    console.log('[initIframeSelector] 未指定模式，默认使用当前章节模式');
                     initialAllowedElements = currentElements;
                 }
                 
@@ -476,9 +506,18 @@ function initIframeSelector(options = {}) {
                             console.error('发送postMessage失败:', error);
                         }
                     }
-                });                selector.start();
-                console.log('[initIframeSelector] 选择器启动，初始允许元素:', initialAllowedElements);
-                console.log('[initIframeSelector] 是否为累积模式:', initialAllowedElements === cumulativeElements);
+                });
+                console.log('[initIframeSelector] 创建选择器，设置允许元素:', initialAllowedElements);
+                selector.start();
+                console.log('[initIframeSelector] 选择器启动，初始允许元素数量:', initialAllowedElements.length);
+                
+                // 添加明确的日志信息，说明当前使用的模式
+                const actuallyUsingCumulative = initialAllowedElements === cumulativeElements;
+                if (actuallyUsingCumulative) {
+                    console.log('[initIframeSelector] 使用累积模式');
+                } else {
+                    console.log('[initIframeSelector] 使用当前章节模式');
+                }
                 break;
             case MESSAGE_TYPES.STOP:
                 if (selector) {
@@ -551,11 +590,14 @@ function createSelectorBridge(options) {
                 }
                 
                 // 获取当前的累积模式状态
+                // 注意：这里的逻辑是当开关被选中时，启用累积模式（可选择所有章节元素）
+                // 当开关未选中时，仅使用当前章节元素
                 let isCumulative = false;
                 try {
                     const toggle = document.getElementById('cumulativeToggle');
                     if (toggle) {
                         isCumulative = toggle.checked;
+                        console.log('[选择器桥接] 获取开关状态:', isCumulative, '（选中=累积模式，未选中=当前章节模式）');
                     }
                 } catch (error) {
                     console.warn('无法获取开关状态:', error);
@@ -696,13 +738,21 @@ function handleCumulativeToggle(allowedElements, showStatus, bridge) {
     const cumulativeToggle = document.getElementById('cumulativeToggle');
     if (cumulativeToggle) {
         const isCumulative = cumulativeToggle.checked;
-        console.log('累积模式切换:', isCumulative);
+        console.log('累积模式切换:', isCumulative, '（选中=累积模式，未选中=当前章节模式）');
+        
+        if (isCumulative) {
+            console.log('当前模式: 累积模式 - 可选择所有累积到当前章节的元素。元素数量:', allowedElements.cumulative.length);
+        } else {
+            console.log('当前模式: 当前章节模式 - 只能选择当前章节的元素。元素数量:', allowedElements.current.length);
+        }
         
         // 优先使用bridge的updateMode方法
         if (bridge && bridge.updateMode) {
+            console.log('通过bridge发送模式更新消息...');
             bridge.updateMode(isCumulative, allowedElements);
         } else {
             // 备用方案：直接向iframe发送消息
+            console.log('未找到bridge，尝试直接发送消息...');
             const iframe = document.getElementById('element-selector-iframe');
             if (iframe && iframe.contentWindow) {
                 try {
@@ -712,6 +762,7 @@ function handleCumulativeToggle(allowedElements, showStatus, bridge) {
                         allowedElements: allowedElements
                     };
                     iframe.contentWindow.postMessage(message, '*');
+                    console.log('消息发送成功，等待iframe响应...');
                 } catch (error) {
                     console.warn('发送累积模式更新消息失败:', error);
                 }
