@@ -19,8 +19,8 @@ class ChatHistory(Base):
     __tablename__ = "chat_history"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    participant_id = Column(String, index=True, nullable=False)
+    participant_id = Column(String(255), index=True, nullable=False)
     timestamp = Column(DateTime, default=lambda: datetime.now(pytz.timezone('Asia/Shanghai')), nullable=False)
-    role = Column(String, nullable=False)  # 'user' or 'ai'
+    role = Column(String(10), nullable=False)  # 'user' or 'ai'
     message = Column(Text, nullable=False)
     raw_prompt_to_llm = Column(Text, nullable=True)
