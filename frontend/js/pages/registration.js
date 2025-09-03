@@ -32,7 +32,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 // 使用统一的apiClient方法发送请求
                 const result = await apiClient.postWithoutAuth('/session/initiate', {
-                    participant_id: username
+                    participant_id: username,
+                    group: 'control'
                 });
 
                 if (result.code === 200 || result.code === 201) {

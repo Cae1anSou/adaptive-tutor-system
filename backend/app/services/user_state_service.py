@@ -364,14 +364,14 @@ class UserStateService:
         self.set_profile(profile, set_dict)
         logger.info(f"Updated knowledge level {level} for topic {topic_id} stats for {participant_id}")
 
-    def get_or_create_profile(self, participant_id: str, db: Session = None, group: str = "experimental") -> tuple[StudentProfile, bool]:
+    def get_or_create_profile(self, participant_id: str, db: Session = None, group: str = "control") -> tuple[StudentProfile, bool]:
         """
         获取或创建用户配置
         
         Args:
             participant_id: 参与者ID
             db: 数据库会话（可选）
-            group: 实验分组，默认为'experimental'
+            group: 实验分组，默认为'control'
             
         Returns:
             tuple: (profile, is_new_user)
