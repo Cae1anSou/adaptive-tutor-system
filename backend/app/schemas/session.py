@@ -7,10 +7,10 @@ class SessionInitiateRequest(BaseModel):
     
     Attributes:
         participant_id: 参与者唯一标识符（UUID格式）
-        group: 实验分组，默认为'experimental'实验组
+        group: 实验分组，默认为'control'对照组
     """
     participant_id: str = Field(..., description="User-provided or system-generated unique ID (UUID) for the participant")
-    group: str = Field("experimental", description="Assigned experiment group")
+    group: str = Field("control", description="Assigned experiment group")
 
 class SessionInitiateResponse(BaseModel):
     """会话初始化响应模型
