@@ -53,11 +53,46 @@ class BehaviorInterpreterService:
             "test_submission": self._handle_test_submission,
             "ai_help_request": self._handle_ai_help_request,
             "knowledge_level_access": self._handle_knowledge_level_access,
+            "significant_edits": self._handle_code_behavior_event,
+            "coding_problem": self._handle_code_behavior_event,
+            "coding_session_summary": self._handle_code_behavior_event,
+            "large_addition": self._handle_code_behavior_event,
+            "idle_hint_displayed": self._handle_lightweight_event
         }
+        
         # 添加轻量级事件的处理
-        for event_type in ("dom_element_select", "code_edit", "page_focus_change", "user_idle", "page_click", "significant_edits", "large_addition", "coding_problem", "coding_session_summary", "idle_hint_displayed"):
-
+        for event_type in ("dom_element_select", "code_edit", "page_focus_change", "user_idle", "page_click"):
             self._event_handlers[event_type] = self._handle_lightweight_event
+
+    def _handle_code_behavior_event(self, participant_id, event_data, timestamp, user_state_service, is_replay):
+        """处理代码行为事件"""
+        if user_state_service is None or is_replay:
+            return
+            
+        try:
+            # 获取事件类型
+            event_type = None
+            if hasattr(event_data, 'event_type'):
+                event_type = event_data.event_type
+            elif isinstance(event_data, dict) and 'event_type' in event_data:
+                event_type = event_data['event_type']
+            
+            logger.info(f"处理代码行为事件 - 参与者ID: {participant_id}, 事件类型: {event_type}")
+            logger.info(f"事件数据: {event_data}")
+            
+            if event_type:
+                user_state_service.handle_code_behavior_event(participant_id, event_type, event_data)
+                
+                # 更新情感状态（编码问题可能表示挫败）
+                if event_type == "coding_problem":
+                    severity = event_data.get('severity', 'low')
+                    frustration_increase = 0.1 if severity == 'low' else 0.2 if severity == 'medium' else 0.3
+                    
+                    sentiment_update = {'negative': frustration_increase, 'neutral': -frustration_increase/2, 'positive': -frustration_increase/2}
+                    user_state_service.update_emotional_state(participant_id, sentiment_update, weight=0.3)
+                    
+        except Exception as e:
+            logger.error(f"处理参与者 {participant_id} 的代码行为事件时出错: {e}")
 
     def interpret_event(self, event, user_state_service=None, db_session=None, is_replay: bool = False):
         """

@@ -44,7 +44,7 @@
 
     { "data": { "source": "2_end", "target": "2_1" } },
     { "data": { "source": "2_end", "target": "2_2" } },
-    { "data": { "source": "2_end", "target": "2_2" } },
+    { "data": { "source": "2_end", "target": "2_3" } },
 
     { "data": { "source": "3_end", "target": "3_1" } },
     { "data": { "source": "3_end", "target": "3_2" } },
