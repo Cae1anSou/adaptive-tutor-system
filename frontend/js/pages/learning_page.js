@@ -352,29 +352,6 @@ function initializeUIEvents(iframe) {
     initIframeSelector();
 }
 
-// 处理初始化失败的情况
-// async function handleInitializationFailure(topicId) {
-//     console.log('[MainApp] 使用默认配置进行初始化...');
-
-//     // 设置默认元素
-//     allowedElements = {
-//         cumulative: ['div', 'span', 'p', 'h1', 'h2', 'h3'],
-//         current: ['div', 'span', 'p']
-//     };
-
-//     // 初始化知识点模块
-//     knowledgeModule = new KnowledgeModule();
-//     console.log('[MainApp] 知识点模块初始化完成（失败后）');
-
-    // 初始化聊天模块 - 已注释
-    // try {
-    //     chatModule.init('learning', topicId);
-    //     console.log('[MainApp] 聊天模块初始化完成（失败后）');
-    // } catch (error) {
-    //     console.error('[MainApp] 聊天模块初始化失败（失败后）:', error);
-    // }
-// }
-
 // ==================== 功能模块 ====================
 
 /**
@@ -992,8 +969,6 @@ document.addEventListener('problemHintNeeded', (event) => {
 });
 
 // 在AI对话框中显示提示消息
-// 在AI对话框中显示提示消息（适配现有HTML结构）
-// 在AI对话框中显示提示消息（永远追加到底部）
 function showProblemHintInChat(message, editorType, editCount) {
     const chatMessages = document.getElementById('ai-chat-messages');
     if (!chatMessages) {
