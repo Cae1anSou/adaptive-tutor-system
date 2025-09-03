@@ -597,34 +597,6 @@ class KnowledgeModule {
         });
     }
     
- 
-=======
-        // 去除任何可能影响卡片展示的类
-        this.levelCards.forEach(card => {
-            // 移除可能影响卡片大小的所有类
-            card.classList.remove('collapsed');
-            card.classList.remove('expanded');
-            // 删除点击效果
-            card.style.cursor = 'default';
-        });
-    }
-    
-
-    
-
-    
-    // 展开指定等级的卡片（兼容现有API）
-    expandLevel(level) {
-        // 仅做兼容，不执行实际操作
-        console.log(`[KnowledgeModule] expandLevel 函数被调用，但由于现在所有卡片已直接显示，因此不执行操作`);
-    }
-    
-    // 收起所有卡片（兼容现有API）
-    collapseAll() {
-        // 仅做兼容，不执行实际操作
-        console.log(`[KnowledgeModule] collapseAll 函数被调用，但由于现在已使用直接显示模式，因此不执行操作`);
-    }
->>>>>>> 7520342a0e67a9ac683ad0d15203a418a0d9cf10
 }
 
 // ==================== 事件处理函数 ====================
