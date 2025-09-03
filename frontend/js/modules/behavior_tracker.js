@@ -15,7 +15,6 @@
 
 import debounce from 'https://cdn.jsdelivr.net/npm/lodash-es@4.17.21/debounce.js';
 import { getParticipantId } from './session.js';
-
 class BehaviorTracker {
   constructor() {
     // code_edit 防抖时长（ms）
@@ -25,6 +24,8 @@ class BehaviorTracker {
     this._focusAndIdleBound = false;
     this._enabledEvents = {};
     this._elementClickBound = false;
+    // 控制组：默认关闭一切前端“主动提示”UI（但保留行为日志上报）
+    this._proactiveHintsEnabled = false;
 
     this.hintConfig = {
       hintThreshold: 3, // 触发提示的连续修改次数阈值
@@ -106,6 +107,10 @@ class BehaviorTracker {
 
   init(config = {}) {
     this._enabledEvents = config;
+    // 控制组：如未明确开启，则保持关闭主动提示
+    if (typeof config.proactive_hints === 'boolean') {
+      this._proactiveHintsEnabled = !!config.proactive_hints;
+    }
     // 允许外部覆盖空闲提示配置
     if (config.idleHintConfig) {
       this.idleHintConfig = { ...this.idleHintConfig, ...config.idleHintConfig };
@@ -398,8 +403,8 @@ class BehaviorTracker {
 
     this.problemEvents.push(problemEvent);
 
-    // 触发问题提示
-    if (consecutiveEdits >= this.hintConfig.hintThreshold) {
+    // 控制组：不触发前端提示（但仍保留问题事件上报）
+    if (this._proactiveHintsEnabled && consecutiveEdits >= this.hintConfig.hintThreshold) {
       this._triggerProblemHint(editorType, consecutiveEdits, timestamp);
     }
     // 立即提交问题事件
@@ -407,6 +412,7 @@ class BehaviorTracker {
   }
   // 新增问题提示触发方法
   _triggerProblemHint(editorType, editCount, timestamp) {
+    if (!this._proactiveHintsEnabled) return; // 控制组：关闭
     // 检查冷却时间
     const now = Date.now();
     if (now - this.hintConfig.lastHintTime < this.hintConfig.cooldownPeriod) {
@@ -424,9 +430,7 @@ class BehaviorTracker {
       message: this._generateHintMessage(editorType, editCount)
     };
 
-    const event = new CustomEvent('problemHintNeeded', {
-      detail: eventDetail
-    });
+    const event = new CustomEvent('problemHintNeeded', { detail: eventDetail });
     document.dispatchEvent(event);
 
     console.log(`触发问题提示: ${editorType} 编辑器, ${editCount} 次修改`);
@@ -547,31 +551,31 @@ class BehaviorTracker {
   // // -------------------- AI 求助（聊天） --------------------
   // // sendButtonId: 提问按钮 id；inputSelector: 文本输入选择器
   // // mode: 模式 ('learning' 或 'test')；contentId: 内容ID
-  // initChat(sendButtonId, inputSelector, mode = 'learning', contentId = null) {
-  //   const btn = document.getElementById(sendButtonId);
-  //   const input = document.querySelector(inputSelector);
-  //   if (!btn || !input) return;
+  initChat(sendButtonId, inputSelector, mode = 'learning', contentId = null) {
+    const btn = document.getElementById(sendButtonId);
+    const input = document.querySelector(inputSelector);
+    if (!btn || !input) return;
 
-  //   const sendMessage = () => {
-  //     const message = input.value || '';
-  //     if (!message.trim()) return;
-  //     this.logEvent('ai_help_request', {
-  //       message: message.substring(0, 2000),
-  //       mode: mode,
-  //       content_id: contentId
-  //     });
-  //   };
+    const sendMessage = () => {
+      const message = input.value || '';
+      if (!message.trim()) return;
+      this.logEvent('ai_help_request', {
+        message: message.substring(0, 2000),
+        mode: mode,
+        content_id: contentId
+      });
+    };
 
-  //   btn.addEventListener('click', sendMessage);
+    btn.addEventListener('click', sendMessage);
 
-  //   // 支持 Enter 提交
-  //   input.addEventListener('keydown', (e) => {
-  //     if (e.key === 'Enter' && !e.shiftKey) {
-  //       e.preventDefault();
-  //       sendMessage();
-  //     }
-  //   });
-  // }
+    // 支持 Enter 提交
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+  }
 
   // // -------------------- 测试/提交（包含 code） --------------------
   // // runBtnId / submitBtnId: 按钮 id；editors: 同 initEditors；topicIdGetter: 可选函数返回 topic_id
@@ -649,12 +653,13 @@ class BehaviorTracker {
         if (this._idleStartTs == null) {
           this._idleStartTs = this._lastActivityTs; // 空闲起点=上次活动时间
         }
-        // 现在才开始提示计时
-        const delay = computeHintDelay();
-        this._idleHintTimer = setTimeout(() => {
-          // 仍处于空闲才提示
-          if (this._idleStartTs != null) this._maybeShowIdleHint();
-        }, delay);
+        // 控制组：不安排前端提示计时器，仅记录空闲
+        if (this._proactiveHintsEnabled) {
+          const delay = computeHintDelay();
+          this._idleHintTimer = setTimeout(() => {
+            if (this._idleStartTs != null) this._maybeShowIdleHint();
+          }, delay);
+        }
       }, idleMs);
     };
 
@@ -729,6 +734,7 @@ class BehaviorTracker {
  * - 复用 problemHintNeeded 事件展示在聊天 UI
  */
   _maybeShowIdleHint() {
+    if (!this._proactiveHintsEnabled) return; // 控制组：关闭
     const now = Date.now();
 
     // 冷却中则不提示
@@ -757,12 +763,7 @@ class BehaviorTracker {
     }));
 
     // 行为日志：记录提示本身（可用于 AB 评估）
-    this.logEvent('idle_hint_displayed', {
-      message,
-      idle_ms: idleSoFar,
-      page_url: window.location.pathname,
-      timestamp: new Date().toISOString()
-    });
+    // 控制组：不记录“提示已展示”，因为实际上不展示
 
     // 调试输出
     console.log(`[IdleHint] ${message}（已空闲 ${Math.round(idleSoFar / 1000)}s）`);

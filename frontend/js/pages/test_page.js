@@ -1,7 +1,7 @@
 // 导入模块
 import { getParticipantId } from '../modules/session.js';
 import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
-import { setupHeaderTitle, setupBackButton, getUrlParam, debugUrlParams, getReturnUrl  } from '../modules/navigation.js';
+import { setupHeaderTitle, setupBackButton, getUrlParam, debugUrlParams } from '../modules/navigation.js';
 import tracker from '../modules/behavior_tracker.js';
 import chatModule from '../modules/chat.js';
 import websocket from '../modules/websocket_client.js';
@@ -152,114 +152,13 @@ function initSmartCodeTracking() {
             tracker._initSessionEndHandler();
         }
 
-        // 监听问题提示事件
-        document.addEventListener('problemHintNeeded', (event) => {
-            const { editor, editCount, message } = event.detail;
-            console.log(`收到问题提示: ${message}`);
-
-            // 在AI对话框中显示提示
-            showProblemHintInChat(message, editor, editCount);
-        });
+        // 控制组：不接收 nor 展示前端主动提示
 
     } else {
         console.warn('无法初始化智能代码监控：编辑器状态或跟踪器不可用');
     }
 }
-// 在AI对话框中显示提示消息
-// 在AI对话框中显示提示消息（适配现有HTML结构）
-// 在AI对话框中显示提示消息（永远追加到底部）
-function showProblemHintInChat(message, editorType, editCount) {
-    const chatMessages = document.getElementById('ai-chat-messages');
-    if (!chatMessages) {
-        console.warn('未找到AI聊天消息容器');
-        return;
-    }
-
-    // 创建AI消息元素
-    const aiMessage = document.createElement('div');
-    aiMessage.className = 'ai-message';
-    aiMessage.innerHTML = `
-      <div class="ai-avatar">
-        <iconify-icon icon="mdi:robot" width="20" height="20"></iconify-icon>
-      </div>
-      <div class="ai-content">
-        <div class="markdown-content">
-          <div class="problem-hint-container">
-            <div class="problem-hint-header">
-              <iconify-icon icon="mdi:lightbulb-on" width="16" height="16" style="color: #ff9800;"></iconify-icon>
-              <span>学习提示</span>
-            </div>
-            <div class="problem-hint-content">
-              ${message}
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // 添加提示消息样式（如果尚未添加）
-    if (!document.getElementById('hint-styles')) {
-        const styles = document.createElement('style');
-        styles.id = 'hint-styles';
-        styles.textContent = `
-        .problem-hint-container {
-          background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
-          border: 1px solid #ffd54f;
-          border-radius: 8px;
-          padding: 16px;
-          margin: 12px 0;
-          box-shadow: 0 2px 8px rgba(255, 179, 0, 0.15);
-        }
-        .problem-hint-header {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin-bottom: 12px;
-          font-weight: 600;
-          color: #ff6f00;
-          font-size: 15px;
-        }
-        .problem-hint-content {
-          color: #5d4037;
-          line-height: 1.5;
-          margin-bottom: 16px;
-          font-size: 14px;
-        }
-      `;
-        document.head.appendChild(styles);
-    }
-
-    // ✅ ceq关键：永远追加到末尾（保持时间顺序）
-    chatMessages.appendChild(aiMessage);
-
-    // 平滑滚动到底部
-    // （如果容器用了 column-reverse，请把样式改回正常方向，否则仍会“上新增”）
-    if (typeof chatMessages.scrollTo === 'function') {
-        chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
-    } else {
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    // 进入动画
-    aiMessage.style.opacity = '0';
-    aiMessage.style.transform = 'translateY(20px)';
-    aiMessage.style.transition = 'all 0.3s ease';
-    requestAnimationFrame(() => {
-        aiMessage.style.opacity = '1';
-        aiMessage.style.transform = 'translateY(0)';
-    });
-
-    // 记录提示事件
-    if (tracker && typeof tracker.logEvent === 'function') {
-        tracker.logEvent('problem_hint_displayed', {
-            editor: editorType,
-            edit_count: editCount,
-            message: message,
-            timestamp: new Date().toISOString()
-        });
-    }
-    return aiMessage;
-}
+// 控制组：不生成“学习提示”消息块
 
 
 // 提交逻辑
@@ -273,8 +172,10 @@ function setupSubmitLogic() {
             const behaviorAnalysis = tracker.getCodingBehaviorAnalysis();
             console.log('测试时的编程行为分析:', behaviorAnalysis);
 
-            // 提交测试事件（包含当前行为分析）
-            tracker.logEvent('test_run', {
+            // 统一使用后端支持的事件类型：test_submission
+            // 在 event_data 中增加 phase 区分阶段
+            tracker.logEvent('test_submission', {
+                phase: 'run',
                 timestamp: new Date().toISOString(),
                 behavior_snapshot: behaviorAnalysis
             });
@@ -341,11 +242,13 @@ function setupSubmitLogic() {
                     alert("测试完成！即将跳转回到知识图谱界面");
                     setTimeout(() => { window.location.href = '/pages/knowledge_graph.html'; }, 3000);
                 } else {
-                    tracker.logEvent('test_failed', {
+                    // 统一为 test_submission，标记失败阶段
+                    tracker.logEvent('test_submission', {
+                        phase: 'failed',
                         topic_id: topicId,
                         edit_count: finalBehaviorAnalysis.totalSignificantEdits,
                         problem_count: finalBehaviorAnalysis.problemEventsCount,
-                        failure_reason: result.data.message || '未知原因'
+                        failure_reason: (result && result.data && result.data.message) || '未知原因'
                     });
                     // TODO: 可以考虑直接在这里主动触发AI
                     // 测试未通过，给用户一些鼓励和建议
@@ -355,7 +258,9 @@ function setupSubmitLogic() {
 
         } catch (error) {
             console.error('提交测试时出错:', error);
-            tracker.logEvent('submission_error', {
+            // 统一为 test_submission，标记错误阶段
+            tracker.logEvent('test_submission', {
+                phase: 'error',
                 error_message: error.message,
                 timestamp: new Date().toISOString()
             });
@@ -400,18 +305,8 @@ document.addEventListener('DOMContentLoaded', function () {
     setupBackButton();
     // 调试信息
     debugUrlParams();
-    require(['vs/editor/editor.main'], function () {
-        initializePage();
-        setupSubmitLogic();
-
-        // 初始化AI聊天功能
-        // 获取并解密URL参数
-        const returnUrl = getReturnUrl();
-        console.log('返回URL:', returnUrl);
-        const contentId = getUrlParam('topic');
-        if (contentId && contentId.id) {
-            // 使用新的聊天模块初始化
-            chatModule.init('test', contentId);
-        }
+        require(['vs/editor/editor.main'], function () {
+            initializePage();
+            setupSubmitLogic();
+        });
     });
-});

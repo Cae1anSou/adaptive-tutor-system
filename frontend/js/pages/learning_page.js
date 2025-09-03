@@ -1019,16 +1019,12 @@ function askAIAboutElement() {
 
     console.log('[DEBUG] window.pendingElementContext 已设置为:', window.pendingElementContext);
 
-    // 发送消息到AI
+    // 控制组：不主动追加AI提示，仅保存上下文供用户自行发问
     if (chatModule) {
-        // 切换到AI聊天标签页（如果存在）
         const tabChat = document.getElementById('tab-chat');
         if (tabChat) {
             tabChat.click();
         }
-
-        // AI主动发送询问消息
-        chatModule.addMessageToUI('ai', aiInitialMessage);
     } else {
         console.error('AI聊天模块未初始化');
     }
@@ -1148,74 +1144,21 @@ function extendChatModuleForElementContext() {
     // 保存原始的sendMessage方法
     const originalSendMessage = chatModule.sendMessage.bind(chatModule);
 
-    // 重写sendMessage方法
+    // 重写sendMessage方法：合并元素上下文后，委托给原始逻辑
     chatModule.sendMessage = async function(mode, contentId) {
         const message = this.inputElement.value.trim();
         if (!message || this.isLoading) return;
 
-        // 清空输入框
-        this.inputElement.value = '';
-
-        // 添加用户消息到UI
-        this.addMessageToUI('user', message);
-
-        // 设置加载状态
-        this.setLoadingState(true);
-
-        try {
-            // 构建请求体
-            let finalUserMessage = message;
-
-            // 如果存在待处理的元素上下文，将元素信息和用户消息结合
-            if (window.pendingElementContext && window.pendingElementContext.message) {
-                console.log('[DEBUG] 检测到待处理的元素上下文，将结合用户消息和元素信息');
-                console.log('用户消息:', message);
-                console.log('元素上下文信息:', window.pendingElementContext.message);
-
-                // 将用户消息和元素信息结合起来
-                finalUserMessage = `${window.pendingElementContext.message}
-
-用户问题: ${message}`;
-
-                // 用户回应后清除上下文（避免后续消息继续携带）
-                window.pendingElementContext = null;
-                console.log('[DEBUG] window.pendingElementContext 已清除');
-            }
-
-            const requestBody = {
-                user_message: finalUserMessage,
-                conversation_history: this.getConversationHistory(),
-                code_context: this.getCodeContext(),
-                mode: mode,
-                content_id: contentId
-            };
-
-            console.log('[DEBUG] 最终请求体:', JSON.stringify(requestBody, null, 2));
-
-            // 如果是测试模式，添加测试结果
-            if (mode === 'test') {
-                const testResults = this._getTestResults();
-                if (testResults) {
-                    requestBody.test_results = testResults;
-                }
-            }
-
-            // 使用封装的 apiClient 发送请求
-            const data = await window.apiClient.post('/chat/ai/chat', requestBody);
-
-            if (data.code === 200 && data.data && typeof data.data.ai_response === 'string') {
-                // 添加AI回复到UI
-                this.addMessageToUI('ai', data.data.ai_response);
-            } else {
-                throw new Error(data.message || 'AI回复内容为空或格式不正确');
-            }
-        } catch (error) {
-            console.error('[ChatModule] 发送消息时出错:', error);
-            this.addMessageToUI('ai', `抱歉，我无法回答你的问题。错误信息: ${error.message}`);
-        } finally {
-            // 取消加载状态
-            this.setLoadingState(false);
+        let finalUserMessage = message;
+        if (window.pendingElementContext && window.pendingElementContext.message) {
+            console.log('[DEBUG] 检测到待处理的元素上下文，将结合用户消息和元素信息');
+            finalUserMessage = `${window.pendingElementContext.message}\n\n用户问题: ${message}`;
+            window.pendingElementContext = null; // 清除上下文
         }
+
+        // 覆盖输入框内容后，交由原始 sendMessage 处理（包含WebSocket解锁逻辑）
+        this.inputElement.value = finalUserMessage;
+        return originalSendMessage(mode, contentId);
     };
 
     console.log('[Learning] 聊天模块已扩展以支持元素上下文');

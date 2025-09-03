@@ -14,8 +14,8 @@ export const AppConfig = {
 export async function initializeConfig() {
   try {
     // We construct the URL manually here for the initial config fetch
-    // 在所有环境中都使用相对路径，通过Nginx代理
-    const configUrl = '/api/v1/config';
+    // 使用当前页面 origin 构建绝对地址，确保端口正确（例如 8325）
+    const configUrl = `${window.location.origin}/api/v1/config`;
       
     const response = await fetch(configUrl);
     const result = await response.json();
