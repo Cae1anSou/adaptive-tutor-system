@@ -25,17 +25,21 @@ def log_behavior(
     - **异步解释**: 将事件分派到`chat_queue`进行解释和状态更新。
     - **快速响应**: 立即返回 `202 Accepted`，不等待后台任务完成。
     """
+    logger.info(f"[log_behavior] 接收到的事件: {event_in}")
+    
     # 任务1: 异步持久化原始事件 (fire-and-forget)
-
+    logger.info("[log_behavior] 分派到 save_behavior_task")
     save_behavior_task.apply_async(
         args=[event_in.model_dump()], 
         queue='db_writer_queue'
     )
 
     # 任务2: 异步解释事件 (fire-and-forget)
+    logger.info("[log_behavior] 分派到 interpret_behavior_task")
     interpret_behavior_task.apply_async(
         args=[event_in.model_dump()],
         queue='behavior_queue'
     )
 
-    return {"status": "Event received for processing"}
+    logger.info(f"[log_behavior] 参与者 {event_in.participant_id} 的事件处理已分派")
+    return {"status": "事件已接收并正在处理"}

@@ -184,50 +184,12 @@ function showProblemHintInChat(message, editorType, editCount) {
       </div>
       <div class="ai-content">
         <div class="markdown-content">
-          <div class="problem-hint-container">
-            <div class="problem-hint-header">
-              <iconify-icon icon="mdi:lightbulb-on" width="16" height="16" style="color: #ff9800;"></iconify-icon>
-              <span>学习提示</span>
-            </div>
-            <div class="problem-hint-content">
-              ${message}
-            </div>
+            <p>${message}</p>
           </div>
         </div>
       </div>
     `;
 
-    // 添加提示消息样式（如果尚未添加）
-    if (!document.getElementById('hint-styles')) {
-        const styles = document.createElement('style');
-        styles.id = 'hint-styles';
-        styles.textContent = `
-        .problem-hint-container {
-          background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
-          border: 1px solid #ffd54f;
-          border-radius: 8px;
-          padding: 16px;
-          margin: 12px 0;
-          box-shadow: 0 2px 8px rgba(255, 179, 0, 0.15);
-        }
-        .problem-hint-header {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin-bottom: 12px;
-          font-weight: 600;
-          color: #ff6f00;
-          font-size: 15px;
-        }
-        .problem-hint-content {
-          color: #5d4037;
-          line-height: 1.5;
-          margin-bottom: 16px;
-          font-size: 14px;
-        }
-      `;
-        document.head.appendChild(styles);
-    }
 
     // ✅ ceq关键：永远追加到末尾（保持时间顺序）
     chatMessages.appendChild(aiMessage);
@@ -240,24 +202,6 @@ function showProblemHintInChat(message, editorType, editCount) {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // 进入动画
-    aiMessage.style.opacity = '0';
-    aiMessage.style.transform = 'translateY(20px)';
-    aiMessage.style.transition = 'all 0.3s ease';
-    requestAnimationFrame(() => {
-        aiMessage.style.opacity = '1';
-        aiMessage.style.transform = 'translateY(0)';
-    });
-
-    // 记录提示事件
-    if (tracker && typeof tracker.logEvent === 'function') {
-        tracker.logEvent('problem_hint_displayed', {
-            editor: editorType,
-            edit_count: editCount,
-            message: message,
-            timestamp: new Date().toISOString()
-        });
-    }
     return aiMessage;
 }
 
@@ -265,21 +209,7 @@ function showProblemHintInChat(message, editorType, editCount) {
 // 提交逻辑
 function setupSubmitLogic() {
     const submitButton = document.getElementById('submit-button');
-    const runButton = document.getElementById('run-button');
     if (!submitButton) return;
-    if (runButton) {
-        runButton.addEventListener('click', () => {
-            // 获取当前的编程行为分析
-            const behaviorAnalysis = tracker.getCodingBehaviorAnalysis();
-            console.log('测试时的编程行为分析:', behaviorAnalysis);
-
-            // 提交测试事件（包含当前行为分析）
-            tracker.logEvent('test_run', {
-                timestamp: new Date().toISOString(),
-                behavior_snapshot: behaviorAnalysis
-            });
-        });
-    }
     submitButton.addEventListener('click', async () => {
         const behaviorAnalysis = tracker.getCodingBehaviorAnalysis();
         console.log('提交时的编程行为分析:', behaviorAnalysis);

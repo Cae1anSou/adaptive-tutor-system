@@ -101,6 +101,46 @@ export class GraphRenderer {
             'transition-duration': '0.3s',
             'transition-timing-function': 'ease'
           }
+        },
+        {
+          // 章节到章节的边样式
+          selector: 'edge.chapter-to-chapter',
+          style: {
+            'line-color': '#4f46e5',
+            'target-arrow-color': '#4f46e5',
+            'width': 4,
+            'line-style': 'solid',
+            'opacity': 0.9
+          }
+        },
+        {
+          // 章节到知识点的边样式
+          selector: 'edge.chapter-to-knowledge',
+          style: {
+            'line-color': '#f59e0b',
+            'target-arrow-color': '#f59e0b',
+            'width': 2.5,
+            'line-style': 'dashed',
+            'opacity': 0.8
+          }
+        },
+        {
+          // 边悬停效果
+          selector: 'edge.hover',
+          style: {
+            'width': 5,
+            'opacity': 1,
+            'line-color': '#facc15',  // 悬停时使用更明亮的颜色
+            'target-arrow-color': '#facc15'
+          }
+        },
+        {
+          // 边光效动画
+          selector: 'edge.edge-glow',
+          style: {
+            'line-gradient-stop-colors': '#facc15 #facc15 #f59e0b #f59e0b',
+            'line-gradient-stop-positions': '0 0.5 0.5 1'
+          }
         }
       ],
       layout: { name: 'preset' },
@@ -130,6 +170,29 @@ export class GraphRenderer {
   addElements(elements) {
     this.cy.add(elements);
 
+    // 为不同类型的边设置不同的样式类
+    this.cy.edges().forEach(edge => {
+      const sourceId = edge.data('source');
+      const targetId = edge.data('target');
+      
+      // 获取源节点和目标节点
+      const sourceNode = this.cy.getElementById(sourceId);
+      const targetNode = this.cy.getElementById(targetId);
+      
+      // 判断节点类型
+      const sourceType = sourceNode.data('type');
+      const targetType = targetNode.data('type');
+      
+      // 章节到知识点的边添加特殊类
+      if (sourceType === 'chapter' && targetType === 'knowledge') {
+        edge.addClass('chapter-to-knowledge');
+      } 
+      // 章节到章节的边添加特殊类
+      else if (sourceType === 'chapter' && targetType === 'chapter') {
+        edge.addClass('chapter-to-chapter');
+      }
+    });
+
     // 存储新添加节点的原始尺寸
     this.cy.nodes().forEach(node => {
       if (!this.originalSizes.has(node.id())) {
@@ -151,48 +214,58 @@ export class GraphRenderer {
       });
     });
 
-    // 节点悬停效果
+    // 节点悬停效果 - 添加动画过渡
     this.cy.on('mouseover', 'node', (evt) => {
       const node = evt.target;
       const originalSize = this.originalSizes.get(node.id()) || { width: 120, height: 120 };
       const scaleFactor = node.data('type') === 'chapter' ? 1.15 : 1.1;
       
-      node.style({
-        'background-color': node.data('type') === 'chapter' ? '#3730a3' : '#c7d2fe',
-        'color': node.data('type') === 'chapter' ? '#ffffff' : '#1e293b',
-        'border-color': '#4f46e5',
-        'width': originalSize.width * scaleFactor,
-        'height': originalSize.height * scaleFactor
+      // 使用动画过渡效果
+      node.stop().animate({
+        style: {
+          'background-color': node.data('type') === 'chapter' ? '#3730a3' : '#c7d2fe',
+          'color': node.data('type') === 'chapter' ? '#ffffff' : '#1e293b',
+          'border-color': '#4f46e5',
+          'width': originalSize.width * scaleFactor,
+          'height': originalSize.height * scaleFactor
+        }
+      }, {
+        duration: 200
       });
-      
     });
 
     this.cy.on('mouseout', 'node', (evt) => {
       const node = evt.target;
-      node.style({
-        'color': '#1e293b',
+      // 使用动画恢复原始样式
+      node.stop().animate({
+        style: {
+          'color': '#1e293b'
+        }
+      }, {
+        duration: 150,
+        complete: () => {
+          this.restoreNodeStyle(node);
+        }
       });
-      this.restoreNodeStyle(node);
-      
     });
 
-    // 边悬停效果
+    // 边悬停效果 - 优化样式变化
     this.cy.on('mouseover', 'edge', (evt) => {
       const edge = evt.target;
-      edge.style({
-        'line-color': '#4f46e5',
-        'target-arrow-color': '#4f46e5',
-        'width': 4
-      });
+      
+      // 直接使用CSS类切换而不是动态修改样式
+      edge.addClass('hover');
+      
+      // 添加光效动画
+      if (!edge.data('isChapterToChapter')) {
+        edge.addClass('edge-glow');
+        setTimeout(() => edge.removeClass('edge-glow'), 1500);
+      }
     });
 
     this.cy.on('mouseout', 'edge', (evt) => {
       const edge = evt.target;
-      edge.style({
-        'line-color': '#2563eb',
-        'target-arrow-color': '#2563eb',
-        'width': 3
-      });
+      edge.removeClass('hover');
     });
   }
 
@@ -480,7 +553,8 @@ addToolbarFunctionality() {
         // 淡入动画
         e.animate({
           style: {
-            'opacity': 1
+            'opacity': e.classes().includes('chapter-to-knowledge') ? 0.8 : 
+                       e.classes().includes('chapter-to-chapter') ? 0.9 : 1
           }
         }, {
           duration: 300

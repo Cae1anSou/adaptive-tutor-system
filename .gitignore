@@ -64,6 +64,7 @@ Thumbs.db
 celerybeat-schedule.bak
 celerybeat-schedule.dat
 celerybeat-schedule.dir
+celerybeat-schedule
 
 # 敏感信息 (secrets)
 *.env

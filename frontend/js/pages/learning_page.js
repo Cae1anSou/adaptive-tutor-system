@@ -352,29 +352,6 @@ function initializeUIEvents(iframe) {
     initIframeSelector();
 }
 
-// 处理初始化失败的情况
-// async function handleInitializationFailure(topicId) {
-//     console.log('[MainApp] 使用默认配置进行初始化...');
-
-//     // 设置默认元素
-//     allowedElements = {
-//         cumulative: ['div', 'span', 'p', 'h1', 'h2', 'h3'],
-//         current: ['div', 'span', 'p']
-//     };
-
-//     // 初始化知识点模块
-//     knowledgeModule = new KnowledgeModule();
-//     console.log('[MainApp] 知识点模块初始化完成（失败后）');
-
-    // 初始化聊天模块 - 已注释
-    // try {
-    //     chatModule.init('learning', topicId);
-    //     console.log('[MainApp] 聊天模块初始化完成（失败后）');
-    // } catch (error) {
-    //     console.error('[MainApp] 聊天模块初始化失败（失败后）:', error);
-    // }
-// }
-
 // ==================== 功能模块 ====================
 
 /**
@@ -742,6 +719,40 @@ function initEventListeners() {
     const askAIButton = document.getElementById('askAIButton');
     const clearSelectionButton = document.getElementById('clearSelectionButton');
 
+    // 添加知识图谱展开/收起功能
+    const miniGraphToggle = document.getElementById('miniGraphToggle');
+    const miniKnowledgeGraph = document.getElementById('miniKnowledgeGraph');
+    const toggleIcon = document.getElementById('toggleIcon');
+
+    if (miniGraphToggle && miniKnowledgeGraph && toggleIcon) {
+        // 确保图标默认有颜色和可见性
+        toggleIcon.style.color = '#4f46e5';
+        toggleIcon.style.opacity = '0.8';
+        
+        miniGraphToggle.addEventListener('click', () => {
+            // 切换展开状态
+            const isExpanding = !miniKnowledgeGraph.classList.contains('expanded');
+            miniKnowledgeGraph.classList.toggle('expanded');
+            
+            // 更改图标并切换旋转类
+            if (isExpanding) {
+                // 展开时，将图标更改为向上箭头
+                toggleIcon.setAttribute('icon', 'mdi:chevron-up');
+                // 移除旋转类以防止重复应用
+                miniGraphToggle.classList.remove('rotated');
+                toggleIcon.style.color = '#3730a3'; // 更深的紫色
+                toggleIcon.style.opacity = '1';     // 完全不透明
+            } else {
+                // 收起时，将图标更改为向下箭头
+                toggleIcon.setAttribute('icon', 'mdi:chevron-down');
+                // 移除旋转类以防止重复应用
+                miniGraphToggle.classList.remove('rotated');
+                toggleIcon.style.color = '#4f46e5'; // 恢复默认紫色
+                toggleIcon.style.opacity = '0.8';   // 恢复默认不透明度
+            }
+        });
+    }
+
     // 初始化按钮状态：确保询问AI按钮默认隐藏
     if (askAIButton) {
         askAIButton.style.display = 'none';
@@ -958,8 +969,6 @@ document.addEventListener('problemHintNeeded', (event) => {
 });
 
 // 在AI对话框中显示提示消息
-// 在AI对话框中显示提示消息（适配现有HTML结构）
-// 在AI对话框中显示提示消息（永远追加到底部）
 function showProblemHintInChat(message, editorType, editCount) {
     const chatMessages = document.getElementById('ai-chat-messages');
     if (!chatMessages) {
@@ -976,50 +985,13 @@ function showProblemHintInChat(message, editorType, editCount) {
       </div>
       <div class="ai-content">
         <div class="markdown-content">
-          <div class="problem-hint-container">
-            <div class="problem-hint-header">
-              <iconify-icon icon="mdi:lightbulb-on" width="16" height="16" style="color: #ff9800;"></iconify-icon>
-              <span>学习提示</span>
-            </div>
-            <div class="problem-hint-content">
-              ${message}
-            </div>
+            <p>${message}</p>
           </div>
         </div>
       </div>
     `;
 
-    // 添加提示消息样式（如果尚未添加）
-    if (!document.getElementById('hint-styles')) {
-        const styles = document.createElement('style');
-        styles.id = 'hint-styles';
-        styles.textContent = `
-        .problem-hint-container {
-          background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
-          border: 1px solid #ffd54f;
-          border-radius: 8px;
-          padding: 16px;
-          margin: 12px 0;
-          box-shadow: 0 2px 8px rgba(255, 179, 0, 0.15);
-        }
-        .problem-hint-header {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin-bottom: 12px;
-          font-weight: 600;
-          color: #ff6f00;
-          font-size: 15px;
-        }
-        .problem-hint-content {
-          color: #5d4037;
-          line-height: 1.5;
-          margin-bottom: 16px;
-          font-size: 14px;
-        }
-      `;
-        document.head.appendChild(styles);
-    }
+    
 
     // ✅ ceq关键：永远追加到末尾（保持时间顺序）
     chatMessages.appendChild(aiMessage);
@@ -1032,24 +1004,7 @@ function showProblemHintInChat(message, editorType, editCount) {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // 进入动画
-    aiMessage.style.opacity = '0';
-    aiMessage.style.transform = 'translateY(20px)';
-    aiMessage.style.transition = 'all 0.3s ease';
-    requestAnimationFrame(() => {
-        aiMessage.style.opacity = '1';
-        aiMessage.style.transform = 'translateY(0)';
-    });
-
-    // 记录提示事件
-    if (tracker && typeof tracker.logEvent === 'function') {
-        tracker.logEvent('problem_hint_displayed', {
-            editor: editorType,
-            edit_count: editCount,
-            message: message,
-            timestamp: new Date().toISOString()
-        });
-    }
+    // 创建并返回AI消息元素
     return aiMessage;
 }
 // ==================== 数据处理函数 ====================
@@ -1447,19 +1402,18 @@ function extendChatModuleForElementContext() {
             }
 
             // 使用封装的 apiClient 发送请求
-            const data = await window.apiClient.post('/chat/ai/chat', requestBody);
+            const data = await window.apiClient.post('/chat/ai/chat2', requestBody);
 
-            if (data.code === 200 && data.data && typeof data.data.ai_response === 'string') {
-                // 添加AI回复到UI
-                this.addMessageToUI('ai', data.data.ai_response);
-            } else {
-                throw new Error(data.message || 'AI回复内容为空或格式不正确');
-            }
+            // if (data.code === 200 && data.data && typeof data.data.ai_response === 'string') {
+            //     // 添加AI回复到UI
+            //     this.addMessageToUI('ai', data.data.ai_response);
+            // } else {
+            //     throw new Error(data.message || 'AI回复内容为空或格式不正确');
+            // }
         } catch (error) {
             console.error('[ChatModule] 发送消息时出错:', error);
             this.addMessageToUI('ai', `抱歉，我无法回答你的问题。错误信息: ${error.message}`);
-        } finally {
-            // 取消加载状态
+            // 请求失败（不会有 WebSocket 结果），需要解锁按钮
             this.setLoadingState(false);
         }
     };
