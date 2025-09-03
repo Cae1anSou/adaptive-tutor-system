@@ -51,84 +51,7 @@ class StudentProfile:
                 'last_analysis_timestamp': None # 上次分析时间
             } 
         }
-    # 添加处理代码行为事件的方法
-    def handle_code_behavior_event(self, participant_id: str, event_type: str, event_data: Dict):
-        """处理代码行为事件"""
-        try:
-            logger.info(f"[handle_code_behavior_event] 参与者ID: {participant_id}, 事件类型: {event_type}")
-            logger.info(f"[handle_code_behavior_event] 原始事件数据: {event_data}")
-            
-            profile, _ = self.get_or_create_profile(participant_id, None)
-            
-            if 'code_behavior_analysis' not in profile.behavior_patterns:
-                profile.behavior_patterns['code_behavior_analysis'] = {
-                    'significant_edits': [],
-                    'coding_problems': [],
-                    'session_summaries': [],
-                    'last_analysis_timestamp': None
-                }
-            
-            code_behavior = profile.behavior_patterns['code_behavior_analysis']
-            current_time = datetime.now(UTC)
-            
-            logger.info(f"[handle_code_behavior_event] 当前代码行为状态: {code_behavior}")
-            
-            if event_type == "significant_edits":
-                # 处理批量重要编辑
-                if 'edits' in event_data:
-                    logger.info(f"[handle_code_behavior_event] 处理 {len(event_data['edits'])} 个编辑")
-                    for i, edit in enumerate(event_data['edits']):
-                        # 过滤掉前端的submitted字段，只保存必要的数据
-                        filtered_edit = {k: v for k, v in edit.items() if k != 'submitted'}
-                        logger.info(f"[handle_code_behavior_event] 处理编辑 {i}: {filtered_edit}")
-                        code_behavior['significant_edits'].append({
-                            **filtered_edit,
-                            'received_at': current_time.isoformat()
-                        })
-                    # 保持最近100条记录
-                    if len(code_behavior['significant_edits']) > 100:
-                        code_behavior['significant_edits'] = code_behavior['significant_edits'][-100:]
-                    logger.info(f"[handle_code_behavior_event] 处理后, 重要编辑数量: {len(code_behavior['significant_edits'])}")
-            
-            elif event_type == "coding_problem":
-                # 处理编码问题
-                # 过滤掉前端的submitted字段，只保存必要的数据
-                filtered_data = {k: v for k, v in event_data.items() if k != 'submitted'}
-                logger.info(f"[handle_code_behavior_event] 处理编码问题: {filtered_data}")
-                code_behavior['coding_problems'].append({
-                    **filtered_data,
-                    'received_at': current_time.isoformat()
-                })
-                if len(code_behavior['coding_problems']) > 50:
-                    code_behavior['coding_problems'] = code_behavior['coding_problems'][-50:]
-                logger.info(f"[handle_code_behavior_event] 处理后, 编码问题数量: {len(code_behavior['coding_problems'])}")
-            
-            elif event_type == "coding_session_summary":
-                # 处理会话摘要
-                # 过滤掉前端的submitted字段，只保存必要的数据
-                filtered_data = {k: v for k, v in event_data.items() if k != 'submitted'}
-                logger.info(f"[handle_code_behavior_event] 处理会话摘要: {filtered_data}")
-                code_behavior['session_summaries'].append({
-                    **filtered_data,
-                    'received_at': current_time.isoformat()
-                })
-                if len(code_behavior['session_summaries']) > 20:
-                    code_behavior['session_summaries'] = code_behavior['session_summaries'][-20:]
-                logger.info(f"[handle_code_behavior_event] 处理后, 会话摘要数量: {len(code_behavior['session_summaries'])}")
-            
-            code_behavior['last_analysis_timestamp'] = current_time.isoformat()
-            
-            # 更新Redis
-            set_dict = {
-                'behavior_patterns.code_behavior_analysis': code_behavior
-            }
-            logger.info(f"[handle_code_behavior_event] 更新Redis: {set_dict}")
-            self.set_profile(profile, set_dict)
-            
-            logger.info(f"更新参与者 {participant_id} 的代码行为分析, 事件类型: {event_type}")
-            
-        except Exception as e:
-            logger.error(f"处理参与者 {participant_id} 的代码行为事件时出错: {e}")
+    
     # TODO: 需要检查实现to_dict和from_dict方法
     def to_dict(self) -> Dict[str, Any]:
         """将StudentProfile序列化为字典"""
@@ -292,6 +215,82 @@ class UserStateService:
             logger.info(f"UserStateService: 更新用户 {participant_id} 挫败程度为 {new_frustration:.3f}")
         except Exception as e:
             logger.error(f"UserStateService: 处理挫败事件时发生错误: {e}")
+
+    def handle_code_behavior_event(self, participant_id: str, event_type: str, event_data: Dict):
+        """处理代码行为事件（从 StudentProfile 迁移至 UserStateService）"""
+        try:
+            logger.info(f"[handle_code_behavior_event] 参与者ID: {participant_id}, 事件类型: {event_type}")
+            logger.info(f"[handle_code_behavior_event] 原始事件数据: {event_data}")
+
+            profile, _ = self.get_or_create_profile(participant_id, None)
+
+            if 'code_behavior_analysis' not in profile.behavior_patterns:
+                profile.behavior_patterns['code_behavior_analysis'] = {
+                    'significant_edits': [],
+                    'coding_problems': [],
+                    'session_summaries': [],
+                    'last_analysis_timestamp': None
+                }
+
+            code_behavior = profile.behavior_patterns['code_behavior_analysis']
+            current_time = datetime.now(UTC)
+
+            logger.info(f"[handle_code_behavior_event] 当前代码行为状态: {code_behavior}")
+
+            if event_type == "significant_edits":
+                # 处理批量重要编辑
+                if 'edits' in event_data:
+                    logger.info(f"[handle_code_behavior_event] 处理 {len(event_data['edits'])} 个编辑")
+                    for i, edit in enumerate(event_data['edits']):
+                        # 过滤掉前端的submitted字段，只保存必要的数据
+                        filtered_edit = {k: v for k, v in edit.items() if k != 'submitted'}
+                        logger.info(f"[handle_code_behavior_event] 处理编辑 {i}: {filtered_edit}")
+                        code_behavior['significant_edits'].append({
+                            **filtered_edit,
+                            'received_at': current_time.isoformat()
+                        })
+                # 保持最近100条记录
+                if len(code_behavior['significant_edits']) > 100:
+                    code_behavior['significant_edits'] = code_behavior['significant_edits'][-100:]
+                logger.info(f"[handle_code_behavior_event] 处理后, 重要编辑数量: {len(code_behavior['significant_edits'])}")
+
+            elif event_type == "coding_problem":
+                # 处理编码问题
+                filtered_data = {k: v for k, v in event_data.items() if k != 'submitted'}
+                logger.info(f"[handle_code_behavior_event] 处理编码问题: {filtered_data}")
+                code_behavior['coding_problems'].append({
+                    **filtered_data,
+                    'received_at': current_time.isoformat()
+                })
+                if len(code_behavior['coding_problems']) > 50:
+                    code_behavior['coding_problems'] = code_behavior['coding_problems'][-50:]
+                logger.info(f"[handle_code_behavior_event] 处理后, 编码问题数量: {len(code_behavior['coding_problems'])}")
+
+            elif event_type == "coding_session_summary":
+                # 处理会话摘要
+                filtered_data = {k: v for k, v in event_data.items() if k != 'submitted'}
+                logger.info(f"[handle_code_behavior_event] 处理会话摘要: {filtered_data}")
+                code_behavior['session_summaries'].append({
+                    **filtered_data,
+                    'received_at': current_time.isoformat()
+                })
+                if len(code_behavior['session_summaries']) > 20:
+                    code_behavior['session_summaries'] = code_behavior['session_summaries'][-20:]
+                logger.info(f"[handle_code_behavior_event] 处理后, 会话摘要数量: {len(code_behavior['session_summaries'])}")
+
+            code_behavior['last_analysis_timestamp'] = current_time.isoformat()
+
+            # 更新Redis
+            set_dict = {
+                'behavior_patterns.code_behavior_analysis': code_behavior
+            }
+            logger.info(f"[handle_code_behavior_event] 更新Redis: {set_dict}")
+            self.set_profile(profile, set_dict)
+
+            logger.info(f"更新参与者 {participant_id} 的代码行为分析, 事件类型: {event_type}")
+
+        except Exception as e:
+            logger.error(f"处理参与者 {participant_id} 的代码行为事件时出错: {e}")
 
     def handle_ai_help_request(self, participant_id: str, content_title: str = None):
         """

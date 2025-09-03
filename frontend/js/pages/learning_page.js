@@ -1415,8 +1415,7 @@ function extendChatModuleForElementContext() {
         } catch (error) {
             console.error('[ChatModule] 发送消息时出错:', error);
             this.addMessageToUI('ai', `抱歉，我无法回答你的问题。错误信息: ${error.message}`);
-        } finally {
-            // 取消加载状态
+            // 请求失败（不会有 WebSocket 结果），需要解锁按钮
             this.setLoadingState(false);
         }
     };
