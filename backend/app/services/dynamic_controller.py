@@ -9,7 +9,7 @@ from app.services.rag_service import RAGService
 from app.services.prompt_generator import PromptGenerator
 from app.services.llm_gateway import LLMGateway
 from app.services.content_loader import load_json_content  # 导入content_loader
-from app.services.progress_clustering_service import progress_clustering_service  # 导入聚类服务
+from app.services.progress_clustering_service import progress_clustering_service  # 在线进度分配服务单例
 from app.crud.crud_event import event as crud_event
 from app.crud.crud_chat_history import chat_history as crud_chat_history
 from app.schemas.chat import ChatHistoryCreate
@@ -17,6 +17,17 @@ from app.schemas.behavior import BehaviorEvent
 # 准备事件数据
 from app.schemas.behavior import EventType, AiHelpRequestData
 from datetime import datetime, UTC
+import logging
+from typing import Dict, Any, List
+
+# 使用绝对导入的服务单例，避免重复
+from app.services.user_state_service import user_state_service
+# 新增：导入可用的服务单例，便于模块级默认实例化
+from app.services.prompt_generator import prompt_generator
+from app.services.llm_gateway import llm_gateway
+from app.services.sentiment_analysis_service import sentiment_analysis_service
+
+logger = logging.getLogger(__name__)
 
 
 class DynamicController:
@@ -144,23 +155,24 @@ class DynamicController:
             clustering_result = None
             if request.conversation_history and len(request.conversation_history) >= 12:
                 try:
-                    # 将ConversationMessage转换为字典格式用于聚类分析
-                    conversation_history_dicts = []
+                    # 将ConversationMessage转换为字典格式用于聚类分析（仅学生消息）
+                    conversation_history_user_dicts = []
                     for msg in request.conversation_history:
-                        conversation_history_dicts.append({
-                            'role': msg.role,
-                            'content': msg.content
-                        })
+                        if getattr(msg, 'role', None) == 'user' and getattr(msg, 'content', None):
+                            conversation_history_user_dicts.append({
+                                'role': 'user',
+                                'content': msg.content
+                            })
                     
-                    # 执行聚类分析
+                    # 执行聚类分析（仅学生消息）
                     clustering_result = progress_clustering_service.analyze_conversation_progress(
-                        conversation_history_dicts, 
+                        conversation_history_user_dicts,
                         request.participant_id
                     )
                     
                     # 更新用户状态中的聚类信息
                     self.user_state_service.update_clustering_state(
-                        request.participant_id, 
+                        request.participant_id,
                         clustering_result
                     )
                     
@@ -230,7 +242,7 @@ class DynamicController:
         # StudentProfile 已经包含了所有需要的状态
         # 使用传入的sentiment_result来更新emotion_state
         emotion_state = profile.emotion_state if profile.emotion_state else {}
-
+        
         # 使用情感分析结果更新emotion_state
         emotion_state["current_sentiment"] = sentiment_result.label
         emotion_state["confidence"] = sentiment_result.confidence
@@ -408,23 +420,24 @@ class DynamicController:
             clustering_result = None
             if request.conversation_history and len(request.conversation_history) >= 12:
                 try:
-                    # 将ConversationMessage转换为字典格式用于聚类分析
-                    conversation_history_dicts = []
+                    # 将ConversationMessage转换为字典格式用于聚类分析（仅学生消息）
+                    conversation_history_user_dicts = []
                     for msg in request.conversation_history:
-                        conversation_history_dicts.append({
-                            'role': msg.role,
-                            'content': msg.content
-                        })
+                        if getattr(msg, 'role', None) == 'user' and getattr(msg, 'content', None):
+                            conversation_history_user_dicts.append({
+                                'role': 'user',
+                                'content': msg.content
+                            })
                     
-                    # 执行聚类分析
+                    # 执行聚类分析（仅学生消息）
                     clustering_result = progress_clustering_service.analyze_conversation_progress(
-                        conversation_history_dicts, 
+                        conversation_history_user_dicts,
                         request.participant_id
                     )
                     
                     # 更新用户状态中的聚类信息
                     self.user_state_service.update_clustering_state(
-                        request.participant_id, 
+                        request.participant_id,
                         clustering_result
                     )
                     
@@ -479,3 +492,59 @@ class DynamicController:
             return ChatResponse(
                 ai_response="I'm sorry, but a critical error occurred on our end. Please notify the research staff."
             )
+
+    # 单例实例将在类定义末尾创建
+
+    def process_message_stream(self, conversation_history: List[Dict[str, str]], participant_id: str) -> Dict[str, Any]:
+        # 1) 在线进度分配（不重聚类）
+        progress_result = progress_clustering_service.analyze_conversation_progress(conversation_history, participant_id)
+        state_label, confidence = progress_clustering_service.get_current_progress_state(participant_id)
+
+        # 2) 更新用户状态（改为使用完整聚类结果）
+        user_state_service.update_clustering_state(participant_id, progress_result)
+
+        # 3) 生成策略建议（示例：根据状态微调提示词）
+        prompt_strategy = self._build_prompt_strategy(state_label, confidence)
+
+        result = {
+            "participant_id": participant_id,
+            "progress_analysis": progress_result,
+            "current_state": state_label,
+            "confidence": confidence,
+            "prompt_strategy": prompt_strategy,
+        }
+        return result
+
+    def _build_prompt_strategy(self, state_label: str, confidence: float) -> Dict[str, Any]:
+        # 根据状态动态调整回复风格
+        if state_label == "低进度":
+            return {
+                "tone": "supportive",
+                "hints": "更小步引导，提供示例与反例，明确下一步",
+                "code_suggestion_level": "high",
+                "ask_checkpoints": True,
+            }
+        elif state_label == "超进度":
+            return {
+                "tone": "challenge",
+                "hints": "提供拓展思考与优化建议，鼓励自我验证",
+                "code_suggestion_level": "low",
+                "ask_checkpoints": False,
+            }
+        else:  # 正常
+            return {
+                "tone": "neutral",
+                "hints": "按任务节奏推进，遇到障碍再加提示",
+                "code_suggestion_level": "medium",
+                "ask_checkpoints": True,
+            }
+
+
+# 单例（避免在导入时加载重资源，RAG默认None，情感分析使用可用单例）
+dynamic_controller = DynamicController(
+    user_state_service=user_state_service,
+    sentiment_service=sentiment_analysis_service,
+    rag_service=None,
+    prompt_generator=prompt_generator,
+    llm_gateway=llm_gateway,
+)

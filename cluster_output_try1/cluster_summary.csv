@@ -1,0 +1,6 @@
+,progress_score,progress_score,done_hits,done_hits,code_change,code_change,repeat_sim,repeat_sim,inrep_ng4,inrep_ng4,stagnation_rate,count
+,mean,median,mean,median,mean,median,mean,median,mean,median,mean,n
+cluster,,,,,,,,,,,,
+0,-0.2702,-0.2782,0.1222,0.0,0.267,0.2362,0.4253,0.3927,0.0176,0.0,0.7888888888888889,90
+1,0.0453,-0.004,0.2152,0.0,0.6697,0.6806,0.2243,0.2309,0.0234,0.0,0.15454545454545454,110
+2,-0.1541,-0.1451,0.4842,0.3333,0.372,0.3116,0.3574,0.344,0.0415,0.0,0.631578947368421,95

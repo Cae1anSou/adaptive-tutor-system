@@ -1,0 +1,6 @@
+[Check mapping] PASS ✅ expected={'低进度': 0, '正常': 2, '超进度': 1} auto={'低进度': 0, '正常': 2, '超进度': 1}
+[dup-rank] dup_max_inwin: [2, 1, 0]
+[dup-rank] code_repeat_excess: [2, 1, 0]
+[dup-rank] inrep_ng4_all: [2, 1, 0]
+[dup-rank] inrep_ng4: [2, 1, 0]
+[dup-rank] repeat_sim: [0, 2, 1]

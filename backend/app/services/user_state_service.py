@@ -40,10 +40,10 @@ class StudentProfile:
             'persistence_score': 0.5,      # [0,1] 坚持度
             'learning_velocity': 0.5,      # [0,1] 学习速度
             'attention_stability': 0.5,    # [0,1] 注意力稳定性
-<<<<<<< HEAD
              'submission_timestamps': [],   # 保留时间戳用于计算频率
             'recent_events': [],           # 保留最近事件用于滑动窗口计算
             'knowledge_level_history': {}, # { 'topic_id': { 'level': {'visits': 0, 'total_duration_ms': 0} } }
+            'clustering_state': {},   # 聚类分析状态
 
             # 代码问题记录 - 增强数据结构
             'coding_problems': [],         # 存储代码问题记录
@@ -145,12 +145,7 @@ class StudentProfile:
                 'idle_duration': 0,           # 空闲时长（秒）
                 'last_activity_time': None    # 最后活动时间
             }
-=======
-            'submission_timestamps': [],    # 保留时间戳用于计算频率
-            'recent_events': [],             # 保留最近事件用于滑动窗口计算
-            'knowledge_level_history': {},  # { 'level_id': {'visits': 0, 'total_duration_ms': 0} }
-            'clustering_state': {}          # 聚类分析状态
->>>>>>> 302dc2a (添加了聚类)
+          
         }
     
     # user_state_service.py - 添加批量处理方法
@@ -1213,7 +1208,7 @@ class UserStateService:
                 'progress_score': clustering_result.get('progress_score', [])[-1] if clustering_result.get('progress_score') else 0.0,
                 'window_count': clustering_result.get('window_count', 0),
                 'message_count': clustering_result.get('message_count', 0),
-                'confidence': min(1.0, abs(clustering_result.get('progress_score', [0])[-1]) / 2.0) if clustering_result.get('progress_score') else 0.0
+                'confidence': (clustering_result.get('confidence', [])[-1] if clustering_result.get('confidence') else (min(1.0, abs(clustering_result.get('progress_score', [0])[-1]) / 2.0) if clustering_result.get('progress_score') else 0.0))
             }
             
             # 计算趋势

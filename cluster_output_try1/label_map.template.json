@@ -1,0 +1,22 @@
+{
+  "by_mean_progress_sorted": [
+    {
+      "cluster_id": 0,
+      "mean_progress": -0.2702246690795329
+    },
+    {
+      "cluster_id": 2,
+      "mean_progress": -0.15405837269738415
+    },
+    {
+      "cluster_id": 1,
+      "mean_progress": 0.04532242923471778
+    }
+  ],
+  "template_mapping": {
+    "0": "低进度",
+    "2": "正常",
+    "1": "超进度"
+  },
+  "note": "请人工确认每个簇的标签，并另存为 label_map.json 后重跑本脚本加 --label_map 使用。"
+}

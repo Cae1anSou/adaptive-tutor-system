@@ -579,6 +579,10 @@ LEARNING FOCUS: Please pay close attention to the student's behavior patterns to
             
             # 生成教学建议
             recommendations = self._get_progress_recommendations(current_state, score_trend if 'score_trend' in locals() else 0)
+
+            # 使用聚类结果中的置信度（如可用），否则回退到由分数估计的置信度
+            confidence_list = clustering_result.get("confidence", [])
+            confidence_display = (confidence_list[-1] if confidence_list else min(1.0, abs(current_score) / 2.0))
             
             progress_info = f"""
 PROGRESS ANALYSIS: Based on conversation pattern analysis, the student's current learning progress state is "{current_state}".
@@ -591,7 +595,7 @@ TEACHING RECOMMENDATIONS:
 ANALYSIS DETAILS:
 - Progress Score: {current_score:.3f}
 - Windows Analyzed: {window_count}
-- Confidence: {min(1.0, abs(current_score) / 2.0):.2f}
+- Confidence: {confidence_display:.2f}
 
 Please adjust your teaching approach based on this progress analysis. If the student is in "低进度" (low progress), provide more detailed explanations and encouragement. If they are in "超进度" (high progress), offer more challenging content and advanced concepts.
 """

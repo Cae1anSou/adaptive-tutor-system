@@ -1,0 +1,15 @@
+{
+  "semantic_mode_used": "st",
+  "embed_model": "sentence-transformers/all-mpnet-base-v2",
+  "silhouette_overall": 0.18742221821839877,
+  "silhouette_per_cluster": {
+    "0": 0.18954694974217395,
+    "1": 0.21372923990662385,
+    "2": 0.15494855271477218
+  },
+  "cluster_mean_progress": {
+    "0": -0.2702246690795329,
+    "1": 0.04532242923471778,
+    "2": -0.15405837269738415
+  }
+}
