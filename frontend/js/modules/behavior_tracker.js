@@ -54,7 +54,8 @@ class BehaviorTracker {
 
     // —— Idle 追踪 & 提示 ——
     // 最近一次活动时间、一次空闲会话开始时间
-    this.idleThreshold = 4000; // 进入空闲判定阈值（ms）
+    // 调整为空闲 60s 才进入“空闲”判定，避免过早打扰
+    this.idleThreshold = 60000; // 进入空闲判定阈值（ms）
     this._lastActivityTs = Date.now();
     this._idleStartTs = null;
 
@@ -66,8 +67,13 @@ class BehaviorTracker {
     this._idleStartTs = null;          // 本次空闲起点（= 上一次活动时间）
     this._idleMsgIdx = 0;              // 空闲提示轮换索引
     this.idleHintConfig = {
-      hintAfterMs: 3000,  // 空闲多久后提示（默认 3s）
-      cooldownMs: 18000,  // 提示冷却（默认 3 分钟）TODO：暂时没有用，一次空闲只提醒一次，每次重新空闲都会再提醒。
+      // 使用新语义：从“进入空闲”起再等待多久提示（默认 15s）
+      // 因 idleThreshold=60s，所以首次提示 ≈ 60s + 15s = 75s
+      delayAfterIdleMs: 15000,
+      // 兼容旧语义（总时长），不再作为默认通道
+      hintAfterMs: 75000,
+      // 全局冷却，避免频繁打扰（默认 10 分钟）
+      cooldownMs: 600000,
       lastHintTs: 0,
       messages: [
         '已经有一会儿没有操作了，需要我给点思路吗？请告诉我你的疑惑',
@@ -831,10 +837,13 @@ class BehaviorTracker {
         if (this._idleStartTs == null) {
           this._idleStartTs = this._lastActivityTs;
         }
-        // 重新启动提示计时器
+        // 重新启动提示计时器（与 initIdleAndFocus 的延迟规则一致）
+        const delayAfterIdle = (typeof this.idleHintConfig?.delayAfterIdleMs === 'number')
+          ? Math.max(0, this.idleHintConfig.delayAfterIdleMs)
+          : Math.max(0, (typeof this.idleHintConfig?.hintAfterMs === 'number' ? this.idleHintConfig.hintAfterMs : this.idleThreshold) - this.idleThreshold);
         this._idleHintTimer = setTimeout(() => {
           if (this._idleStartTs != null) this._maybeShowIdleHint();
-        }, 3000); // 3秒后再次检查
+        }, delayAfterIdle);
       }, this.idleThreshold);
     };
     
