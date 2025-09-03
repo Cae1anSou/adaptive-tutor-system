@@ -15,6 +15,7 @@ class ChatHistory(Base):
         role: 'user' 或 'ai'
         message: 消息的文本内容
         raw_prompt_to_llm: (仅对AI消息) 记录当时为了生成这条AI回答，我们实际发送给LLM的完整Prompt
+        raw_context_to_llm: (仅对AI消息) 记录发送给LLM的上下文消息快照（RAG、内容JSON、行为摘要、测试结果等）
     """
     __tablename__ = "chat_history"
 
@@ -24,3 +25,4 @@ class ChatHistory(Base):
     role = Column(String, nullable=False)  # 'user' or 'ai'
     message = Column(Text, nullable=False)
     raw_prompt_to_llm = Column(Text, nullable=True)
+    raw_context_to_llm = Column(Text, nullable=True)
