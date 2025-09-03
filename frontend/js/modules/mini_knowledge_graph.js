@@ -435,6 +435,7 @@ export class MiniKnowledgeGraph {
       node.style({
         'background-color': node.data('type') === 'chapter' ? '#3730a3' : '#c7d2fe',
         'color': node.data('type') === 'chapter' ? '#ffffff' : '#1e293b',
+        'font-size': node.data('type') === 'chapter' ? '30px' : '20px',
         'border-color': '#4f46e5',
         'width': originalSize.width * scaleFactor,
         'height': originalSize.height * scaleFactor
@@ -451,6 +452,7 @@ export class MiniKnowledgeGraph {
       const node = evt.target;
       node.style({
         'color': '#1e293b',
+        'font-size': node.data('type') === 'chapter' ? '28px' : '14px',
       });
       this.restoreNodeStyle(node);
       
