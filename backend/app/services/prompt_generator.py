@@ -149,6 +149,62 @@ Please provide a comprehensive, engaging learning experience that helps the stud
         emotion_strategy = PromptGenerator._get_emotion_strategy(emotion)
         prompt_parts.append(f"STRATEGY: {emotion_strategy}")
 
+        # 添加代码行为分析信息
+        if hasattr(user_state, 'behavior_patterns') and user_state.behavior_patterns:
+            behavior_patterns = user_state.behavior_patterns
+            
+            # 检查是否有代码行为分析数据
+            if 'code_behavior_analysis' in behavior_patterns:
+                code_analysis = behavior_patterns['code_behavior_analysis']
+                
+                analysis_parts = []
+                
+                # 添加重要编辑信息
+                if 'significant_edits' in code_analysis and code_analysis['significant_edits']:
+                    total_edits = len(code_analysis['significant_edits'])
+                    recent_edits = code_analysis['significant_edits'][-10:]  # 最近10条编辑
+                    
+                    edit_summary = f"Student has made {total_edits} significant code edits recently. "
+                    
+                    # 分析编辑模式
+                    editor_counts = {}
+                    for edit in recent_edits:
+                        editor = edit.get('editor', 'unknown')
+                        editor_counts[editor] = editor_counts.get(editor, 0) + 1
+                    
+                    if editor_counts:
+                        edit_summary += f"Recent focus: {', '.join([f'{k}({v})' for k, v in editor_counts.items()])}. "
+                    
+                    analysis_parts.append(edit_summary)
+                
+                # 添加编码问题信息
+                if 'coding_problems' in code_analysis and code_analysis['coding_problems']:
+                    recent_problems = code_analysis['coding_problems'][-5:]  # 最近5个问题
+                    if recent_problems:
+                        problem_summary = "Recent coding difficulties: "
+                        problem_details = []
+                        
+                        for problem in recent_problems:
+                            editor = problem.get('editor', 'unknown')
+                            severity = problem.get('severity', 'unknown')
+                            edits = problem.get('consecutive_edits', 0)
+                            problem_details.append(f"{editor}({severity}, {edits} edits)")
+                        
+                        problem_summary += "; ".join(problem_details)
+                        analysis_parts.append(problem_summary)
+                
+                # 添加会话摘要信息
+                if 'session_summaries' in code_analysis and code_analysis['session_summaries']:
+                    latest_summary = code_analysis['session_summaries'][-1] if code_analysis['session_summaries'] else None
+                    if latest_summary:
+                        session_info = f"Last coding session: {latest_summary.get('total_edits', 0)} edits, " \
+                                    f"{latest_summary.get('problem_events', 0)} problems, " \
+                                    f"{latest_summary.get('session_duration', 0)}s duration"
+                        analysis_parts.append(session_info)
+                
+                if analysis_parts:
+                    prompt_parts.append(f"CODE BEHAVIOR ANALYSIS: {' '.join(analysis_parts)}")
+        
         # 添加用户状态信息
         if user_state.is_new_user:
             prompt_parts.append("STUDENT INFO: This is a new student. Start with basic concepts and be extra patient.")

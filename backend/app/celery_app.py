@@ -137,6 +137,7 @@ celery_app.conf.update(
         'app.tasks.db_tasks.log_ai_event_task': {'queue': 'db_writer_queue'},
         'app.tasks.db_tasks.save_chat_message_task': {'queue': 'db_writer_queue'},
         'app.tasks.wakeup_embedding_task.wakeup_embedding_model': {'queue': 'db_writer_queue'},
+        'app.tasks.db_tasks.save_progress_task': {'queue': 'db_writer_queue'},
     },
     task_default_queue='default',
     
