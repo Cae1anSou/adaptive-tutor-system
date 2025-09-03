@@ -15,7 +15,8 @@ from app.schemas.chat import ChatHistoryCreate
 from app.schemas.behavior import BehaviorEvent
 # 准备事件数据
 from app.schemas.behavior import EventType, AiHelpRequestData
-from datetime import datetime, UTC
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 
 class DynamicController:
@@ -86,8 +87,7 @@ class DynamicController:
                     details={}
                 )
 
-            # 构建用户状态摘要（同时更新用户情感状态）
-            user_state_summary = self._build_user_state_summary(profile, sentiment_result)
+            # 暂不构建用户状态摘要，等待内容加载后递增提问计数
 
             # 步骤3: RAG检索
             retrieved_knowledge = []
@@ -122,6 +122,18 @@ class DynamicController:
                     content_title = None
             else:
                 loaded_content = None
+
+            # 在生成提示词前：递增求助/提问计数，使当前轮次即可反映最新次数
+            try:
+                self.user_state_service.handle_ai_help_request(request.participant_id, content_title)
+                # 重新获取最新profile（从Redis），以反映递增后的行为计数
+                profile, _ = self.user_state_service.get_or_create_profile(request.participant_id, db)
+            except Exception as _:
+                # 计数递增失败不影响主流程
+                pass
+
+            # 现在构建用户状态摘要（包含最新行为计数与情感）
+            user_state_summary = self._build_user_state_summary(profile, sentiment_result)
 
             # 步骤5: 生成提示词
             # 将ConversationMessage转换为字典格式
@@ -224,19 +236,16 @@ class DynamicController:
         根据TDD-I规范，异步记录AI交互。
         1. 在 event_logs 中记录一个 "ai_chat" 事件。
         2. 在 chat_history 中记录用户和AI的完整消息。
-        3. 更新用户状态中的提问计数器。
+        3. 更新用户状态中的提问计数器（已在生成提示词前完成，不在此重复）。
         """
         try:
-            # 更新用户状态
-            self.user_state_service.handle_ai_help_request(request.participant_id, content_title)
-
             # 准备事件数据
             event = BehaviorEvent(
                 participant_id=request.participant_id,
                 event_type=EventType.AI_HELP_REQUEST,
                 event_data=AiHelpRequestData(message=request.user_message).model_dump(),
-                # TODO：这里的时区需要改成上海
-                timestamp=datetime.now(UTC)
+                # 统一使用上海时区
+                timestamp=datetime.now(ZoneInfo("Asia/Shanghai"))
             )
 
             # 准备用户聊天记录
@@ -323,8 +332,7 @@ class DynamicController:
                     confidence=0.0,
                     details={}
                 )
-            # 构建用户状态摘要（同时更新用户情感状态）
-            user_state_summary = self._build_user_state_summary(profile, sentiment_result)
+            # 暂不构建用户状态摘要，等待内容加载后递增提问计数
             # 步骤3: RAG检索
             retrieved_knowledge = []
             if self.rag_service:
@@ -356,6 +364,17 @@ class DynamicController:
                     content_title = None
             else:
                 loaded_content = None
+            # 在生成提示词前：递增求助/提问计数，使当前轮次即可反映最新次数
+            try:
+                self.user_state_service.handle_ai_help_request(request.participant_id, content_title)
+                # 重新获取最新profile（从Redis），以反映递增后的行为计数
+                profile, _ = self.user_state_service.get_or_create_profile(request.participant_id, db)
+            except Exception as _:
+                pass
+
+            # 现在构建用户状态摘要（包含最新行为计数与情感）
+            user_state_summary = self._build_user_state_summary(profile, sentiment_result)
+
             # 步骤5: 生成提示词
             # 将ConversationMessage转换为字典格式
             conversation_history_dicts = []
