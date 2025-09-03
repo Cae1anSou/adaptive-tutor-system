@@ -26,3 +26,7 @@ class ChatHistory(Base):
     message = Column(Text, nullable=False)
     raw_prompt_to_llm = Column(Text, nullable=True)
     raw_context_to_llm = Column(Text, nullable=True)
+    # token usage (only for assistant rows)
+    prompt_tokens = Column(Integer, nullable=True)
+    completion_tokens = Column(Integer, nullable=True)
+    total_tokens = Column(Integer, nullable=True)
