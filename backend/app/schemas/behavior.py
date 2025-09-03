@@ -1,5 +1,9 @@
 from pydantic import BaseModel, Field
+<<<<<<< HEAD
 from typing import Dict, Any,Literal, Optional, Union, Literal,List
+=======
+from typing import Dict, Any,Literal, Optional, Union
+>>>>>>> upstream/main
 from datetime import datetime
 from enum import Enum
 
@@ -24,7 +28,13 @@ class EventType(str, Enum):
     # CODING_PROBLEM = "coding_problem"
     CODING_SESSION_SUMMARY = "coding_session_summary"
     IDLE_HINT_DISPLAYED = "idle_hint_displayed"
+<<<<<<< HEAD
     # PAGE_FOCUS_CHANGE = "page_focus_change"
+=======
+    PAGE_FOCUS_CHANGE = "page_focus_change"
+    TEST_FAILED = "test_failed"
+    SUBMISSION_ERROR = "submission_error"
+>>>>>>> upstream/main
 
 class ProblemHintDisplayedData(BaseModel):
     """问题提示显示事件数据"""
@@ -33,6 +43,7 @@ class ProblemHintDisplayedData(BaseModel):
     message: str = Field(..., description="提示消息内容")
     timestamp: Optional[datetime] = Field(None, description="提示时间")
 
+<<<<<<< HEAD
 class SignificantEditsBatchData(BaseModel):
     """重要编辑批量事件数据"""
     batch_id: str = Field(..., description="批次ID")
@@ -73,6 +84,35 @@ class SignificantEditData(BaseModel):
     deleted_chars: Optional[int] = Field(None, description="删除的字符数")
     added_chars: Optional[int] = Field(None, description="新增的字符数")
     total_modified: Optional[int] = Field(None, description="总共修改的字符数")
+=======
+class CodeEditCycleData(BaseModel):
+    """代码编辑周期数据"""
+    editor: str = Field(..., description="编辑器类型")
+    edit_type: str = Field(..., description="编辑类型")
+    deleted_chars: int = Field(0, description="删除的字符数")
+    added_chars: int = Field(0, description="新增的字符数")
+    total_modified: int = Field(0, description="总共修改的字符数")
+    duration_ms: int = Field(0, description="编辑持续时间（毫秒）")
+    consecutive_edits: int = Field(0, description="连续编辑次数")
+    timestamp: datetime = Field(..., description="时间戳")
+    submitted: Optional[bool] = Field(False, description="是否已提交到后端")
+
+class CodingProblemData(BaseModel):
+    """编码问题数据"""
+    editor: str = Field(..., description="编辑器类型")
+    consecutive_edits: int = Field(..., description="连续编辑次数")
+    severity: str = Field(..., description="问题严重程度")
+    timestamp: datetime = Field(..., description="时间戳")
+
+class CodingSessionSummaryData(BaseModel):
+    """编码会话摘要数据"""
+    total_edits: int = Field(0, description="总编辑次数")
+    problem_events: int = Field(0, description="问题事件次数")
+    session_duration: int = Field(0, description="会话持续时间（秒）")
+    avg_edit_size: float = Field(0.0, description="平均编辑规模")
+    edits_by_editor: Dict[str, int] = Field(default_factory=dict, description="按编辑器分类的编辑数")
+    edits_by_type: Dict[str, int] = Field(default_factory=dict, description="按类型分类的编辑数")
+>>>>>>> upstream/main
 
 class CodeEditData(BaseModel):
     """代码编辑事件数据
@@ -157,12 +197,19 @@ EventDataType = Union[
     UserIdleData,
     KnowledgeLevelAccessData,
     StateSnapshotData,
+<<<<<<< HEAD
     CodeProblemData,          # 新增
     SignificantEditData,      # 新增
     ProblemHintDisplayedData,      # 新增
     SignificantEditsBatchData,     # 新增  
     IdleHintDisplayedData,         # 新增
     Dict[str, Any]            # 兼容其他类型
+=======
+    Dict[str, Any],  # 用于 page_click 等复杂事件
+    CodeEditCycleData,
+    CodingProblemData,
+    CodingSessionSummaryData
+>>>>>>> upstream/main
     # todo:
 
 ]

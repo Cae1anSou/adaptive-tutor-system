@@ -2,25 +2,25 @@
     "topic_id": "6_3",
     "title": "修改页面元素（DOM 操作）",
     "levels": [
-        {
-            "level": 1,
-            "description": "DOM操作是JavaScript动态修改网页内容的核心技术。基础概念包括：DOM（文档对象模型）将HTML文档表示为树状结构；节点（Node）是所有DOM元素的基础类型；元素节点（如div/input）是常见操作对象。核心要点是通过JS选择元素后修改其属性、内容或样式。"
-        },
-        {
-            "level": 2,
-            "description": "常用语法：1) 选择元素：document.getElementById()/querySelector()；2) 获取表单值：input.value/checkbox.checked；3) 阻止默认事件：event.preventDefault()；4) 修改内容：element.textContent/innerHTML。基本用法分三步：获取元素引用→处理数据→更新DOM。"
-        },
-        {
-            "level": 3,
-            "description": "应用场景：用户交互反馈、动态内容加载等。示例：实现颜色选择器。HTML结构：<div id='colorBox'></div><input type='color' id='colorPicker'>。JS代码：\nconst picker = document.getElementById('colorPicker');\npicker.addEventListener('change', (e) => {\n  document.getElementById('colorBox').style.backgroundColor = e.target.value;\n});\n用户选择颜色后实时更新方块背景色。"
-        },
-        {
-            "level": 4,
-            "description": "原理：DOM操作触发浏览器重绘（Repaint）和重排（Reflow），频繁操作影响性能。注意事项：1) 批量修改时先用document.createDocumentFragment()暂存；2) 避免在循环中直接操作DOM；3) 单选框/复选框需遍历name属性获取选中值；4) innerHTML有XSS风险，优先用textContent。"
-        }
-    ],
+            {
+                "level": 1,
+                "description": "在网页开发中，HTML 负责构建页面的结构，CSS 控制外观样式，而 JavaScript 则让页面具备交互能力。其中，最关键的技术之一就是 DOM 操作。DOM 全称是文档对象模型（Document Object Model），它是浏览器将 HTML 文档解析后生成的一个树状结构，每个 HTML 标签都对应一个 DOM 节点。通过 JavaScript，我们可以访问、修改、添加或删除这些节点，从而动态改变页面内容。例如，当我们点击一个按钮时，页面上显示的文字发生变化，这就是 DOM 操作的体现。最基本的操作是获取元素，常用的方法是 document.getElementById()，它可以根据元素的 id 属性找到对应的 DOM 节点。获取元素后，我们可以修改它的内容，比如使用 innerHTML 属性来插入新的 HTML 内容，或使用 textContent 属性只更新纯文本。这些操作不会刷新整个页面，却能让用户看到实时反馈，是实现动态网页的基础。初学者应先理解 DOM 是什么，以及如何通过 JavaScript 选中并修改一个简单的文本元素，这是迈向交互式网页的第一步。"
+            },
+            {
+                "level": 2,
+                "description": "在实际开发中，DOM 操作常常与用户行为结合，比如表单提交、按钮点击、输入框输入等。为了响应这些行为，JavaScript 提供了事件机制，其中最常用的是 addEventListener 方法。它可以为某个 DOM 元素绑定一个事件处理函数，当特定事件发生时（如点击、提交、输入），函数就会执行。例如，给一个按钮绑定 click 事件，点击时就可以修改页面上某个 div 的内容。此外，表单元素如复选框（checkbox）和单选框（radio）的值获取也是常见需求。我们可以通过元素的 checked 属性判断是否被选中，并结合 value 属性获取其值。在处理表单时，通常会使用 preventDefault() 方法来阻止表单的默认提交行为，这样页面就不会刷新，我们可以用 JavaScript 在当前页面处理数据并更新结果。这种模式在现代网页中非常普遍，比如登录验证、问卷调查等场景。掌握如何监听事件、获取用户输入、阻止默认行为并更新页面内容，是构建交互功能的核心技能。"
+            },
+            {
+                "level": 3,
+                "description": "深入理解 DOM 操作的机制有助于编写更高效、更稳定的代码。浏览器在解析 HTML 后会构建 DOM 树和 CSSOM 树，两者结合形成渲染树，决定页面如何显示。每次 DOM 修改都可能触发重排（reflow）或重绘（repaint），影响页面性能。因此，频繁操作 DOM 应尽量避免，尤其是循环中不断修改 innerHTML。更好的做法是先在内存中构建完整的结构，再一次性插入页面。此外，事件监听器的管理也很重要，过多的监听器会占用内存，应适时移除。现代开发中，事件委托是一种优化技术：将事件绑定到父元素，利用事件冒泡机制统一处理子元素的事件，减少监听器数量。同时，DOM 查询方法除了 getElementById，还有 querySelector 和 querySelectorAll，它们支持 CSS 选择器语法，更灵活强大。理解这些底层机制和优化策略，能帮助开发者写出更专业、性能更优的代码，避免常见陷阱，提升用户体验。"
+            },
+            {
+                "level": 4,
+                "description": "现在我们来完成一个综合练习：创建一个电影偏好调查表单，用户可以选择喜欢的类型并选择观影方式，提交后在页面上显示结果。示例代码如下：HTML 中包含一个表单，有复选框用于选择电影类型（如动作片、喜剧片），单选框选择观影方式（影院或在家），提交按钮和一个用于显示结果的 div。JavaScript 中，先获取表单元素，绑定 submit 事件，使用 preventDefault() 阻止页面刷新。然后遍历所有选中的复选框，收集其 value 值，用逗号连接；再查找被选中的单选框，获取其值。最后将结果以指定格式写入 id 为 result 的 div 中，例如：'电影偏好：动作片, 喜剧片；观影方式：在家'。这个练习涵盖了事件监听、阻止默认行为、获取表单值、DOM 查询与内容更新等核心技能。通过此类实战，可以巩固 DOM 操作的完整流程，为后续学习更复杂的前端框架打下坚实基础。"
+            }
+        ],
     "sc_all": [
-        {"topic_id": "1_1", "select_element": ["h1", "h2", "h3", "h4", "h5", "h6", "p"]},
+        {"topic_id": "1_1", "select_element": ["h1", "h2", "h3", "h4", "h5", "h6", "p","span"]},
         {"topic_id": "1_2", "select_element": []},
         {"topic_id": "1_3", "select_element": ["<!DOCTYPE>", "html", "head", "body","meta", "title","footer"]},
         {"topic_id": "2_1", "select_element": ["div"]},

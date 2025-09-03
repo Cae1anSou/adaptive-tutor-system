@@ -2,25 +2,25 @@
     "topic_id": "4_3",
     "title": "使用 Flex 进行布局",
     "levels": [
-        {
-            "level": 1,
-            "description": "Flexbox 是 CSS3 的现代布局模型，用于创建弹性容器，使子元素能自动调整大小和位置。核心概念包括主轴（main axis）和交叉轴（cross axis），通过设置容器属性控制子元素排列方式，特别适合响应式布局和复杂对齐需求。"
-        },
-        {
-            "level": 2,
-            "description": "关键属性：容器设置 `display: flex` 启用布局；`justify-content` 控制主轴对齐（如 space-between 两端对齐）；`align-items` 管理交叉轴对齐；`flex-wrap` 允许换行；`gap` 设置子元素间距。子元素可用 `flex` 属性定义伸缩比例。"
-        },
-        {
-            "level": 3,
-            "description": "应用场景：导航栏布局。示例：HTML 创建导航容器 `<nav><a>首页</a><a>产品</a><a>联系</a></nav>`，CSS 设置 `nav { display: flex; justify-content: space-around; gap: 20px; }` 实现等间距导航。卡片布局使用 `flex-wrap: wrap` 和 `justify-content: center` 实现自动换行居中对齐。"
-        },
-        {
-            "level": 4,
-            "description": "原理：Flex 布局不依赖浮动或定位，通过计算容器剩余空间动态分配子元素尺寸。注意事项：旧浏览器需前缀（如 `-webkit-flex`）；避免过度嵌套导致性能问题；`gap` 属性不兼容 IE。使用 `min-width` 防止内容挤压，移动端优先考虑弹性单位（rem/em）。"
-        }
-    ],
+            {
+                "level": 1,
+                "description": "Flexbox 是 CSS 中一种强大的布局模型，专门用于在页面上对元素进行排列和对齐。它特别适合处理一维布局，也就是沿着水平或垂直方向排列元素。在传统的布局方式中，我们经常使用浮动或定位来实现对齐效果，但这些方法复杂且容易出错。而 Flexbox 提供了一种更直观、更灵活的解决方案。要使用 Flexbox，首先需要将一个容器元素设置为 flex 容器，方法是给该元素添加 CSS 属性 display: flex。一旦设置了这个属性，它的所有直接子元素就自动成为 flex 项目，可以被统一管理排列方式。例如，你可以轻松地让多个按钮在容器中均匀分布，或者让一个标题和一个菜单分别靠左和靠右对齐。Flexbox 的核心概念包括主轴和交叉轴：主轴是元素排列的方向，默认是水平方向，而交叉轴则是垂直于主轴的方向。通过调整 justify-content 可以控制元素在主轴上的对齐方式，比如居中、靠左、靠右或均匀分布；通过 align-items 可以控制元素在交叉轴上的对齐方式，比如顶部对齐、居中或底部对齐。这些属性让布局变得更加可控和响应式，尤其适合现代网页设计中常见的卡片、导航栏和表单布局。"
+            },
+            {
+                "level": 2,
+                "description": "在实际开发中，Flexbox 被广泛应用于各种常见的页面结构设计。例如，网站的头部导航栏通常包含一个品牌标志和一组导航链接，我们希望标志在左侧，链接在右侧，这时就可以使用 display: flex 和 justify-content: space-between 来实现。又比如，在移动端页面中，我们希望一组图标按钮水平居中显示，并且当屏幕变窄时自动换行，这时可以结合 flex-wrap: wrap 和 justify-content: center 来完成。此外，Flexbox 还能很好地处理不同尺寸元素的对齐问题。例如，当一组卡片高度不一致时，使用 align-items: center 可以让它们在垂直方向上居中对齐，避免出现参差不齐的视觉效果。另一个常见场景是表单布局，我们可以将标签和输入框放在同一行，并通过 flex 分配空间，使输入框自动填满剩余区域。Flexbox 的优势在于它不需要精确计算宽度或使用浮动清除，减少了代码复杂度。同时，它天然支持响应式设计，配合媒体查询可以轻松适配不同屏幕尺寸。值得注意的是，flex 项目默认会收缩或拉伸以填充可用空间，这由 flex-shrink 和 flex-grow 属性控制，理解这些行为有助于避免布局意外变形。"
+            },
+            {
+                "level": 3,
+                "description": "深入理解 Flexbox 的工作机制有助于我们更好地优化布局性能和解决复杂问题。Flexbox 的布局过程分为两个阶段：首先确定主轴方向，然后根据主轴和交叉轴的对齐属性分配空间。主轴方向由 flex-direction 属性决定，它可以是 row（从左到右）、column（从上到下）、row-reverse 或 column-reverse，这直接影响元素的排列顺序和对齐方式。flex-wrap 属性控制是否允许换行，当设置为 wrap 时，项目会在容器空间不足时自动换到下一行，形成多行布局。gap 属性是现代 CSS 中新增的特性，用于设置 flex 项目之间的间距，它比使用 margin 更加简洁且不会影响对齐逻辑。在性能方面，Flexbox 的重排和重绘效率较高，因为它基于弹性计算而非浮动或绝对定位，浏览器能更快地计算出元素位置。然而，过度嵌套 flex 容器可能导致渲染性能下降，因此建议避免深层次的 flex 嵌套。此外，flex 项目的默认行为是 flex-shrink: 1，意味着它们在空间不足时会自动缩小，这有时会导致内容被压缩。可以通过设置 flex-shrink: 0 来防止这种情况。理解这些底层机制可以帮助开发者构建更加稳定和高效的布局系统。"
+            },
+            {
+                "level": 4,
+                "description": "为了巩固对 Flexbox 的掌握，我们来实现一个响应式的商品展示页面。假设我们要创建一个电商网站的商品列表，每个商品包含图片、名称、价格和购买按钮。页面顶部有一个标题和搜索框，希望标题靠左、搜索框靠右。下方的商品卡片需要在一行内水平排列，居中对齐，当屏幕变窄时自动换行，且每张卡片之间有 1rem 的间距。我们可以这样编写代码：首先，在 header 上设置 display: flex 和 justify-content: space-between，使标题和搜索框分列两侧。然后，为商品容器 .product-list 设置 display: flex、flex-wrap: wrap、justify-content: center 和 gap: 1rem，确保卡片灵活排列。每个商品卡片使用固定宽度，比如 200px，并设置 margin: 10px 以增强视觉分隔。通过这个练习，你可以看到 Flexbox 如何简化复杂布局的实现。接下来尝试修改 flex-direction 为 column，观察布局变化；或者给某个卡片设置 align-self: flex-start，让它在交叉轴上靠上对齐。这些操作将帮助你深入理解 flex 项目的独立控制能力。最后，结合媒体查询，在小屏幕上调整卡片宽度为 100%，实现真正的响应式设计。"
+            }
+        ],
     "sc_all": [
-        {"topic_id": "1_1", "select_element": ["h1", "h2", "h3", "h4", "h5", "h6", "p"]},
+        {"topic_id": "1_1", "select_element": ["h1", "h2", "h3", "h4", "h5", "h6", "p","span"]},
         {"topic_id": "1_2", "select_element": []},
         {"topic_id": "1_3", "select_element": ["<!DOCTYPE>", "html", "head", "body","meta", "title","footer"]},
         {"topic_id": "2_1", "select_element": ["div"]},

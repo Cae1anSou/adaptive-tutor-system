@@ -6,7 +6,7 @@ export const LAYOUT_PARAMS = {
   ROW_DELTA_Y: 180,//  底部行的Y间隔
   KNOWLEDGE_TOP_ROW_Y: 120,// 知识点顶部行的Y位置
   KNOWLEDGE_ROW_DELTA_Y: 380,// 知识点底部行的Y间隔
-  KNOWLEDGE_GAP_X: 170,// 知识点间的水平间距
+  KNOWLEDGE_GAP_X: 220,// 知识点间的水平间距
   KNOWLEDGE_HEIGHT_STEP: 80 // 知识点高度步进值
 };
 

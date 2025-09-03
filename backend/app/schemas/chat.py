@@ -173,4 +173,9 @@ class ChatHistoryCreate(BaseModel):
     role: str  # "user" 或 "assistant"
     message: str
     raw_prompt_to_llm: Optional[str] = None
+    raw_context_to_llm: Optional[str] = None
+    # token usage (assistant only)
+    prompt_tokens: Optional[int] = None
+    completion_tokens: Optional[int] = None
+    total_tokens: Optional[int] = None
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))

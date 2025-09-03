@@ -1,7 +1,7 @@
 // frontend/js/pages/registration.js
 import { saveParticipantId, checkAndRedirect } from '../modules/session.js';
 import { AppConfig, initializeConfig } from '../modules/config.js';
-import { setupHeaderTitle } from '../modules/navigation.js';
+import { setupHeaderTitle, navigateTo } from '../modules/navigation.js';
 import websocket from '../modules/websocket_client.js';
 import apiClient from '../api_client.js';
 // 页面加载时先检查是否已有会话
@@ -37,8 +37,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 if (result.code === 200 || result.code === 201) {
                     saveParticipantId(result.data.participant_id);
-                    // 注册成功后，跳转到知识图谱页面
-                    window.location.href = `/pages/knowledge_graph.html`;
+                    // 注册成功后，跳转到学习页面的1_1小节
+                    navigateTo('/pages/learning_page.html', '1_1', true);
                 } else {
                     alert(result.message || '注册失败，请重试');
                 }

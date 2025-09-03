@@ -4,7 +4,7 @@
 import { AppConfig, buildBackendUrl, initializeConfig } from '../modules/config.js';
 import { MiniKnowledgeGraph } from '../modules/mini_knowledge_graph.js';
 import { setupHeaderTitle, setupBackButton, getUrlParam, trackReferrer,navigateTo } from '../modules/navigation.js';
-import { setupHeaderTitle, setupBackButton, getUrlParam, trackReferrer, navigateTo } from '../modules/navigation.js';
+
 // 导入功能模块
 import {
     renderTopicContent,
@@ -279,19 +279,21 @@ async function initializeModules(topicId) {
     knowledgeModule = new KnowledgeModule();
     console.log('[MainApp] 知识点模块初始化完成');
 
-    // 初始化简化知识图谱
-    try {
-        const miniGraph = new MiniKnowledgeGraph('miniGraphContainer', {
-        height: 200,
-        nodeSize: 20,
-        chapterNodeSize: 30,
-        fontSize: 10
-        });
-        await miniGraph.init();
-        console.log('[MainApp] 简化知识图谱初始化完成');
-    } catch (error) {
-        console.error('[MainApp] 简化知识图谱初始化失败:', error);
-    }
+  // 初始化简化知识图谱 - 启用完整交互功能
+  try {
+    const miniGraph = new MiniKnowledgeGraph('miniGraphContainer', {
+      height: 200,
+      nodeSize: 20,
+      chapterNodeSize: 30,
+      fontSize: 10,
+      enableInteractions: true,  // 启用完整交互
+      enableModal: true          // 启用模态框
+    });
+    await miniGraph.init();
+    console.log('[MainApp] 简化知识图谱初始化完成');
+  } catch (error) {
+    console.error('[MainApp] 简化知识图谱初始化失败:', error);
+  }
 
 
     // 初始化聊天模块
@@ -352,6 +354,7 @@ function initializeUIEvents(iframe) {
     initIframeSelector();
 }
 
+<<<<<<< HEAD
 // 处理初始化失败的情况
 // async function handleInitializationFailure(topicId) {
 //     console.log('[MainApp] 使用默认配置进行初始化...');
@@ -375,6 +378,8 @@ function initializeUIEvents(iframe) {
 // }
 // }
 
+=======
+>>>>>>> upstream/main
 // ==================== 功能模块 ====================
 
 /**
@@ -742,6 +747,40 @@ function initEventListeners() {
     const askAIButton = document.getElementById('askAIButton');
     const clearSelectionButton = document.getElementById('clearSelectionButton');
 
+    // 添加知识图谱展开/收起功能
+    const miniGraphToggle = document.getElementById('miniGraphToggle');
+    const miniKnowledgeGraph = document.getElementById('miniKnowledgeGraph');
+    const toggleIcon = document.getElementById('toggleIcon');
+
+    if (miniGraphToggle && miniKnowledgeGraph && toggleIcon) {
+        // 确保图标默认有颜色和可见性
+        toggleIcon.style.color = '#4f46e5';
+        toggleIcon.style.opacity = '0.8';
+        
+        miniGraphToggle.addEventListener('click', () => {
+            // 切换展开状态
+            const isExpanding = !miniKnowledgeGraph.classList.contains('expanded');
+            miniKnowledgeGraph.classList.toggle('expanded');
+            
+            // 更改图标并切换旋转类
+            if (isExpanding) {
+                // 展开时，将图标更改为向上箭头
+                toggleIcon.setAttribute('icon', 'mdi:chevron-up');
+                // 移除旋转类以防止重复应用
+                miniGraphToggle.classList.remove('rotated');
+                toggleIcon.style.color = '#3730a3'; // 更深的紫色
+                toggleIcon.style.opacity = '1';     // 完全不透明
+            } else {
+                // 收起时，将图标更改为向下箭头
+                toggleIcon.setAttribute('icon', 'mdi:chevron-down');
+                // 移除旋转类以防止重复应用
+                miniGraphToggle.classList.remove('rotated');
+                toggleIcon.style.color = '#4f46e5'; // 恢复默认紫色
+                toggleIcon.style.opacity = '0.8';   // 恢复默认不透明度
+            }
+        });
+    }
+
     // 初始化按钮状态：确保询问AI按钮默认隐藏
     if (askAIButton) {
         askAIButton.style.display = 'none';
@@ -754,7 +793,7 @@ function initEventListeners() {
     if (startButton) {
         startButton.addEventListener('click', () => {
             handleStartSelector(allowedElements, bridge, showStatus);
-            // 切换按钮状态
+            // 切换按钮状态：隐藏选取元素按钮，显示停止选择按钮
             if (startButton && stopButton) {
                 startButton.style.display = 'none';
                 stopButton.style.display = 'flex';
@@ -766,7 +805,7 @@ function initEventListeners() {
     if (stopButton) {
         stopButton.addEventListener('click', () => {
             stopSelector(bridge);
-            // 切换按钮状态
+            // 切换按钮状态：显示选取元素按钮，隐藏停止选择按钮
             if (startButton && stopButton) {
                 startButton.style.display = 'flex';
                 stopButton.style.display = 'none';
@@ -801,6 +840,13 @@ function initEventListeners() {
             // 隐藏清除选择按钮
             clearSelectionButton.style.display = 'none';
             clearSelectionButton.style.visibility = 'hidden';
+            
+            // 显示选取元素按钮
+            const startButton = document.getElementById('startSelector');
+            if (startButton) {
+                startButton.style.display = 'flex';
+                console.log('清除选择：选取元素按钮已显示');
+            }
 
             // 清空代码面板
             const codeContent = document.getElementById('code-content');
@@ -892,8 +938,9 @@ function createElementSelectedWithTracking() {
 
         console.log('获取到的按钮元素:', {startButton, stopButton, askAIButton, clearSelectionButton});
 
+        // 选中元素后，不显示选取元素按钮
         if (startButton && stopButton) {
-            startButton.style.display = 'flex';
+            startButton.style.display = 'none';
             stopButton.style.display = 'none';
         }
 
@@ -950,8 +997,6 @@ document.addEventListener('problemHintNeeded', (event) => {
 });
 
 // 在AI对话框中显示提示消息
-// 在AI对话框中显示提示消息（适配现有HTML结构）
-// 在AI对话框中显示提示消息（永远追加到底部）
 function showProblemHintInChat(message, editorType, editCount) {
     const chatMessages = document.getElementById('ai-chat-messages');
     if (!chatMessages) {
@@ -968,11 +1013,20 @@ function showProblemHintInChat(message, editorType, editCount) {
       </div>
       <div class="ai-content">
         <div class="markdown-content">
+<<<<<<< HEAD
           <p>${message}</p>
+=======
+            <p>${message}</p>
+          </div>
+>>>>>>> upstream/main
         </div>
       </div>
     `;
 
+<<<<<<< HEAD
+=======
+    
+>>>>>>> upstream/main
 
     // ✅ ceq关键：永远追加到末尾（保持时间顺序）
     chatMessages.appendChild(aiMessage);
@@ -985,24 +1039,7 @@ function showProblemHintInChat(message, editorType, editCount) {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // 进入动画
-    aiMessage.style.opacity = '0';
-    aiMessage.style.transform = 'translateY(20px)';
-    aiMessage.style.transition = 'all 0.3s ease';
-    requestAnimationFrame(() => {
-        aiMessage.style.opacity = '1';
-        aiMessage.style.transform = 'translateY(0)';
-    });
-
-    // 记录提示事件
-    if (tracker && typeof tracker.logEvent === 'function') {
-        tracker.logEvent('problem_hint_displayed', {
-            editor: editorType,
-            edit_count: editCount,
-            message: message,
-            timestamp: new Date().toISOString()
-        });
-    }
+    // 创建并返回AI消息元素
     return aiMessage;
 }
 // ==================== 数据处理函数 ====================
@@ -1400,19 +1437,18 @@ function extendChatModuleForElementContext() {
             }
 
             // 使用封装的 apiClient 发送请求
-            const data = await window.apiClient.post('/chat/ai/chat', requestBody);
+            const data = await window.apiClient.post('/chat/ai/chat2', requestBody);
 
-            if (data.code === 200 && data.data && typeof data.data.ai_response === 'string') {
-                // 添加AI回复到UI
-                this.addMessageToUI('ai', data.data.ai_response);
-            } else {
-                throw new Error(data.message || 'AI回复内容为空或格式不正确');
-            }
+            // if (data.code === 200 && data.data && typeof data.data.ai_response === 'string') {
+            //     // 添加AI回复到UI
+            //     this.addMessageToUI('ai', data.data.ai_response);
+            // } else {
+            //     throw new Error(data.message || 'AI回复内容为空或格式不正确');
+            // }
         } catch (error) {
             console.error('[ChatModule] 发送消息时出错:', error);
             this.addMessageToUI('ai', `抱歉，我无法回答你的问题。错误信息: ${error.message}`);
-        } finally {
-            // 取消加载状态
+            // 请求失败（不会有 WebSocket 结果），需要解锁按钮
             this.setLoadingState(false);
         }
     };

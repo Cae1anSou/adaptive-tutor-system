@@ -2,25 +2,25 @@
     "topic_id": "4_2",
     "title": "理解盒模型",
     "levels": [
-        {
-            "level": 1,
-            "description": "盒模型是CSS布局的核心概念，每个HTML元素都被视为一个矩形盒子。它由四个部分组成：内容区域(content)、内边距(padding)、边框(border)和外边距(margin)。这些部分共同决定了元素在页面中的实际占用空间。"
-        },
-        {
-            "level": 2,
-            "description": "盒模型的关键属性包括：width/height控制内容尺寸，padding设置内容与边框的间距，border定义边框样式，margin控制元素间的距离。box-sizing属性可改变计算方式：content-box（默认）只包含内容，border-box包含边框和内边距。"
-        },
-        {
-            "level": 3,
-            "description": "应用场景：头像容器添加圆角和阴影增强视觉效果。示例：为头像容器设置圆角边框和柔和阴影。代码：.avatar-container { border-radius: 50%; padding: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); background: white; }"
-        },
-        {
-            "level": 4,
-            "description": "注意事项：1) 使用border-box可避免布局错位 2) 阴影过多影响性能 3) 圆角在旧浏览器需前缀 4) 内边距会影响元素实际尺寸 5) 负margin可实现特殊布局但慎用。调试时可用浏览器开发者工具查看盒模型结构。"
-        }
-    ],
+            {
+                "level": 1,
+                "description": "在网页设计中，每一个元素都可以被看作是一个矩形的盒子，这个概念被称为‘盒模型’。盒模型是CSS布局的核心基础，它决定了元素在页面中的大小和位置。每个盒子由四个部分组成：内容区域（content）、内边距（padding）、边框（border）和外边距（margin）。内容区域是显示文本或图像的地方；内边距是内容与边框之间的空白区域，用来增加内容周围的留白；边框是围绕在内边距外的一条线，可以设置颜色、样式和宽度；外边距则是盒子与其他元素之间的距离，控制元素之间的间隔。当我们设置一个元素的宽度和高度时，默认情况下指的是内容区域的尺寸，并不包括padding、border和margin。理解这四个部分如何共同作用，是掌握网页布局的第一步。通过调整这些属性，我们可以精确控制元素的外观和排版，使页面看起来更加整洁美观。"
+            },
+            {
+                "level": 2,
+                "description": "在实际开发中，盒模型的应用非常广泛。例如，当我们想要让两个并排的盒子刚好占满父容器的宽度时，必须考虑它们的padding和border是否会影响总宽度。默认的盒模型（即box-sizing: content-box）会让元素的总宽度等于内容宽度加上padding和border，这可能导致布局溢出。为了解决这个问题，我们可以使用box-sizing: border-box，这样设置的宽度就包含了padding和border，使得布局更加直观和可控。此外，通过组合使用margin和padding，我们可以创建出层次分明的界面结构。比如用较大的padding来突出卡片内容，用margin来分隔不同的模块。box-shadow属性则常用于增强视觉层次，给元素添加阴影效果，使其看起来像是‘浮’在页面上。border-radius可以让直角变得圆润，提升用户体验。这些样式通常一起使用，形成现代网页中常见的卡片式设计风格。"
+            },
+            {
+                "level": 3,
+                "description": "深入理解盒模型还需要了解其背后的渲染机制。浏览器在绘制页面时，会根据HTML结构构建DOM树，然后结合CSS样式计算每个元素的盒模型参数，最终生成渲染树。这个过程中，box-sizing属性起到了关键作用。当设置为content-box时，元素的width和height仅指内容区，任何padding和border都会额外增加总尺寸；而border-box则将padding和border包含在设定的宽高之内，更符合设计师的直觉。在响应式设计中，这一点尤为重要，因为它直接影响到布局的灵活性和可预测性。另外，margin的折叠现象也是一个需要注意的细节：当两个垂直方向的块级元素相邻时，它们之间的实际margin可能不是两者之和，而是取较大的那个值。这种机制虽然节省空间，但也容易导致意料之外的布局问题。掌握这些底层行为，有助于我们写出更稳定、高效的CSS代码。"
+            },
+            {
+                "level": 4,
+                "description": "为了巩固对盒模型的理解，我们可以通过一个实际例子来练习。假设我们要设计一个博客文章卡片，包含标题、摘要和阅读更多按钮。我们可以创建一个class为article-card的div，设置其width为300px，使用border-box确保尺寸准确。然后为其添加padding: 1.5rem，使内容不紧贴边缘；设置border: 1px solid #ddd，增加边界感；通过border-radius: 12px让卡片四角圆润；再用box-shadow: 0 4px 8px rgba(0,0,0,0.1)添加轻微阴影，提升立体感。同时，在卡片之间使用margin-bottom: 20px来保持适当的间距。这样的组合不仅美观，也符合现代UI设计规范。你可以尝试修改这些值，观察页面变化，理解每个属性对整体布局的影响。这个练习将帮助你掌握如何运用盒模型构建清晰、专业的界面结构，为后续学习更复杂的布局打下坚实基础。"
+            }
+        ],
     "sc_all": [
-        {"topic_id": "1_1", "select_element": ["h1", "h2", "h3", "h4", "h5", "h6", "p"]},
+        {"topic_id": "1_1", "select_element": ["h1", "h2", "h3", "h4", "h5", "h6", "p","span"]},
         {"topic_id": "1_2", "select_element": []},
         {"topic_id": "1_3", "select_element": ["<!DOCTYPE>", "html", "head", "body","meta", "title","footer"]},
         {"topic_id": "2_1", "select_element": ["div"]},

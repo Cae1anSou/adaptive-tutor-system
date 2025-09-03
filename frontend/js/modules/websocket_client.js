@@ -43,12 +43,13 @@ class WebSocketManager {
             return;
         }
         try {
+            // 获取 participantId 并确保正确编码
             const participantId = getParticipantId();
             if (!participantId) {
                 console.error('无法获取 participantId，无法建立 WebSocket 连接');
                 return;
             }
-
+            //const wsUrl = buildWebSocketUrl(getParticipantId());
             // 正确编码 participantId（特别是中文字符）
             const encodedParticipantId = encodeURIComponent(participantId);
             const wsUrl = buildWebSocketUrl(`/ws/user/${encodedParticipantId}`);

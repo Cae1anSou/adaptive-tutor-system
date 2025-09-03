@@ -2,25 +2,25 @@
     "topic_id": "6_1",
     "title": "按钮点击事件",
     "levels": [
-        {
-            "level": 1,
-            "description": "按钮点击事件是用户与网页交互的基础方式。当用户点击按钮时触发特定操作，核心包括事件类型（如click）、事件目标（按钮元素）和事件处理函数。通过事件处理可实现数据提交、内容展示等交互功能。"
-        },
-        {
-            "level": 2,
-            "description": "两种主要实现方式：1) HTML的onclick属性直接绑定函数：<button onclick='handleClick()'>；2) JavaScript的addEventListener动态绑定：button.addEventListener('click', callback)。后者更灵活，支持多个监听器。获取表单值常用document.getElementById()和value属性。"
-        },
-        {
-            "level": 3,
-            "description": "应用场景示例：登录表单验证。HTML结构：<input id='username'> <button id='loginBtn'>登录</button>。JavaScript实现：\n\nconst btn = document.getElementById('loginBtn');\nbtn.addEventListener('click', () => {\n  const name = document.getElementById('username').value;\n  alert(`欢迎, ${name}!`);\n});\n此代码在点击时获取输入值并弹出个性化欢迎语。"
-        },
-        {
-            "level": 4,
-            "description": "原理：事件触发后经历捕获-目标-冒泡三阶段。注意事项：1) 避免在HTML中写大量JS逻辑；2) addEventListener可添加多个回调，onclick会覆盖；3) 事件委托优化性能；4) 使用event.preventDefault()阻止默认行为；5) 移动端需考虑touch事件兼容性。"
-        }
-    ],
+            {
+                "level": 1,
+                "description": "在网页开发中，我们经常需要让用户输入一些信息，比如名字、年龄或者搜索内容。JavaScript 是一种可以让网页‘动起来’的编程语言，它可以帮助我们获取用户在输入框中填写的内容。要实现这一点，首先需要在 HTML 中创建一个输入框，通常使用 <input> 标签，并给它一个唯一的 id，比如 id='userInput'。这样，JavaScript 就能通过 document.getElementById('userInput') 找到这个输入框。获取输入框中的内容时，我们需要访问它的 value 属性，也就是 document.getElementById('userInput').value。这个值是一个字符串，代表用户当前输入的文字。然后，我们可以用 alert() 函数把这段文字弹出来，让用户看到。例如，如果用户输入了‘小狗’，我们就可以通过 alert 显示‘你输入的是：小狗’。这是前端开发中最基础的交互方式之一，帮助我们实现用户与网页之间的信息传递。整个过程就像你填写表格后，系统读取你填的内容并做出回应。"
+            },
+            {
+                "level": 2,
+                "description": "在实际项目中，获取用户输入往往不是孤立的操作，而是与其他元素和事件结合使用。最常见的场景是按钮点击触发输入读取。例如，页面上有一个输入框和一个按钮，用户输入内容后点击按钮，程序才去读取输入框的值并进行处理。这需要使用 JavaScript 的事件监听机制。我们可以用 document.getElementById('button').addEventListener('click', function() {}) 来监听按钮的点击事件。当用户点击时，函数内部就可以安全地获取输入框的 value。此外，输入框还可以有 placeholder 提示文字，type 属性可以是 text、email、number 等，帮助浏览器更好地理解和验证用户输入。我们也可以在获取 value 前先检查它是否为空，避免无效操作。这种组合方式广泛应用于搜索功能、登录表单、评论提交等场景。通过将 HTML 结构、CSS 样式和 JavaScript 逻辑结合起来，我们可以构建出完整且友好的用户交互体验。这种模式是现代网页应用的基础，理解它有助于掌握更复杂的前端逻辑。"
+            },
+            {
+                "level": 3,
+                "description": "深入理解获取用户输入的机制，有助于我们写出更高效和健壮的代码。JavaScript 中的 DOM（文档对象模型）是网页内容的树状结构表示，每一个 HTML 元素都是一个节点。当我们调用 document.getElementById 时，浏览器会在 DOM 树中查找对应 id 的元素节点。这个操作虽然简单，但如果频繁调用或在复杂页面中使用，可能会影响性能。因此，最佳实践是将获取到的元素缓存到变量中，避免重复查询。例如，let input = document.getElementById('searchInput')，之后直接使用 input.value。另外，现代开发中推荐使用更灵活的选择器方法如 querySelector，它支持 CSS 选择器语法，能更精确地定位元素。还需要注意，input 元素的 value 属性在任何时候都反映当前输入值，但某些特殊输入类型如 file 或 checkbox 的 value 获取方式略有不同。了解这些细节有助于我们处理各种输入场景，避免因类型差异导致的错误。此外，事件委托等高级技巧也能优化大量输入元素的监听逻辑。"
+            },
+            {
+                "level": 4,
+                "description": "为了巩固对获取用户输入的理解，我们来实现一个简单的用户反馈功能。页面上有一个输入框和一个按钮，用户输入喜欢的颜色后点击按钮，系统会弹出一个包含该颜色的提示。HTML 中设置一个 id='colorInput' 的输入框和 id='submitBtn' 的按钮。JavaScript 中先获取这两个元素，然后为按钮添加点击事件监听。在事件处理函数中，读取输入框的 value，检查是否为空，如果不为空，则用 alert 弹出‘你喜欢的颜色是：’加上用户输入的内容。例如用户输入‘蓝色’，则 alert 显示‘你喜欢的颜色是：蓝色’。这个示例虽然简单，但涵盖了从 HTML 结构搭建、JavaScript 元素获取、事件绑定到用户反馈的完整流程。你可以尝试修改输入类型为 number 或 email，观察 value 的变化，或者将 alert 替换为在页面上动态显示结果，进一步拓展交互方式。这个练习直接对应测试题中的核心逻辑，帮助你掌握如何安全、有效地获取并响应用户输入。"
+            }
+        ],
     "sc_all": [
-        {"topic_id": "1_1", "select_element": ["h1", "h2", "h3", "h4", "h5", "h6", "p"]},
+        {"topic_id": "1_1", "select_element": ["h1", "h2", "h3", "h4", "h5", "h6", "p","span"]},
         {"topic_id": "1_2", "select_element": []},
         {"topic_id": "1_3", "select_element": ["<!DOCTYPE>", "html", "head", "body","meta", "title","footer"]},
         {"topic_id": "2_1", "select_element": ["div"]},

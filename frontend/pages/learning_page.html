@@ -18,7 +18,10 @@
               加载中...
             </h1>
             <!-- 简化的知识图谱预览 -->
-             <div class="mini-knowledge-graph">
+             <div class="mini-knowledge-graph" id="miniKnowledgeGraph">
+              <div class="mini-graph-toggle" id="miniGraphToggle">
+                <iconify-icon icon="mdi:chevron-down" width="20" height="20" id="toggleIcon"></iconify-icon>
+              </div>
               <div class="mini-graph-container" id="miniGraphContainer"></div>
             </div>
             <div class="user-profile">
@@ -229,6 +232,19 @@
             </div>
           </div>
         </div>
+    </div>
+
+    <!-- 知识点详情弹窗 -->
+    <div id="knowledgeModal" class="modal">
+      <div class="modal-content">
+        <iconify-icon icon="mdi:book-open" width="32" height="32" style="color: var(--primary-color);"></iconify-icon>
+        <h2 id="modalTitle"></h2>
+        <p id="modalStatus"></p>
+        <div class="modal-actions">
+          <button id="learnBtn" class="btn btn-primary">学习</button>
+          <button id="testBtn" class="btn btn-primary">测试</button>
+        </div>
+      </div>
     </div>
 
   <!-- 引入learning_page.js（已包含所有必要功能） -->

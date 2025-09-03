@@ -114,8 +114,7 @@ class DynamicController:
                     details={}
                 )
 
-            # 构建用户状态摘要（同时更新用户情感状态）
-            user_state_summary = self._build_user_state_summary(profile, sentiment_result)
+            # 暂不构建用户状态摘要，等待内容加载后递增提问计数
 
             # 步骤3: RAG检索
             retrieved_knowledge = []
@@ -136,13 +135,13 @@ class DynamicController:
                     content_title = getattr(loaded_content, 'title', None) or getattr(loaded_content, 'topic_id', None)
                     
                     # 根据模式处理内容
-                    if request.mode == "test":
-                        loaded_content_json = loaded_content.model_dump_json()
-                    elif request.mode == "learning":
-                        # 移除sc_all字段
+                    # 学习模式：排除 sc_all 字段；测试模式：保留完整JSON
+                    if request.mode == "learning":
                         learning_content_dict = loaded_content.model_dump()
                         learning_content_dict.pop('sc_all', None)
-                        loaded_content_json = json.dumps(learning_content_dict)
+                        loaded_content_json = json.dumps(learning_content_dict, ensure_ascii=False)
+                    else:
+                        loaded_content_json = loaded_content.model_dump_json()
 
                 except Exception as e:
                     print(f"⚠️ 内容加载失败: {e}")
@@ -196,7 +195,7 @@ class DynamicController:
                 conversation_history_dicts = []
             
             retrieved_knowledge_content = [item['content'] for item in retrieved_knowledge if isinstance(item, dict) and 'content' in item]
-            system_prompt, messages = self.prompt_generator.create_prompts(
+            system_prompt, messages, context_snapshot = self.prompt_generator.create_prompts(
                 user_state=user_state_summary,
                 retrieved_context=retrieved_knowledge_content,
                 conversation_history=conversation_history_dicts,
@@ -219,7 +218,7 @@ class DynamicController:
             response = ChatResponse(ai_response=ai_response)
 
             # 步骤8: 记录AI交互
-            self._log_ai_interaction(request, response, db, background_tasks, system_prompt, content_title)
+            self._log_ai_interaction(request, response, db, background_tasks, system_prompt, content_title, context_snapshot)
 
             return response
 
@@ -278,25 +277,23 @@ class DynamicController:
         db: Session,
         background_tasks: Optional[Any] = None,
         system_prompt: Optional[str] = None,
-        content_title: Optional[str] = None
+        content_title: Optional[str] = None,
+        context_snapshot: Optional[str] = None
     ):
         """
         根据TDD-I规范，异步记录AI交互。
         1. 在 event_logs 中记录一个 "ai_chat" 事件。
         2. 在 chat_history 中记录用户和AI的完整消息。
-        3. 更新用户状态中的提问计数器。
+        3. 更新用户状态中的提问计数器（已在生成提示词前完成，不在此重复）。
         """
         try:
-            # 更新用户状态
-            self.user_state_service.handle_ai_help_request(request.participant_id, content_title)
-
             # 准备事件数据
             event = BehaviorEvent(
                 participant_id=request.participant_id,
                 event_type=EventType.AI_HELP_REQUEST,
                 event_data=AiHelpRequestData(message=request.user_message).model_dump(),
-                # TODO：这里的时区需要改成上海
-                timestamp=datetime.now(UTC)
+                # 统一使用上海时区
+                timestamp=datetime.now(ZoneInfo("Asia/Shanghai"))
             )
 
             # 准备用户聊天记录
@@ -307,11 +304,16 @@ class DynamicController:
             )
 
             # 准备AI聊天记录
+            usage = getattr(self.llm_gateway, 'last_usage', None)
             ai_chat = ChatHistoryCreate(
                 participant_id=request.participant_id,
                 role="assistant",
                 message=response.ai_response,
-                raw_prompt_to_llm=system_prompt
+                raw_prompt_to_llm=system_prompt,
+                raw_context_to_llm=context_snapshot,
+                prompt_tokens=(usage or {}).get('prompt_tokens') if usage else None,
+                completion_tokens=(usage or {}).get('completion_tokens') if usage else None,
+                total_tokens=(usage or {}).get('total_tokens') if usage else None,
             )
 
             # 检查是否在Celery Worker环境中运行（background_tasks为None）
@@ -383,8 +385,7 @@ class DynamicController:
                     confidence=0.0,
                     details={}
                 )
-            # 构建用户状态摘要（同时更新用户情感状态）
-            user_state_summary = self._build_user_state_summary(profile, sentiment_result)
+            # 暂不构建用户状态摘要，等待内容加载后递增提问计数
             # 步骤3: RAG检索
             retrieved_knowledge = []
             if self.rag_service:
@@ -403,13 +404,13 @@ class DynamicController:
                     content_title = getattr(loaded_content, 'title', None) or getattr(loaded_content, 'topic_id', None)
                     
                     # 根据模式处理内容
-                    if request.mode == "test":
-                        loaded_content_json = loaded_content.model_dump_json()
-                    elif request.mode == "learning":
-                        # 移除sc_all字段
+                    # 学习模式：排除 sc_all 字段；测试模式：保留完整JSON
+                    if request.mode == "learning":
                         learning_content_dict = loaded_content.model_dump()
                         learning_content_dict.pop('sc_all', None)
-                        loaded_content_json = json.dumps(learning_content_dict)
+                        loaded_content_json = json.dumps(learning_content_dict, ensure_ascii=False)
+                    else:
+                        loaded_content_json = loaded_content.model_dump_json()
                 except Exception as e:
                     print(f"⚠️ 内容加载失败: {e}")
                     loaded_content = None
@@ -461,7 +462,7 @@ class DynamicController:
                 conversation_history_dicts = []
             
             retrieved_knowledge_content = [item['content'] for item in retrieved_knowledge if isinstance(item, dict) and 'content' in item]
-            system_prompt, messages = self.prompt_generator.create_prompts(
+            system_prompt, messages, context_snapshot = self.prompt_generator.create_prompts(
                 user_state=user_state_summary,
                 retrieved_context=retrieved_knowledge_content,
                 conversation_history=conversation_history_dicts,
@@ -481,7 +482,7 @@ class DynamicController:
             # 步骤7: 构建响应（只包含AI回复内容，符合TDD-II-10设计）
             response = ChatResponse(ai_response=ai_response)
             # 步骤8: 记录AI交互
-            self._log_ai_interaction(request, response, db, background_tasks, system_prompt, content_title)
+            self._log_ai_interaction(request, response, db, background_tasks, system_prompt, content_title, context_snapshot)
             return response
         except Exception as e:
             print(f"❌ CRITICAL ERROR in generate_adaptive_response_sync: {e}")

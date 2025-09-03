@@ -1,5 +1,6 @@
 import logging
-import json
+from typing import List
+import logging
 
 from app.celery_app import celery_app, get_user_state_service
 from app.db.database import SessionLocal
@@ -35,11 +36,21 @@ def update_bkt_and_snapshot_task(participant_id: str, topic_id: str, is_correct:
 @celery_app.task(name='app.tasks.db_tasks.save_progress_task')
 def save_progress_task(progress_data: dict):
     """一个专门用于保存用户进度数据的轻量级任务"""
+    logger.info(f"[save_progress_task] 接收到的进度数据: {progress_data}")
     db = SessionLocal()
     try:
         # 创建用户进度记录
         progress_in = UserProgressCreate(**progress_data)
-        crud_progress.create(db=db, obj_in=progress_in)
+        logger.info(f"[save_progress_task] 创建进度记录对象: {progress_in}")
+        result = crud_progress.create(db=db, obj_in=progress_in)
+        logger.info(f"[save_progress_task] 进度记录保存成功: {result}")
+        return result
+    except Exception as e:
+        logger.error(f"[save_progress_task] 保存进度记录时出错: {str(e)}")
+        logger.error(f"[save_progress_task] 错误类型: {type(e)}")
+        import traceback
+        logger.error(f"[save_progress_task] 详细错误信息: {traceback.format_exc()}")
+        raise
     finally:
         db.close()
 
@@ -56,7 +67,9 @@ def save_code_submission_task(submission_data: dict):
 
 @celery_app.task(name='app.tasks.db_tasks.save_behavior_task')
 def save_behavior_task(behavior_data: dict):
-    """一个专门用于保存 behavior 数据的轻量级任务"""
+    """保存行为事件任务"""
+    logger.info(f"[save_behavior_task] 接收到的行为数据: {behavior_data}")
+    
     db = SessionLocal()
     try:
         # 确保 behavior_data 包含 participant_id
@@ -66,17 +79,26 @@ def save_behavior_task(behavior_data: dict):
 
         # 创建行为事件记录
         behavior_event = BehaviorEvent(**behavior_data)
-        logger.info(f"DB Task: 保存行为事件 - 用户: {behavior_event.participant_id}, 类型: {behavior_event.event_type}")
+        logger.info(f"数据库任务: 保存行为事件 - 参与者ID: {behavior_event.participant_id}, 事件类型: {behavior_event.event_type}")
+        
+        # 对于代码行为事件，可以做一些特殊处理或验证
+        if behavior_event.event_type in ["significant_edits", "coding_problem", "coding_session_summary"]:
+            # 计算事件数量
+            if behavior_event.event_type == "significant_edits" and 'edits' in behavior_event.event_data:
+                item_count = len(behavior_event.event_data['edits'])
+            else:
+                item_count = 1
+            logger.info(f"数据库任务: 处理代码行为事件，包含 {item_count} 个项目")
+            logger.info(f"数据库任务: 事件数据详情: {behavior_event.event_data}")
+        
         crud_event.create_from_behavior(db=db, obj_in=behavior_event)
-        logger.info(f"DB Task: 成功保存用户 {behavior_event.participant_id} 的行为事件")
+        logger.info(f"数据库任务: 成功保存参与者 {behavior_event.participant_id} 的行为事件")
     except Exception as e:
-        logger.error(f"DB Task: 保存行为事件失败: {e}")
-        # 记录详细错误信息，包括接收到的数据
-        logger.error(f"DB Task: 接收到的数据: {json.dumps(behavior_data, ensure_ascii=False)}")
+        logger.error(f"数据库任务: 保存行为事件时出错: {e}")
         raise
     finally:
         db.close()
-
+        
 @celery_app.task(name='app.tasks.db_tasks.log_ai_event_task')
 def log_ai_event_task(event_data: dict):
     """一个专门用于记录AI交互事件的轻量级任务"""

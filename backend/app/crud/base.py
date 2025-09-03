@@ -94,6 +94,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                             query = query.order_by(asc(column))
         
         # 应用分页
+        sql = query.statement.compile(compile_kwargs={"literal_binds": True})
+        print("最终生成的 SQL:", sql)
+        
+        # 应用分页
         return query.offset(skip).limit(limit).all()
 
     def get_count(

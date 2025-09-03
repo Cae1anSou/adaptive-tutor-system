@@ -23,6 +23,8 @@ class LLMGateway:
             api_key=self.api_key,
             base_url=self.api_base
         )
+        # 最近一次调用的token用量
+        self.last_usage: Optional[dict] = None
     
     def get_completion_sync(
         self, 
@@ -60,6 +62,20 @@ class LLMGateway:
             )
             
             # 提取回复内容
+            # 记录usage（若提供）
+            try:
+                usage = getattr(response, 'usage', None)
+                if usage is not None:
+                    self.last_usage = {
+                        'prompt_tokens': getattr(usage, 'prompt_tokens', None),
+                        'completion_tokens': getattr(usage, 'completion_tokens', None),
+                        'total_tokens': getattr(usage, 'total_tokens', None),
+                    }
+                else:
+                    self.last_usage = None
+            except Exception:
+                self.last_usage = None
+
             if response.choices and len(response.choices) > 0:
                 return response.choices[0].message.content
             else:
@@ -110,6 +126,20 @@ class LLMGateway:
             )
             
             #TODO:数据返回逻辑需要修改
+
+            # 记录usage（若提供）
+            try:
+                usage = getattr(response, 'usage', None)
+                if usage is not None:
+                    self.last_usage = {
+                        'prompt_tokens': getattr(usage, 'prompt_tokens', None),
+                        'completion_tokens': getattr(usage, 'completion_tokens', None),
+                        'total_tokens': getattr(usage, 'total_tokens', None),
+                    }
+                else:
+                    self.last_usage = None
+            except Exception:
+                self.last_usage = None
 
             if response.choices and len(response.choices) > 0:
                 return response.choices[0].message.content

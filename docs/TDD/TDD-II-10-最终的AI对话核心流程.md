@@ -7,7 +7,7 @@
 
 #### **1. 功能概述 (Feature Overview)**
 
-**目标:** 设计并实现一个能够处理核心AI对话请求 (`POST /api/v1/ai/chat`) 的、高度智能化的后端流程。该流程负责**编排（Orchestrate）** 多个后台服务，全面地、实时地理解学习者的**情境（Context）**和**状态（State）**，并据此动态生成能够驱动LLM产生个性化、自适应教学反馈的Prompts。
+**目标:** 设计并实现一个能够处理核心AI对话请求 (`POST /api/v1/ai/chat`) 的、高度智能化的后端流程。该流程负责**编排（Orchestrate）** 多个后台服务，全面地、实时地理解学习者的**情境（Context）**和**状态（State）**，并据此动态生成能够驱动LLM产生个性化、自适应教学反馈的 Prompts。系统提示与消息层分离：系统提示仅包含稳定的身份与规则，动态上下文放入消息。
 
 **核心原则:**
 
@@ -19,7 +19,7 @@
 
 1.  详细设计`POST /ai/chat`端点背后的核心服务`DynamicController`的`generate_adaptive_response`方法。
 2.  明确`DynamicController`调用`UserStateService`, `SentimentAnalysisService`, `RAGService`, `PromptGenerator`, `LLMGateway`的顺序和数据传递。
-3.  详细设计`PromptGenerator`如何融合所有输入信息，构建最终的System Prompt。
+3.  详细设计`PromptGenerator`如何融合所有输入信息，构建最终的 System Prompt 与上下文消息（messages），并输出可存证的上下文快照。
 
 #### **2. 设计与实现**
 
@@ -54,7 +54,7 @@ sequenceDiagram
 
     Controller->>PromptGen: 9. create_prompts(状态摘要, 检索片段, 完整上下文)
     activate PromptGen
-    PromptGen-->>Controller: 10. 返回构建好的System Prompt和Messages列表
+    PromptGen-->>Controller: 10. 返回构建好的 System Prompt、Messages 列表与 Context Snapshot
     deactivate PromptGen
 
     Controller->>LLM_GW: 11. get_completion(system_prompt, messages)
@@ -112,6 +112,7 @@ class DynamicController:
             db=db,
             request=request,
             system_prompt=system_prompt,
+            context_snapshot=context_snapshot,
             ai_response=ai_response_content
         )
 
@@ -123,6 +124,12 @@ dynamic_controller = DynamicController()
 ```
 **设计决策:** `user_state_service`暴露一个更高层次的方法`get_updated_summary`，该方法内部封装了调用`SentimentAnalysisService`和更新内存状态的逻辑，使`DynamicController`的调用更简洁。
 
+##### **2.2.1. 数据存储与可追溯性**
+- 将本轮用于生成回答的系统提示词与上下文快照同时存入 `chat_history`：
+  - `raw_prompt_to_llm`: System Prompt（身份/规则/策略/模式/安全约束）
+  - `raw_context_to_llm`: 上下文快照（RAG 文本、内容 JSON、测试结果、学生上下文等，按注入顺序拼接）
+- 数据库新增列 `chat_history.raw_context_to_llm`（TEXT）。`init_db.py` 在 `create_all` 后执行轻量迁移：若列不存在，自动 `ALTER TABLE` 添加。
+
 ##### **2.3. 动态Prompt生成器实现 (`backend/services/prompt_generator.py`)**
 
 这是将所有信息转化为prompt的地方。
@@ -133,14 +140,21 @@ dynamic_controller = DynamicController()
 class PromptGenerator:
     def create_prompts(self, user_state: dict, retrieved_context: list, ...) -> (str, list):
       
-        # --- 1. 构建 System Prompt ---
-        system_prompt = self._build_system_prompt(user_state, retrieved_context, task_context)
+        # --- 1. 构建 System Prompt（精简） ---
+        # 仅包含：身份/规则、简短情感策略、模式标志、安全约束。
+        system_prompt = self._build_system_prompt(user_state, mode, content_title)
+
+        # --- 2. 构建 Context Messages（动态上下文） ---
+        # 包含：学生上下文摘要、RAG参考、内容数据（学习模式去除 sc_all；测试模式完整）、测试结果等。
+        context_messages = self._build_context_messages(user_state, retrieved_context, mode, content_title, content_json, test_results)
+
+        # --- 3. 构建 Conversation Messages（历史+当前用户） ---
+        messages = context_messages + self._build_message_history(conversation_history, code_context, user_message)
+
+        # --- 4. 生成 Context Snapshot（用于科研存证） ---
+        context_snapshot = serialize(context_messages)
       
-        # --- 2. 构建 Messages 列表 ---
-        # messages列表包含了对话历史和用户最新的提问
-        messages = self._build_message_history(conversation_history, code_context, user_message)
-      
-        return system_prompt, messages
+        return system_prompt, messages, context_snapshot
 
     def _build_system_prompt(self, user_state, retrieved_context, task_context) -> str:
         # --- 角色和总体目标 ---
@@ -157,13 +171,7 @@ class PromptGenerator:
       
         # ... 可以加入更多基于BKT模型和行为状态的策略 ...
 
-        # --- RAG上下文指令 ---
-        if retrieved_context:
-            formatted_context = "\n\n---\n\n".join(retrieved_context)
-            prompt_parts.append(f"REFERENCE KNOWLEDGE: Use the following information from the knowledge base to answer the user's question accurately.\n\n{formatted_context}")
-
-        # --- 任务上下文指令 ---
-        prompt_parts.append(f"TASK CONTEXT: The student is currently working on the topic: '{task_context}'. Frame your explanations within this context.")
+        # 动态上下文（RAG/内容JSON/测试结果/学生行为等）不会放入 System Prompt，而是以 assistant 消息注入。
 
         return "\n\n".join(prompt_parts)
 
@@ -195,5 +203,9 @@ prompt_generator = PromptGenerator()
 
 ***
 
+**内容注入与保真规则:**
+- 学习内容（learning_content）：仅在学习模式注入，去除 `sc_all` 字段后再格式化展示；其他字段不删减。
+- 测试任务（test_tasks）：在测试模式注入，保持完整，不删减。
+
 **总结:**
-设计了AI对话这一核心功能的**编排逻辑**和**智能核心（Prompt工程）**。通过一个清晰的`DynamicController`，我们将多个独立的后台服务有机地组织起来，实现了**状态理解、信息检索和响应生成**的完整流程。`PromptGenerator`的设计将我们所有的研究思想（对用户状态的洞察）转化为对LLM具体、可执行的教学策略，是实现“自适应”教学理念的最终体现。至此，我们系统最复杂、最核心的部分已经设计完毕。
+我们将 AI 对话的系统提示与动态上下文彻底分层：System Prompt 承载稳定且高优先级的规则，Messages 注入所有动态上下文。`PromptGenerator` 产出 `system_prompt + messages + context_snapshot`，`DynamicController` 负责编排并将 `context_snapshot` 与 `system_prompt` 一并存证到 `chat_history`。这样既优化了模型对指令的遵从性，也保证了科研数据的可追溯与完整性。
