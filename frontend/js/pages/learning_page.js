@@ -3,7 +3,7 @@
 // 导入配置模块
 import { AppConfig, buildBackendUrl, initializeConfig } from '../modules/config.js';
 import { setupHeaderTitle, setupBackButton, getUrlParam, trackReferrer, navigateTo } from '../modules/navigation.js';
-import {  setupBackButton, getUrlParam, trackReferrer,navigateTo } from '../modules/navigation.js';
+import { getParticipantId } from '../modules/session.js';
 // 导入功能模块
 import {
     renderTopicContent,
@@ -101,15 +101,7 @@ const AppDataStore = {
 // iframe加载状态管理
 let iframeLoadProcessed = false;
 
-// 为行为追踪器设置participant_id（如果不存在则使用默认值）
-if (!window.participantId) {
-    window.participantId = 'user123'; // 默认用户ID，实际应用中应该从session获取
-}
-
-// 确保localStorage中有participant_id，供api_client.js使用
-if (!localStorage.getItem('participant_id')) {
-    localStorage.setItem('participant_id', 'user123');
-}
+// 移除默认 participant_id 注入逻辑：若无会话应重定向到首页由用户输入
 
 // ==================== 主应用初始化 ====================
 async function initMainApp() {
@@ -250,8 +242,8 @@ async function fetchTopicContent(topicId) {
 
 // 获取用户进度数据
 async function fetchUserProgress() {
-    // 从localStorage或session获取用户ID
-    const userId = localStorage.getItem('participant_id') || 'user123';
+    // 从会话获取用户ID（学习页已在 DOMContentLoaded 前校验，无则会重定向）
+    const userId = getParticipantId();
     const progressUrl = buildBackendUrl(`/progress/participants/${userId}/progress`);
     console.log('[MainApp] 进度API请求地址:', progressUrl);
 
