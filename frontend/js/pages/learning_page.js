@@ -1137,16 +1137,12 @@ function askAIAboutElement() {
 
     console.log('[DEBUG] window.pendingElementContext 已设置为:', window.pendingElementContext);
 
-    // 发送消息到AI
+    // 控制组：不主动追加AI提示，仅保存上下文供用户自行发问
     if (chatModule) {
-        // 切换到AI聊天标签页（如果存在）
         const tabChat = document.getElementById('tab-chat');
         if (tabChat) {
             tabChat.click();
         }
-
-        // AI主动发送询问消息
-        chatModule.addMessageToUI('ai', aiInitialMessage);
     } else {
         console.error('AI聊天模块未初始化');
     }
