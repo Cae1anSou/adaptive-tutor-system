@@ -12,6 +12,10 @@ def create_chat_history(db: Session, *, obj_in: ChatHistoryCreate) -> ChatHistor
         role=obj_in.role,
         message=obj_in.message,
         raw_prompt_to_llm=obj_in.raw_prompt_to_llm,
+        raw_context_to_llm=getattr(obj_in, 'raw_context_to_llm', None),
+        prompt_tokens=getattr(obj_in, 'prompt_tokens', None),
+        completion_tokens=getattr(obj_in, 'completion_tokens', None),
+        total_tokens=getattr(obj_in, 'total_tokens', None),
     )
     db.add(db_obj)
     db.commit()
