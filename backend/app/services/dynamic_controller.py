@@ -257,12 +257,16 @@ class DynamicController:
             )
 
             # 准备AI聊天记录
+            usage = getattr(self.llm_gateway, 'last_usage', None)
             ai_chat = ChatHistoryCreate(
                 participant_id=request.participant_id,
                 role="assistant",
                 message=response.ai_response,
                 raw_prompt_to_llm=system_prompt,
-                raw_context_to_llm=context_snapshot
+                raw_context_to_llm=context_snapshot,
+                prompt_tokens=(usage or {}).get('prompt_tokens') if usage else None,
+                completion_tokens=(usage or {}).get('completion_tokens') if usage else None,
+                total_tokens=(usage or {}).get('total_tokens') if usage else None,
             )
 
             # 检查是否在Celery Worker环境中运行（background_tasks为None）

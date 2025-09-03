@@ -61,6 +61,22 @@ def init_db():
                     conn.execute(text("ALTER TABLE chat_history ADD COLUMN raw_context_to_llm TEXT"))
                     conn.commit()
                 print("迁移: 已为 chat_history 添加列 raw_context_to_llm")
+            # 添加 token usage 列（若不存在）
+            if 'prompt_tokens' not in columns:
+                with engine.connect() as conn:
+                    conn.execute(text("ALTER TABLE chat_history ADD COLUMN prompt_tokens INTEGER"))
+                    conn.commit()
+                print("迁移: 已为 chat_history 添加列 prompt_tokens")
+            if 'completion_tokens' not in columns:
+                with engine.connect() as conn:
+                    conn.execute(text("ALTER TABLE chat_history ADD COLUMN completion_tokens INTEGER"))
+                    conn.commit()
+                print("迁移: 已为 chat_history 添加列 completion_tokens")
+            if 'total_tokens' not in columns:
+                with engine.connect() as conn:
+                    conn.execute(text("ALTER TABLE chat_history ADD COLUMN total_tokens INTEGER"))
+                    conn.commit()
+                print("迁移: 已为 chat_history 添加列 total_tokens")
     except Exception as e:
         print(f"迁移检查/执行失败（可忽略或手动处理）: {e}")
 
