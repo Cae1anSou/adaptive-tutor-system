@@ -19,11 +19,31 @@ class ChatModule {
     this.inputElement = null;
     this.sendButton = null;
     this.isLoading = false;
+    this.awaitingResponse = false;
+    this.pendingTimer = null;
+    this.sendButtonOriginalText = null;
+    this.sendButtonOriginalHTML = null;
     //websocket.userId = getParticipantId();
     //websocket.connect();
      // 订阅 WebSocket 消息
     websocket.subscribe("chat_result", (msg) => {
       console.log("[ChatModule] 收到AI结果:", msg);
+      // 仅当当前正等待AI回复时才解锁
+      if (this.awaitingResponse) {
+        // 清理超时计时器
+        if (this.pendingTimer) {
+          clearTimeout(this.pendingTimer);
+          this.pendingTimer = null;
+        }
+        // 去除加载占位并解锁发送按钮
+        this.setLoadingState(false);
+        this.awaitingResponse = false;
+      }
+      // 安全兜底：收到结果时确保输入框为空
+      if (this.inputElement) {
+        this.inputElement.value = '';
+      }
+      // 展示AI消息
       this.addMessageToUI('ai', msg.ai_response);
     });
 
@@ -49,6 +69,11 @@ class ChatModule {
     this.messagesContainer = document.getElementById('ai-chat-messages');
     this.inputElement = document.getElementById('user-message');
     this.sendButton = document.getElementById('send-message');
+    // 记录按钮原始文案，便于恢复
+    if (this.sendButton && !this.sendButtonOriginalText) {
+      this.sendButtonOriginalText = this.sendButton.textContent;
+      this.sendButtonOriginalHTML = this.sendButton.innerHTML;
+    }
 
     if (!this.chatContainer || !this.messagesContainer || !this.inputElement || !this.sendButton) {
       console.warn('[ChatModule] 聊天界面元素未找到，无法初始化聊天模块');
@@ -96,8 +121,9 @@ class ChatModule {
     // 添加用户消息到UI
     this.addMessageToUI('user', message);
 
-    // 设置加载状态
+    // 设置加载状态并标记等待WebSocket结果
     this.setLoadingState(true);
+    this.awaitingResponse = true;
 
     try {
       // 构建请求体 (participant_id 会由 apiClient 自动注入)
@@ -116,13 +142,39 @@ class ChatModule {
           requestBody.test_results = testResults;
         }
       }
-      api_client.post('/chat/ai/chat2', requestBody)
-      .then(response => {
-          console.log('AI Response:', response);
-      })
-      .catch(error => {
-          console.error('API Error:', error);
-      });
+      // 确保 WebSocket 已连接（若未连接则尝试连接）
+      try {
+        if (!websocket.socket || websocket.socket.readyState !== WebSocket.OPEN) {
+          websocket.connect();
+        }
+      } catch (e) {
+        console.warn('[ChatModule] WebSocket 未就绪，稍后将重试:', e);
+      }
+
+      // 发送异步聊天请求，等待 WebSocket 回传
+      api_client
+        .post('/chat/ai/chat2', requestBody)
+        .then(response => {
+          console.log('[ChatModule] 已提交聊天任务:', response);
+        })
+        .catch(error => {
+          console.error('[ChatModule] 提交聊天任务失败:', error);
+          // 请求失败则立刻解锁并提示错误
+          this.setLoadingState(false);
+          this.awaitingResponse = false;
+          this.addMessageToUI('ai', `抱歉，请求失败：${error.message || '未知错误'}`);
+        });
+
+      // 设置超时兜底：若一定时间内未收到WebSocket结果，则解锁并提示
+      if (this.pendingTimer) clearTimeout(this.pendingTimer);
+      this.pendingTimer = setTimeout(() => {
+        if (this.awaitingResponse) {
+          console.warn('[ChatModule] 等待AI响应超时，解除按钮锁定');
+          this.setLoadingState(false);
+          this.awaitingResponse = false;
+          this.addMessageToUI('ai', '抱歉，AI响应超时，请稍后重试。');
+        }
+      }, 60000); // 60秒超时可按需调整
 
 
       // let block=this.addMessageToUI('ai', "");
@@ -177,9 +229,13 @@ class ChatModule {
     } catch (error) {
       console.error('[ChatModule] 发送消息时出错:', error);
       this.addMessageToUI('ai', `抱歉，我无法回答你的问题。错误信息: ${error.message}`);
-    } finally {
-      // 取消加载状态
+      // 取消加载状态（本地出错，不再等待WebSocket）
       this.setLoadingState(false);
+      this.awaitingResponse = false;
+      if (this.pendingTimer) {
+        clearTimeout(this.pendingTimer);
+        this.pendingTimer = null;
+      }
     }
   }
      appendMessageContent(messageContentElement, content) {
@@ -285,7 +341,16 @@ class ChatModule {
     this.isLoading = loading;
     if (this.sendButton) {
       this.sendButton.disabled = loading;
-      this.sendButton.textContent = loading ? '发送中...' : '提问';
+      // 使用原始文案还原，避免页面不同按钮文本被覆盖
+      if (loading) {
+        this.sendButton.textContent = '发送中...';
+      } else {
+        if (this.sendButtonOriginalHTML) {
+          this.sendButton.innerHTML = this.sendButtonOriginalHTML;
+        } else {
+          this.sendButton.textContent = this.sendButtonOriginalText || '提问';
+        }
+      }
     }
     
     // 添加或移除加载指示器

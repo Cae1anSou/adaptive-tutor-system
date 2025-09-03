@@ -1,7 +1,7 @@
 // 导入模块
 import { getParticipantId } from '../modules/session.js';
 import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
-import { setupHeaderTitle, setupBackButton, getUrlParam, debugUrlParams, getReturnUrl  } from '../modules/navigation.js';
+import { setupHeaderTitle, setupBackButton, getUrlParam, debugUrlParams } from '../modules/navigation.js';
 import tracker from '../modules/behavior_tracker.js';
 import chatModule from '../modules/chat.js';
 import websocket from '../modules/websocket_client.js';
@@ -172,8 +172,10 @@ function setupSubmitLogic() {
             const behaviorAnalysis = tracker.getCodingBehaviorAnalysis();
             console.log('测试时的编程行为分析:', behaviorAnalysis);
 
-            // 提交测试事件（包含当前行为分析）
-            tracker.logEvent('test_run', {
+            // 统一使用后端支持的事件类型：test_submission
+            // 在 event_data 中增加 phase 区分阶段
+            tracker.logEvent('test_submission', {
+                phase: 'run',
                 timestamp: new Date().toISOString(),
                 behavior_snapshot: behaviorAnalysis
             });
@@ -240,11 +242,13 @@ function setupSubmitLogic() {
                     alert("测试完成！即将跳转回到知识图谱界面");
                     setTimeout(() => { window.location.href = '/pages/knowledge_graph.html'; }, 3000);
                 } else {
-                    tracker.logEvent('test_failed', {
+                    // 统一为 test_submission，标记失败阶段
+                    tracker.logEvent('test_submission', {
+                        phase: 'failed',
                         topic_id: topicId,
                         edit_count: finalBehaviorAnalysis.totalSignificantEdits,
                         problem_count: finalBehaviorAnalysis.problemEventsCount,
-                        failure_reason: result.data.message || '未知原因'
+                        failure_reason: (result && result.data && result.data.message) || '未知原因'
                     });
                     // TODO: 可以考虑直接在这里主动触发AI
                     // 测试未通过，给用户一些鼓励和建议
@@ -254,7 +258,9 @@ function setupSubmitLogic() {
 
         } catch (error) {
             console.error('提交测试时出错:', error);
-            tracker.logEvent('submission_error', {
+            // 统一为 test_submission，标记错误阶段
+            tracker.logEvent('test_submission', {
+                phase: 'error',
                 error_message: error.message,
                 timestamp: new Date().toISOString()
             });
@@ -299,18 +305,8 @@ document.addEventListener('DOMContentLoaded', function () {
     setupBackButton();
     // 调试信息
     debugUrlParams();
-    require(['vs/editor/editor.main'], function () {
-        initializePage();
-        setupSubmitLogic();
-
-        // 初始化AI聊天功能
-        // 获取并解密URL参数
-        const returnUrl = getReturnUrl();
-        console.log('返回URL:', returnUrl);
-        const contentId = getUrlParam('topic');
-        if (contentId && contentId.id) {
-            // 使用新的聊天模块初始化
-            chatModule.init('test', contentId);
-        }
+        require(['vs/editor/editor.main'], function () {
+            initializePage();
+            setupSubmitLogic();
+        });
     });
-});
