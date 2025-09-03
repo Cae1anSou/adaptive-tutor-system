@@ -60,8 +60,8 @@ class Settings(BaseSettings):
     )
 
     # Module enable/disable flags
-    ENABLE_RAG_SERVICE: bool = True
-    ENABLE_SENTIMENT_ANALYSIS: bool = True
+    ENABLE_RAG_SERVICE: bool = False
+    ENABLE_SENTIMENT_ANALYSIS: bool = False
     ENABLE_TRANSLATION_SERVICE: bool = False
     
     # Redis 配置

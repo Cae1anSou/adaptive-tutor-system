@@ -3,11 +3,10 @@ import json
 from typing import Any, Optional
 from sqlalchemy.orm import Session
 from app.schemas.chat import ChatRequest, ChatResponse, UserStateSummary, SentimentAnalysisResult
-from app.services.sentiment_analysis_service import SentimentAnalysisService
 from app.services.user_state_service import UserStateService
-from app.services.rag_service import RAGService
 from app.services.prompt_generator import PromptGenerator
 from app.services.llm_gateway import LLMGateway
+from typing import Optional, Any
 from app.services.content_loader import load_json_content  # 导入content_loader
 from app.crud.crud_event import event as crud_event
 from app.crud.crud_chat_history import chat_history as crud_chat_history
@@ -22,9 +21,9 @@ class DynamicController:
     """动态控制器（控制组）：不使用用户画像、RAG或情感分析"""
 
     def __init__(self,
-                 user_state_service: UserStateService,
-                 sentiment_service: SentimentAnalysisService,
-                 rag_service: RAGService,
+                 user_state_service: Optional[UserStateService],
+                 sentiment_service: Optional[Any],
+                 rag_service: Optional[Any],
                  prompt_generator: PromptGenerator,
                  llm_gateway: LLMGateway,):
         """
