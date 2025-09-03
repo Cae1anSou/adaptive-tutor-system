@@ -1,7 +1,7 @@
 // 导入模块
 import { getParticipantId } from '../modules/session.js';
 import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
-import { setupHeaderTitle, setupBackButton, getUrlParam, debugUrlParams, getReturnUrl } from '../modules/navigation.js';
+import { setupHeaderTitle, setupBackButton, getUrlParam, debugUrlParams, getReturnUrl, navigateTo } from '../modules/navigation.js';
 import tracker from '../modules/behavior_tracker.js';
 import chatModule from '../modules/chat.js';
 import websocket from '../modules/websocket_client.js';
@@ -268,8 +268,52 @@ function setupSubmitLogic() {
                 restoreButton();
                 displayTestResult(msg);
                 if(msg.passed) {
-                    alert("测试完成！即将跳转回到知识图谱界面");
-                    setTimeout(() => { window.location.href = '/pages/knowledge_graph.html'; }, 3000);
+                    // 获取当前topic参数
+                    const topicData = getUrlParam('topic');
+                    let currentTopicId = topicData && topicData.id ? topicData.id : null;
+                    let nextTopicId = null;
+                    let shouldNavigateToLearning = false;
+                    
+                    if (currentTopicId) {
+                        // 检查是否已经是最后一小节(6_3)
+                        if (currentTopicId === '6_3') {
+                            // 如果已经是6_3，跳转回6_3的学习页面
+                            nextTopicId = '6_3';
+                            shouldNavigateToLearning = true;
+                        } else {
+                            // 计算下一小节的topic_id
+                            const [chapter, section] = currentTopicId.split('_').map(Number);
+                            let nextChapter = chapter;
+                            let nextSection = section + 1;
+                            
+                            // 处理章节边界情况
+                            if (nextSection > 3) {
+                                nextChapter += 1;
+                                nextSection = 1;
+                            }
+                            
+                            // 确保不超过最大章节
+                            if (nextChapter <= 6) {
+                                nextTopicId = `${nextChapter}_${nextSection}`;
+                                shouldNavigateToLearning = true;
+                            }
+                        }
+                    }
+                    
+                    // 显示提示信息
+                    if (shouldNavigateToLearning) {
+                        alert(`测试完成！即将跳转到${nextTopicId}学习界面`);
+                        // 立即开始倒计时跳转
+                        setTimeout(() => { 
+                            navigateTo('/pages/learning_page.html', nextTopicId, true); 
+                        }, 100);
+                    } else {
+                        alert("测试完成！即将跳转回到注册页面");
+                        // 立即开始倒计时跳转
+                        setTimeout(() => { 
+                            window.location.href = '/pages/index.html'; 
+                        }, 100);
+                    }
                 } else {
                     tracker.logEvent('test_failed', {
                         topic_id: topicId,

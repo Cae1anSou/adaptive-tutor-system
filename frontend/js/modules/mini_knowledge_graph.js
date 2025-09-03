@@ -2,7 +2,7 @@
 import { GraphState, LAYOUT_PARAMS } from './graph_data.js';
 import { buildBackendUrl } from './config.js';
 import { getParticipantId } from './session.js';
-import { getUrlParam } from './navigation.js';
+import { getUrlParam, navigateTo } from './navigation.js';
 
 export class MiniKnowledgeGraph {
   constructor(containerId, options = {}) {
@@ -12,6 +12,9 @@ export class MiniKnowledgeGraph {
       nodeSize: 20,
       chapterNodeSize: 30,
       fontSize: 10,
+      // 添加新的选项
+      enableInteractions: true,
+      enableModal: true,
       ...options
     };
     this.cy = null;
@@ -20,6 +23,9 @@ export class MiniKnowledgeGraph {
     this.layoutParams = LAYOUT_PARAMS;
     // 存储节点的原始尺寸
     this.originalSizes = new Map();
+    // 添加点击状态管理
+    this.clickState = { lastId: null, timer: null, ts: 0 };
+    this.DBL_DELAY = 280;
   }
 
   // 初始化简化知识图谱
@@ -186,9 +192,9 @@ export class MiniKnowledgeGraph {
             'text-halign': 'center',
             'color': '#1e293b',
             'background-color': '#f1f5f9',
-            'width': 150,
-            'height': 150,
-            'font-size': '20px',
+            'width': 170,
+            'height': 170,
+            'font-size': '22px',
             'font-family': 'Inter, sans-serif',
             'font-weight': 500,
             'font-weight': 'bold',
@@ -386,10 +392,20 @@ export class MiniKnowledgeGraph {
             // 容器收起时，重置图谱大小并收起所有章节
             this.resetSize();
             // 等待容器动画完成后再进行居中操作
-            miniKnowledgeGraph.addEventListener('transitionend', () => {
+            // 使用更可靠的监听方式，确保捕获到过渡完成事件
+            const handleTransitionEnd = () => {
               console.log('容器收起动画完成，开始居中图谱');
               this.centerAndZoomGraph();
-            }, { once: true }); // 只执行一次
+            };
+            
+            // 使用once选项确保事件只触发一次
+            miniKnowledgeGraph.addEventListener('transitionend', handleTransitionEnd, { once: true });
+            
+            // 添加一个备用的定时器，防止transitionend事件未触发
+            setTimeout(() => {
+              console.log('容器收起动画超时，开始居中图谱');
+              this.centerAndZoomGraph();
+            }, 350); // 略长于CSS过渡时间(300ms)
           }
         }
       });
@@ -406,6 +422,9 @@ export class MiniKnowledgeGraph {
     
     console.log('调整图谱大小以适应展开容器');
     
+    // 更新原始尺寸以确保使用当前正确的尺寸
+    this.updateOriginalSizes();
+    
     // 设置章节节点的放大比例
     const chapterScaleFactor = 1.5; // 放大50%
     
@@ -421,6 +440,7 @@ export class MiniKnowledgeGraph {
       }
     });
     
+    this.updateOriginalSizes();
     // 调整后重新应用布局
     this.setFixedChapterPositions();
     this.centerAndZoomGraph();
@@ -431,23 +451,31 @@ export class MiniKnowledgeGraph {
       if (!this.cy) return;
     
       console.log('重置图谱大小 - 通过重新初始化');
-    // 恢复所有节点到原始大小
+    // 恢复所有节点到默认大小（收起状态的大小）
     this.cy.nodes().forEach(node => {
-      const originalSize = this.originalSizes.get(node.id());
-      if (originalSize) {
+      // 恢复到默认尺寸而不是当前尺寸
+      if (node.data('type') === 'chapter') {
         node.style({
-          'width': originalSize.width,
-          'height': originalSize.height
+          'width': 340,
+          'height': 120
         });
-        
-        // 恢复字体大小
-        if (node.data('type') === 'chapter') {
-          node.style('font-size', '28px');
-        } else {
-          node.style('font-size', '20px');
-        }
+      } else {
+        node.style({
+          'width': 150,
+          'height': 150
+        });
+      }
+      
+      // 恢复字体大小
+      if (node.data('type') === 'chapter') {
+        node.style('font-size', '28px');
+      } else {
+        node.style('font-size', '20px');
       }
     });
+
+    // 更新原始尺寸以确保使用当前正确的尺寸
+    this.updateOriginalSizes();
     
     // 重新应用布局
     this.setFixedChapterPositions();
@@ -472,12 +500,7 @@ export class MiniKnowledgeGraph {
   // 设置交互效果
   setupInteractions() {
     // 存储所有节点的原始尺寸
-    this.cy.nodes().forEach(node => {
-      this.originalSizes.set(node.id(), {
-        width: parseFloat(node.style('width')),
-        height: parseFloat(node.style('height'))
-      });
-    });
+    this.updateOriginalSizes();
 
     // 节点悬停效果
     this.cy.on('mouseover', 'node', (evt) => {
@@ -485,33 +508,32 @@ export class MiniKnowledgeGraph {
       const originalSize = this.originalSizes.get(node.id()) || { width: 120, height: 120 };
       const scaleFactor = node.data('type') === 'chapter' ? 1.15 : 1.1;
       
-      node.style({
-        'background-color': node.data('type') === 'chapter' ? '#3730a3' : '#c7d2fe',
-        'color': node.data('type') === 'chapter' ? '#ffffff' : '#1e293b',
-        'font-size': node.data('type') === 'chapter' ? '30px' : '28px',
-        'border-color': '#4f46e5',
-        'width': originalSize.width * scaleFactor,
-        'height': originalSize.height * scaleFactor
-      });
-      
-      // 显示标签
-      const label = node.data('label') || node.id();
-      node.style({
-        'content': label
+      // 使用动画过渡效果
+      node.stop().animate({
+        style: {
+          'background-color': node.data('type') === 'chapter' ? '#3730a3' : '#c7d2fe',
+          'color': node.data('type') === 'chapter' ? '#ffffff' : '#1e293b',
+          'border-color': '#4f46e5',
+          'width': originalSize.width * scaleFactor,
+          'height': originalSize.height * scaleFactor
+        }
+      }, {
+        duration: 200
       });
     });
 
     this.cy.on('mouseout', 'node', (evt) => {
       const node = evt.target;
-      node.style({
-        'color': '#1e293b',
-        'font-size': node.data('type') === 'chapter' ? '28px' : '20px',
-      });
-      this.restoreNodeStyle(node);
-      
-      // 隐藏标签
-      node.style({
-        'content': 'data(label)'
+      // 使用动画恢复原始样式
+      node.stop().animate({
+        style: {
+          'color': '#1e293b'
+        }
+      }, {
+        duration: 150,
+        complete: () => {
+          this.restoreNodeStyle(node);
+        }
       });
     });
 
@@ -542,19 +564,177 @@ export class MiniKnowledgeGraph {
     this.cy.on('tap', 'node', (evt) => {
       const node = evt.target;
       const id = node.id();
-      const type = node.data('type');
+      const now = Date.now();
 
-      // 只处理章节节点的点击事件
-      if (type === 'chapter') {
-        if (this.graphState.expandedSet.has(id)) {
-          // 如果章节已展开，则收起
-          this.collapseChapter(id);
+      // 如果启用了完整的交互功能
+      if (this.options.enableInteractions) {
+        if (this.clickState.lastId === id && (now - this.clickState.ts) < this.DBL_DELAY) {
+          clearTimeout(this.clickState.timer);
+          this.clickState.timer = null;
+          this.clickState.lastId = null;
+          this.handleDoubleClick(node);
         } else {
-          // 如果章节未展开，则展开
-          this.expandChapter(id);
+          this.clickState.lastId = id;
+          this.clickState.ts = now;
+          this.clickState.timer = setTimeout(() => {
+            this.handleSingleClick(node);
+            this.clickState.timer = null;
+            this.clickState.lastId = null;
+          }, this.DBL_DELAY);
+        }
+      } else {
+        // 只处理章节节点的点击事件（原有逻辑）
+        const type = node.data('type');
+        if (type === 'chapter') {
+          if (this.graphState.expandedSet.has(id)) {
+            // 如果章节已展开，则收起
+            this.collapseChapter(id);
+          } else {
+            // 如果章节未展开，则展开
+            this.expandChapter(id);
+          }
         }
       }
     });
+  }
+
+  // 单击处理
+  handleSingleClick(node) {
+    const id = node.id();
+    const type = node.data('type');
+
+    if (type === 'chapter') {
+      if (this.graphState.expandedSet.has(id)) {
+        this.collapseChapter(id);
+      } else {
+        this.expandChapter(id);
+      }
+
+      if (this.graphState.currentLearningChapter === null && id === 'chapter1' &&
+        !this.graphState.learnedNodes.includes(id)) {
+        this.graphState.currentLearningChapter = id;
+      }
+
+      this.updateNodeStates();
+      return;
+    }
+
+    if (type === 'knowledge') {
+      const label = node.data('label') || id;
+      if (this.options.enableModal) {
+        this.showKnowledgeModal(id, label);
+      } else {
+        // 如果不启用模态框，直接导航到学习页面
+        this.navigateTo('/pages/learning_page.html', id);
+      }
+    }
+  }
+
+  // 双击处理
+  handleDoubleClick(node) {
+    const id = node.id();
+    const type = node.data('type');
+
+    if (type === 'chapter') {
+      if (this.graphState.isChapterCompleted(id)) {
+        if (confirm("您已学过本章节，是否再次进行测试？")) {
+          this.navigateTo('/pages/test_page.html', id, true, true);
+        }
+      } else if (this.graphState.currentLearningChapter === id) {
+        if (confirm("您还未学完当前章节内容，是否直接开始测试？")) {
+          this.navigateTo('/pages/test_page.html', id, true, true);
+        }
+      } else {
+        if (confirm("您还未解锁前置章节，是否直接开始测试？")) {
+          this.navigateTo('/pages/test_page.html', id, true, true);
+        }
+      }
+
+      this.graphState.passChapterTest(id);
+      this.updateNodeStates();
+    }
+  }
+
+  // 显示知识点弹窗
+  showKnowledgeModal(knowledgeId, nodeLabel) {
+    // 创建或获取模态框元素
+    let modal = document.getElementById('knowledgeModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'knowledgeModal';
+      modal.className = 'modal';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <iconify-icon icon="mdi:book-open" width="32" height="32" style="color: var(--primary-color);"></iconify-icon>
+          <h2 id="modalTitle"></h2>
+          <p id="modalStatus"></p>
+          <div class="modal-actions">
+            <button id="learnBtn" class="btn btn-primary">学习</button>
+            <button id="testBtn" class="btn btn-primary">测试</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    const title = document.getElementById('modalTitle');
+    const status = document.getElementById('modalStatus');
+    const learnBtn = document.getElementById('learnBtn');
+    const testBtn = document.getElementById('testBtn');
+
+    title.textContent = nodeLabel || knowledgeId;
+    learnBtn.className = 'learn-btn';
+    learnBtn.disabled = false;
+    learnBtn.textContent = '学习';
+    testBtn.className = 'test-btn';
+
+    if (this.graphState.learnedNodes.includes(knowledgeId)) {
+      status.textContent = '您已学过该知识点，是否再次复习或重新测试？';
+      learnBtn.textContent = '复习';
+      learnBtn.className = 'review-btn';
+
+      learnBtn.onclick = () => {
+        this.navigateTo('/pages/learning_page.html', knowledgeId);
+      };
+
+      testBtn.onclick = () => {
+        this.navigateTo('/pages/test_page.html', knowledgeId, true, true);
+      };
+    } else if (this.graphState.isKnowledgeUnlocked(knowledgeId)) {
+      status.textContent = '您可以开始学习该知识点或直接进行测试';
+
+      learnBtn.onclick = () => {
+        this.navigateTo('/pages/learning_page.html', knowledgeId);
+      };
+
+      testBtn.onclick = () => {
+        this.navigateTo('/pages/test_page.html', knowledgeId, true, true);
+      };
+    } else {
+      status.textContent = '该知识点尚未解锁，您是否要直接开始测试？';
+      learnBtn.disabled = true;
+      learnBtn.className += ' disabled';
+
+      learnBtn.onclick = () => { };
+      testBtn.onclick = () => {
+        this.navigateTo('/pages/test_page.html', knowledgeId, true, true);
+      };
+    }
+    modal.style.display = 'block';
+
+    // 添加关闭功能
+    const closeModal = (event) => {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    };
+    modal.onclick = closeModal;
+  }
+
+  // 导航到指定页面
+  navigateTo(page, topicId, isTest = false, forceTest = false) {
+    // 使用导入的navigateTo函数
+    navigateTo(page, topicId, isTest, forceTest);
   }
 
   // 恢复节点样式到正确状态
@@ -634,6 +814,16 @@ export class MiniKnowledgeGraph {
         });
       }
     }
+  }
+
+  // 添加更新原始尺寸的方法
+  updateOriginalSizes() {
+    this.cy.nodes().forEach(node => {
+      this.originalSizes.set(node.id(), {
+        width: parseFloat(node.style('width')),
+        height: parseFloat(node.style('height'))
+      });
+    });
   }
 
   // 设置章节固定位置 - 优化布局
@@ -747,7 +937,11 @@ export class MiniKnowledgeGraph {
     this.updateNodeStates();
     
     // 延迟调整布局，确保动画完成
-    setTimeout(() => this.centerAndZoomGraph(), 350);
+    setTimeout(() => {
+      this.centerAndZoomGraph();
+      // 更新节点原始尺寸
+      // this.updateOriginalSizes();
+    }, 350);
   }
 
   // 收起章节
@@ -762,6 +956,9 @@ export class MiniKnowledgeGraph {
     this.graphState.expandedSet.delete(chapterId);
     this.updateNodeStates();
     this.centerAndZoomGraph(); // 收起后调整布局
+    
+    // 更新节点原始尺寸
+    // this.updateOriginalSizes();
   }
 
   // 更新边可见性

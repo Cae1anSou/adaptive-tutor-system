@@ -279,19 +279,21 @@ async function initializeModules(topicId) {
     knowledgeModule = new KnowledgeModule();
     console.log('[MainApp] 知识点模块初始化完成');
 
-    // 初始化简化知识图谱
-    try {
-        const miniGraph = new MiniKnowledgeGraph('miniGraphContainer', {
-        height: 200,
-        nodeSize: 20,
-        chapterNodeSize: 30,
-        fontSize: 10
-        });
-        await miniGraph.init();
-        console.log('[MainApp] 简化知识图谱初始化完成');
-    } catch (error) {
-        console.error('[MainApp] 简化知识图谱初始化失败:', error);
-    }
+  // 初始化简化知识图谱 - 启用完整交互功能
+  try {
+    const miniGraph = new MiniKnowledgeGraph('miniGraphContainer', {
+      height: 200,
+      nodeSize: 20,
+      chapterNodeSize: 30,
+      fontSize: 10,
+      enableInteractions: true,  // 启用完整交互
+      enableModal: true          // 启用模态框
+    });
+    await miniGraph.init();
+    console.log('[MainApp] 简化知识图谱初始化完成');
+  } catch (error) {
+    console.error('[MainApp] 简化知识图谱初始化失败:', error);
+  }
 
 
     // 初始化聊天模块
