@@ -51,7 +51,11 @@ RUN node --version && npm --version
 
 # 复制requirements文件并安装Python依赖
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt \
+    -i https://pypi.tuna.tsinghua.edu.cn/simple \
+    --trusted-host pypi.tuna.tsinghua.edu.cn \
+    --default-timeout=600 \
+    --retries 5
 
 # 复制项目代码
 COPY . .

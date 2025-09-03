@@ -80,6 +80,7 @@ pydantic-settings==2.10.1
 pydantic_core==2.33.2
 pyee==13.0.0
 Pygments==2.19.2
+pymysql
 pytest==8.4.1
 pytest-asyncio==1.1.0
 pytest-cov==6.2.1

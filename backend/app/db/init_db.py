@@ -41,8 +41,7 @@ def init_db():
     print(f"Using database URL: {settings.DATABASE_URL}")
     # 创建数据库引擎
     engine = create_engine(
-        settings.DATABASE_URL,
-        connect_args={"check_same_thread": False}
+        settings.DATABASE_URL
     )
     
     # 创建所有表

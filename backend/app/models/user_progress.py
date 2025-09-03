@@ -17,6 +17,6 @@ class UserProgress(Base):
     __tablename__ = "user_progress"
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    participant_id = Column(String, index=True, nullable=False)
-    topic_id = Column(String, index=True, nullable=False)
+    participant_id = Column(String(255), index=True, nullable=False)
+    topic_id = Column(String(255), index=True, nullable=False)
     completed_at = Column(DateTime, default=lambda: datetime.now(pytz.timezone('Asia/Shanghai')))

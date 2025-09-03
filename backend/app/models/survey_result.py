@@ -18,7 +18,7 @@ class SurveyResult(Base):
     __tablename__ = "survey_results"
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    participant_id = Column(String, nullable=False)
-    survey_type = Column(String, nullable=False)
+    participant_id = Column(String(255), nullable=False)
+    survey_type = Column(String(50), nullable=False)
     answers = Column(JSON, nullable=False)
     submitted_at = Column(DateTime, default=lambda: datetime.now(pytz.timezone('Asia/Shanghai')))
