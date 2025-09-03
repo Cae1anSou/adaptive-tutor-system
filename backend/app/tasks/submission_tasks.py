@@ -35,7 +35,8 @@ def process_submission_task(self, submission_data: dict):
         # 2. 执行代码评测
         evaluation_result = sandbox_service.run_evaluation(
             user_code=submission_in.code.model_dump(),
-            checkpoints=checkpoints
+            checkpoints=checkpoints,
+            topic_id=submission_in.topic_id
         )
 
         # 3. 异步更新学生模型和快照
