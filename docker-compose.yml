@@ -21,7 +21,7 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - DATABASE_URL=mysql+pymysql://caelan:Silvis0852.@172.25.22.172:3306/ai_baseline
+      - DATABASE_URL=mysql+pymysql://caelan:Silvis0852.@172.25.22.172:3306/ai_exp
     volumes:
       - ./backend:/app/backend
       - backend_data:/app/backend/app/db
@@ -39,7 +39,7 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - DATABASE_URL=mysql+pymysql://caelan:Silvis0852.@172.25.22.172:3306/ai_baseline
+      - DATABASE_URL=mysql+pymysql://caelan:Silvis0852.@172.25.22.172:3306/ai_exp
     volumes:
       - ./backend:/app/backend
     depends_on:
@@ -57,7 +57,7 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - DATABASE_URL=mysql+pymysql://caelan:Silvis0852.@172.25.22.172:3306/ai_baseline
+      - DATABASE_URL=mysql+pymysql://caelan:Silvis0852.@172.25.22.172:3306/ai_exp
     volumes:
       - ./backend:/app/backend
     depends_on:
@@ -75,7 +75,7 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - DATABASE_URL=mysql+pymysql://caelan:Silvis0852.@172.25.22.172:3306/ai_baseline
+      - DATABASE_URL=mysql+pymysql://caelan:Silvis0852.@172.25.22.172:3306/ai_exp
     volumes:
       - ./backend:/app/backend
     depends_on:
@@ -93,7 +93,7 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - DATABASE_URL=mysql+pymysql://caelan:Silvis0852.@172.25.22.172:3306/ai_baseline
+      - DATABASE_URL=mysql+pymysql://caelan:Silvis0852.@172.25.22.172:3306/ai_exp
     volumes:
       - ./backend:/app/backend
     depends_on:
