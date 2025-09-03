@@ -98,23 +98,6 @@ body {
     transform: 0.5s ease-in-out;
 }
 
-.top-header-lean {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: var(--header-height);
-    padding: 0 var(--spacing-xl);
-    background:var(--head-background);
-    color: white;
-    box-shadow: var(--shadow-light);
-    position: absolute; /* 改为绝对定位 */
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 50;
-    transition: height 0.5s ease-in-out;
-}
-
 .header-title {
     font-size: var(--header-font-size);
     font-weight: 600;
@@ -122,52 +105,116 @@ body {
     letter-spacing: -0.025em;
     z-index: 10; /* 确保标题在最上层 */
     flex-shrink: 0; /* 防止标题被压缩 */
+    position: absolute; /* 添加绝对定位 */
+    left: 20px; /* 设置左侧固定位置 */
 }
+
 .user-profile {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
     font-size: var(--font-size-sm);
-    z-index: 10;
-    flex-shrink: 0; 
+    z-index: 10; /* 确保用户信息在最上层 */
+    flex-shrink: 0; /* 防止用户信息被压缩 */
+    position: absolute; /* 添加绝对定位 */
+    right: 20px; /* 设置右侧固定位置 */
+}
+
+.top-header-lean {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: var(--header-height);
+    padding: 0 var(--spacing-xl);
+    background: var(--head-background);
+    color: white;
+    box-shadow: var(--shadow-light);
+    position: absolute; /* 保持绝对定位 */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20; /* 确保标题栏位于较高层级 */
+    transition: height 0.3s ease;
 }
 
 .top-header-lean:hover{
-  height: 300px; 
-  transition: height 0.3s ease; 
-  position: absolute; 
+  height: 64px; /* 保持原始高度 */
+  transition: height 0.3s ease;
+  position: absolute;
   width: 100%;
-  z-index: 100; 
+  z-index: 100;
 }
 
 .mini-knowledge-graph {
-    /* 强制重置对齐方式，确保左对齐 */
+    /* 修改为在标题栏内居中显示 */
     position: absolute !important;
     top: 50% !important;
-    left: 0 !important;
-    transform: translateY(-50%) !important;
-    margin-left: 2% !important;
-    width: calc(100% - 250px) !important; /* 进一步减小宽度，为右侧用户信息区域预留更多空间 */
-    height: 90% !important;
+    left: 50% !important; 
+    transform: translate(-50%, -50%) !important;
+    margin-left: 0 !important; 
+    width: 60% !important; 
+    height: 40px !important;
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-medium);
-    display: none;
-    z-index: 5; /* 在标题和用户信息之下 */
+    display: block;
+    z-index: 5;
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* 加快过渡效果，从0.2s改为0.3s */
+    transition: height 0.3s ease, box-shadow 0.3s ease, top 0.3s ease;
 }
 
-.top-header-lean:hover .mini-knowledge-graph {
-  display: block;
+.mini-knowledge-graph.expanded {
+    top: calc(50% + 70px) !important;
+    height: 180px !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.mini-graph-toggle {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 15;
+    border-radius: 50%;
+    transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+    background-color: #ffffff; /* 完全不透明的白色背景 */
+    border: 1px solid rgba(79, 70, 229, 0.3); /* 边框使用品牌色 */
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.15); /* 阴影使用品牌色 */
+}
+
+.mini-graph-toggle iconify-icon {
+    color: #4f46e5 !important; /* 确保图标使用品牌色 */
+    opacity: 1 !important; /* 确保完全不透明 */
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1)); /* 添加微小阴影提高可见度 */
+}
+
+.mini-graph-toggle:hover {
+    background-color: rgba(79, 70, 229, 0.1); /* 悬停时改变背景色 */
+    transform: scale(1.1);
+    box-shadow: 0 3px 8px rgba(79, 70, 229, 0.25); /* 悬停时增强阴影效果 */
+}
+
+.mini-graph-toggle:hover iconify-icon {
+    color: #3730a3 !important; /* 悬停时加深图标颜色 */
+}
+
+/* 修改旋转方向 */
+.mini-graph-toggle.rotated {
+    transform: rotate(180deg);
 }
 
 .mini-graph-container {
   width: 100%;
   height: 100%;
   position: relative;
-    padding: 20px; /* 添加内边距 */
+  padding: 0; /* 移除内边距 */
+  box-sizing: border-box; /* 确保边框和内边距不会增加元素尺寸 */
 }
 
 
@@ -254,14 +301,11 @@ body {
     }
 }
 
-/* 添加悬停时的微动效 */
-/* 当在.mini-knowledge-graph有单独指定时，这里的设置可能会被覆盖 */
-
-/* 知识图谱悬停效果 */
+/* 修改为不改变位置的悬停效果 */
 .mini-knowledge-graph:hover, .top-header-lean:hover .mini-knowledge-graph:hover {
-    transform: translateY(-50%) scale(1.02) !important;
     box-shadow: var(--card-shadow) !important;
 }
+
 /* 内容容器样式 */
 .content-container {
     display: flex;
@@ -2258,11 +2302,4 @@ iconify-icon {
 /* 确保标题栏与内容紧密连接 */
 .test-page .top-header {
     margin-bottom: 0; /* 移除底部边距 */
-}
-
-/* 在知识图谱展开时隐藏标题文字 */
-.top-header-lean:hover .header-title {
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
 }

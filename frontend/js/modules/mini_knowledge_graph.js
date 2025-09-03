@@ -14,14 +14,9 @@ export class MiniKnowledgeGraph {
       fontSize: 10,
       ...options
     };
-    
     this.cy = null;
     this.graphState = null;
     this.isInitialized = false;
-    this.isInitializing = false; // 初始化锁定标志
-    this.isVisible = false; // 跟踪容器是否可见
-    this.initAttempts = 0; // 初始化尝试次数
-    this.resizeObserver = null; // 用于监听容器尺寸变化
     this.layoutParams = LAYOUT_PARAMS;
     // 存储节点的原始尺寸
     this.originalSizes = new Map();
@@ -29,49 +24,11 @@ export class MiniKnowledgeGraph {
 
   // 初始化简化知识图谱
   async init() {
-    // 添加计数和时间戳
-    this._initCounter = this._initCounter || 0;
-    console.log(`尝试初始化 #${++this._initCounter}，时间：${new Date().toISOString()}`);
-    
-    // 如果正在初始化或已经初始化完成，则直接返回
-    if (this.isInitializing || this.isInitialized) {
-      console.log('已经在初始化中或已初始化完成，跳过本次初始化');
-      return;
-    }
-    
-    // 限制初始化尝试次数，避免无限循环
-    if (this.initAttempts > 5) {
-      console.warn(`知识图谱初始化尝试次数过多，跳过初始化`);
-      return;
-    }
-    
-    // 设置初始化锁定标志
-    this.isInitializing = true;
-    this.initAttempts++;
-    
     try {
       // 检查容器元素是否存在
       const container = document.getElementById(this.containerId);
       if (!container) {
         console.warn(`知识图谱容器元素 #${this.containerId} 不存在`);
-        return;
-      }
-      
-      // 检查容器是否可见，如果不可见则添加监听器等待可见
-      const isVisible = this.isContainerVisible(container);
-      if (!isVisible) {
-        console.log(`知识图谱容器元素 #${this.containerId} 当前不可见，等待可见`);
-        this.observeVisibility();
-        this.isInitializing = false; // 重置锁定标志
-        return;
-      }
-      
-      // 检查容器尺寸是否有效
-      const containerRect = container.getBoundingClientRect();
-      if (containerRect.width === 0 || containerRect.height === 0) {
-        console.warn(`知识图谱容器元素 #${this.containerId} 尺寸无效: ${containerRect.width}x${containerRect.height}，等待尺寸变化`);
-        this.observeVisibility();
-        this.isInitializing = false; // 重置锁定标志
         return;
       }
       
@@ -125,18 +82,17 @@ export class MiniKnowledgeGraph {
       // 添加交互效果
       this.setupInteractions();
       
+      // 启动监听容器状态变化
+      this.listenToContainerStateChange();
+      
+      // 绑定布局事件监听器
+      this.bindLayoutEvents();
+      
       this.isInitialized = true;
-      this.isVisible = true;
-      this.initAttempts = 0; // 重置尝试次数
       console.log('简化知识图谱初始化完成');
       
     } catch (error) {
       console.error('初始化简化知识图谱失败:', error);
-    } finally {
-      // 重置初始化锁定标志
-      if (!this.isInitialized) {
-        this.isInitializing = false;
-      }
     }
   }
 
@@ -209,12 +165,6 @@ export class MiniKnowledgeGraph {
     } catch (error) {
       console.error('设置当前学习节点失败:', error);
     }
-  }
-
-  // 检查容器是否可见
-  isContainerVisible(element) {
-    const style = window.getComputedStyle(element);
-    return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
   }
 
   // 创建Cytoscape实例
@@ -307,7 +257,7 @@ export class MiniKnowledgeGraph {
             'taxi-direction': 'auto',  // 自动选择最佳方向
             'taxi-turn': '40%',  // 调整拐角位置
             'edge-distances': 'intersection',  // 从节点边缘开始连线
-            'arrow-scale': 1.5,  // 减小箭头尺寸
+            'arrow-scale': 2,  // 减小箭头尺寸
             'line-style': 'solid',
             'transition-property': 'line-color, width, target-arrow-color',
             'transition-duration': '0.3s',
@@ -389,16 +339,13 @@ export class MiniKnowledgeGraph {
     // 隐藏所有知识点
     this.hideAllKnowledgeNodes();
     
-    // 自动展开当前学习章节
-    this.expandCurrentChapter();
-    
     // 居中缩放图谱
     this.centerAndZoomGraph();
   }
 
   // 自动展开当前学习章节
   expandCurrentChapter() {
-    // 如果有当前学习的章节，则自动展开它
+    // 恢复自动展开功能实现
     if (this.graphState.currentLearningChapter) {
       this.expandChapter(this.graphState.currentLearningChapter);
       console.log(`自动展开当前学习章节: ${this.graphState.currentLearningChapter}`);
@@ -414,6 +361,112 @@ export class MiniKnowledgeGraph {
         }
       }
     }
+  }
+
+  // 添加监听容器状态变化的方法
+  listenToContainerStateChange() {
+    const miniKnowledgeGraph = document.getElementById('miniKnowledgeGraph');
+    if (!miniKnowledgeGraph) {
+      console.warn('未找到知识图谱容器元素');
+      return;
+    }
+
+    // 创建MutationObserver来监听类名变化
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          const isExpanded = miniKnowledgeGraph.classList.contains('expanded');
+          console.log('知识图谱容器状态变化:', isExpanded ? '展开' : '收起');
+          
+          if (isExpanded) {
+            // 容器展开时，等比放大图谱并自动展开章节
+            this.adjustSizeForExpandedContainer();
+            this.expandCurrentChapter();
+          } else {
+            // 容器收起时，重置图谱大小并收起所有章节
+            this.resetSize();
+            // 等待容器动画完成后再进行居中操作
+            miniKnowledgeGraph.addEventListener('transitionend', () => {
+              console.log('容器收起动画完成，开始居中图谱');
+              this.centerAndZoomGraph();
+            }, { once: true }); // 只执行一次
+          }
+        }
+      });
+    });
+
+    // 开始监听容器的class属性变化
+    observer.observe(miniKnowledgeGraph, { attributes: true, attributeFilter: ['class'] });
+    console.log('已启动知识图谱容器状态监听');
+  }
+
+  // 等比放大图谱以适应展开的容器
+  adjustSizeForExpandedContainer() {
+    if (!this.cy) return;
+    
+    console.log('调整图谱大小以适应展开容器');
+    
+    // 设置章节节点的放大比例
+    const chapterScaleFactor = 1.5; // 放大50%
+    
+    // 调整章节节点大小
+    this.cy.nodes('[type="chapter"]').forEach(node => {
+      const originalSize = this.originalSizes.get(node.id());
+      if (originalSize) {
+        node.style({
+          'width': originalSize.width * chapterScaleFactor,
+          'height': originalSize.height * chapterScaleFactor,
+          'font-size': parseInt(node.style('font-size')) * chapterScaleFactor + 'px'
+        });
+      }
+    });
+    
+    // 调整后重新应用布局
+    this.setFixedChapterPositions();
+    this.centerAndZoomGraph();
+  }
+
+  // 重置图谱大小
+  resetSize() {
+      if (!this.cy) return;
+    
+      console.log('重置图谱大小 - 通过重新初始化');
+    // 恢复所有节点到原始大小
+    this.cy.nodes().forEach(node => {
+      const originalSize = this.originalSizes.get(node.id());
+      if (originalSize) {
+        node.style({
+          'width': originalSize.width,
+          'height': originalSize.height
+        });
+        
+        // 恢复字体大小
+        if (node.data('type') === 'chapter') {
+          node.style('font-size', '28px');
+        } else {
+          node.style('font-size', '14px');
+        }
+      }
+    });
+    
+    // 重新应用布局
+    this.setFixedChapterPositions();
+    this.hideAllKnowledgeNodes();
+    this.centerAndZoomGraph();
+
+  }
+
+  // 收起所有章节
+  collapseAllChapters() {
+    if (!this.cy) return;
+    
+    console.log('收起所有章节');
+    
+    // 获取所有已展开的章节并收起
+    const expandedChapters = [...this.graphState.expandedSet];
+    expandedChapters.forEach(chapterId => {
+      this.collapseChapter(chapterId);
+    });
   }
 
   // 设置交互效果
@@ -588,8 +641,8 @@ export class MiniKnowledgeGraph {
     const chapterNodes = this.cy.nodes('[type="chapter"]');
     const containerWidth = this.cy.container().clientWidth;
 
-    // 增加间距系数，1.2表示比原来宽20%
-    const spacingFactor = 2.5;
+    // 增加间距系数，从2.5增加到4.0，使章节之间间距更大
+    const spacingFactor = 4.0;
     const baseSpacing = containerWidth / (chapterNodes.length + 1);
     const actualSpacing = baseSpacing * spacingFactor;
 
@@ -724,7 +777,7 @@ export class MiniKnowledgeGraph {
           'opacity': 0,
           'curve-style': 'straight',  // 确保使用直线连接
           'edge-distances': 'intersection',  // 从节点边缘开始连线
-          'arrow-scale': 1.5  // 保持一致的箭头尺寸
+          'arrow-scale': 2  // 保持一致的箭头尺寸
         });
         e.show();
         
@@ -742,9 +795,29 @@ export class MiniKnowledgeGraph {
     });
   }
 
+  bindLayoutEvents() {
+    // 窗口大小改变时重新布局
+    window.addEventListener('resize', () => {
+      this.debounceCenterAndZoom();
+    });
+
+    // 节点位置变化时重新调整
+    this.cy.on('position', 'node', () => {
+      this.debounceCenterAndZoom();
+    });
+  }
+
+  debounceCenterAndZoom() {
+    if (this.debounceTimer) clearTimeout(this.debounceTimer);
+    this.debounceTimer = setTimeout(() => {
+      /* this.adjustLayoutToAvoidOverlap(); */// 添加自动布局调整功能
+      this.centerAndZoomGraph();
+    }, 100);
+  }
+
   // 居中缩放图谱
   centerAndZoomGraph() {
-     const nodes = this.cy.nodes().filter(node => node.visible());
+    const nodes = this.cy.nodes().filter(node => node.visible());
     if (nodes.length === 0) return;
     
     let minX = Infinity, maxX = -Infinity;
@@ -773,15 +846,31 @@ export class MiniKnowledgeGraph {
     const width = maxX - minX;
     const height = maxY - minY;
     
-    const containerWidth = this.cy.container().clientWidth;
-    const containerHeight = this.cy.container().clientHeight;
+    const container = this.cy.container();
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
     
-    const scaleX = containerWidth / width;
-    const scaleY = containerHeight / height;
-    const scale = Math.min(scaleX, scaleY, 1.2) * 0.95; // 稍微增加缩放比例
+    // 检查是否处于收起状态（高度接近40px）
+    const isCollapsed = containerHeight <= 50; // 收起状态高度阈值
     
-    const panX = -centerX * scale + containerWidth / 2;
-    const panY = -centerY * scale + containerHeight / 2;
+    let scale, panX, panY;
+    
+    if (isCollapsed) {
+      // 使用固定的缩放比例，确保图谱可见
+      scale = Math.min(0.3, 1.2) * 0.95; // 收起时使用较小但可见的缩放比例
+      
+      // 在收起状态下居中显示
+      panX = -centerX * scale + containerWidth / 2;
+      panY = -centerY * scale + containerHeight / 2; 
+    } else {
+      // 展开状态下的正常处理
+      const scaleX = containerWidth / width;
+      const scaleY = containerHeight / height;
+      scale = Math.min(scaleX, scaleY, 1.2) * 0.95; // 稍微增加缩放比例
+      
+      panX = -centerX * scale + containerWidth / 2;
+      panY = -centerY * scale + containerHeight / 2;
+    }
     
     this.cy.animate({
       zoom: scale,
@@ -806,44 +895,6 @@ export class MiniKnowledgeGraph {
       this.cy.destroy();
     }
     this.isInitialized = false;
-    this.isInitializing = false;
-    this.isVisible = false;
-    
-    // 断开观察器
-    if (this.resizeObserver) {
-      this.resizeObserver.disconnect();
-      this.resizeObserver = null;
-    }
-  }
-
-  // 监听容器可见性变化
-  observeVisibility() {
-    console.log(`执行observeVisibility方法，时间：${new Date().toISOString()}`);
-    
-    const container = document.getElementById(this.containerId);
-    if (!container) return;
-
-    // 如果已经存在观察器，先断开
-    if (this.resizeObserver) {
-      this.resizeObserver.disconnect();
-      this.resizeObserver = null;
-    }
-
-    // 仅使用 ResizeObserver 作为唱一初始化入口
-    if (window.ResizeObserver) {
-      this.resizeObserver = new ResizeObserver(entries => {
-        for (let entry of entries) {
-          const { width, height } = entry.contentRect;
-          // 如果容器尺寸变为有效且之前未初始化成功，则尝试初始化
-          if (width > 0 && height > 0 && !this.isInitialized) {
-            console.log('检测到容器尺寸变化为有效，尝试初始化知识图谱');
-            // 直接初始化，不使用延时
-            this.init();
-          }
-        }
-      });
-      this.resizeObserver.observe(container);
-    }
   }
 }
 

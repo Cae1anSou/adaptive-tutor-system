@@ -352,29 +352,6 @@ function initializeUIEvents(iframe) {
     initIframeSelector();
 }
 
-// 处理初始化失败的情况
-// async function handleInitializationFailure(topicId) {
-//     console.log('[MainApp] 使用默认配置进行初始化...');
-
-//     // 设置默认元素
-//     allowedElements = {
-//         cumulative: ['div', 'span', 'p', 'h1', 'h2', 'h3'],
-//         current: ['div', 'span', 'p']
-//     };
-
-//     // 初始化知识点模块
-//     knowledgeModule = new KnowledgeModule();
-//     console.log('[MainApp] 知识点模块初始化完成（失败后）');
-
-    // 初始化聊天模块 - 已注释
-    // try {
-    //     chatModule.init('learning', topicId);
-    //     console.log('[MainApp] 聊天模块初始化完成（失败后）');
-    // } catch (error) {
-    //     console.error('[MainApp] 聊天模块初始化失败（失败后）:', error);
-    // }
-// }
-
 // ==================== 功能模块 ====================
 
 /**
@@ -742,6 +719,40 @@ function initEventListeners() {
     const askAIButton = document.getElementById('askAIButton');
     const clearSelectionButton = document.getElementById('clearSelectionButton');
 
+    // 添加知识图谱展开/收起功能
+    const miniGraphToggle = document.getElementById('miniGraphToggle');
+    const miniKnowledgeGraph = document.getElementById('miniKnowledgeGraph');
+    const toggleIcon = document.getElementById('toggleIcon');
+
+    if (miniGraphToggle && miniKnowledgeGraph && toggleIcon) {
+        // 确保图标默认有颜色和可见性
+        toggleIcon.style.color = '#4f46e5';
+        toggleIcon.style.opacity = '0.8';
+        
+        miniGraphToggle.addEventListener('click', () => {
+            // 切换展开状态
+            const isExpanding = !miniKnowledgeGraph.classList.contains('expanded');
+            miniKnowledgeGraph.classList.toggle('expanded');
+            
+            // 更改图标并切换旋转类
+            if (isExpanding) {
+                // 展开时，将图标更改为向上箭头
+                toggleIcon.setAttribute('icon', 'mdi:chevron-up');
+                // 移除旋转类以防止重复应用
+                miniGraphToggle.classList.remove('rotated');
+                toggleIcon.style.color = '#3730a3'; // 更深的紫色
+                toggleIcon.style.opacity = '1';     // 完全不透明
+            } else {
+                // 收起时，将图标更改为向下箭头
+                toggleIcon.setAttribute('icon', 'mdi:chevron-down');
+                // 移除旋转类以防止重复应用
+                miniGraphToggle.classList.remove('rotated');
+                toggleIcon.style.color = '#4f46e5'; // 恢复默认紫色
+                toggleIcon.style.opacity = '0.8';   // 恢复默认不透明度
+            }
+        });
+    }
+
     // 初始化按钮状态：确保询问AI按钮默认隐藏
     if (askAIButton) {
         askAIButton.style.display = 'none';
@@ -958,8 +969,6 @@ document.addEventListener('problemHintNeeded', (event) => {
 });
 
 // 在AI对话框中显示提示消息
-// 在AI对话框中显示提示消息（适配现有HTML结构）
-// 在AI对话框中显示提示消息（永远追加到底部）
 function showProblemHintInChat(message, editorType, editCount) {
     const chatMessages = document.getElementById('ai-chat-messages');
     if (!chatMessages) {
