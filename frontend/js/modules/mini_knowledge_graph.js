@@ -186,9 +186,9 @@ export class MiniKnowledgeGraph {
             'text-halign': 'center',
             'color': '#1e293b',
             'background-color': '#f1f5f9',
-            'width': 120,
-            'height': 120,
-            'font-size': '14px',
+            'width': 150,
+            'height': 150,
+            'font-size': '20px',
             'font-family': 'Inter, sans-serif',
             'font-weight': 500,
             'font-weight': 'bold',
@@ -444,7 +444,7 @@ export class MiniKnowledgeGraph {
         if (node.data('type') === 'chapter') {
           node.style('font-size', '28px');
         } else {
-          node.style('font-size', '14px');
+          node.style('font-size', '20px');
         }
       }
     });
@@ -488,7 +488,7 @@ export class MiniKnowledgeGraph {
       node.style({
         'background-color': node.data('type') === 'chapter' ? '#3730a3' : '#c7d2fe',
         'color': node.data('type') === 'chapter' ? '#ffffff' : '#1e293b',
-        'font-size': node.data('type') === 'chapter' ? '30px' : '20px',
+        'font-size': node.data('type') === 'chapter' ? '30px' : '28px',
         'border-color': '#4f46e5',
         'width': originalSize.width * scaleFactor,
         'height': originalSize.height * scaleFactor
@@ -505,7 +505,7 @@ export class MiniKnowledgeGraph {
       const node = evt.target;
       node.style({
         'color': '#1e293b',
-        'font-size': node.data('type') === 'chapter' ? '28px' : '14px',
+        'font-size': node.data('type') === 'chapter' ? '28px' : '20px',
       });
       this.restoreNodeStyle(node);
       
@@ -687,20 +687,17 @@ export class MiniKnowledgeGraph {
     const isTop = idx % 2 === 0;
 
     // 减小知识点与章节之间的距离，使连线更短
-    const baseY = isTop 
-      ? chapterPos.y + this.layoutParams.KNOWLEDGE_ROW_DELTA_Y * 0.6  // 减小垂直距离
-      : chapterPos.y - this.layoutParams.KNOWLEDGE_ROW_DELTA_Y * 0.6;
+    const baseY =  chapterPos.y + this.layoutParams.KNOWLEDGE_ROW_DELTA_Y * 0.6;
 
     const n = kids.length;
-    const maxWidth = this.cy.container().clientWidth * 0.5;  // 减小横向宽度，使知识点更集中
-    const gap = Math.min(this.layoutParams.KNOWLEDGE_GAP_X * 0.8, maxWidth / Math.max(n, 4));  // 减小间距
+    const maxWidth = this.cy.container().clientWidth * 1;  // 减小横向宽度，使知识点更集中
+    const gap = Math.min(this.layoutParams.KNOWLEDGE_GAP_X * 0.8, maxWidth / Math.max(n, 4));  // 减小间距 
     const half = (n - 1) / 2;
     const slopeStep = (this.layoutParams.KNOWLEDGE_HEIGHT_STEP || 25) * 0.7;  // 减小高度步进
 
     kids.forEach((id, i) => {
       const x = chapterPos.x + (i - half) * gap;
-      // 减小倾斜偏移
-      const y = baseY + (i - half) * slopeStep * (isTop ? 1 : -1);
+      const y = baseY;
 
       this.graphState.fixedPositions[id] = { x, y };
     });
