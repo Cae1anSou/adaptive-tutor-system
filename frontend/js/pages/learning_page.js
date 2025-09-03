@@ -11,16 +11,7 @@ import {
     getTopicData
 } from '../modules/docs_module.js';
 
-import {
-    createSelectorBridge,
-    initIframeSelector,
-    handleStartSelector,
-    stopSelector,
-    initBridge,
-    handleCumulativeToggle,
-    handleShowSource,
-    handleError
-} from '../modules/iframe-selector.js';
+// 移除选取元素模块导入
 
 // 导入行为追踪器
 import tracker from '../modules/behavior_tracker.js';
@@ -41,13 +32,8 @@ import websocket from '../modules/websocket_client.js';
 console.log('learning_page.js 开始加载...');
 
 // ==================== 变量定义 ====================
-let bridge = null;
-let allowedElements = {
-    cumulative: [],
-    current: []
-};
+// 移除了选取元素相关变量
 let currentTopicId = '1_1'; // 默认主题ID
-let selectedElementInfo = null; // 保存当前选中的元素信息
 
 // 模块实例
 let knowledgeModule = null;
@@ -101,8 +87,6 @@ const AppDataStore = {
 // iframe加载状态管理
 let iframeLoadProcessed = false;
 
-// 移除默认 participant_id 注入逻辑：若无会话应重定向到首页由用户输入
-
 // ==================== 主应用初始化 ====================
 async function initMainApp() {
     // 防止重复初始化的检查
@@ -126,14 +110,11 @@ async function initMainApp() {
             console.log('开始初始化主应用...');
             
             // 获取必要的DOM元素
-            const { startButton, stopButton, iframe } = getRequiredDOMElements();
-            if (!startButton || !stopButton || !iframe) {
-                throw new Error('必要的DOM元素未找到');
+            const { iframe } = getRequiredDOMElements();
+            if (!iframe) {
+                throw new Error('iframe元素未找到');
             }
             
-            // 初始化按钮状态
-            startButton.disabled = true;
-
             // 获取topicId并更新页面标题
             const topicId = getTopicIdFromURL();
             updatePageTitle(topicId);
@@ -148,15 +129,11 @@ async function initMainApp() {
                 // 初始化UI事件
                 initializeUIEvents(iframe);
 
-                // 启用按钮
-                startButton.disabled = false;
-
                 console.log('主应用初始化完成');
 
             } catch (error) {
                 console.error('数据加载失败，使用默认配置:', error);
                 //await handleInitializationFailure(topicId);
-                startButton.disabled = false;
             }
 
         } catch (error) {
@@ -173,11 +150,9 @@ async function initMainApp() {
 
 // 获取必要的DOM元素
 function getRequiredDOMElements() {
-    const startButton = document.getElementById('startSelector');
-    const stopButton = document.getElementById('stopSelector');
     const iframe = document.getElementById('element-selector-iframe');
 
-    return { startButton, stopButton, iframe };
+    return { iframe };
 }
 
 // 从URL获取topicId
@@ -215,14 +190,14 @@ async function loadAllData(topicId) {
     AppDataStore.setData('userProgress', userProgress);
     AppDataStore.setData('allowedElements', elementsData);
 
-    // 设置全局变量
-    allowedElements = elementsData;
-
     console.log('[MainApp] 数据加载完成:', {
         topicContent: topicContent.title,
         elementsCount: elementsData.current.length,
         progress: userProgress?.data?.completed_topics?.length || 0
     });
+
+    // 显示示例代码片段
+    displayExampleCodeSnippets(topicContent);
 }
 
 // 获取学习内容数据
@@ -323,38 +298,9 @@ async function initializeModules(topicId) {
 
 // 初始化UI事件
 function initializeUIEvents(iframe) {
-    // 初始化iframe事件监听（只绑定一次）
-    initIframeEvents(iframe);
-
     // 初始化所有事件监听器
     initEventListeners();
-
-    // 初始化iframe选择器
-    initIframeSelector();
 }
-
-// 处理初始化失败的情况
-// async function handleInitializationFailure(topicId) {
-//     console.log('[MainApp] 使用默认配置进行初始化...');
-
-//     // 设置默认元素
-//     allowedElements = {
-//         cumulative: ['div', 'span', 'p', 'h1', 'h2', 'h3'],
-//         current: ['div', 'span', 'p']
-//     };
-
-//     // 初始化知识点模块
-//     knowledgeModule = new KnowledgeModule();
-//     console.log('[MainApp] 知识点模块初始化完成（失败后）');
-
-    // 初始化聊天模块 - 已注释
-    // try {
-    //     chatModule.init('learning', topicId);
-    //     console.log('[MainApp] 聊天模块初始化完成（失败后）');
-    // } catch (error) {
-    //     console.error('[MainApp] 聊天模块初始化失败（失败后）:', error);
-    // }
-// }
 
 // ==================== 功能模块 ====================
 
@@ -634,7 +580,6 @@ function initIframeEvents(iframe) {
 
 // 事件监听器初始化
 function initEventListeners() {
-    const startButton = document.getElementById('startSelector');
     const stopButton = document.getElementById('stopSelector');
     const cumulativeToggle = document.getElementById('cumulativeToggle');
     const showSourceBtn = document.getElementById('showSourceBtn');
@@ -653,63 +598,12 @@ function initEventListeners() {
         console.log('初始化：询问AI按钮已隐藏');
     }
 
-    // 启动选择器
-    if (startButton) {
-        startButton.addEventListener('click', () => {
-            handleStartSelector(allowedElements, bridge, showStatus);
-            // 切换按钮状态
-            if (startButton && stopButton) {
-                startButton.style.display = 'none';
-                stopButton.style.display = 'flex';
-            }
-        });
-    }
 
-    // 停止选择器
-    if (stopButton) {
-        stopButton.addEventListener('click', () => {
-            stopSelector(bridge);
-            // 切换按钮状态
-            if (startButton && stopButton) {
-                startButton.style.display = 'flex';
-                stopButton.style.display = 'none';
-            }
-            // 注意：不隐藏AI询问按钮，让它保持显示状态
-            // AI按钮的显示状态基于是否有选中的元素（selectedElementInfo），而不是选择器状态
-            // 只有点击“清除选择”按钮时才会隐藏AI按钮
-        });
-    }
 
     // AI询问按钮
     if (askAIButton) {
         askAIButton.addEventListener('click', () => {
             askAIAboutElement();
-        });
-    }
-
-    // 清除选择按钮
-    if (clearSelectionButton) {
-        clearSelectionButton.addEventListener('click', () => {
-            // 清除选中的元素信息
-            selectedElementInfo = null;
-
-            // 隐藏AI询问按钮（重置为默认隐藏状态）
-            if (askAIButton) {
-                askAIButton.classList.remove('show');
-                askAIButton.style.display = 'none';
-                askAIButton.style.visibility = 'hidden';
-                console.log('清除选择：询问AI按钮已隐藏');
-            }
-
-            // 隐藏清除选择按钮
-            clearSelectionButton.style.display = 'none';
-            clearSelectionButton.style.visibility = 'hidden';
-
-            // 清空代码面板
-            const codeContent = document.getElementById('code-content');
-            if (codeContent) {
-                codeContent.innerHTML = '<h2>选中元素代码</h2><pre id="selectedElementCode"></pre>';
-            }
         });
     }
 
@@ -737,11 +631,6 @@ function initEventListeners() {
             tabCode.classList.add('active');
             tabKnowledge.classList.remove('active');
         });
-    }
-
-    // 返回源代码按钮
-    if (showSourceBtn) {
-        showSourceBtn.addEventListener('click', handleShowSource);
     }
 
     // 开始测试按钮
@@ -788,18 +677,11 @@ function createElementSelectedWithTracking() {
         // }
 
         // 自动切换按钮状态
-        const startButton = document.getElementById('startSelector');
         const stopButton = document.getElementById('stopSelector');
         const askAIButton = document.getElementById('askAIButton');
         const clearSelectionButton = document.getElementById('clearSelectionButton');
 
-        console.log('获取到的按钮元素:', {startButton, stopButton, askAIButton, clearSelectionButton});
-
-        if (startButton && stopButton) {
-            startButton.style.display = 'flex';
-            stopButton.style.display = 'none';
-        }
-
+        console.log('获取到的按钮元素:', {stopButton, askAIButton, clearSelectionButton});
 
         // 显示AI询问按钮（只有在选中元素后才显示）
         if (askAIButton) {
@@ -1337,4 +1219,58 @@ function extendChatModuleForElementContext() {
     };
 
     console.log('[Learning] 聊天模块已扩展以支持元素上下文');
+}
+
+// 显示示例代码片段
+function displayExampleCodeSnippets(topicContent) {
+    // 获取代码展示区域
+    const codeContentElement = document.getElementById('code-content');
+    
+    // 检查是否有示例代码
+    if (!topicContent.example_code_snippets || topicContent.example_code_snippets.length === 0) {
+        return;
+    }
+    
+    // 直接替换代码内容区域的内容
+    if (codeContentElement) {
+        // 构建示例代码的HTML内容
+        let exampleCodeHTML = '<h2>示例代码</h2>';
+        
+        // 为每个示例代码片段创建展示元素
+        topicContent.example_code_snippets.forEach((snippet, index) => {
+            // 获取代码内容（code或snippet字段）
+            const codeSnippet = snippet.code || snippet.snippet || '';
+            
+            // 格式化代码
+            const formattedCode = formatCode(codeSnippet);
+            
+            // 添加到HTML内容中
+            exampleCodeHTML += `
+                <div class="example-snippet" style="margin-bottom: 20px;">
+                    <h4 class="snippet-title" style="margin-bottom: 10px; color: var(--text-color);">${snippet.element}</h4>
+                    <pre class="snippet-code" style="background: #f6f8fa; padding: 12px; border-radius: 4px; overflow-x: auto; font-size: var(--font-size-sm); line-height: 1.5;"><code style="font-family: 'Courier New', monospace; font-size: var(--font-size-sm);">${formattedCode}</code></pre>
+                </div>
+            `;
+        });
+        
+        // 显示到代码面板
+        codeContentElement.innerHTML = exampleCodeHTML;
+    }
+}
+
+// 格式化代码显示
+function formatCode(code) {
+    if (!code) return '';
+    
+    // 转义HTML特殊字符
+    const escapeHtml = (text) => {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    };
+    
+    // 格式化代码（简单的换行处理）
+    return escapeHtml(code)
+        .replace(/\n/g, '<br>')
+        .replace(/\s/g, '&nbsp;');
 }

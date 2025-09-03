@@ -83,6 +83,21 @@ class SelectElementInfo(BaseModel):
     select_element: List[str] = Field(..., min_length=0, description="选择元素列表")
 
 
+class ExampleCodeSnippet(BaseModel):
+    """示例代码片段模型
+    
+    用于展示学习内容中的示例代码。
+    
+    Attributes:
+        element: 元素描述
+        code: HTML代码示例（可选）
+        snippet: CSS/JS代码片段（可选）
+    """
+    element: str = Field(..., min_length=1, description="元素描述")
+    code: Optional[str] = Field(None, description="HTML代码示例")
+    snippet: Optional[str] = Field(None, description="CSS/JS代码片段")
+
+
 class LearningContent(BaseModel):
     """学习内容模型
     
@@ -93,11 +108,13 @@ class LearningContent(BaseModel):
         title: 学习内容标题
         levels: 等级信息列表
         sc_all: 选择元素信息列表
+        example_code_snippets: 示例代码片段列表
     """
     topic_id: str = Field(..., min_length=1, description="知识点ID")
     title: str = Field(..., min_length=1, description="学习内容标题")
     levels: List[LevelInfo] = Field(..., min_length=1, description="等级信息列表")
     sc_all: List[SelectElementInfo] = Field(..., description="选择元素信息列表")
+    example_code_snippets: Optional[List[ExampleCodeSnippet]] = Field(None, description="示例代码片段列表")
 
 
 class BaseCheckpoint(BaseModel):

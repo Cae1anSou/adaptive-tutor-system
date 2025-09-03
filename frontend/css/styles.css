@@ -1981,7 +1981,7 @@ html.sw-selector-active .clickable {
 
 /* 代码展示区域标题样式 */
 #code-content h2 {
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-lg);
     font-weight: 600;
     margin-bottom: var(--spacing-md);
     color: var(--text-color);
