@@ -2,6 +2,9 @@
 // ==================== 导入模块 ====================
 // 导入配置模块
 import { AppConfig, buildBackendUrl, initializeConfig } from '../modules/config.js';
+<<<<<<< HEAD
+import {  setupBackButton, getUrlParam, trackReferrer,navigateTo } from '../modules/navigation.js';
+=======
 import { MiniKnowledgeGraph } from '../modules/mini_knowledge_graph.js';
 import { setupHeaderTitle, setupBackButton, getUrlParam, trackReferrer,navigateTo } from '../modules/navigation.js';
 // 导入功能模块
@@ -10,6 +13,7 @@ import {
     setTopicData,
     getTopicData
 } from '../modules/docs_module.js';
+>>>>>>> 7520342a0e67a9ac683ad0d15203a418a0d9cf10
 
 import {
     createSelectorBridge,
@@ -316,8 +320,20 @@ async function initializeModules(topicId) {
     
     // 渲染知识点内容
     if (topicContent?.levels) {
-        setTopicData(topicContent);
-        renderTopicContent();
+        // 获取知识点内容容器
+        const knowledgeContent = document.getElementById('knowledge-content');
+        if (knowledgeContent) {
+            // 清空现有内容
+            knowledgeContent.innerHTML = '';
+            
+            // 为每个level创建一个段落元素
+            topicContent.levels.forEach(level => {
+                const paragraph = document.createElement('p');
+                paragraph.textContent = level.description;
+                paragraph.className = 'knowledge-point-description';
+                knowledgeContent.appendChild(paragraph);
+            });
+        }
     }
 }
 
@@ -547,31 +563,40 @@ class KnowledgeModule {
     showAllCardContents() {
         console.log('[KnowledgeModule] 直接显示所有卡片内容');
         
-        // 去除任何可能影响卡片展示的类
-        this.levelCards.forEach(card => {
-            // 移除可能影响卡片大小的所有类
-            card.classList.remove('collapsed');
-            card.classList.remove('expanded');
-            // 删除点击效果
-            card.style.cursor = 'default';
+<<<<<<< HEAD
+        this.levelCards.forEach((card, index) => {
+            console.log(`[KnowledgeModule] 为卡片 ${index + 1} (level ${card.dataset.level}) 绑定点击事件`);
+            
+            card.addEventListener('click', (event) => {
+                console.log(`[KnowledgeModule] 卡片 ${index + 1} 被点击了！`);
+                event.preventDefault();
+                event.stopPropagation();
+                this.handleCardClick(card);
+            });
+        });
+        
+        console.log('[KnowledgeModule] 事件绑定完成');
+    }
+    
+    // 绑定键盘事件
+    bindKeyboardEvents() {
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                const isExpanded = this.knowledgePanel.classList.contains('expanded');
+                if (isExpanded) {
+                    console.log('[KnowledgeModule] 检测到ESC键，退出展开模式');
+                    // 收起所有卡片
+                    this.levelCards.forEach(card => {
+                        card.classList.remove('expanded');
+                        card.classList.add('collapsed');
+                    });
+                    // 收起知识点面板
+                    this.knowledgePanel.classList.remove('expanded');
+                }
+            }
         });
     }
     
-
-    
-
-    
-    // 展开指定等级的卡片（兼容现有API）
-    expandLevel(level) {
-        // 仅做兼容，不执行实际操作
-        console.log(`[KnowledgeModule] expandLevel 函数被调用，但由于现在所有卡片已直接显示，因此不执行操作`);
-    }
-    
-    // 收起所有卡片（兼容现有API）
-    collapseAll() {
-        // 仅做兼容，不执行实际操作
-        console.log(`[KnowledgeModule] collapseAll 函数被调用，但由于现在已使用直接显示模式，因此不执行操作`);
-    }
 }
 
 // ==================== 事件处理函数 ====================
