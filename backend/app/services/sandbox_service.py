@@ -49,17 +49,23 @@ class SandboxService:
         self._playwright_manager = playwright_manager or DefaultPlaywrightManager()
         self._headless = headless
 
-    def run_evaluation(self, user_code: Dict[str, str], checkpoints: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def run_evaluation(self, user_code: Dict[str, str], checkpoints: List[Dict[str, Any]], topic_id: str = None) -> Dict[str, Any]:
         """
         运行代码评测
 
         Args:
             user_code: 用户提交的代码，包含 html, css, js
             checkpoints: 检查点列表
+            topic_id: 测试任务ID，用于判断是否使用 raw HTML 模式
 
         Returns:
             评测结果字典
         """
+        # 根据 topic_id 判断是否使用 raw HTML 模式
+        # 指定需要使用 raw HTML 模式的任务列表
+        RAW_HTML_TASKS = ["1_3","1_end","2_end","3_end","4_end","5_end","6_end"]  # 可以在这里添加更多需要 raw 模式的任务
+        raw_html_mode = (topic_id in RAW_HTML_TASKS)
+        
         results = []
         passed_all = True
 
@@ -81,21 +87,76 @@ class SandboxService:
                 )
                 page = browser.new_page()
 
-                # 构建更标准的HTML结构
-                full_html = f"""
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <style>{user_code.get('css', '')}</style>
-                </head>
-                <body>
-                    {user_code.get('html', '')}
-                    <script>{user_code.get('js', '')}</script>
-                </body>
-                </html>
-                """
-                page.set_content(full_html, wait_until="load")  # 等待页面加载完成
+                # 根据模式构建HTML结构
+                if raw_html_mode:
+                    # Raw HTML模式：直接使用用户的完整HTML代码，不做任何修改
+                    full_html = user_code.get('html', '')
+                    
+                    # 如果用户没有写任何内容，添加一个标记以便检查点识别
+                    if not full_html.strip():
+                        # 用户什么都没写，使用一个特殊的空页面
+                        full_html = '<html><head></head><body data-empty="true"></body></html>'
+                    
+                    # 在Raw模式下，需要将CSS和JS也整合到HTML中
+                    css_content = user_code.get('css', '')
+                    js_content = user_code.get('js', '')
+                    
+                    # 将用户原始HTML传递给页面，供检查点使用
+                    full_html_with_script = full_html + f'<script>window.userOriginalHTML = {repr(user_code.get("html", ""))}</script>'
+                    
+                    # 注入CSS和JS
+                    if css_content:
+                        # 在<head>标签中添加<style>标签
+                        if '<head>' in full_html_with_script:
+                            full_html_with_script = full_html_with_script.replace(
+                                '<head>', 
+                                f'<head><style>{css_content}</style>', 
+                                1
+                            )
+                        else:
+                            # 如果没有<head>标签，添加一个
+                            full_html_with_script = full_html_with_script.replace(
+                                '<html', 
+                                f'<html><head><style>{css_content}</style></head>', 
+                                1
+                            )
+                    
+                    if js_content:
+                        # 在</body>标签前添加<script>标签
+                        if '</body>' in full_html_with_script:
+                            full_html_with_script = full_html_with_script.replace(
+                                '</body>', 
+                                f'<script>{js_content}</script></body>', 
+                                1
+                            )
+                        else:
+                            # 如果没有</body>标签，添加一个
+                            full_html_with_script = full_html_with_script + f'<script>{js_content}</script>'
+                    
+                    # 在Raw模式下也需要设置页面内容
+                    page.set_content(full_html_with_script, wait_until="load")  # 等待页面加载完成
+                else:
+                    # 标准沙箱模式：将用户代码嵌入到标准模板中
+                    full_html = f"""
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <style>{user_code.get('css', '')}</style>
+                    </head>
+                    <body>
+                        {user_code.get('html', '')}
+                        <script>
+                        window.__alertMessages = [];
+                        window.alert = function (msg) {{
+                            window.__alertMessages.push(msg);
+                        }};
+                        </script>
+                        <script>{user_code.get('js', '')}</script>
+                    </body>
+                    </html>
+                    """
+                    page.set_content(full_html, wait_until="load")  # 等待页面加载完成
 
                 for i, cp in enumerate(checkpoints):
                     passed, detail = self._evaluate_checkpoint(page, cp)
@@ -379,8 +440,26 @@ class SandboxService:
             比较结果
         """
         # 清理值（去除首尾空格）
-        actual_value = actual_value.strip()
-        expected_value = expected_value.strip()
+        actual_value = actual_value.strip().lower()
+        expected_value = expected_value.strip().lower()
+        
+        # 处理font-weight特殊值映射
+        font_weight_mapping = {
+            'bold': '700',
+            '700': 'bold',
+            'normal': '400',
+            '400': 'normal',
+            # 它们的计算值取决于父元素的字重
+        }
+        
+        # 如果是font-weight相关的比较，进行特殊处理
+        if assertion_op == "equals":
+            # 检查是否为font-weight值的等价比较
+            if (actual_value in font_weight_mapping and 
+                font_weight_mapping[actual_value] == expected_value) or \
+               (expected_value in font_weight_mapping and 
+                font_weight_mapping[expected_value] == actual_value):
+                return True
         
         # 解析单位
         def parse_value_with_unit(value):
@@ -388,7 +467,7 @@ class SandboxService:
             match = re.match(r'^([+-]?(?:\d+\.?\d*|\.\d+))([a-zA-Z%]*)$', value)
             if match:
                 num, unit = match.groups()
-                return float(num), unit
+                return float(num), unit.lower()  # 单位也进行小写化
             return value, ""
         
         # 尝试进行颜色比较
@@ -442,11 +521,15 @@ class SandboxService:
                 return actual_num >= expected_num
             elif assertion_op == "less_than_or_equal":
                 return actual_num <= expected_num
+            elif assertion_op == "contains":
+                return str(expected_value) in str(actual_value)
+            elif assertion_op == "exists":
+                return actual_value != "" and actual_value != "none"
         except (ValueError, TypeError):
             # 如果解析失败，回退到字符串比较
             pass
 
-        # 对于非数值比较，直接字符串比较
+        # 对于非数值比较，直接字符串比较（大小写不敏感）
         if assertion_op == "equals":
             return actual_value == expected_value
         elif assertion_op == "contains":

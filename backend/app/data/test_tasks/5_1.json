@@ -3,7 +3,7 @@
   "title": "插入并管理网页中的图片元素",
   "description_md": "请为每个商品卡片插入图片，并设置合适的展示样式。\n\n- 请在 `.card` 元素的顶部添加 `<img>` 标签\n- 每个图片应包含 `src` 和 `alt` 属性\n- 设置图片宽度为 `100%`，并使用 `object-fit: cover` 保持比例裁剪",
   "start_code": {
-    "html": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n  <title>商品展示 Demo</title>\n  <style>\n    body {\n      margin: 0;\n      font-family: 'Arial', sans-serif;\n      background: linear-gradient(to bottom, #006400, #00aa00);\n      color: #fff;\n    }\n    .card {\n      border-radius: 10px;\n      box-shadow: 0 0 10px rgba(0,0,0,0.2);\n      background-color: #004d00;\n      width: 200px;\n      overflow: hidden;\n    }\n    .card-content {\n      padding: 1rem;\n    }\n    .card-container {\n      display: flex;\n      flex-wrap: wrap;\n      justify-content: center;\n      gap: 1rem;\n    }\n    header {\n      display: flex;\n      justify-content: space-between;\n      align-items: center;\n      padding: 1rem 2rem;\n      background-color: #004d00;\n    }\n    header h2 {\n      margin: 0;\n      font-size: 1.8rem;\n      color: #adff2f;\n    }\n  </style>\n</head>\n<body>\n  <header>\n    <h2 style=\"font-weight: bold; font-style: italic;\">WCF 商品展示 2025</h2>\n    <nav>\n      <button style=\"font-weight: bold; font-style: italic;\">热销排行</button>\n      <button style=\"font-weight: bold; font-style: italic;\">查找商品</button>\n      <button style=\"font-weight: bold; font-style: italic;\">展会日历</button>\n    </nav>\n  </header>\n  <section class=\"features\">\n    <div class=\"search-bar\">\n      <input type=\"text\" placeholder=\"搜索商品名称\" id=\"searchInput\">\n      <select>\n        <option>选择分类</option>\n        <option>数码</option>\n        <option>家居</option>\n        <option>服饰</option>\n      </select>\n      <button>搜索</button>\n    </div>\n    <div class=\"card-container\">\n      <div class=\"card\">\n        <!-- 在这里插入图片 -->\n        <div class=\"card-content\">\n          <h3>智能手表</h3>\n          <p>分类：数码</p>\n          <p>价格：￥1299</p>\n        </div>\n      </div>\n      <div class=\"card\">\n        <!-- 在这里插入图片 -->\n        <div class=\"card-content\">\n          <h3>保温杯</h3>\n          <p>分类：家居</p>\n          <p>价格：￥89</p>\n        </div>\n      </div>\n    </div>\n  </section>\n  <footer>\n    <p>© 2025 商品前端示例页面 - 教学用途</p>\n  </footer>\n</body>\n</html>",
+    "html": "<div class=\"card\">\n  <!-- 在这里插入图片 -->\n  <div class=\"card-content\">\n    <h3>智能手表</h3>\n    <p>分类：数码</p>\n    <p>价格：￥1299</p>\n  </div>\n</div>\n<div class=\"card\">\n  <!-- 在这里插入图片 -->\n  <div class=\"card-content\">\n    <h3>保温杯</h3>\n    <p>分类：家居</p>\n    <p>价格：￥89</p>\n  </div>\n</div>",
     "css": "",
     "js": ""
   },
@@ -26,17 +26,14 @@
     },
     {
       "name": "图片宽度为 100%",
-      "type": "assert_style",
-      "selector": ".card img",
-      "css_property": "width",
-      "assertion_type": "equals",
-      "value": "100%",
+      "type": "custom_script",
+      "script": "const css = document.querySelector('style') ? document.querySelector('style').textContent : ''; return css.includes('.card img') && css.includes('width: 100%');",
       "feedback": "请将图片宽度设置为 100%。"
     },
     {
       "name": "图片裁剪样式",
       "type": "assert_style",
-      "selector": ".card img",
+      "selector": ".card:nth-of-type(1) img",
       "css_property": "object-fit",
       "assertion_type": "equals",
       "value": "cover",
@@ -44,8 +41,8 @@
     }
   ],
   "answer": {
-    "html": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n  <title>商品展示 Demo</title>\n  <style>\n    body {\n      margin: 0;\n      font-family: 'Arial', sans-serif;\n      background: linear-gradient(to bottom, #006400, #00aa00);\n      color: #fff;\n    }\n    .card {\n      border-radius: 10px;\n      box-shadow: 0 0 10px rgba(0,0,0,0.2);\n      background-color: #004d00;\n      width: 200px;\n      overflow: hidden;\n    }\n    .card-content {\n      padding: 1rem;\n    }\n    .card-container {\n      display: flex;\n      flex-wrap: wrap;\n      justify-content: center;\n      gap: 1rem;\n    }\n    header {\n      display: flex;\n      justify-content: space-between;\n      align-items: center;\n      padding: 1rem 2rem;\n      background-color: #004d00;\n    }\n    header h2 {\n      margin: 0;\n      font-size: 1.8rem;\n      color: #adff2f;\n    }\n    .card img {\n      width: 100%;\n      height: 150px;\n      object-fit: cover;\n    }\n  </style>\n</head>\n<body>\n  <header>\n    <h2 style=\"font-weight: bold; font-style: italic;\">WCF 商品展示 2025</h2>\n    <nav>\n      <button style=\"font-weight: bold; font-style: italic;\">热销排行</button>\n      <button style=\"font-weight: bold; font-style: italic;\">查找商品</button>\n      <button style=\"font-weight: bold; font-style: italic;\">展会日历</button>\n    </nav>\n  </header>\n  <section class=\"features\">\n    <div class=\"search-bar\">\n      <input type=\"text\" placeholder=\"搜索商品名称\" id=\"searchInput\">\n      <select>\n        <option>选择分类</option>\n        <option>数码</option>\n        <option>家居</option>\n        <option>服饰</option>\n      </select>\n      <button>搜索</button>\n    </div>\n    <div class=\"card-container\">\n      <div class=\"card\">\n        <img src=\"watch.jpg\" alt=\"智能手表\">\n        <div class=\"card-content\">\n          <h3>智能手表</h3>\n          <p>分类：数码</p>\n          <p>价格：￥1299</p>\n        </div>\n      </div>\n      <div class=\"card\">\n        <img src=\"cup.jpg\" alt=\"保温杯\">\n        <div class=\"card-content\">\n          <h3>保温杯</h3>\n          <p>分类：家居</p>\n          <p>价格：￥89</p>\n        </div>\n      </div>\n    </div>\n  </section>\n  <footer>\n    <p>© 2025 商品前端示例页面 - 教学用途</p>\n  </footer>\n</body>\n</html>",
-    "css": "",
+    "html": "<div class=\"card\">\n  <img src=\"watch.jpg\" alt=\"智能手表\">\n  <div class=\"card-content\">\n    <h3>智能手表</h3>\n    <p>分类：数码</p>\n    <p>价格：￥1299</p>\n  </div>\n</div>\n<div class=\"card\">\n  <img src=\"cup.jpg\" alt=\"保温杯\">\n  <div class=\"card-content\">\n    <h3>保温杯</h3>\n    <p>分类：家居</p>\n    <p>价格：￥89</p>\n  </div>\n</div>",
+    "css": ".card img {\n  width: 100%;\n  height: 150px;\n  object-fit: cover;\n}",
     "js": ""
   }
 }

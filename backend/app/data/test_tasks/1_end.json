@@ -1,7 +1,7 @@
 {
-  "topic_id":"1_end",
-  "title": "第一章文本与页面结构基础",
-  "description_md": "# 综合测试\n\n ## 测试任务：\n请完成html基础的结构布局并为页面内容添加标题和尾部声明。\n### 任务一：声明定义\n### 任务二：html结构定义，将语言设置为中文\n### 任务三：head标签定义，添加meta标签，设置字符编码为：UTF-8，name值为viewport，content为：width=device-width, initial-scale=1.0\n### 任务四：title标签定义，设置网页标题为：猫咪展示 Demo\n### 任务五：body标签定义\n### 任务五：footer标签定义\n## 任务六：\n添加h1标题：WCF 猫咪展示 2025，使用段落标签，添加尾部声明内容：© 2025 猫咪前端示例页面 - 教学用途",
+  "topic_id": "1_end",
+  "title": "第1章文本与页面结构基础综合测试",
+  "description_md": "# 综合测试\n\n## 测试任务：\n请综合运用本章所学知识点，构建一个关于“WCF Best Cat Exhibition”（WCF最佳猫咪展览）的介绍页面。\n\n### 任务一：创建页面基本结构\n- 添加HTML5文档类型声明\n- 设置页面语言为英文\n- 添加页面标题为“WCF Best Cat Exhibition”\n- 设置字符编码为UTF-8\n- 添加viewport meta标签确保响应式布局\n\n### 任务二：添加页面内容结构\n- 添加主标题（h1）为“WCF Best Cat Exhibition”\n- 添加二级标题（h2）为“Welcome to the Cat Exhibition”\n- 添加三级标题（h3）为“Event Highlights”\n- 添加另一个三级标题（h3）为“Daily Schedule”\n- 在适当位置添加段落（p）元素，内容为：Join us for a purr-fect celebration of feline beauty and grace. Discover various cat breeds and experience the excitement of the event!\n\n### 任务三：应用文本格式化\n- 使用span元素将\"purr-fect\"文本包装起来，并为其添加加粗样式，使用CSS的font-weight属性\n- 使用span元素将\"grace\"文本包装起来，并为其添加斜体样式，使用CSS的font-style属性\n",
   "start_code": {
     "html": "",
     "css": "",
@@ -9,95 +9,80 @@
   },
   "checkpoints": [
     {
-      "name": "声明检查",
+      "name": "HTML5文档类型声明检查",
       "type": "custom_script",
-      "script": "return !!document.doctype && document.doctype.name === 'html';",
-      "feedback": "请在代码最顶端添加<!DOCTYPE html>声明。"
+      "script": "return window.userOriginalHTML && window.userOriginalHTML.includes('<!DOCTYPE html>');",
+      "feedback": "请添加HTML5文档类型声明<!DOCTYPE html>"
     },
     {
-      "name": "<html>标签及语言设置检查",
+      "name": "html标签lang属性检查",
       "type": "custom_script",
-      "script": "return !!document.documentElement && document.documentElement.lang === 'zh';",
-      "feedback": "请在代码最顶端添加<!DOCTYPE html>声明。"
+      "script": "return window.userOriginalHTML && /<html\\s+[^>]*lang\\s*=\\s*['\"]en['\"]/i.test(window.userOriginalHTML);",
+      "feedback": "请为html标签添加lang='en'属性"
     },
     {
-      "name": "<head>标签检查",
-      "type": "custom_script",
-      "script": "return document.querySelector('html').contains(document.querySelector('head'))",
-      "feedback": "请在<html>标签内添加<head>标签。"
-    },
-    {
-      "name": "字符编码检查",
-      "type": "assert_attribute",
-      "selector": "meta",
-      "attribute": "charset",
-      "assertion_type": "equals",
-      "value": "UTF-8",
-      "feedback": "请在<head>标签内添加<meta charset=\"UTF-8\">标签，将字符编码定义为UTF-8。"
-    },
-    {
-      "name": "viewport检查",
-      "type": "assert_attribute",
-      "selector": "meta",
-      "attribute": "content",
-      "assertion_type": "equals",
-      "value": "width=device-width, initial-scale=1.0",
-      "feedback": "请在<head>标签内添加<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">标签，设置网页的宽度与设备的屏幕一致，并设置网页的初始缩放比例为1.0。"
-    },
-    {
-      "name": "标题检查",
-      "type": "custom_script",
-      "script": "return document.querySelector('head').contains(document.querySelector('title'))",
-      "feedback": "请在<head>标签内添加<title>标签，设置网页的标题。"
-    },
-    {
-      "name": "标题内容检查",
+      "name": "页面标题检查",
       "type": "assert_text_content",
       "selector": "title",
       "assertion_type": "equals",
-      "value": "猫咪展示 Demo",
-      "feedback": "请<title>标签内设置网页的标题为猫咪展示 Demo。"
+      "value": "WCF Best Cat Exhibition",
+      "feedback": "请设置页面标题为'WCF Best Cat Exhibition'"
     },
     {
-      "name": "<body>标签检查",
-      "type": "custom_script",
-      "script": "return document.querySelector('html').contains(document.querySelector('body'))",
-      "feedback": "请在<html>标签中，在<head>标签后添加<body>标签。"
+      "name": "主标题h1元素检查",
+      "type": "assert_element",
+      "selector": "h1",
+      "assertion_type": "exists",
+      "feedback": "请添加主标题h1元素"
     },
     {
-      "name": "<footer>标签检查",
-      "type": "custom_script",
-      "script": "return document.querySelector('body').contains(document.querySelector('footer'))",
-      "feedback": "请在<body>标签内添加<footer>标签。"
-    },
-    {
-      "name": "<h1>标签检查",
-      "type": "custom_script",
-      "script": "return document.querySelector('body').contains(document.querySelector('h1'))",
-      "feedback": "请在<body>标签内添加一个<h1>标签。"
-    },
-    {
-      "name": "<h1>标签内容检查",
+      "name": "主标题内容检查",
       "type": "assert_text_content",
       "selector": "h1",
       "assertion_type": "equals",
-      "value": "WCF 猫咪展示 2025",
-      "feedback": "请在<h1>标签内输入内容WCF 猫咪展示 2025。"
+      "value": "WCF Best Cat Exhibition",
+      "feedback": "h1元素的内容应为'WCF Best Cat Exhibition'"
     },
     {
-      "name": "<p>段落标签检查",
-      "type": "custom_script",
-      "script": "return document.querySelector('footer').contains(document.querySelector('p'))",
-      "feedback": "请在<footer>标签中添加一个段落<p>标签。"
+      "name": "二级标题h2检查",
+      "type": "assert_element",
+      "selector": "h2",
+      "assertion_type": "exists",
+      "feedback": "请添加二级标题h2元素"
     },
     {
-      "name": "<p>段落标签内容检查",
+      "name": "二级标题内容检查",
       "type": "assert_text_content",
-      "selector": "p",
+      "selector": "h2",
       "assertion_type": "equals",
-      "value": "© 2025 猫咪前端示例页面 - 教学用途",
-      "feedback": "请在<p>标签内输入内容© 2025 猫咪前端示例页面 - 教学用途。"
+      "value": "Welcome to the Cat Exhibition",
+      "feedback": "h2元素的内容应为'Welcome to the Cat Exhibition'"
+    },
+    {
+      "name": "段落元素内容检查",
+      "type": "custom_script",
+      "script": "const paragraph = document.querySelector('p'); if (!paragraph) return false; const textContent = paragraph.textContent || paragraph.innerText; return textContent === 'Join us for a purr-fect celebration of feline beauty and grace. Discover various cat breeds and experience the excitement of the event!';",
+      "feedback": "请给p元素中添加正确的段落内容"
+    },
+    {
+      "name": "加粗文本样式检查",
+      "type": "custom_script",
+      "script": "const boldElement = document.querySelector('p span.bold-text'); if (!boldElement) return false; const computedStyle = window.getComputedStyle(boldElement); return computedStyle.fontWeight === 'bold' || computedStyle.fontWeight === '700';",
+      "feedback": "请使用CSS的font-weight属性为'purr-fect'添加加粗样式"
+    },
+    {
+      "name": "斜体文本样式检查",
+      "type": "assert_style",
+      "selector": "p span.italic-text",
+      "css_property": "font-style",
+      "assertion_type": "equals",
+      "value": "italic",
+      "feedback": "请使用CSS的font-style属性为'grace'添加斜体样式"
     }
-  ]
+  ],
+  "answer": {
+    "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>WCF Best Cat Exhibition</title>\n    <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body>\n    <h1>WCF Best Cat Exhibition</h1>\n    <h2>Welcome to the Cat Exhibition</h2>\n    <h3>Event Highlights</h3>\n    <p>Join us for a <span class=\"bold-text\">purr-fect</span> celebration of feline beauty and <span class=\"italic-text\">grace</span>. Discover various cat breeds and experience the excitement of the event!</p>\n</body>\n</html>",
+    "css": ".bold-text {\n    font-weight: bold;\n}\n\n.italic-text {\n    font-style: italic;\n}",
+    "js": ""
+  }
 }
-

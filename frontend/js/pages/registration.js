@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (result.code === 200 || result.code === 201) {
                     saveParticipantId(result.data.participant_id);
                     // 注册成功后，跳转到知识图谱页面
-                    window.location.href = `/pages/knowledge_graph.html`;
+                    window.location.href = `/pages/learning_page.html?topic=1_1`;
                 } else {
                     alert(result.message || '注册失败，请重试');
                 }
