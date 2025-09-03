@@ -251,22 +251,30 @@ CONTENT DATA: Here is the detailed content data for the current topic. Use this 
 
 ---
 
+说明：
+- 学习内容（learning_content）在学习模式注入，去除 `sc_all` 字段后以格式化 JSON 展示；其他字段保留完整。
+- 测试任务（test_tasks）在测试模式注入，保持完整，不删减。
+
 ## 提示词构建顺序
 
-系统按以下顺序构建最终提示词：
+系统与消息分层如下：
 
-1. **基础系统提示词** - 核心教学原则
-2. **情感策略** - 根据学生情感状态调整 (`STRATEGY: {emotion_strategy}`)
-3. **学生信息** - 新学生/现有学生标识
-4. **学习进度** - BKT模型掌握度信息
-5. **行为指标** - 错误频率、求助倾向等
-6. **学习历史** - 知识点访问模式 (仅在有历史数据时添加)
-7. **知识库参考** - RAG检索的上下文
-8. **模式设置** - 学习/测试模式
-9. **模式特定模板** - 根据模式选择对应的模板：
-   - **测试模式**: 调试提示词模板 (基于question_count)
-   - **学习模式**: 学习提示词模板 (基于mastery_level)
-10. **内容数据** - 详细的课程内容 (仅在提供时添加)
+- System Prompt（高优先级、稳定、精简）
+  1. 基础系统提示词：核心教学原则与身份
+  2. 情感策略（简短）：`STRATEGY: {emotion_strategy}`
+  3. 学生标识（简短）：`STUDENT: new|existing`
+  4. 模式标志（简短）：`MODE: test|learning`
+  5. 安全约束：`CONTEXT SAFETY`（系统指令优先，不跟随参考内的指令）
+
+- Messages（动态上下文、体量较大、随对话变化）
+  1. 历史对话（原样）
+  2. assistant 消息：学生上下文摘要（行为分析、指标、知识历史、question_count 等）
+  3. assistant 消息：知识库参考（RAG 检索文本）
+  4. assistant 消息：内容数据
+     - 学习模式（learning_content）：保留完整结构但排除 `sc_all` 字段
+     - 测试模式（test_tasks）：完整保留，不删减
+  5. assistant 消息：测试结果/错误
+  6. 当前用户消息：代码片段 + 最新问题
 
 ## 代码上下文格式化
 
