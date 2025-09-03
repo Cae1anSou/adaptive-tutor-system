@@ -24,7 +24,14 @@ class ChatModule {
      // 订阅 WebSocket 消息
     websocket.subscribe("chat_result", (msg) => {
       console.log("[ChatModule] 收到AI结果:", msg);
+      // 展示AI回复
       this.addMessageToUI('ai', msg.ai_response);
+      // 收到结果后解除加载状态，解锁“提问”按钮
+      this.setLoadingState(false);
+      // 双重保证：收到结果时清空输入框（即使发送时已清空）
+      if (this.inputElement) {
+        this.inputElement.value = '';
+      }
     });
 
     // websocket.subscribe("submission_progress", (msg) => {
@@ -116,13 +123,9 @@ class ChatModule {
           requestBody.test_results = testResults;
         }
       }
-      api_client.post('/chat/ai/chat2', requestBody)
-      .then(response => {
-          console.log('AI Response:', response);
-      })
-      .catch(error => {
-          console.error('API Error:', error);
-      });
+      // 发送请求以触发后端处理，实际回复通过 WebSocket 返回
+      // 等待请求返回（通常为确认/排队），错误时在 catch 中解锁按钮
+      await api_client.post('/chat/ai/chat2', requestBody);
 
 
       // let block=this.addMessageToUI('ai', "");
@@ -177,8 +180,7 @@ class ChatModule {
     } catch (error) {
       console.error('[ChatModule] 发送消息时出错:', error);
       this.addMessageToUI('ai', `抱歉，我无法回答你的问题。错误信息: ${error.message}`);
-    } finally {
-      // 取消加载状态
+      // 请求失败（不会有 WebSocket 结果），需要解锁按钮
       this.setLoadingState(false);
     }
   }
