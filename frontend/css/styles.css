@@ -1706,6 +1706,44 @@ body {
         height: 150px;
     }
     
+    .sidebar-section {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+            
+    .sidebar-section.expanded {
+        width: 100%;
+    }
+            
+    .sidebar-title {
+        opacity: 1;
+    }
+            
+    .nav-link-text {
+        opacity: 1;
+    }
+            
+    .nav-item.has-children > .nav-link::after {
+        opacity: 1;
+    }
+            
+    .status-indicator {
+        opacity: 1;
+    }
+            
+    .levels-flow {
+        flex-direction: column;
+    }
+            
+    .level-card {
+        max-width: 100%;
+        margin: 10px 0;
+    }
+            
+    .arrow {
+        display: none;
+    }
+    
     /* 优化小屏幕上的标签显示 */
     .element-info {
         gap: 4px; /* 减小间距 */
