@@ -110,6 +110,7 @@ soupsieve==2.7
 pymysql==1.1.1
 SQLAlchemy==2.0.42
 sqlalchemy-stubs==0.4
+cryptography==45.0.7
 stack-data==0.6.3
 starlette==0.47.2
 sympy==1.14.0

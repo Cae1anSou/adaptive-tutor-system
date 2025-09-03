@@ -23,9 +23,7 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - DATABASE_URL=mysql+pymysql://root:Silvis0852@host.docker.internal:3306/ai_exp
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - DATABASE_URL=mysql+pymysql://root:Silvis0852.@172.25.22.172:3306/ai_exp
 
     volumes:
       - ./backend:/app/backend
@@ -45,9 +43,8 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - DATABASE_URL=mysql+pymysql://root:Silvis0852@host.docker.internal:3306/ai_exp
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - DATABASE_URL=mysql+pymysql://root:Silvis0852.@172.25.22.172:3306/ai_exp
+
     volumes:
       - ./backend:/app/backend
     depends_on:
@@ -66,9 +63,8 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - DATABASE_URL=mysql+pymysql://root:Silvis0852@host.docker.internal:3306/ai_exp
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - DATABASE_URL=mysql+pymysql://root:Silvis0852.@172.25.22.172:3306/ai_exp
+
     volumes:
       - ./backend:/app/backend
     depends_on:
@@ -87,9 +83,8 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - DATABASE_URL=mysql+pymysql://root:Silvis0852@host.docker.internal:3306/ai_exp
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - DATABASE_URL=mysql+pymysql://root:Silvis0852.@172.25.22.172:3306/ai_exp
+
     volumes:
       - ./backend:/app/backend
     depends_on:
@@ -108,9 +103,8 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - DATABASE_URL=mysql+pymysql://root:Silvis0852@host.docker.internal:3306/ai_exp
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - DATABASE_URL=mysql+pymysql://root:Silvis0852.@172.25.22.172:3306/ai_exp
+
     volumes:
       - ./backend:/app/backend
     depends_on:
@@ -129,9 +123,8 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - DATABASE_URL=mysql+pymysql://root:Silvis0852@host.docker.internal:3306/ai_exp
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - DATABASE_URL=mysql+pymysql://root:Silvis0852.@172.25.22.172:3306/ai_exp
+
     volumes:
       - ./backend:/app/backend
     depends_on:
