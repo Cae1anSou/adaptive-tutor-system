@@ -2,25 +2,25 @@
     "topic_id": "3.3",
     "title": "表单提交机制",
     "levels": [
-        {
-            "level": 1,
-            "description": "表单提交机制是HTML表单的核心功能，用于将用户输入的数据发送到服务器或进行客户端处理。核心要点包括：<form>元素作为容器，定义数据收集范围；提交事件触发时执行自定义逻辑；onsubmit属性绑定JavaScript函数处理提交过程，事件对象event提供交互细节。"
-        },
-        {
-            "level": 2,
-            "description": "语法：<form onsubmit=\"return handleSubmit(event)\">，其中handleSubmit是自定义函数。基本用法：event参数包含事件信息，函数返回false可阻止默认提交。例如，使用method属性指定HTTP方法（GET/POST），action定义目标URL。关键元素包括提交按钮（<button type=\"submit\">）和输入控件（如<input>）。"
-        },
-        {
-            "level": 3,
-            "description": "实际应用：用户注册表单场景。示例代码：<form onsubmit=\"handleSubmit(event)\"><label>用户名：<input type=\"text\" name=\"username\"></label><label>邮箱：<input type=\"email\" name=\"email\"></label><button type=\"submit\">注册</button></form>。JavaScript函数handleSubmit(event) { event.preventDefault(); console.log('数据已处理'); } 用于拦截提交并输出日志。"
-        },
-        {
-            "level": 4,
-            "description": "原理：提交触发submit事件，事件冒泡允许捕获处理。event.preventDefault()阻止默认页面刷新，实现单页应用交互。注意事项：始终验证数据（如空值检查）防止无效提交；避免onsubmit内嵌复杂逻辑，保持代码可维护；考虑无障碍性，确保表单控件有明确标签。"
-        }
-    ],
+            {
+                "level": 1,
+                "description": "在网页开发中，表单提交机制是用户与网站交互的重要方式之一。当你在网页上填写用户名、密码或选择兴趣爱好并点击提交按钮时，这些信息需要被发送到服务器进行处理，这个过程就是表单提交。HTML中的form元素是用来包裹所有表单控件的容器，比如输入框、单选按钮、复选框等。form元素有一个重要的属性叫做onsubmit，它允许我们在表单即将提交时执行一段JavaScript代码。例如，我们可以用它来检查用户是否填写了必填项，或者确认用户是否真的想提交数据。当用户点击提交按钮时，浏览器会触发onsubmit事件，如果该事件绑定的函数返回true，则表单正常提交；如果返回false，则阻止提交。这是前端防止无效数据提交的第一道防线。理解form元素和onsubmit的基本作用，是学习用户数据收集和交互处理的基础，也是前端新手必须掌握的核心知识之一。"
+            },
+            {
+                "level": 2,
+                "description": "在实际开发中，表单提交不仅仅是把数据发出去那么简单，还需要考虑用户体验和数据的正确性。常见的场景包括注册页面、登录表单、问卷调查等。在这些场景中，我们通常会结合JavaScript对表单进行验证。例如，一个注册表单可能要求邮箱格式正确、密码长度足够、两次输入的密码一致等。这时就可以利用form元素的onsubmit属性来调用一个自定义的验证函数。这个函数接收一个事件对象作为参数，通常命名为event，通过调用event.preventDefault()可以阻止表单的默认提交行为，然后在函数内部进行各种判断。如果验证通过，再手动提交表单；否则给出提示信息。此外，onsubmit还可以与其他表单元素如input、button、label配合使用，形成完整的交互流程。label标签可以关联输入控件，提升可访问性；button设置type='submit'可以触发提交行为。这些元素协同工作，构成了一个功能完整的表单系统。掌握这些常见组合用法，能帮助开发者构建更加健壮和用户友好的界面。"
+            },
+            {
+                "level": 3,
+                "description": "深入理解表单提交机制，需要了解其背后的运行原理和性能优化策略。当form元素的onsubmit事件被触发时，浏览器会先执行绑定的JavaScript函数，这个函数运行在主线程上，因此如果逻辑过于复杂或涉及大量计算，可能会导致页面卡顿或响应延迟。为了提升性能，可以将复杂的验证逻辑拆分为异步操作，或者使用防抖技术避免频繁触发。此外，现代前端框架如React、Vue等通常不推荐直接使用onsubmit属性，而是通过监听submit事件并使用事件委托来管理表单行为，这样更利于组件化和状态管理。原生JavaScript中，除了onsubmit属性，还可以使用addEventListener('submit', handler)的方式来绑定提交事件，这种方式更加灵活，支持多个监听器，并且便于解绑。同时，表单提交的方式（method）可以是GET或POST，目标地址（action）可以是当前页面或另一个URL。理解这些机制有助于开发者根据实际需求选择最优方案，避免安全漏洞和性能瓶颈。"
+            },
+            {
+                "level": 4,
+                "description": "现在我们来完成一个综合实战任务：创建一个宠物领养申请表单，并实现完整的提交机制。首先，使用form标签包裹所有输入项，包括姓名、年龄、联系电话以及是否愿意定期回访的复选框。然后，在form标签上添加onsubmit属性，赋值为handleForm(event)，这个函数将在提交时被调用。在JavaScript中定义handleForm函数，接收event参数，首先调用event.preventDefault()阻止默认提交。接着检查姓名是否为空，电话是否符合11位数字格式，若任一验证失败，则弹出提示并返回。验证通过后，可以模拟数据提交过程，比如将表单数据收集成对象并通过console.log输出。示例代码如下：HTML中包含form、input、label和button元素；JS中定义handleForm函数进行验证。这样既完成了题目要求的onsubmit绑定，又实践了表单控制与用户反馈的完整流程，为后续更复杂的表单处理打下坚实基础。"
+            }
+        ],
     "sc_all": [
-        {"topic_id": "1_1", "select_element": ["h1", "h2", "h3", "h4", "h5", "h6", "p"]},
+        {"topic_id": "1_1", "select_element": ["h1", "h2", "h3", "h4", "h5", "h6", "p","span"]},
         {"topic_id": "1_2", "select_element": []},
         {"topic_id": "1_3", "select_element": ["<!DOCTYPE>", "html", "head", "body","meta", "title","footer"]},
         {"topic_id": "2_1", "select_element": ["div"]},

@@ -94,6 +94,21 @@ body {
     box-shadow: var(--shadow-light);
     position: relative;
     z-index: 50;
+    transform: 0.5s ease-in-out;
+}
+
+.top-header-lean {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: var(--header-height);
+    padding: 0 var(--spacing-xl);;
+    background:var(--head-background);
+    color: white;
+    box-shadow: var(--shadow-light);
+    position: relative;
+    z-index: 50;
+    transform: 0.5s ease-in-out;
 }
 
 .header-title {
@@ -101,37 +116,27 @@ body {
     font-weight: 600;
     color: white;
     letter-spacing: -0.025em;
+    z-index: 10; /* 确保标题在最上层 */
+    flex-shrink: 0; /* 防止标题被压缩 */
 }
-
 .user-profile {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
     font-size: var(--font-size-sm);
+    z-index: 10; /* 确保用户信息在最上层 */
+    flex-shrink: 0; /* 防止用户信息被压缩 */
 }
 
-.user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-}
 
 /* 内容容器样式 */
 .content-container {
-    flex: 1;
-    margin-left: 0;
-    transition: margin-left 0.3s ease;
     display: flex;
     gap: var(--spacing-md); /* 主内容区域与侧边栏之间的间距 */
     padding: var(--spacing-md);
     height: calc(100vh - var(--header-height));
     overflow: hidden;
     width: 100%;
-}
-.content-container.sidebar-open {
-    margin-left: 250px; /* 与侧边栏宽度一致 */
 }
 /* 栏目容器样式 */
 .panel {
@@ -145,7 +150,7 @@ body {
 }
 .panel-header {
     display: flex;
-    max-height: 60px;
+    max-height: 40px; /* 从60px减少到50px，让标题栏更紧凑 */
     justify-content: space-between;
     background: var(--head-background);
     align-items: center;
@@ -153,6 +158,7 @@ body {
     color: white;
     padding: var(--spacing-md) var(--spacing-lg);
     border-bottom: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0; /* 只在上部添加圆角 */
 }
 .panel-header h2 {
     font-size: var(--font-size-lg);
@@ -401,6 +407,72 @@ body {
     #knowledgeModal {
       display: none;
     }
+/* 知识图谱容器样式增强 */
+#cy {
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-color);
+  position: relative;
+}
+
+/* 图谱工具栏样式（如果需要添加工具栏） */
+.cy-toolbar {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1000;
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-medium);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.cy-toolbar button {
+  padding: 6px 10px;
+  border: 1px solid var(--border-color);
+  background: white;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: var(--font-size-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+}
+
+.cy-toolbar button:hover {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-light);
+}
+
+/* 图谱提示信息样式 */
+.cy-tip {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 1000;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-xs);
+  color: var(--text-light);
+  box-shadow: var(--shadow-light);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
 /* ide页面布局样式 */
     /* 左侧面板样式 */
     .left-panel {
@@ -461,7 +533,7 @@ body {
     display: flex;
     gap: var(--spacing-md);
     height: auto;
-    min-height: 240px;
+    min-height: 200px; /* 减少最小高度从240px到200px */
     align-items: stretch;
 }
     /* 合并的预览和代码展示面板样式 */
@@ -473,28 +545,61 @@ body {
         min-height: 240px;
     }
     
-    /* 预览区域样式 */
+    /* 新的示例页面探索面板样式 */
+    .example-exploration-panel {
+        flex: 1 1 0;
+        min-height: 200px; /* 减少最小高度从240px到200px */
+        border-radius: var(--border-radius-lg); /* 确保整个面板有圆角 */
+        overflow: hidden; /* 确保内容不会超出圆角边界 */
+    }
+    
+    /* 探索内容区域 - 水平布局：左侧预览 + 右侧代码 */
+    .exploration-content {
+        display: flex;
+        height: calc(100% - 60px); /* 减去标题栏高度 */
+        border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+        overflow: hidden;
+    }
+    
+    /* 修复代码区域内的info-content样式 */
+    .code-section .info-content {
+        flex: 1;
+        padding: var(--spacing-lg) var(--spacing-xl);
+        overflow-y: auto;
+        min-height: 0; /* 允许flex子元素收缩 */
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* 预览区域样式 - 适应新的exploration-content布局 */
     .preview-section {
         flex: 2 1 0;
         min-width: 300px;
         box-sizing: border-box;
+        background: var(--content-background);
     }
     
-    /* 代码展示区域样式 */
+    /* 代码展示区域样式 - 适应新的exploration-content布局 */
     .code-section {
         flex: 1 1 0;
         overflow: hidden;
         min-width: 250px;
+        background: var(--content-background);
+        border-left: 1px solid var(--border-color); /* 添加分隔线 */
+        display: flex;
+        flex-direction: column;
     }
 
     /* 代码展示面板底部区域 */
     .code-panel-footer {
         margin-top: auto;
-        padding: var(--spacing-lg);
+        padding: var(--spacing-lg) calc(var(--spacing-lg) - var(--spacing-xs)) var(--spacing-lg) var(--spacing-lg); /* 减少右侧padding，让按钮更靠右 */
         background: var(--content-background);
         display: flex;
         flex-direction: column;
         align-items: flex-end;
+        border-top: 1px solid var(--border-color); /* 添加顶部分隔线 */
+        gap: var(--spacing-sm); /* 在按钮区域和开关区域之间添加间隔 */
     }
 
     .selector-controls {
@@ -502,11 +607,13 @@ body {
         gap: var(--spacing-sm);
         margin-bottom: var(--spacing-md);
         justify-content: flex-end;
+        align-items: center; /* 确保按钮垂直对齐 */
     }
 
     .selector-controls .btn {
         flex: 0 0 auto;
         min-width: 100px;
+        margin: 0; /* 移除所有margin，使用gap控制间距 */
     }
 
     /* 聊天面板样式 */
@@ -517,21 +624,16 @@ body {
         position: relative;
         z-index: 5;
     }
-    /* 知识区域 */
-    /* 知识点展示（下排跨两列，宽度=左+中） */
-.knowledge-panel {
-    height: auto;
-    flex: 1 1 0;
-    min-height: 200px; /* 确保最小高度 */
-    box-sizing: border-box;
-    overflow: hidden;
-    /* 与上排 preview-code-panel 右边界对齐 */
-    align-self: stretch;
-    /* 确保知识点面板始终可见 */
-    position: relative;
-    z-index: 10;
-    /* 确保默认状态下所有等级卡片都可见 */
-}
+        .knowledge-panel {
+        height: auto; /* 改为auto实现自适应高度 */
+        flex: 1 1 0;
+        min-height: 200px;
+        box-sizing: border-box;
+        overflow: visible; /* 允许内容溢出，以便卡片扩展 */
+        align-self: stretch;
+        position: relative;
+        z-index: 10;
+    }
 
 /* 确保默认状态下所有等级卡片都可见 */
 .knowledge-panel:not(.expanded) .level-card {
@@ -594,7 +696,7 @@ body {
     
     .info-content {
         flex: 1;
-        padding: var(--spacing-lg) var(--spacing-xl);
+        padding: var(--spacing-xs) var(--spacing-xl); /* 减小上下内边距 */
         overflow-y: auto;
         border-bottom: 1px solid var(--border-color);
     }
@@ -621,81 +723,111 @@ body {
         background: var(--panel-background);
     }
 
+    .levels-container {
+        height: auto; /* 自适应高度 */
+        display: flex;
+        align-items: stretch; /* 使子元素拉伸到相同高度 */
+        justify-content: center; /* 水平居中 */
+        padding: 0 var(--spacing-md); /* 移除上下内边距，保留左右内边距 */
+        box-sizing: border-box;
+    }
+
     /* 等级流展示 */
     .levels-flow {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: var(--spacing-md);
-        padding: var(--spacing-md) 0 var(--spacing-lg) 0;
+        align-items: stretch; /* 改为stretch以允许卡片自适应高度 */
+        /* 移除justify-content，让flex和gap自然控制分布 */
+        gap: var(--spacing-lg); /* 增加卡片间距，替代箭头的间隔 */
+        width: 100%; /* 占满整个容器宽度 */
+        height: auto; /* 改为auto自适应高度 */
+        min-height: 200px; /* 调整最小高度，确保所有卡片高度一致 */
+        box-sizing: border-box;
     }
 
-    .levels-flow .arrow {
-        font-size: 22px;
-        color: var(--text-lighter);
-        flex: 0 0 auto;
-        line-height: 1;
-    }
+
 
     .level-card {
-        flex: 1 1 0;
+        flex: 1 1 0; /* 保持弹性布局 */
         background: var(--card-bg);
         border: 1px solid var(--border-color);
         border-radius: var(--border-radius-lg);
-        padding: var(--spacing-lg);
+        padding: var(--spacing-lg); /* 使用更大的padding显示完整内容 */
         display: flex;
         flex-direction: column;
-        gap: var(--spacing-sm);
-        min-height: 120px;
-        cursor: pointer;
-        transition: all 0.3s ease;
+        justify-content: flex-start; /* 内容靠上对齐 */
+        height: auto; /* 改为auto以实现自适应高度 */
+        min-height: 150px; /* 保持最小高度不变 */
         position: relative;
         z-index: 50; /* 确保卡片在最上层 */
+        width: 0; /* 强制宽度由flex计算 */
+        box-sizing: border-box;
+        box-shadow: var(--shadow-light);
+        cursor: default; /* 使用默认光标而非手型光标 */
+        overflow: visible; /* 允许内容溢出，以便自适应高度 */
     }
 
-    .level-card:hover {
-        box-shadow: var(--card-shadow);
-        transform: translateY(-2px);
+    @media (max-width: 1024px) {
+        .levels-flow {
+            width: 100%;
+            height: auto;
+            gap: var(--spacing-lg); /* 增加间距以替代箭头 */
+        }
+        
+        .level-card {
+            min-height: 150px;
+        }
     }
 
-    .level-card.collapsed {
-        min-height: 80px;
-        padding: var(--spacing-md);
+    @media (max-width: 768px) {
+        .levels-flow {
+            flex-direction: column;
+            width: 100%;
+            height: auto;
+            gap: var(--spacing-lg); /* 增加间距以替代箭头 */
+        }
+        
+        .level-card {
+            width: 100%;
+            height: auto;
+            min-height: 150px;
+            flex: 0 0 auto;
+        }
     }
 
-    .level-card.expanded {
-        min-height: 200px;
-        z-index: 10;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    }
+
+
+
+
+
 
     .level-header {
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
         width: 100%;
+        flex: 0 0 auto; /* 不让header根据内容拉伸，保持固定大小 */
+        text-align: center;
+        /* 响应式高度：根据容器大小自适应 */
+        min-height: calc(var(--spacing-lg) * 2);
+        padding: 0; /* 减少内边距 */
     }
 
     .level-content {
         opacity: 1;
-        max-height: 200px;
-        overflow: hidden;
-        transition: all 0.3s ease;
+        max-height: none; /* 移除高度限制 */
+        overflow: visible; /* 允许内容完整显示 */
+        width: 100%;
+        word-wrap: break-word; /* 确保文字自动换行 */
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        text-align: left; /* 文本左对齐 */
     }
 
-    .level-card.collapsed .level-content {
-        opacity: 0;
-        max-height: 0;
-        overflow: hidden;
-        transform: translateY(-10px);
-    }
 
-    .level-card.expanded .level-content {
-        opacity: 1;
-        max-height: 200px;
-        margin-top: var(--spacing-md);
-        transform: translateY(0);
-    }
+
+
 
     .level-card h3 {
         margin: 0;
@@ -705,22 +837,28 @@ body {
         color: #2c3e50;
     }
 
-    .click-hint {
-        font-size: var(--font-size-xs);
-        color: var(--primary-color);
+    .level-description {
+        font-size: var(--font-size-sm);
+        color: var(--text-light);
         text-align: center;
-        margin-top: var(--spacing-sm);
-        opacity: 0.8;
-        font-weight: 500;
-        transition: all 0.3s ease;
+        margin: calc(var(--spacing-xs) / 2) 0; /* 减小上下边距 */
+        line-height: 1.4;
+        flex: 0 0 auto; /* 不让描述拉伸 */
+        /* 响应式高度：自适应内容 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden; /* 超出部分隐藏 */
+        padding: 0 var(--spacing-xs); /* 左右内边距 */
     }
 
-    .level-card.collapsed .click-hint {
-        opacity: 1;
-    }
-
-    .level-card.expanded .click-hint {
-        opacity: 0;
+    .content-text {
+        margin: 0;
+        font-size: var(--font-size-base);
+        line-height: 1.6;
+        color: var(--text-color);
+        text-align: left;
+        width: 100%;
     }
 
     .start-button {
@@ -928,6 +1066,7 @@ body {
 .markdown-content {
     font-family: var(--font-family);
     line-height: 1.6;
+    color: var(--text-color);
     overflow-wrap: break-word;
     font-size: var(--font-size-sm);
 }
@@ -1152,17 +1291,18 @@ body {
 }
 
 /* 在AI对话中应用的特殊样式 */
-.ai-content .markdown-content {
+.ai-content .content-text {
     margin: 0;
-    padding: 0;
-    overflow-x: auto;
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    color: var(--text-color);
 }
 
-.ai-content .markdown-content p:last-child {
+.ai-content .content-text p:last-child {
     margin-bottom: 0;
 }
 
-.ai-content .markdown-content pre {
+.ai-content .content-text pre {
     margin-top: var(--spacing-sm);
     margin-bottom: var(--spacing-sm);
     background-color: rgba(0, 0, 0, 0.05);
@@ -1173,49 +1313,49 @@ body {
     position: relative;
 }
 
-.ai-content .markdown-content h3, 
-.ai-content .markdown-content h4 {
+.ai-content .content-text h3, 
+.ai-content .content-text h4 {
     margin-top: var(--spacing-md);
     margin-bottom: var(--spacing-sm);
 }
 
-.ai-content .markdown-content ul, 
-.ai-content .markdown-content ol {
+.ai-content .content-text ul, 
+.ai-content .content-text ol {
     margin-bottom: var(--spacing-sm);
     padding-left: var(--spacing-lg);
     list-style-position: outside;
 }
 
-.ai-content .markdown-content ul li,
-.ai-content .markdown-content ol li {
+.ai-content .content-text ul li,
+.ai-content .content-text ol li {
     margin-bottom: var(--spacing-xs);
 }
 
-.ai-content .markdown-content ul {
+.ai-content .content-text ul {
     list-style-type: disc;
 }
 
-.ai-content .markdown-content ul ul {
+.ai-content .content-text ul ul {
     list-style-type: circle;
 }
 
-.ai-content .markdown-content ul ul ul {
+.ai-content .content-text ul ul ul {
     list-style-type: square;
 }
 
-.ai-content .markdown-content ol {
+.ai-content .content-text ol {
     list-style-type: decimal;
 }
 
-.ai-content .markdown-content strong {
+.ai-content .content-text strong {
     font-weight: 600;
 }
 
-.ai-content .markdown-content em {
+.ai-content .content-text em {
     font-style: italic;
 }
 
-.ai-content .markdown-content blockquote {
+.ai-content .content-text blockquote {
     padding-left: var(--spacing-md);
     border-left: 3px solid #ddd;
     color: var(--text-light);
@@ -1223,7 +1363,7 @@ body {
 }
 
 /* 表格增强样式 */
-.ai-content .markdown-content table {
+.ai-content .content-text table {
     border-collapse: collapse;
     width: 100%;
     margin: var(--spacing-md) 0;
@@ -1231,18 +1371,18 @@ body {
     display: block;
 }
 
-.ai-content .markdown-content table th,
-.ai-content .markdown-content table td {
+.ai-content .content-text table th,
+.ai-content .content-text table td {
     border: 1px solid var(--border-color);
     padding: var(--spacing-sm) var(--spacing-md);
 }
 
-.ai-content .markdown-content table th {
+.ai-content .content-text table th {
     background-color: #f5f5f5;
     font-weight: 600;
 }
 
-.ai-content .markdown-content table tr:nth-child(even) {
+.ai-content .content-text table tr:nth-child(even) {
     background-color: #f9f9f9;
 }
 
@@ -1394,10 +1534,10 @@ body {
 
 .btn-select {
     padding: var(--spacing-sm) var(--spacing-md);
-    margin-right: var(--spacing-sm);
     font-size: var(--font-size-sm);
     background-color: var(--primary-color);
     color: white;
+    margin: 0; /* 移除margin，避免位置偏移 */
 }
 .btn-select:hover { 
     background-color: var(--primary-hover);
@@ -1406,11 +1546,39 @@ body {
 .btn-stop-selector {
     background: var(--error-color);
     border-color: var(--error-color);
-    color: #fff;
+    color: white;
+    margin: 0;
 }
 .btn-stop-selector:hover {
     background: #dc2626;
     transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3); /* 与清除按钮保持一致 */
+}
+
+/* 询问AI按钮样式 */
+.btn-ai {
+    background: linear-gradient(90deg, var(--accent-color), var(--secondary-color)); /* 使用项目已定义的紫色系列 */
+    border-color: var(--accent-color);
+    color: white;
+    margin: 0;
+}
+.btn-ai:hover {
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(167, 139, 250, 0.3); /* 使用accent-color的透明度 */
+}
+
+/* 清除选择按钮样式 - 与停止选择完全一致 */
+.btn-clear {
+    background: var(--error-color); /* 与停止选择相同 */
+    border-color: var(--error-color);
+    color: white;
+    margin: 0;
+}
+.btn-clear:hover {
+    background: #dc2626; /* 与停止按钮悬停效果完全一致 */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3); /* 与停止按钮阴影效果完全一致 */
 }
 /* 返回按钮样式 */
 .back-button {
@@ -1443,7 +1611,10 @@ body {
     transition: all 0.2s ease;
 }
 
-
+.header-title:hover {
+    opacity: 0.8;
+    transform: scale(1.02);
+}
 .info-tab {
     padding: var(--spacing-sm) var(--spacing-lg);
     font-size: var(--font-size-base);
@@ -1518,44 +1689,21 @@ body {
     .preview-container {
         height: 150px;
     }
-
-    .sidebar-section {
-        width: 100%;
-        margin-bottom: 20px;
+    
+    /* 优化小屏幕上的标签显示 */
+    .element-info {
+        gap: 4px; /* 减小间距 */
     }
-            
-    .sidebar-section.expanded {
-        width: 100%;
+    
+    .element-info span {
+        font-size: 10px; /* 减小字体 */
+        padding: 2px 6px; /* 减小内边距 */
+        max-width: 120px; /* 限制最大宽度 */
     }
-            
-    .sidebar-title {
-        opacity: 1;
+    
+    .code-header h4 {
+        font-size: var(--font-size-sm); /* 减小标题字体 */
     }
-            
-    .nav-link-text {
-        opacity: 1;
-    }
-            
-    .nav-item.has-children > .nav-link::after {
-        opacity: 1;
-    }
-            
-    .status-indicator {
-        opacity: 1;
-    }
-            
-    .levels-flow {
-        flex-direction: column;
-    }
-            
-    .level-card {
-        max-width: 100%;
-        margin: 10px 0;
-    }
-            
-    .arrow {
-        display: none;
-            }
 }
 
 /* 选择器开关样式 */
@@ -1737,8 +1885,8 @@ html.sw-selector-active .clickable {
 /* 代码面板样式 */
 .code-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column; /* 改为垂直布局，给标签更多空间 */
+    gap: var(--spacing-sm); /* 添加间距 */
     margin-bottom: var(--spacing-md);
     padding-bottom: var(--spacing-sm);
     border-bottom: 1px solid var(--border-color);
@@ -1753,8 +1901,11 @@ html.sw-selector-active .clickable {
 
 .element-info {
     display: flex;
+    flex-wrap: wrap; /* 允许标签换行 */
     gap: var(--spacing-xs);
     align-items: center;
+    max-width: 100%; /* 限制最大宽度 */
+    overflow-wrap: break-word; /* 允许单词换行 */
 }
 
 .element-info span {
@@ -1762,6 +1913,11 @@ html.sw-selector-active .clickable {
     border-radius: var(--border-radius-sm);
     font-size: var(--font-size-xs);
     font-weight: 500;
+    white-space: nowrap; /* 保持单个标签不换行 */
+    flex-shrink: 0; /* 防止标签被压缩 */
+    max-width: 100%; /* 限制最大宽度 */
+    overflow: hidden; /* 隐藏超出部分 */
+    text-overflow: ellipsis; /* 超出时显示省略号 */
 }
 
 .tag-name {
@@ -1777,6 +1933,12 @@ html.sw-selector-active .clickable {
 .element-class {
     background-color: #e8f5e8;
     color: #388e3c;
+}
+
+.element-class-more {
+    background-color: #fff3e0;
+    color: #f57c00;
+    font-size: 10px;
 }
 
 .code-block {
@@ -1827,50 +1989,36 @@ html.sw-selector-active .clickable {
     margin-right: var(--spacing-md);
 }
 
-/* 展开时的特殊样式 */
-.knowledge-panel.expanded {
-    position: relative;
-    z-index: 100;
-    /* 确保展开时知识点面板仍然可见 */
-    min-height: 300px;
-    background: var(--content-background);
+/* 移除展开时的特殊样式 - 禁用卡片点击展开功能 */
+.level-card {
+    pointer-events: none; /* 禁用点击事件 */
 }
 
-.knowledge-panel.expanded .info-content {
-    padding: var(--spacing-xl);
-    min-height: 200px;
+.level-content {
+    pointer-events: none; /* 禁用点击事件 */
 }
 
-.knowledge-panel.expanded .levels-flow {
-    flex-direction: column;
-    gap: 20px;
+.content-text {
+    pointer-events: none; /* 禁用点击事件 */
 }
 
-.knowledge-panel.expanded .level-card {
-    width: 100%;
-    max-width: none;
-}
-
-/* 隐藏其他等级卡片 - 实现单卡片展开模式 */
-.knowledge-panel.expanded .level-card:not(.expanded) {
-    display: none !important;
-}
-
-.knowledge-panel.expanded .arrow {
-    display: none;
-    transform: rotate(90deg);
-}
-
-/* 展开时调整内容区域 */
-.knowledge-panel.expanded .level-content {
-    max-height: none;
-    margin-top: var(--spacing-lg);
-}
-
+/* 清除所有.expanded相关的样式 */
+.knowledge-panel.expanded,
+.knowledge-panel.expanded .info-content,
+.knowledge-panel.expanded .levels-flow,
+.knowledge-panel.expanded .level-card,
+.knowledge-panel.expanded .level-card:not(.expanded),
+.knowledge-panel.expanded .arrow,
+.knowledge-panel.expanded .level-content,
 .knowledge-panel.expanded .level-card.expanded {
-    min-height: 300px;
+    /* 清空所有特殊样式，使用初始状态 */
+    all: initial;
+    /* 继承一些必要的样式 */
+    font-family: inherit;
+    color: inherit;
 }
-/* 图标相关样式 */
+
+/* 代码示例样式 */
 iconify-icon {
     display: inline-flex;
     vertical-align: middle;

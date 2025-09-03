@@ -6,6 +6,7 @@ const MESSAGE_TYPES = {
     START: 'SW_SELECT_START',
     STOP: 'SW_SELECT_STOP',
     CHOSEN: 'SW_SELECT_CHOSEN',
+    UPDATE_MODE: 'SW_UPDATE_CUMULATIVE_MODE'
 };
 
 // ==================== 工具函数 ====================
@@ -142,6 +143,37 @@ class ElementSelector {
             this.options.onClose();
         }
         console.log('[ElementSelector] 选择器已停止');
+    }
+    
+    // ==================== 累积模式更新 ====================
+    updateCumulativeMode(isCumulative, allowedElements) {
+        console.log('[ElementSelector] 更新累积模式:', isCumulative);
+        
+        // 更新允许的元素列表
+        if (typeof allowedElements === 'object' && !Array.isArray(allowedElements)) {
+            this.currentElements = allowedElements.current || [];
+            this.cumulativeElements = allowedElements.cumulative || [];
+        }
+        
+        // 根据累积模式设置实际使用的元素列表
+        if (isCumulative) {
+            this.options.allowedElements = this.cumulativeElements;
+        } else {
+            this.options.allowedElements = this.currentElements;
+        }
+        
+        console.log('[ElementSelector] 当前允许的元素:', this.options.allowedElements);
+        
+        // 如果当前有高亮元素，重新检查是否仍然可选
+        if (this.lastHoveredElement) {
+            if (this.shouldIgnoreElement(this.lastHoveredElement)) {
+                this.hideHighlight();
+                this.lastHoveredElement = null;
+            } else {
+                // 重新更新高亮显示以反映新的颜色
+                this.updateHighlight(this.lastHoveredElement);
+            }
+        }
     }
     
     // ==================== 事件处理方法 ====================
@@ -386,7 +418,8 @@ function initIframeSelector(options = {}) {
         
         switch (message.type) {
             case MESSAGE_TYPES.START:
-                console.log('[initIframeSelector] 接收到START消息:', message);
+                console.log('[initIframeSelector] 接收到START消息');
+                console.log('[initIframeSelector] 检查 isCumulative 字段:', message.hasOwnProperty('isCumulative') ? message.isCumulative : '未定义');
                 
                 if (selector) {
                     selector.stop();
@@ -403,17 +436,30 @@ function initIframeSelector(options = {}) {
                     cumulativeElements = allowedElements;
                 }
                 
-                console.log('[initIframeSelector] 解析后的元素列表:', {
-                    allowedElements: startMessage.allowedElements,
-                    currentElements: currentElements,
-                    cumulativeElements: cumulativeElements
-                });
+                console.log('[initIframeSelector] 元素解析: 当前(', currentElements.length, ')，累积(', cumulativeElements.length, ')');
                 
                 // 创建ElementSelector实例
+                // 根据传递的消息决定初始允许的元素
+                let initialAllowedElements = cumulativeElements;
+                
+                // 检查启动消息中是否包含累积模式标志
+                if (startMessage.hasOwnProperty('isCumulative')) {
+                    if (startMessage.isCumulative) {
+                        initialAllowedElements = cumulativeElements;
+                        console.log('[initIframeSelector] 使用累积模式, 元素数量:', cumulativeElements.length);
+                    } else {
+                        initialAllowedElements = currentElements;
+                        console.log('[initIframeSelector] 使用当前模式, 元素数量:', currentElements.length);
+                    }
+                } else {
+                    console.log('[initIframeSelector] 未指定模式，使用当前模式');
+                    initialAllowedElements = currentElements;
+                }
+                
                 selector = new ElementSelector({
                     ignoreSelectors: startMessage.ignore,
                     allowedTags: startMessage.allowedTags || allowedTags,
-                    allowedElements: cumulativeElements,
+                    allowedElements: initialAllowedElements,
                     currentElements: currentElements,
                     cumulativeElements: cumulativeElements,
                     onElementSelected: (element, info) => {
@@ -430,9 +476,9 @@ function initIframeSelector(options = {}) {
                             console.error('发送postMessage失败:', error);
                         }
                     }
-                });
-                selector.start();
-                console.log('[initIframeSelector] 选择器启动，允许元素:', cumulativeElements);
+                });                selector.start();
+                console.log('[initIframeSelector] 选择器启动，初始允许元素:', initialAllowedElements);
+                console.log('[initIframeSelector] 是否为累积模式:', initialAllowedElements === cumulativeElements);
                 break;
             case MESSAGE_TYPES.STOP:
                 if (selector) {
@@ -440,6 +486,15 @@ function initIframeSelector(options = {}) {
                     selector = null;
                 }
                 console.log('[initIframeSelector] 选择器停止');
+                break;
+            case MESSAGE_TYPES.UPDATE_MODE:
+                if (selector) {
+                    const updateMessage = message;
+                    console.log('[initIframeSelector] 接收到累积模式更新消息:', updateMessage);
+                    selector.updateCumulativeMode(updateMessage.isCumulative, updateMessage.allowedElements);
+                } else {
+                    console.warn('[initIframeSelector] 选择器未初始化，无法更新累积模式');
+                }
                 break;
         }
     };
@@ -495,11 +550,23 @@ function createSelectorBridge(options) {
                     };
                 }
                 
+                // 获取当前的累积模式状态
+                let isCumulative = false;
+                try {
+                    const toggle = document.getElementById('cumulativeToggle');
+                    if (toggle) {
+                        isCumulative = toggle.checked;
+                    }
+                } catch (error) {
+                    console.warn('无法获取开关状态:', error);
+                }
+                
                 const message = {
                     type: MESSAGE_TYPES.START,
                     ignore: ignoreSelectors,
                     allowedTags,
-                    allowedElements: elementsToSend
+                    allowedElements: elementsToSend,
+                    isCumulative: isCumulative  // 传递累积模式状态
                 };
                 
                 try {
@@ -542,6 +609,35 @@ function createSelectorBridge(options) {
             }
         },
         
+        updateMode(isCumulative, allowedElements) {
+            try {
+                if (!iframeWindow || !iframeWindow.postMessage) {
+                    console.warn('iframe window未准备就绪，无法发送模式更新消息');
+                    return;
+                }
+                
+                const message = {
+                    type: MESSAGE_TYPES.UPDATE_MODE,
+                    isCumulative: isCumulative,
+                    allowedElements: allowedElements
+                };
+                
+                try {
+                    iframeWindow.postMessage(message, targetOrigin);
+                } catch (postMessageError) {
+                    console.warn('postMessage模式更新消息发送失败:', postMessageError);
+                    if (onError) {
+                        onError(postMessageError instanceof Error ? postMessageError : new Error(String(postMessageError)));
+                    }
+                }
+            } catch (error) {
+                console.error('更新模式失败:', error);
+                if (onError) {
+                    onError(error instanceof Error ? error : new Error(String(error)));
+                }
+            }
+        },
+        
         destroy() {
             window.removeEventListener('message', handleMessage);
         }
@@ -551,18 +647,16 @@ function createSelectorBridge(options) {
 // ==================== 公共API函数 ====================
 function handleStartSelector(allowedElements, bridge, showStatus) {
     if (!bridge) {
-        showStatus('error', '选择器桥接未初始化');
+        console.error('选择器桥接未初始化');
         return;
     }
     
     try {
-        console.log('启动选择器，允许的元素:', allowedElements);
         bridge.start([], allowedElements);
         // 不再显示选择器启动状态信息
         // showStatus('success', '选择器已启动，请点击要选择的元素');
     } catch (error) {
         console.error('启动选择器失败:', error);
-        showStatus('error', '启动选择器失败: ' + error.message);
     }
 }
 
@@ -598,18 +692,33 @@ function initBridge(createSelectorBridge, onElementSelected, onError) {
     }
 }
 
-function handleCumulativeToggle(allowedElements, showStatus) {
+function handleCumulativeToggle(allowedElements, showStatus, bridge) {
     const cumulativeToggle = document.getElementById('cumulativeToggle');
     if (cumulativeToggle) {
         const isCumulative = cumulativeToggle.checked;
         console.log('累积模式切换:', isCumulative);
         
-        // 不再显示累积模式切换状态信息
-        // if (isCumulative) {
-        //     showStatus('info', '已启用累积模式，可选择之前章节的元素');
-        // } else {
-        //     showStatus('info', '已禁用累积模式，只能选择当前章节的元素');
-        // }
+        // 优先使用bridge的updateMode方法
+        if (bridge && bridge.updateMode) {
+            bridge.updateMode(isCumulative, allowedElements);
+        } else {
+            // 备用方案：直接向iframe发送消息
+            const iframe = document.getElementById('element-selector-iframe');
+            if (iframe && iframe.contentWindow) {
+                try {
+                    const message = {
+                        type: MESSAGE_TYPES.UPDATE_MODE,
+                        isCumulative: isCumulative,
+                        allowedElements: allowedElements
+                    };
+                    iframe.contentWindow.postMessage(message, '*');
+                } catch (error) {
+                    console.warn('发送累积模式更新消息失败:', error);
+                }
+            }
+        }
+    } else {
+        console.warn('[handleCumulativeToggle] 未找到cumulativeToggle元素');
     }
 }
 
@@ -626,7 +735,6 @@ function handleShowSource() {
 
 function handleError(error, showStatus, onStop) {
     console.error('选择器错误:', error);
-    showStatus('error', '选择器错误: ' + error.message);
     
     if (onStop) {
         onStop();

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>元素选择+知识点展示</title>
+    <script src="../js/modules/cytoscape.min.js"></script>
     <link rel="stylesheet" href="../css/styles.css">
     <!-- Iconify图标库 -->
   <script src="../js/modules/iconify-icon.min.js"></script>
@@ -11,12 +12,16 @@
 <body>
     <div class="main-container">
       <!-- 顶部标题栏 -->
-        <header class="top-header">
+        <header class="top-header-lean">
             <h1 class="header-title" id="headerTitle">
               <iconify-icon icon="mdi:book-education" width="24" height="24"></iconify-icon>
               标题
             </h1>
             <div class="user-profile">
+              <button class="back-button" id="backButton">
+                <iconify-icon icon="mdi:arrow-left" width="20" height="20"></iconify-icon>
+                返回
+              </button>
               <iconify-icon icon="mdi:account-circle" width="36" height="36"></iconify-icon>
             </div>
         </header>
@@ -40,52 +45,64 @@
           </div>
           <!-- 左侧组合列（占 60% 宽） -->
           <div class="left-group">
-            <!-- 上排：预览 + 代码（合并成一个div） -->
+            <!-- 上排：开放式示例页面探索（预览 + 代码展示） -->
             <div class="top-row">
-              <!-- 合并的预览和代码展示区 -->
-              <div class="preview-code-panel">
-                <!-- 左侧网页预览区 -->
-                <div class="preview-section panel">
-                    <div class="ratio-16x9">
-                      <iframe
-                        id="element-selector-iframe"
-                        src="example_pages/index.html"
-                      ></iframe>
-                    </div>
+              <!-- 整合的示例页面探索区域 -->
+              <div class="example-exploration-panel panel">
+                <!-- 统一标题栏 -->
+                <div class="panel-header">
+                  <iconify-icon icon="mdi:web" width="18" height="18"></iconify-icon>
+                  <h2>开放式示例页面探索</h2>
                 </div>
-                <!-- 右侧代码展示区 -->
-                <div class="code-section panel">
-                  <div class="panel-header">
-                    <iconify-icon icon="mdi:code-tags" width="18" height="18"></iconify-icon>
-                    <h2>代码展示</h2>
-                  </div>
-                  <div class="info-content" id="code-content">
-                      <h2>选中元素代码</h2>
-                      <pre id="selectedElementCode"></pre>
-                  </div>
-                  <!-- 代码展示面板底部的选择器控制区域 -->
-                  <div class="code-panel-footer">
-                      <div class="selector-controls">
-                          <button id="startSelector" class="btn btn-select">
-                            <iconify-icon icon="mdi:cursor-default-click" width="16" height="16"></iconify-icon>
-                            选取元素
-                          </button>
-                          <button id="stopSelector" class="btn btn-select btn-stop-selector" style="display: none;">
-                            <iconify-icon icon="mdi:stop" width="16" height="16"></iconify-icon>
-                            停止选择
-                          </button>
+                <!-- 内容区域：左侧预览 + 右侧代码 -->
+                <div class="exploration-content">
+                  <!-- 左侧网页预览区 -->
+                  <div class="preview-section">
+                      <div class="ratio-16x9">
+                        <iframe
+                          id="element-selector-iframe"
+                          src="example_pages/index.html"
+                        ></iframe>
                       </div>
-                      <!-- 选择范围开关 -->
-                      <div class="selector-toggle-container">
-                          <label class="toggle-label">
-                              <input type="checkbox" id="cumulativeToggle">
-                              <span>包含之前章节的元素</span>
-                          </label>
-                          <div class="toggle-description">
-                            <iconify-icon icon="mdi:information" width="14" height="14"></iconify-icon>
-                              开启后可选择当前及之前所有章节的元素，关闭时仅可选择当前章节元素
-                          </div>
-                      </div>
+                  </div>
+                  <!-- 右侧代码展示区 -->
+                  <div class="code-section">
+                    <div class="info-content" id="code-content">
+                        <h2>选中元素代码</h2>
+                        <pre id="selectedElementCode"></pre>
+                    </div>
+                    <!-- 代码展示面板底部的选择器控制区域 -->
+                    <div class="code-panel-footer">
+                        <div class="selector-controls">
+                            <button id="startSelector" class="btn btn-select">
+                              <iconify-icon icon="mdi:cursor-default-click" width="16" height="16"></iconify-icon>
+                              选取元素
+                            </button>
+                            <button id="stopSelector" class="btn btn-select btn-stop-selector" style="display: none;">
+                              <iconify-icon icon="mdi:stop" width="16" height="16"></iconify-icon>
+                              停止选择
+                            </button>
+                            <button id="askAIButton" class="btn btn-ai" style="display: none;">
+                              <iconify-icon icon="mdi:robot-happy" width="16" height="16"></iconify-icon>
+                              询问AI
+                            </button>
+                            <button id="clearSelectionButton" class="btn btn-clear" style="display: none;">
+                              <iconify-icon icon="mdi:close" width="16" height="16"></iconify-icon>
+                              清除选择
+                            </button>
+                        </div>
+                        <!-- 选择范围开关 -->
+                        <div class="selector-toggle-container">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="cumulativeToggle">
+                                <span>包含之前章节的元素</span>
+                            </label>
+                            <div class="toggle-description">
+                              <iconify-icon icon="mdi:information" width="14" height="14"></iconify-icon>
+                                开启后可选择当前及之前所有章节的元素，关闭时仅可选择当前章节元素
+                            </div>
+                        </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -113,7 +130,7 @@
           <div class="chat-panel panel">
             <div class="panel-header">
               <iconify-icon icon="mdi:robot" width="18" height="18"></iconify-icon>
-              <h2>AI对话</h2>
+              <h2>AI助教</h2>
             </div>
             <div class="chat-history">
               <div class="ai-chat-messages" id="ai-chat-messages">

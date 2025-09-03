@@ -1,28 +1,13 @@
 {
   "topic_id": "6_3",
   "title": "修改页面元素内容与样式（DOM 操作）",
-  "description_md": "使用 JavaScript 修改页面内容：\n\n- 获取表单中的复选框和单选框值；\n- 使用 `event.preventDefault()` 阻止默认提交；\n- 将结果以文本形式展示在 `<div id=\"result\">` 中；\n- 格式示例：`爱好：阅读, 游泳；性别：女`",
+  "description_md": "使用 JavaScript 修改页面内容：\n\n- 获取表单中的复选框和单选框值；\n- 使用 `event.preventDefault()` 阻止默认提交；\n- 将结果以文本形式展示在 `<div id=\"result\">` 中；\n- 格式示例：`爱好：阅读, 游戏；性别：女`",
   "start_code": {
-    "html": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n  <title>用户偏好调查 Demo</title>\n  <style>\n    body {\n      margin: 0;\n      font-family: 'Arial', sans-serif;\n      background: linear-gradient(to bottom, #006400, #00aa00);\n      color: #fff;\n    }\n    .form-demo {\n      background: #ffffff;\n      color: #000;\n      padding: 1.5rem;\n      border-radius: 10px;\n      box-shadow: 0 0 8px rgba(0,0,0,0.1);\n      max-width: 600px;\n      margin: 2rem auto;\n    }\n    .form-demo h3 {\n      margin-top: 0;\n    }\n    .form-demo label {\n      display: block;\n      margin-top: 1rem;\n    }\n  </style>\n</head>\n<body>\n  <section class=\"form-demo\">\n    <h3>用户偏好调查</h3>\n    <form id=\"userForm\">\n      <label><input type=\"checkbox\" name=\"hobbies\" value=\"阅读\"> 爱好阅读</label>\n      <label><input type=\"checkbox\" name=\"hobbies\" value=\"游泳\"> 喜欢游泳</label>\n\n      <label>性别：</label>\n      <label><input type=\"radio\" name=\"gender\" value=\"男\"> 男</label>\n      <label><input type=\"radio\" name=\"gender\" value=\"女\"> 女</label>\n\n      <button type=\"submit\">提交</button>\n    </form>\n    <div id=\"result\"></div>\n  </section>\n\n  <script>\n    // 在此处添加 JS 代码实现功能\n  </script>\n</body>\n</html>",
+    "html": "<section class=\"form-demo\">\n  <h3>用户偏好调查</h3>\n  <form id=\"userForm\">\n    <label><input type=\"checkbox\" name=\"hobbies\" value=\"阅读\"> 爱好阅读</label>\n    <label><input type=\"checkbox\" name=\"hobbies\" value=\"游戏\"> 喜欢游戏</label>\n\n    <label>性别：</label>\n    <label><input type=\"radio\" name=\"gender\" value=\"男\"> 男</label>\n    <label><input type=\"radio\" name=\"gender\" value=\"女\"> 女</label>\n\n    <button type=\"submit\">提交</button>\n  </form>\n  <div id=\"result\"></div>\n</section>",
     "css": "",
     "js": ""
   },
   "checkpoints": [
-    {
-      "name": "表单提交后更新页面内容",
-      "type": "interaction_and_assert",
-      "feedback": "验证表单提交功能是否正确",
-      "action_selector": "form#userForm button[type=\"submit\"]",
-      "action_type": "click",
-      "assertion": {
-        "type": "assert_text_content",
-        "name": "验证表单功能",
-        "selector": "#result",
-        "assertion_type": "contains",
-        "value": "爱好：阅读, 游泳；性别：女",
-        "feedback": "请将用户爱好与性别结果写入页面中的 `#result` 区域中，格式应包含“爱好”和“性别”两部分内容。"
-      }
-    },
     {
       "name": "验证结果区域存在",
       "type": "assert_element",
@@ -36,11 +21,65 @@
       "selector": "form#userForm",
       "assertion_type": "exists",
       "feedback": "请确保页面中存在一个 id 为 `userForm` 的 form 表单元素。"
+    },
+    {
+      "name": "选中阅读复选框",
+      "type": "interaction_and_assert",
+      "feedback": "选中阅读复选框",
+      "action_selector": "input[name=\"hobbies\"][value=\"阅读\"]",
+      "action_type": "click",
+      "assertion": {
+        "name": "验证阅读复选框选中状态",
+        "type": "custom_script",
+        "script": "(() => { return document.querySelector('input[name=\"hobbies\"][value=\"阅读\"]').checked === true; })()",
+        "feedback": "阅读复选框应该被选中"
+      }
+    },
+    {
+      "name": "选中游戏复选框",
+      "type": "interaction_and_assert",
+      "feedback": "选中游戏复选框",
+      "action_selector": "input[name=\"hobbies\"][value=\"游戏\"]",
+      "action_type": "click",
+      "assertion": {
+        "name": "验证游戏复选框选中状态",
+        "type": "custom_script",
+        "script": "(() => { return document.querySelector('input[name=\"hobbies\"][value=\"游戏\"]').checked === true; })()",
+        "feedback": "游戏复选框应该被选中"
+      }
+    },
+    {
+      "name": "选中女性单选框",
+      "type": "interaction_and_assert",
+      "feedback": "选中女性单选框",
+      "action_selector": "input[name=\"gender\"][value=\"女\"]",
+      "action_type": "click",
+      "assertion": {
+        "name": "验证女性单选框选中状态",
+        "type": "custom_script",
+        "script": "(() => { return document.querySelector('input[name=\"gender\"][value=\"女\"]').checked === true; })()",
+        "feedback": "女性单选框应该被选中"
+      }
+    },
+    {
+      "name": "表单提交后更新页面内容",
+      "type": "interaction_and_assert",
+      "feedback": "验证表单提交功能是否正确",
+      "action_selector": "form#userForm button[type=\"submit\"]",
+      "action_type": "click",
+      "assertion": {
+        "name": "验证表单功能",
+        "type": "assert_text_content",
+        "selector": "#result",
+        "assertion_type": "contains",
+        "value": "爱好：阅读, 游戏；性别：女",
+        "feedback": "请将用户爱好与性别结果写入页面中的 `#result` 区域中，格式应包含\"爱好\"和\"性别\"两部分内容。"
+      }
     }
   ],
   "answer": {
-    "html": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n  <title>用户偏好调查 Demo</title>\n  <style>\n    body {\n      margin: 0;\n      font-family: 'Arial', sans-serif;\n      background: linear-gradient(to bottom, #006400, #00aa00);\n      color: #fff;\n    }\n    .form-demo {\n      background: #ffffff;\n      color: #000;\n      padding: 1.5rem;\n      border-radius: 10px;\n      box-shadow: 0 0 8px rgba(0,0,0,0.1);\n      max-width: 600px;\n      margin: 2rem auto;\n    }\n    .form-demo h3 {\n      margin-top: 0;\n    }\n    .form-demo label {\n      display: block;\n      margin-top: 1rem;\n    }\n  </style>\n</head>\n<body>\n  <section class=\"form-demo\">\n    <h3>用户偏好调查</h3>\n    <form id=\"userForm\">\n      <label><input type=\"checkbox\" name=\"hobbies\" value=\"阅读\"> 爱好阅读</label>\n      <label><input type=\"checkbox\" name=\"hobbies\" value=\"游泳\"> 喜欢游泳</label>\n\n      <label>性别：</label>\n      <label><input type=\"radio\" name=\"gender\" value=\"男\"> 男</label>\n      <label><input type=\"radio\" name=\"gender\" value=\"女\"> 女</label>\n\n      <button type=\"submit\">提交</button>\n    </form>\n    <div id=\"result\"></div>\n  </section>\n\n  <script>\n    document.getElementById('userForm').addEventListener('submit', function(e) {\n      e.preventDefault();\n      \n      const hobbies = [];\n      document.querySelectorAll('input[name=\"hobbies\"]:checked').forEach(checkbox => {\n        hobbies.push(checkbox.value);\n      });\n      \n      const gender = document.querySelector('input[name=\"gender\"]:checked')?.value || '';\n      \n      const resultText = `爱好：${hobbies.join(', ')}；性别：${gender}`;\n      document.getElementById('result').textContent = resultText;\n    });\n  </script>\n</body>\n</html>",
+    "html": "<section class=\"form-demo\">\n  <h3>用户偏好调查</h3>\n  <form id=\"userForm\">\n    <label><input type=\"checkbox\" name=\"hobbies\" value=\"阅读\"> 爱好阅读</label>\n    <label><input type=\"checkbox\" name=\"hobbies\" value=\"游戏\"> 喜欢游戏</label>\n\n    <label>性别：</label>\n    <label><input type=\"radio\" name=\"gender\" value=\"男\"> 男</label>\n    <label><input type=\"radio\" name=\"gender\" value=\"女\"> 女</label>\n\n    <button type=\"submit\">提交</button>\n  </form>\n  <div id=\"result\"></div>\n</section>",
     "css": "",
-    "js": "document.getElementById('userForm').addEventListener('submit', function(e) {\n  e.preventDefault();\n  \n  const hobbies = [];\n  document.querySelectorAll('input[name=\"hobbies\"]:checked').forEach(checkbox => {\n    hobbies.push(checkbox.value);\n  });\n  \n  const gender = document.querySelector('input[name=\"gender\"]:checked')?.value || '';\n  \n  const resultText = `爱好：${hobbies.join(', ')}；性别：${gender}`;\n  document.getElementById('result').textContent = resultText;\n});"
+    "js": "document.getElementById('userForm').addEventListener('submit', function(e) {\n  e.preventDefault();\n  \n  const hobbies = [];\n  document.querySelectorAll('input[name=\"hobbies\"]:checked').forEach(checkbox => {\n    hobbies.push(checkbox.getAttribute('value'));\n  });\n  \n  const genderElement = document.querySelector('input[name=\"gender\"]:checked');\n  const gender = genderElement ? genderElement.getAttribute('value') : '';\n  \n  const resultText = `爱好：${hobbies.join(', ')}；性别：${gender}`;\n  document.getElementById('result').textContent = resultText;\n});"
   }
 }

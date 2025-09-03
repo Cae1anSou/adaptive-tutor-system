@@ -1,7 +1,7 @@
 {
   "topic_id": "1_3",
   "title": "构建页面基本结构",
-  "description_md": "# 任务描述：\n## 任务一：\n请完成HTML文档的基本结构，包含<!DOCTYPE html>声明、<html>和<head>标签。\n## 任务二：\n将<html>标签的语言属性设置为中文。\n## 任务三：\n在<head>标签内添加<meta charset=\"UTF-8\">，定义字符编码为UTF-8。\n## 任务四：\n添加<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">，设置响应式布局。\n## 任务五：\n在<head>标签内添加<title>标签，设置网页标题为“编程学习教程”。\n## 任务六：\n添加<body>标签，作为页面内容的容器。\n## 任务七：\n在<body>标签内添加<footer>标签，用于显示页面底部信息。\n## 示例代码：\n```\n<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <footer>© 2025 编程学习教程</footer>\n</body>\n</html>\n```",
+  "description_md": "# 任务描述：\n## 任务一：\n请完成HTML文档的基本结构，包含<!DOCTYPE html>声明、<html>和<head>标签。\n## 任务二：\n将<html>标签的语言属性设置为中文。\n## 任务三：\n在<head>标签内添加<meta charset=\"UTF-8\">，定义字符编码为UTF-8。\n## 任务四：\n添加<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">，设置响应式布局。\n## 任务五：\n在<head>标签内添加<title>标签，设置网页标题为\"编程学习教程\"。\n## 任务六：\n添加<body>标签，作为页面内容的容器。\n## 任务七：\n在<body>标签内添加<footer>标签，用于显示页面底部信息。\n## 示例代码：\n\n```html\n<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <footer>© 2025 编程学习教程</footer>\n</body>\n</html>\n```",
   "start_code": {
     "html": "#请在此处完成HTML基础结构的定义！",
     "css": "",
@@ -9,66 +9,64 @@
   },
   "checkpoints": [
     {
-      "name": "声明检查",
+      "name": "DOCTYPE声明检查",
       "type": "custom_script",
-      "script": "return !!document.doctype && document.doctype.name === 'html';",
+      "script": "return window.userOriginalHTML && window.userOriginalHTML.toLowerCase().includes('<!doctype html>');",
       "feedback": "请在代码最顶端添加<!DOCTYPE html>声明。"
     },
     {
-      "name": "<html>标签及语言设置检查",
+      "name": "<html>标签检查",
+      "type": "custom_script", 
+      "script": "return window.userOriginalHTML && window.userOriginalHTML.toLowerCase().includes('<html') && window.userOriginalHTML.toLowerCase().includes('</html>');",
+      "feedback": "请添加完整的<html>标签对。"
+    },
+    {
+      "name": "语言属性检查",
       "type": "custom_script",
-      "script": "return !!document.documentElement && document.documentElement.lang === 'zh';",
-      "feedback": "请确保<html>标签存在，并设置lang属性为'zh'。"
+      "script": "return window.userOriginalHTML && (window.userOriginalHTML.includes('lang=\"zh\"') || window.userOriginalHTML.includes(\"lang='zh'\"));",
+      "feedback": "请为<html>标签设置lang属性为'zh'。"
     },
     {
       "name": "<head>标签检查",
       "type": "custom_script",
-      "script": "return document.querySelector('html').contains(document.querySelector('head'))",
-      "feedback": "请在<html>标签内添加<head>标签。"
+      "script": "return window.userOriginalHTML && window.userOriginalHTML.includes('<head>') && window.userOriginalHTML.includes('</head>');",
+      "feedback": "请在<html>标签内添加<head>标签对。"
     },
     {
       "name": "字符编码检查",
-      "type": "assert_attribute",
-      "selector": "meta",
-      "attribute": "charset",
-      "assertion_type": "equals",
-      "value": "UTF-8",
-      "feedback": "请在<head>标签内添加<meta charset=\"UTF-8\">标签，将字符编码定义为UTF-8。"
+      "type": "custom_script",
+      "script": "const metaCharset = document.querySelector('meta[charset]'); return metaCharset && metaCharset.getAttribute('charset').toUpperCase() === 'UTF-8';",
+      "feedback": "请在<head>标签内添加<meta charset=\"UTF-8\">标签。"
     },
     {
       "name": "viewport检查",
-      "type": "assert_attribute",
-      "selector": "meta",
-      "attribute": "content",
-      "assertion_type": "equals",
-      "value": "width=device-width, initial-scale=1.0",
-      "feedback": "请在<head>标签内添加<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">标签，设置网页的宽度与设备的屏幕一致，并设置网页的初始缩放比例为1.0。"
+      "type": "custom_script",
+      "script": "const metaViewport = document.querySelector('meta[name=\"viewport\"]'); return metaViewport && metaViewport.getAttribute('content').includes('width=device-width');",
+      "feedback": "请添加viewport meta标签设置响应式布局。"
     },
     {
-      "name": "标题检查",
+      "name": "<title>标签检查",
       "type": "custom_script",
-      "script": "return document.querySelector('head').contains(document.querySelector('title'))",
-      "feedback": "请在<head>标签内添加<title>标签，设置网页的标题。"
+      "script": "return document.title !== null && document.title !== '';",
+      "feedback": "请在<head>标签内添加<title>标签对。"
     },
     {
       "name": "标题内容检查",
-      "type": "assert_text_content",
-      "selector": "title",
-      "assertion_type": "equals",
-      "value": "编程学习教程",
-      "feedback": "请<title>标签内设置网页的标题为“编程学习教程”。"
+      "type": "custom_script",
+      "script": "return document.title === '编程学习教程';",
+      "feedback": "请将<title>标签的内容设置为'编程学习教程'。"
     },
     {
       "name": "<body>标签检查",
       "type": "custom_script",
-      "script": "return document.querySelector('html').contains(document.querySelector('body'))",
-      "feedback": "请在<html>标签中添加<body>标签。"
+      "script": "return window.userOriginalHTML && window.userOriginalHTML.includes('<body>') && window.userOriginalHTML.includes('</body>');",
+      "feedback": "请添加<body>标签对。"
     },
     {
       "name": "<footer>标签检查",
       "type": "custom_script",
-      "script": "return document.querySelector('body').contains(document.querySelector('footer'))",
-      "feedback": "请在<body>标签内添加<footer>标签。"
+      "script": "return document.querySelector('footer') !== null;",
+      "feedback": "请在<body>标签内添加<footer>标签对。"
     }
   ],
   "answer": {
