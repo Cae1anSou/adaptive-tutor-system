@@ -4,12 +4,6 @@
 import { getParticipantId } from '../modules/session.js';
 import { AppConfig, buildBackendUrl, initializeConfig } from '../modules/config.js';
 import {  setupBackButton, getUrlParam, trackReferrer,navigateTo } from '../modules/navigation.js';
-// 导入功能模块
-import { 
-    renderTopicContent,
-    setTopicData,
-    getTopicData
-} from '../modules/docs_module.js';
 
 import {
     createSelectorBridge,
@@ -300,8 +294,20 @@ async function initializeModules(topicId) {
     
     // 渲染知识点内容
     if (topicContent?.levels) {
-        setTopicData(topicContent);
-        renderTopicContent();
+        // 获取知识点内容容器
+        const knowledgeContent = document.getElementById('knowledge-content');
+        if (knowledgeContent) {
+            // 清空现有内容
+            knowledgeContent.innerHTML = '';
+            
+            // 为每个level创建一个段落元素
+            topicContent.levels.forEach(level => {
+                const paragraph = document.createElement('p');
+                paragraph.textContent = level.description;
+                paragraph.className = 'knowledge-point-description';
+                knowledgeContent.appendChild(paragraph);
+            });
+        }
     }
 }
 
@@ -421,75 +427,7 @@ class KnowledgeModule {
         });
     }
     
-    // 处理卡片点击事件
-    handleCardClick(clickedCard) {
-        console.log('[KnowledgeModule] 处理卡片点击事件');
-        console.log('[KnowledgeModule] 被点击的卡片:', clickedCard);
-        console.log('[KnowledgeModule] 卡片当前类名:', clickedCard.className);
-        console.log('[KnowledgeModule] 卡片等级:', clickedCard.dataset.level);
-        
-        const isExpanded = this.knowledgePanel.classList.contains('expanded');
-        console.log('[KnowledgeModule] 知识点面板是否已展开:', isExpanded);
-        
-        if (!isExpanded) {
-            // 进入单卡片展开模式
-            console.log('[KnowledgeModule] 进入单卡片展开模式');
-            
-            // 先收起所有卡片
-            this.levelCards.forEach(card => {
-                card.classList.remove('expanded');
-                card.classList.add('collapsed');
-                console.log(`[KnowledgeModule] 收起卡片 ${card.dataset.level}:`, card.className);
-            });
-            
-            // 展开被点击的卡片
-            clickedCard.classList.remove('collapsed');
-            clickedCard.classList.add('expanded');
-            console.log(`[KnowledgeModule] 展开卡片 ${clickedCard.dataset.level}:`, clickedCard.className);
-            
-            // 展开整个知识点面板
-            this.knowledgePanel.classList.add('expanded');
-            console.log('[KnowledgeModule] 知识点面板类名:', this.knowledgePanel.className);
-            
-            console.log('[KnowledgeModule] 单卡片展开模式已激活');
-        } else {
-            // 退出单卡片展开模式
-            console.log('[KnowledgeModule] 退出单卡片展开模式');
-            
-            // 收起所有卡片
-            this.levelCards.forEach(card => {
-                card.classList.remove('expanded');
-                card.classList.add('collapsed');
-                console.log(`[KnowledgeModule] 收起卡片 ${card.dataset.level}:`, card.className);
-            });
-            
-            // 收起知识点面板
-            this.knowledgePanel.classList.remove('expanded');
-            console.log('[KnowledgeModule] 知识点面板类名:', this.knowledgePanel.className);
-            
-            console.log('[KnowledgeModule] 已退出单卡片展开模式，返回选择界面');
-        }
-    }
-    
-    // 展开指定等级的卡片
-    expandLevel(level) {
-        const targetCard = document.querySelector(`.level-card[data-level="${level}"]`);
-        if (targetCard) {
-            this.handleCardClick(targetCard);
-        }
-    }
-    
-    // 收起所有卡片
-    collapseAll() {
-        this.levelCards.forEach(card => {
-            card.classList.remove('expanded');
-            card.classList.add('collapsed');
-        });
-        
-        if (this.knowledgePanel) {
-            this.knowledgePanel.classList.remove('expanded');
-        }
-    }
+ 
 }
 
 // ==================== 事件处理函数 ====================
