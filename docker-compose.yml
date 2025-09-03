@@ -1,0 +1,141 @@
+version: '3.8'
+
+services:
+  # Redis服务
+  redis:
+    image: redis/redis-stack:latest
+    container_name: redis-stack-integration
+    ports:
+      - "6381:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  # 后端服务
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: adaptive-tutor-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - BACKEND_PORT=8000
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DATABASE_URL=sqlite:///./app/db/database.db
+    volumes:
+      - ./backend:/app/backend
+      - backend_data:/app/backend/app/db
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  # Celery Chat Worker
+  celery-chat-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: celery-chat-worker
+    command: celery -A app.celery_app worker -l info -Q chat_queue --pool=prefork -n ai_worker@%h -c 2
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./backend:/app/backend
+    depends_on:
+      - redis
+      - backend
+    restart: unless-stopped
+
+  # Celery Submission Worker
+  celery-submit-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: celery-submit-worker
+    command: celery -A app.celery_app worker -l info -Q submit_queue --pool=prefork -n submit_worker@%h -c 2
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./backend:/app/backend
+    depends_on:
+      - redis
+      - backend
+    restart: unless-stopped
+
+  # Celery DB Writer Worker
+  celery-db-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: celery-db-worker
+    command: celery -A app.celery_app worker -l info -Q db_writer_queue --pool=gevent -n db_worker@%h -c 10
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./backend:/app/backend
+    depends_on:
+      - redis
+      - backend
+    restart: unless-stopped
+
+  # Celery Behavior Worker
+  celery-behavior-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: celery-behavior-worker
+    command: celery -A app.celery_app worker -l info -Q behavior_queue --pool=prefork -n behavior_worker@%h -c 2
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./backend:/app/backend
+    depends_on:
+      - redis
+      - backend
+    restart: unless-stopped
+
+  # Celery Beat
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: celery-beat
+    command: celery -A app.celery_app beat -l info
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./backend:/app/backend
+    depends_on:
+      - redis
+      - backend
+    restart: unless-stopped
+
+  # 前端服务
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: adaptive-tutor-frontend
+    ports:
+      - "8325:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  backend_data:

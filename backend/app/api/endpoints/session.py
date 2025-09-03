@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status, Response
 from sqlalchemy.orm import Session
 from app.schemas.response import StandardResponse
 from app.schemas.session import SessionInitiateRequest, SessionInitiateResponse
-from app.config.dependency_injection import get_user_state_service, get_db
+from app.config.dependency_injection import get_user_state_service, get_db, get_redis_client
 from app.services.user_state_service import UserStateService
 
 router = APIRouter()
@@ -12,7 +12,7 @@ router = APIRouter()
 def initiate_session(
         response: Response,
         session_in: SessionInitiateRequest,
-        user_state_service: UserStateService = Depends(get_user_state_service),
+        user_state_service: UserStateService = Depends(lambda: get_user_state_service(get_redis_client())),
         db: Session = Depends(get_db)
 ):
     """

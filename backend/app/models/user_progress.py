@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime
-from datetime import datetime, UTC
+from datetime import datetime
+import pytz
 from app.db.base_class import Base
 
 class UserProgress(Base):
@@ -18,4 +19,4 @@ class UserProgress(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     participant_id = Column(String, index=True, nullable=False)
     topic_id = Column(String, index=True, nullable=False)
-    completed_at = Column(DateTime, default=datetime.now(UTC))
+    completed_at = Column(DateTime, default=lambda: datetime.now(pytz.timezone('Asia/Shanghai')))

@@ -1487,6 +1487,22 @@ body {
     gap: var(--spacing-xs);
 }
 
+/* 禁用按钮样式 - 完全去除交互效果 */
+.btn:disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.7;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.btn:disabled:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    background-color: inherit !important;
+    color: inherit !important;
+}
+
 .btn-primary {
     background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
     color: white;

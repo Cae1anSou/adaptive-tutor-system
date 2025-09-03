@@ -1,7 +1,11 @@
 // frontend/js/api_client.js
 import { getParticipantId } from './modules/session.js';
 import { buildBackendUrl } from './modules/config.js';
+import {AppConfig} from './modules/config.js';
 
+export function buildWebSocketUrl(id='') {
+    return `${buildBackendUrl('/ws/user/')}${id}`;
+}
 // --- 新增：不带 participant_id 的通用请求方法 ---
 async function _requestWithoutAuth(endpoint, options = {}) {
     const defaultOptions = {

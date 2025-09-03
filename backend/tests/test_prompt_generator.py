@@ -18,12 +18,14 @@ def make_user_state(
     is_new_user: bool,
     emotion: str = "NEUTRAL",
     bkt_models: dict | None = None,
-    behavior_counters: dict | None = None,
+    behavior_patterns: dict | None = None,
 ):
+    patterns = behavior_patterns or {}
     return UserStateSummary(
         participant_id="u1",
         emotion_state={"current_sentiment": emotion},
-        behavior_counters=behavior_counters or {},
+        behavior_counters=patterns,
+        behavior_patterns=patterns,
         bkt_models=bkt_models or {},
         is_new_user=is_new_user,
     )
@@ -88,18 +90,18 @@ def test_build_system_prompt_existing_user_with_progress_behavior_and_context():
         "topic2": {"mastery_prob": 0.6},    # intermediate
         "topic3": {"mastery_prob": 0.2},    # beginner
     }
-    behavior = {
-        "error_count": 3,
-        "submission_timestamps": [1, 2],
+    behavior_patterns = {
+        "error_frequency": 0.75,
+        "help_seeking_tendency": 0.3,
     }
-    user_state = make_user_state(is_new_user=False, emotion="CONFUSED", bkt_models=bkt_models, behavior_counters=behavior)
+    user_state = make_user_state(is_new_user=False, emotion="CONFUSED", bkt_models=bkt_models, behavior_patterns=behavior_patterns)
 
     retrieved = ["ctx1", "ctx2"]
     prompt = g._build_system_prompt(
         user_state=user_state,
         retrieved_context=retrieved,
-        task_context="Implement stack",
-        topic_title="loops",
+        mode="learning",
+        content_title="loops",
     )
 
     # 既有学生提示
@@ -108,14 +110,12 @@ def test_build_system_prompt_existing_user_with_progress_behavior_and_context():
     assert "topic1: advanced" in prompt
     assert "topic2: intermediate" in prompt
     # 行为统计
-    assert "errors: 3" in prompt
-    assert "submissions: 2" in prompt
+    assert "BEHAVIOR METRICS: error frequency: 0.75, help-seeking tendency: 0.30" in prompt
     # RAG 上下文连接符与内容
     assert "REFERENCE KNOWLEDGE" in prompt and "ctx1" in prompt and "ctx2" in prompt
     assert "---" in prompt
     # 任务与主题
-    assert "TASK CONTEXT: The student is currently working on: 'Implement stack'" in prompt
-    assert "TOPIC: The current learning topic is 'loops'" in prompt
+    assert "TOPIC: The current topic is 'loops'" in prompt
 
 
 def test_create_prompts_integration():
@@ -132,8 +132,8 @@ def test_create_prompts_integration():
         conversation_history=conversation_history,
         user_message="Explain closures",
         code_content=code,
-        task_context="Practice functions",
-        topic_title="javascript",
+        mode="learning",
+        content_title="javascript",
     )
 
     # 系统提示含期待关键字

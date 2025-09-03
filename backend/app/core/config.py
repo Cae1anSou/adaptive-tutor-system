@@ -60,6 +60,12 @@ class Settings(BaseSettings):
     ENABLE_RAG_SERVICE: bool = True
     ENABLE_SENTIMENT_ANALYSIS: bool = True
     ENABLE_TRANSLATION_SERVICE: bool = False
+    
+    # Redis 配置
+    REDIS_URL: str = "redis://localhost:6380/0"
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6380
+    # REDIS_PASSWORD: str = ""
 
 # Create a single, globally accessible instance of the settings.
 # This will raise a validation error on startup if required settings are missing.

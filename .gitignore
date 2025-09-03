@@ -60,10 +60,16 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
+# Celery Beat 调度文件
+celerybeat-schedule.bak
+celerybeat-schedule.dat
+celerybeat-schedule.dir
+
 # 敏感信息 (secrets)
 *.env
 secrets.ini
 
+save/
 # 模型文件
 models/
 download_model.log
