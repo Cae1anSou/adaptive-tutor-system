@@ -19,7 +19,7 @@ from datetime import datetime, UTC
 
 
 class DynamicController:
-    """动态控制器 - 编排各个服务的核心逻辑"""
+    """动态控制器（控制组）：不使用用户画像、RAG或情感分析"""
 
     def __init__(self,
                  user_state_service: UserStateService,
@@ -37,9 +37,7 @@ class DynamicController:
             prompt_generator: 提示词生成器
             llm_gateway: LLM网关服务
         """
-        # 验证必需的服务
-        if user_state_service is None:
-            raise TypeError("user_state_service cannot be None")
+        # 验证必需的服务（控制组仅要求提示词与LLM网关）
         if prompt_generator is None:
             raise TypeError("prompt_generator cannot be None")
         if llm_gateway is None:
@@ -69,62 +67,10 @@ class DynamicController:
             ChatResponse: AI回复
         """
         try:
-            # 步骤1: 获取或创建用户档案（使用UserStateService）
-            profile, _ = self.user_state_service.get_or_create_profile(request.participant_id, db)
-
-            # 步骤2: 情感分析
-            if self.sentiment_service:
-                sentiment_result = self.sentiment_service.analyze_sentiment(
-                    request.user_message
-                )
-            else:
-                # 如果情感分析服务未启用，创建一个默认的情感分析结果
-                from app.schemas.chat import SentimentAnalysisResult
-                sentiment_result = SentimentAnalysisResult(
-                    label="neutral",
-                    confidence=0.0,
-                    details={}
-                )
-
-            # 构建用户状态摘要（同时更新用户情感状态）
-            user_state_summary = self._build_user_state_summary(profile, sentiment_result)
-
-            # 步骤3: RAG检索
-            retrieved_knowledge = []
-            if self.rag_service:
-                try:
-                    retrieved_knowledge = self.rag_service.retrieve(request.user_message)
-                except Exception as e:
-                    print(f"⚠️ RAG检索失败，使用空知识内容: {e}")
-                    retrieved_knowledge = []
-
-            # 步骤4: 加载内容（学习内容或测试任务）
+            # 控制组：不做情感分析、不做RAG、不加载内容
             content_title = None
-            loaded_content_json = None
-            if request.mode and request.content_id:
-                try:
-                    content_type = "learning_content" if request.mode == "learning" else "test_tasks"
-                    loaded_content = load_json_content(content_type, request.content_id)
-                    content_title = getattr(loaded_content, 'title', None) or getattr(loaded_content, 'topic_id', None)
-                    
-                    # 根据模式处理内容
-                    if request.mode == "test":
-                        loaded_content_json = loaded_content.model_dump_json()
-                    elif request.mode == "learning":
-                        # 移除sc_all字段
-                        learning_content_dict = loaded_content.model_dump()
-                        learning_content_dict.pop('sc_all', None)
-                        loaded_content_json = json.dumps(learning_content_dict)
 
-                except Exception as e:
-                    print(f"⚠️ 内容加载失败: {e}")
-                    loaded_content = None
-                    content_title = None
-            else:
-                loaded_content = None
-
-            # 步骤5: 生成提示词
-            # 将ConversationMessage转换为字典格式
+            # 准备对话历史
             conversation_history_dicts = []
             if request.conversation_history:
                 for msg in request.conversation_history:
@@ -133,34 +79,28 @@ class DynamicController:
                         'content': msg.content
                     })
             elif request.conversation_history is None:
-                # 确保即使conversation_history为None也传递空列表
                 conversation_history_dicts = []
 
-            retrieved_knowledge_content = [item['content'] for item in retrieved_knowledge if isinstance(item, dict) and 'content' in item]
             system_prompt, messages = self.prompt_generator.create_prompts(
-                user_state=user_state_summary,
-                retrieved_context=retrieved_knowledge_content,
+                user_state=None,
+                retrieved_context=[],
                 conversation_history=conversation_history_dicts,
                 user_message=request.user_message,
-                code_content=request.code_context,
-                mode=request.mode,
-                content_title=content_title,
-                content_json=loaded_content_json,  # 传递加载的内容JSON
-                test_results=request.test_results  # 传递测试结果
+                code_content=None,
+                mode=None,
+                content_title=None,
+                content_json=None,
+                test_results=None
             )
 
-            # 步骤6: 调用LLM
-            #TODO:done表示流式输出是否完成    elapsed:表示当前已经输出多少字
+            # 调用LLM
             ai_response = await self.llm_gateway.get_completion(
                 system_prompt=system_prompt,
                 messages=messages
             )
-            # 步骤7: 构建响应（只包含AI回复内容，符合TDD-II-10设计）
+            # 构建响应并记录
             response = ChatResponse(ai_response=ai_response)
-
-            # 步骤8: 记录AI交互
             self._log_ai_interaction(request, response, db, background_tasks, system_prompt, content_title)
-
             return response
 
         except Exception as e:
@@ -227,10 +167,7 @@ class DynamicController:
         3. 更新用户状态中的提问计数器。
         """
         try:
-            # 更新用户状态
-            self.user_state_service.handle_ai_help_request(request.participant_id, content_title)
-
-            # 准备事件数据
+            # 准备事件数据（控制组：不更新用户画像，仅写事件与聊天记录）
             event = BehaviorEvent(
                 participant_id=request.participant_id,
                 event_type=EventType.AI_HELP_REQUEST,
@@ -308,56 +245,9 @@ class DynamicController:
             ChatResponse: AI回复
         """
         try:
-            # 步骤1: 获取或创建用户档案（使用UserStateService）
-            profile, _ = self.user_state_service.get_or_create_profile(request.participant_id, db)
-            # 步骤2: 情感分析
-            if self.sentiment_service:
-                sentiment_result = self.sentiment_service.analyze_sentiment(
-                    request.user_message
-                )
-            else:
-                # 如果情感分析服务未启用，创建一个默认的情感分析结果
-                from app.schemas.chat import SentimentAnalysisResult
-                sentiment_result = SentimentAnalysisResult(
-                    label="neutral",
-                    confidence=0.0,
-                    details={}
-                )
-            # 构建用户状态摘要（同时更新用户情感状态）
-            user_state_summary = self._build_user_state_summary(profile, sentiment_result)
-            # 步骤3: RAG检索
-            retrieved_knowledge = []
-            if self.rag_service:
-                try:
-                    retrieved_knowledge = self.rag_service.retrieve(request.user_message)
-                except Exception as e:
-                    print(f"⚠️ RAG检索失败，使用空知识内容: {e}")
-                    retrieved_knowledge = []
-            # 步骤4: 加载内容（学习内容或测试任务）
             content_title = None
-            loaded_content_json = None
-            if request.mode and request.content_id:
-                try:
-                    content_type = "learning_content" if request.mode == "learning" else "test_tasks"
-                    loaded_content = load_json_content(content_type, request.content_id)
-                    content_title = getattr(loaded_content, 'title', None) or getattr(loaded_content, 'topic_id', None)
-                    
-                    # 根据模式处理内容
-                    if request.mode == "test":
-                        loaded_content_json = loaded_content.model_dump_json()
-                    elif request.mode == "learning":
-                        # 移除sc_all字段
-                        learning_content_dict = loaded_content.model_dump()
-                        learning_content_dict.pop('sc_all', None)
-                        loaded_content_json = json.dumps(learning_content_dict)
-                except Exception as e:
-                    print(f"⚠️ 内容加载失败: {e}")
-                    loaded_content = None
-                    content_title = None
-            else:
-                loaded_content = None
-            # 步骤5: 生成提示词
-            # 将ConversationMessage转换为字典格式
+
+            # 准备对话历史
             conversation_history_dicts = []
             if request.conversation_history:
                 for msg in request.conversation_history:
@@ -366,28 +256,26 @@ class DynamicController:
                         'content': msg.content
                     })
             elif request.conversation_history is None:
-                # 确保即使conversation_history为None也传递空列表
                 conversation_history_dicts = []
-            retrieved_knowledge_content = [item['content'] for item in retrieved_knowledge if isinstance(item, dict) and 'content' in item]
+
             system_prompt, messages = self.prompt_generator.create_prompts(
-                user_state=user_state_summary,
-                retrieved_context=retrieved_knowledge_content,
+                user_state=None,
+                retrieved_context=[],
                 conversation_history=conversation_history_dicts,
                 user_message=request.user_message,
-                code_content=request.code_context,
-                mode=request.mode,
-                content_title=content_title,
-                content_json=loaded_content_json,  # 传递加载的内容JSON
-                test_results=request.test_results  # 传递测试结果
+                code_content=None,
+                mode=None,
+                content_title=None,
+                content_json=None,
+                test_results=None
             )
-            # 步骤6: 调用LLM（同步方式）
+
+            # 调用LLM（同步方式）
             ai_response = self.llm_gateway.get_completion_sync(
                 system_prompt=system_prompt,
                 messages=messages
             )
-            # 步骤7: 构建响应（只包含AI回复内容，符合TDD-II-10设计）
             response = ChatResponse(ai_response=ai_response)
-            # 步骤8: 记录AI交互
             self._log_ai_interaction(request, response, db, background_tasks, system_prompt, content_title)
             return response
         except Exception as e:

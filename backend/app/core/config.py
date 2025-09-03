@@ -55,6 +55,9 @@ class Settings(BaseSettings):
     # LLM Settings
     LLM_MAX_TOKENS: int = 65536
     LLM_TEMPERATURE: float = 0.7
+    BASIC_SYSTEM_PROMPT: str = (
+        "You are a helpful assistant. Answer clearly and concisely."
+    )
 
     # Module enable/disable flags
     ENABLE_RAG_SERVICE: bool = True
