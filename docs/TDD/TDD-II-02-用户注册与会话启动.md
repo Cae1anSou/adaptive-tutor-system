@@ -303,8 +303,8 @@ export function checkAndRedirect() {
 - **`localStorage` 是什么?** `localStorage` 是浏览器提供的一种本地存储机制。与 `cookie` 不同，它存储的数据**没有过期时间**，除非被用户手动清除或代码主动删除。即使用户关闭浏览器或重启电脑，`localStorage` 中的数据依然存在。这正是实现持久化会话的关键。
 - **各个函数的作用:**
     - `saveParticipantId(id)`: 调用 `localStorage.setItem` 方法，将后端返回的 `participant_id` 以键值对的形式 (`'participant_id': 'some-uuid-string'`) 存入 `localStorage`。
-    - `getParticipantId()`: 调用 `localStorage.getItem` 方法，根据键名 `'participant_id'` 从 `localStorage` 中读取出已保存的用户ID。
-    - `clearParticipantId()`: 调用 `localStorage.removeItem` 方法，删除已保存的用户ID。这个函数在用户登出时会很有用。
+    - `getParticipantId()`: 调用 `localStorage.getItem` 方法，根据键名 `'participant_id'` 从 `localStorage` 中读取出已保存的实验编号。
+    - `clearParticipantId()`: 调用 `localStorage.removeItem` 方法，删除已保存的实验编号。这个函数在用户登出时会很有用。
     - `checkAndRedirect()`: 这是一个提升用户体验的核心函数。
         - 它首先检查 `localStorage` 中是否存在 `participant_id`。
         - 如果**存在**，说明用户之前已经登录过，是个"返回用户"。为了避免让用户重复输入用户名，它会检查当前页面的URL。如果用户不在主功能页（如 `knowledge_graph.html`），代码会自动将他**重定向**过去，实现无缝的会话恢复。

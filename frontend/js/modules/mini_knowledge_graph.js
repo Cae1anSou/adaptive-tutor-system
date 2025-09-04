@@ -40,7 +40,7 @@ export class MiniKnowledgeGraph {
       
       const participantId = getParticipantId();
       if (!participantId) {
-        console.warn('未找到用户ID，无法加载简化知识图谱');
+        console.warn('未找到实验编号，无法加载简化知识图谱');
         return;
       }
       
