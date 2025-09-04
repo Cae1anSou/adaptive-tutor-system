@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const username = usernameInput.value.trim();
             // 简单的输入校验
             if (!username) {
-                alert('请输入用户ID');
+                alert('请输入实验编号');
                 return;
             }
 

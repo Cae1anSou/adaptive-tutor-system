@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 设置返回按钮
   setupBackButton();
   try {
-    // 获取用户ID并验证
+    // 获取实验编号并验证
     const participantId = getParticipantId();
     if (!participantId) {
       window.location.href = '/pages/index.html';
