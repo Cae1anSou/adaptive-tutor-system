@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     BACKEND_PORT: int = 8000
 
     # OpenAI (for chat completions)
-    TUTOR_OPENAI_API_KEY: str = "ms-9ab1cd11-fc6c-4163-9813-d3d0b51bc9e8"
+    TUTOR_OPENAI_API_KEY: str = "ms-ca08ef4d-a049-4ac3-9355-753ff46986e5"
     TUTOR_OPENAI_MODEL: str = "Qwen/Qwen3-Coder-480B-A35B-Instruct"
     TUTOR_OPENAI_API_BASE: str = "https://api-inference.modelscope.cn/v1"
 
