@@ -121,7 +121,7 @@ let iframeLoadProcessed = false;
 
 // 为行为追踪器设置participant_id（如果不存在则使用默认值）
 if (!window.participantId) {
-    window.participantId = 'user123'; // 默认用户ID，实际应用中应该从session获取
+    window.participantId = 'user123'; // 默认实验编号，实际应用中应该从session获取
 }
 
 // 确保localStorage中有participant_id，供api_client.js使用
@@ -268,7 +268,7 @@ async function fetchTopicContent(topicId) {
 
 // 获取用户进度数据
 async function fetchUserProgress() {
-    // 从localStorage或session获取用户ID
+    // 从localStorage或session获取实验编号
     const userId = localStorage.getItem('participant_id') || 'user123';
     const progressUrl = buildBackendUrl(`/progress/participants/${userId}/progress`);
     console.log('[MainApp] 进度API请求地址:', progressUrl);
@@ -1007,10 +1007,10 @@ async function initKnowledgeGraph() {
   try {
     console.log('[KnowledgeGraph] 开始初始化知识图谱...');
     
-    // 获取用户ID并验证
+    // 获取实验编号并验证
     const participantId = getParticipantId();
     if (!participantId) {
-      console.warn('[KnowledgeGraph] 未找到用户ID，无法加载知识图谱');
+      console.warn('[KnowledgeGraph] 未找到实验编号，无法加载知识图谱');
       return;
     }
 

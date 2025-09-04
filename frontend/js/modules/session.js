@@ -1,6 +1,16 @@
+import chatStorage from './chat_storage.js';
 const PARTICIPANT_ID_KEY = 'participant_id';
 
 export function saveParticipantId(id) {
+  const prev = localStorage.getItem(PARTICIPANT_ID_KEY);
+  if (prev && prev !== id) {
+    try {
+      // 用户切换账号时清空旧账号的聊天记录
+      chatStorage.clear(prev);
+    } catch (e) {
+      console.warn('[session] 清空旧用户聊天历史失败:', e);
+    }
+  }
   localStorage.setItem(PARTICIPANT_ID_KEY, id);
 }
 
