@@ -12,44 +12,152 @@ document.addEventListener('DOMContentLoaded', async () => {
     await initializeConfig();
     // 设置标题点击跳转到首页（刷新）
     setupHeaderTitle('/index.html');
-    
-    const startButton = document.getElementById('start-button');
-    const usernameInput = document.getElementById('username-input');
 
-    if (startButton && usernameInput) {
+    const startButton = document.getElementById('start-button');
+    const nicknameInput = document.getElementById('nickname-input');
+    const themeSelector = document.getElementById('theme-selector');
+
+    // 监听输入变化
+    if (nicknameInput) {
+        nicknameInput.addEventListener('input', checkFormValid);
+        nicknameInput.addEventListener('blur', validateNickname);
+    }
+
+    if (themeSelector) {
+        themeSelector.addEventListener('change', checkFormValid);
+    }
+
+    // 开始按钮点击处理
+    if (startButton) {
         startButton.addEventListener('click', async () => {
-            const username = usernameInput.value.trim();
-            // 简单的输入校验
-            if (!username) {
-                alert('请输入用户ID');
+            const nickname = nicknameInput?.value.trim() || '';
+            const theme = themeSelector?.value || '';
+
+            // 验证输入
+            if (!nickname) {
+                showError('请输入学习昵称');
+                nicknameInput?.focus();
+                return;
+            }
+
+            if (!theme) {
+                showError('请选择学习主题');
+                themeSelector?.focus();
                 return;
             }
 
             // 禁用按钮，防止重复点击
             startButton.disabled = true;
-            startButton.textContent = '处理中...';
+            const originalText = startButton.innerHTML;
+            startButton.innerHTML = '<iconify-icon icon="mdi:loading" width="20" height="20" class="spin"></iconify-icon> 启动中...';
 
             try {
+                // 生成基于昵称和主题的用户ID
+                const participantId = generateParticipantId(nickname, theme);
+
                 // 使用统一的apiClient方法发送请求
                 const result = await apiClient.postWithoutAuth('/session/initiate', {
-                    participant_id: username
+                    participant_id: participantId,
+                    nickname: nickname,
+                    theme: theme
                 });
 
                 if (result.code === 200 || result.code === 201) {
                     saveParticipantId(result.data.participant_id);
-                    // 注册成功后，跳转到学习页面的1_1小节
-                    navigateTo('/pages/learning_page.html', '1_1', true);
+                    // 成功提示
+                    showSuccess(`欢迎 ${nickname}！正在进入${getThemeName(theme)}学习...`);
+
+                    // 延迟跳转，让用户看到欢迎信息
+                    setTimeout(() => {
+                        navigateTo('/pages/learning_page.html', '1_1', true);
+                    }, 1500);
                 } else {
-                    alert(result.message || '注册失败，请重试');
+                    showError(result.message || '启动失败，请重试');
                 }
             } catch (error) {
-                console.error('注册请求失败:', error);
-                alert('网络错误，请检查网络连接后重试');
+                console.error('启动请求失败:', error);
+                showError('网络错误，请检查网络连接后重试');
             } finally {
                 // 恢复按钮状态
-                startButton.disabled = false;
-                startButton.textContent = '开始学习';
+                setTimeout(() => {
+                    if (startButton) {
+                        startButton.disabled = false;
+                        startButton.innerHTML = originalText;
+                        checkFormValid(); // 重新检查表单状态
+                    }
+                }, 1500);
             }
         });
     }
+
+    // 检查表单是否有效
+    function checkFormValid() {
+        const nickname = nicknameInput?.value.trim() || '';
+        const theme = themeSelector?.value || '';
+        const isValid = nickname.length >= 2 && theme;
+
+        if (startButton) {
+            startButton.disabled = !isValid;
+        }
+    }
+
+    // 验证昵称
+    function validateNickname() {
+        const nickname = nicknameInput?.value.trim() || '';
+        if (nickname && nickname.length < 2) {
+            showError('昵称至少需要2个字符');
+            return false;
+        }
+        return true;
+    }
+
+    // 生成基于昵称和主题的参与者ID
+    function generateParticipantId(nickname, theme) {
+        const timestamp = Date.now().toString().slice(-6);
+        const themePrefix = getThemePrefix(theme);
+        // 清理昵称，只保留字母数字和中文
+        const cleanNickname = nickname.replace(/[^\w\u4e00-\u9fa5]/g, '').slice(0, 10);
+        return `${themePrefix}_${cleanNickname}_${timestamp}`;
+    }
+
+    // 获取主题前缀
+    function getThemePrefix(theme) {
+        const prefixes = {
+            'pets': 'PET',
+            'shopping': 'SHOP',
+            'travel': 'TRAVEL',
+            'food': 'FOOD',
+            'fitness': 'FIT',
+            'music': 'MUSIC'
+        };
+        return prefixes[theme] || 'USER';
+    }
+
+    // 获取主题名称
+    function getThemeName(theme) {
+        const names = {
+            'pets': '宠物世界',
+            'shopping': '购物商城',
+            'travel': '旅游探索',
+            'food': '美食天地',
+            'fitness': '健身达人',
+            'music': '音乐空间'
+        };
+        return names[theme] || '学习';
+    }
+
+    // 显示错误提示
+    function showError(message) {
+        // 简单的错误提示，可以后续优化为更好的UI组件
+        alert('❌ ' + message);
+    }
+
+    // 显示成功提示
+    function showSuccess(message) {
+        // 简单的成功提示，可以后续优化为更好的UI组件
+        alert('✅ ' + message);
+    }
+
+    // 初始化检查表单状态
+    checkFormValid();
 });
