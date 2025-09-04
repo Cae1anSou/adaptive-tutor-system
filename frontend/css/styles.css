@@ -609,6 +609,51 @@ body {
         display: flex;
         flex-direction: column;
     }
+
+    /* 面板底部样式 */
+    .panel-footer {
+        padding: var(--spacing-md);
+        border-top: 1px solid var(--border-color);
+        background-color: var(--panel-background);
+        border-bottom-left-radius: var(--border-radius-md);
+        border-bottom-right-radius: var(--border-radius-md);
+    }
+
+    /* 解题思路按钮样式 */
+    #problem-solving-hint-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--spacing-sm);
+        width: 100%;
+        padding: var(--spacing-md);
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius-md);
+        font-weight: 600;
+        font-size: var(--font-size-sm);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-light);
+    }
+
+    #problem-solving-hint-btn:hover {
+        background-color: #6366f1;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-medium);
+    }
+
+    #problem-solving-hint-btn:active {
+        transform: translateY(0);
+        box-shadow: var(--shadow-light);
+    }
+
+    #problem-solving-hint-btn:focus {
+        outline: 2px solid rgba(99, 102, 241, 0.5);
+        outline-offset: 2px;
+    }
+
     /* 中间面板样式 */
     .mid-panel {
         width: 45%;
@@ -649,6 +694,55 @@ body {
         text-align: center;
     }
 
+/* 询问AI按钮样式 */
+#ask-ai-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    width: 100%;
+    padding: var(--spacing-md);
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#ask-ai-btn:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+}
+
+#ask-ai-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-light);
+}
+
+#ask-ai-btn:focus {
+    outline: 2px solid rgba(79, 70, 229, 0.5);
+    outline-offset: 2px;
+}
+
+#ask-ai-btn:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+}
+
+#ask-ai-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-light);
+}
+
+#ask-ai-btn:focus {
+    outline: 2px solid rgba(79, 70, 229, 0.5);
+    outline-offset: 2px;
+}
 
 /* learn页面栏目布局 */
 /* 左侧组合列（占 60% 宽） */

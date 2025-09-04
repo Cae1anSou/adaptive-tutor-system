@@ -1,6 +1,6 @@
 {
   "topic_id": "1_end",
-  "title": "第1章文本与页面结构基础综合测试",
+  "title": "1_end 第1章文本与页面结构基础综合测试",
   "description_md": "# 综合测试\n\n## 测试任务：\n请综合运用本章所学知识点，构建一个关于“WCF Best Cat Exhibition”（WCF最佳猫咪展览）的介绍页面。\n\n### 任务一：创建页面基本结构\n- 添加HTML5文档类型声明\n- 设置页面语言为英文\n- 添加页面标题为“WCF Best Cat Exhibition”\n- 设置字符编码为UTF-8\n- 添加viewport meta标签确保响应式布局\n\n### 任务二：添加页面内容结构\n- 添加主标题（h1）为“WCF Best Cat Exhibition”\n- 添加二级标题（h2）为“Welcome to the Cat Exhibition”\n- 添加三级标题（h3）为“Event Highlights”\n- 添加另一个三级标题（h3）为“Daily Schedule”\n- 在适当位置添加段落（p）元素，内容为：Join us for a purr-fect celebration of feline beauty and grace. Discover various cat breeds and experience the excitement of the event!\n\n### 任务三：应用文本格式化\n- 使用span元素将\"purr-fect\"文本包装起来，并为其添加加粗样式，使用CSS的font-weight属性\n- 使用span元素将\"grace\"文本包装起来，并为其添加斜体样式，使用CSS的font-style属性\n",
   "start_code": {
     "html": "",

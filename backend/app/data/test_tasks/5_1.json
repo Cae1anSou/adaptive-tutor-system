@@ -1,6 +1,6 @@
 {
   "topic_id": "5_1",
-  "title": "插入并管理网页中的图片元素",
+  "title": "5_1 插入并管理网页中的图片元素",
   "description_md": "请为每个商品卡片插入图片，并设置合适的展示样式。\n\n- 请在 `.card` 元素的顶部添加 `<img>` 标签\n- 每个图片应包含 `src` 和 `alt` 属性\n- 设置图片宽度为 `100%`，并使用 `object-fit: cover` 保持比例裁剪",
   "start_code": {
     "html": "<div class=\"card\">\n  <!-- 在这里插入图片 -->\n  <div class=\"card-content\">\n    <h3>智能手表</h3>\n    <p>分类：数码</p>\n    <p>价格：￥1299</p>\n  </div>\n</div>\n<div class=\"card\">\n  <!-- 在这里插入图片 -->\n  <div class=\"card-content\">\n    <h3>保温杯</h3>\n    <p>分类：家居</p>\n    <p>价格：￥89</p>\n  </div>\n</div>",

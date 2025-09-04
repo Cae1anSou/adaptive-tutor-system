@@ -1,6 +1,6 @@
 {
   "topic_id": "5_3",
-  "title": "在网页中嵌入教学视频",
+  "title": "5_3 在网页中嵌入教学视频",
   "description_md": "请在网页中嵌入一段编程教学视频。\n\n- 使用 `<video>` 标签，并启用 `controls`\n- 添加 `<source>`，类型为 `video/mp4`\n- 设置视频宽度为 `100%`\n- 提供备用文本提示浏览器不支持视频播放",
   "start_code": {
     "html": "<section class=\"list-demo\">\n  <h3>课程教学视频</h3>\n  <!-- 在这里添加 video 标签 -->\n</section>",

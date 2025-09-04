@@ -1,6 +1,6 @@
 {
   "topic_id": "6_1",
-  "title": "为登录按钮添加点击事件",
+  "title": "6_1 为登录按钮添加点击事件",
   "description_md": "为“登录”按钮添加点击事件，当用户点击按钮时获取用户名输入框的内容，并弹出欢迎信息。\n\n- 给按钮添加 `onclick` 属性或使用 JavaScript 添加点击事件监听器\n- 弹出提示框展示用户输入的用户名，例如“欢迎, 张三!”",
   "start_code": {
     "html": "<div class=\"login-bar\">\n  <input type=\"text\" placeholder=\"请输入用户名\" id=\"usernameInput\">\n  <button id=\"loginBtn\">登录</button>\n</div>",

@@ -1,6 +1,6 @@
 {
   "topic_id": "3_3",
-  "title": "表单提交机制",
+  "title": "3_3 表单提交机制",
   "description_md": "# 表单提交机制\n## 任务描述：\n请为下面的用户注册表单添加表单提交机制。要求使用<form>元素包裹所有表单控件，并通过onsubmit属性绑定一个名为handleRegister的JavaScript函数来处理提交事件。确保提交时阻止默认行为并在控制台输出“注册信息已处理”。",
   "start_code": {
     "html": "<label>用户名：<input type=\"text\" name=\"username\"></label>\n<label>邮箱：<input type=\"email\" name=\"email\"></label>\n<button type=\"submit\">注册</button>",

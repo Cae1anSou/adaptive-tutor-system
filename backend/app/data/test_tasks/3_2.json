@@ -1,6 +1,6 @@
 {
   "topic_id": "3_2",
-  "title": "复选框与单选框练习",
+  "title": "3_2 复选框与单选框练习",
   "description_md": "# 复选框与单选框\n## 任务一：\n请创建两个复选框，name值为：skills，第一个复选框的value值为：HTML，内容为：掌握HTML；第二个复选框的value值为：CSS，内容为：掌握CSS。\n## 任务二：\n在复选框下方创建两个单选框，name值为：level，第一个单选框的value值为：初级，内容为：初级程序员；第二个单选框的value值为：高级，内容为：高级程序员。",
   "start_code": {
     "html": "",
