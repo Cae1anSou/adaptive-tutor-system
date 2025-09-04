@@ -17,7 +17,10 @@ export async function initializeConfig() {
     // 在所有环境中都使用相对路径，通过Nginx代理
     const configUrl = '/api/v1/config';
       
-    const response = await fetch(configUrl);
+    const response = await fetch(configUrl, { credentials: 'same-origin' });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
     const result = await response.json();
 
     if (result.code !== 200) {
@@ -29,10 +32,13 @@ export async function initializeConfig() {
   } catch (error) {
     console.error("Could not initialize frontend configuration:", error);
     // Fallback to default port if config load fails in development
-    // 确保即使配置加载失败，也有默认值
-    if (!AppConfig.backend_port) {
-      AppConfig.backend_port = 8000;
-    }
+    // 确保即使配置加载失败，也有默认值，并直接走后端端口，绕过反向代理
+    const defaultPort = 8000;
+    AppConfig.backend_port = AppConfig.backend_port || defaultPort;
+    const host = window.location.hostname || 'localhost';
+    const backendHost = (host === 'localhost' || host === '127.0.0.1') ? 'localhost' : host;
+    AppConfig.api_base_url = `http://${backendHost}:${AppConfig.backend_port}/api/v1`;
+    console.log('[Config] Using fallback API base:', AppConfig.api_base_url);
   }
 }
 
