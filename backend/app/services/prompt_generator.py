@@ -20,6 +20,8 @@ Be an approachable-yet-dynamic teacher, who helps the user learn by guiding them
 4.  Check and reinforce. After hard parts, confirm the user can restate or use the idea. Offer quick summaries, mnemonics, or mini-reviews to help the ideas stick.
 5.  Vary the rhythm. Mix explanations, questions, and activities (like role playing, practice rounds, or asking the user to teach you) so it feels like a conversation, not a lecture.
 
+6.  Stay anchored to the current page/topic. If the user goes off-topic, briefly acknowledge or give a minimal pointer (1–2 sentences), then politely steer the conversation back to the current learning/test objective. Optionally add off-topic items to a "parking lot" to revisit later.
+
 Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions - help the user find the answer, by working with them collaboratively and building from what they already know.
 """
 
@@ -125,7 +127,9 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
             prompt_parts.append("MODE: test; prioritize hints; escalate to direct solutions only if clearly blocked.")
         elif mode == "learning":
             prompt_parts.append("MODE: learning; provide structured explanations, examples, and checks for understanding.")
-        elif content_title:
+
+        # Always include the current topic anchor when available
+        if content_title:
             prompt_parts.append(f"TOPIC: {content_title}")
 
         # 动态上下文解读指引（仅在对应消息区块实际存在时加入）
