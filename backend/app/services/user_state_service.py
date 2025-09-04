@@ -1,11 +1,13 @@
 import logging
 import redis
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional
 from sqlalchemy.orm import Session
 from app.crud.crud_event import event as crud_event
 from app.schemas.behavior import BehaviorEvent
 from datetime import datetime, timedelta, UTC, timezone
 import json
+import os
+import numpy as np
 
 # 导入BKT模型
 from ..models.bkt import BKTModel
@@ -15,6 +17,29 @@ from ..models.bkt import BKTModel
 
 # 配置日志
 logger = logging.getLogger(__name__)
+
+# 导入聚类相关服务
+try:
+    # 设置环境变量防止TensorFlow冲突
+    os.environ["TRANSFORMERS_NO_TF"] = "1"
+    os.environ["TRANSFORMERS_NO_FLAX"] = "1"
+    os.environ["USE_TF"] = "0"
+    
+    from .clustering_core_service import (
+        preprocess_messages, 
+        encode_messages, 
+        pool_window_embeddings_with_padding,
+        window_repeat_features, 
+        window_code_change, 
+        done_stuck_counts, 
+        progress_score_from_proxies,
+        create_single_window_from_messages
+    )
+    CLUSTERING_CORE_AVAILABLE = True
+    logger.info("聚类核心服务模块加载成功")
+except Exception as e:
+    CLUSTERING_CORE_AVAILABLE = False
+    logger.warning(f"聚类核心服务模块加载失败: {e}")
 
 class StudentProfile:
     def __init__(self, participant_id, is_new_user=True):
@@ -49,7 +74,16 @@ class StudentProfile:
                 'coding_problems': [],          # 编码问题记录
                 'session_summaries': [],        # 会话摘要记录
                 'last_analysis_timestamp': None # 上次分析时间
-            } 
+            },
+            # 新增进度聚类分析字段
+            'progress_clustering': {
+                'current_cluster': None,        # 当前所属聚类：'低进度'/'正常'/'超进度'
+                'cluster_confidence': 0.0,      # 聚类置信度 [0,1]
+                'progress_score': 0.0,          # 进度评分 [-2,2]
+                'last_analysis_timestamp': None,# 上次聚类分析时间
+                'conversation_count_analyzed': 0,# 已分析的对话数量
+                'clustering_history': []        # 聚类历史记录
+            }
         }
     
     # TODO: 需要检查实现to_dict和from_dict方法
@@ -131,10 +165,29 @@ class StudentProfile:
                 'attention_stability': 0.5,
                 'submission_timestamps': [],
                 'recent_events': [],
-                'knowledge_level_history': {}
+                'knowledge_level_history': {},
+                'progress_clustering': {
+                    'current_cluster': None,
+                    'cluster_confidence': 0.0,
+                    'progress_score': 0.0,
+                    'last_analysis_timestamp': None,
+                    'conversation_count_analyzed': 0,
+                    'clustering_history': []
+                }
             }
         else:
             profile.behavior_patterns = data['behavior_patterns']
+            # 确保progress_clustering字段存在
+            if 'progress_clustering' not in profile.behavior_patterns:
+                logger.warning(f"StudentProfile: 用户 {participant_id} 缺少 progress_clustering 字段，使用默认值")
+                profile.behavior_patterns['progress_clustering'] = {
+                    'current_cluster': None,
+                    'cluster_confidence': 0.0,
+                    'progress_score': 0.0,
+                    'last_analysis_timestamp': None,
+                    'conversation_count_analyzed': 0,
+                    'clustering_history': []
+                }
         
         # 反序列化时间戳
         if 'submission_timestamps' in profile.behavior_patterns:
@@ -1064,3 +1117,325 @@ class UserStateService:
         except Exception as e:
             logger.error(f"计算挫败指数时发生错误: {e}")
             return 0.0
+
+    # analyze_learning_progress 方法已删除 - 功能与 analyze_with_distance_clustering 重复
+    # 方法体已删除，功能合并到 analyze_with_distance_clustering
+
+    def _should_perform_clustering(self, profile: 'StudentProfile', conversation_history: List[Dict[str, str]]) -> bool:
+        """
+        判断是否应该执行聚类分析（滑动窗口逻辑：每8条消息触发）
+        
+        基于预训练模型的滑动窗口参数：
+        - batch_size=12, overlap=4, 步长=8
+        - 每8条新消息相当于一个新的滑动窗口
+        
+        Args:
+            profile: 用户档案
+            conversation_history: 对话历史
+            
+        Returns:
+            是否应该执行聚类分析
+        """
+        try:
+            # 获取当前对话数量
+            current_message_count = len([msg for msg in conversation_history if msg.get('role') == 'user'])
+            
+            # 获取上次分析的消息数量
+            progress_clustering = profile.behavior_patterns.get('progress_clustering', {})
+            last_analyzed_count = progress_clustering.get('conversation_count_analyzed', 0)
+            last_analysis_time = progress_clustering.get('last_analysis_timestamp')
+            
+            # 如果消息数量少于1条，不进行分析
+            if current_message_count < 1:
+                return False
+            
+            # 如果从未分析过，且有消息，进行分析
+            if last_analyzed_count == 0:
+                return True
+            
+            # 如果新增消息数量达到8条以上，进行分析（符合滑动窗口步长=batch_size-overlap=12-4=8）
+            if current_message_count - last_analyzed_count >= 8:
+                return True
+            
+            # 如果距离上次分析超过30分钟，且有新消息，进行分析
+            if last_analysis_time and current_message_count > last_analyzed_count:
+                try:
+                    last_time = datetime.fromisoformat(last_analysis_time)
+                    if datetime.now(UTC) - last_time > timedelta(minutes=30):
+                        return True
+                except ValueError:
+                    # 如果时间格式解析失败，进行分析
+                    return True
+            
+            return False
+            
+        except Exception as e:
+            logger.error(f"判断是否执行聚类分析时出错: {e}")
+            return False
+
+    def get_current_learning_progress_cluster(self, participant_id: str) -> Optional[Dict[str, Any]]:
+        """
+        获取用户当前的学习进度聚类信息
+        
+        Args:
+            participant_id: 参与者ID
+            
+        Returns:
+            当前聚类信息字典或None
+        """
+        try:
+            profile, _ = self.get_or_create_profile(participant_id, None)
+            progress_clustering = profile.behavior_patterns.get('progress_clustering', {})
+            
+            if not progress_clustering.get('current_cluster'):
+                return None
+            
+            return {
+                'cluster_name': progress_clustering.get('current_cluster'),
+                'cluster_confidence': progress_clustering.get('cluster_confidence', 0.0),
+                'progress_score': progress_clustering.get('progress_score', 0.0),
+                'last_analysis_timestamp': progress_clustering.get('last_analysis_timestamp'),
+                'conversation_count_analyzed': progress_clustering.get('conversation_count_analyzed', 0)
+            }
+            
+        except Exception as e:
+            logger.error(f"获取用户 {participant_id} 聚类信息失败: {e}")
+            return None
+
+    def analyze_real_time_progress(self, participant_id: str, conversation_history: List[Dict[str, str]]) -> Optional[Dict[str, Any]]:
+        """
+        实时学习进度分析 - 无需等待大量数据
+        
+        Args:
+            participant_id: 参与者ID
+            conversation_history: 对话历史
+            
+        Returns:
+            实时进度分析结果或None
+        """
+        try:
+            # 导入实时分析器
+            import sys
+            import os
+            
+            # 动态导入实时分析器类
+            real_time_analyzer_path = os.path.join(os.path.dirname(__file__), '..', '..', 'real_time_progress_analyzer.py')
+            if os.path.exists(real_time_analyzer_path):
+                import importlib.util
+                spec = importlib.util.spec_from_file_location("real_time_progress_analyzer", real_time_analyzer_path)
+                rta_module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(rta_module)
+                
+                analyzer = rta_module.RealTimeProgressAnalyzer()
+                result = analyzer.analyze_real_time_progress(participant_id, conversation_history)
+                
+                if result['analysis_type'] != 'insufficient_data':
+                    # 更新用户档案
+                    profile, _ = self.get_or_create_profile(participant_id, None)
+                    current_time = datetime.now(UTC)
+                    
+                    clustering_data = {
+                        'current_cluster': result['cluster_name'],
+                        'cluster_confidence': result['confidence'],
+                        'progress_score': result['progress_score'],
+                        'last_analysis_timestamp': current_time.isoformat(),
+                        'conversation_count_analyzed': result['message_count'],
+                        'analysis_type': result['analysis_type'],
+                        'teaching_strategy': result['teaching_strategy'],
+                        'clustering_history': profile.behavior_patterns.get('progress_clustering', {}).get('clustering_history', [])
+                    }
+                    
+                    # 添加历史记录
+                    clustering_data['clustering_history'].append({
+                        'timestamp': current_time.isoformat(),
+                        'cluster_name': result['cluster_name'],
+                        'confidence': result['confidence'],
+                        'progress_score': result['progress_score'],
+                        'message_count': result['message_count'],
+                        'analysis_type': result['analysis_type']
+                    })
+                    
+                    # 保持历史记录数量限制
+                    if len(clustering_data['clustering_history']) > 20:
+                        clustering_data['clustering_history'] = clustering_data['clustering_history'][-20:]
+                    
+                    # 更新Redis
+                    set_dict = {
+                        'behavior_patterns.progress_clustering': clustering_data
+                    }
+                    self.set_profile(profile, set_dict)
+                    
+                    logger.info(f"实时进度分析完成: {participant_id} -> {result['cluster_name']} (置信度: {result['confidence']:.3f}, 消息数: {result['message_count']})")
+                    
+                    return {
+                        'cluster_name': result['cluster_name'],
+                        'cluster_confidence': result['confidence'],
+                        'progress_score': result['progress_score'],
+                        'analysis_type': result['analysis_type'],
+                        'teaching_strategy': result['teaching_strategy'],
+                        'message_count': result['message_count'],
+                        'analysis_successful': True
+                    }
+                
+                return None
+            else:
+                logger.warning("实时进度分析器模块未找到，无其他备用方法")
+                return None
+                
+        except Exception as e:
+            logger.error(f"实时进度分析失败: {e}")
+            # 无其他备用方法
+            return None
+
+    def analyze_with_distance_clustering(self, participant_id: str, conversation_history: List[Dict[str, str]]) -> Optional[Dict[str, Any]]:
+        """
+        使用距离聚类算法进行学习进度分析
+        
+        Args:
+            participant_id: 参与者ID
+            conversation_history: 对话历史
+            
+        Returns:
+            聚类分析结果或None
+        """
+        try:
+            logger.info(f"开始为用户 {participant_id} 进行距离聚类分析")
+            
+            # 直接导入距离聚类服务（已在同一目录下）
+            from .distance_based_clustering_service import DistanceBasedClusteringService
+            
+            # 创建距离聚类服务实例
+            clustering_service = DistanceBasedClusteringService()
+            
+            if not clustering_service.is_loaded:
+                logger.warning("距离聚类模型未加载成功，回退到实时分析")
+                return self.analyze_real_time_progress(participant_id, conversation_history)
+            
+            # 提取用户消息
+            user_messages = [msg['content'] for msg in conversation_history if msg.get('role') == 'user']
+            
+            if len(user_messages) == 0:
+                logger.info(f"用户 {participant_id} 无可分析的消息")
+                return None
+            
+            logger.info(f"用户 {participant_id} 有 {len(user_messages)} 条消息待分析")
+            
+            # 使用距离聚类进行分类
+            result = clustering_service.classify_with_strategy(user_messages)
+            
+            if not result.get('analysis_successful'):
+                logger.warning(f"用户 {participant_id} 距离聚类分析失败，回退到实时分析")
+                return self.analyze_real_time_progress(participant_id, conversation_history)
+            
+            # 获取窗口特征（从距离聚类服务的特征提取过程）
+            try:
+                from .clustering_core_service import (
+                    preprocess_messages, 
+                    encode_messages,
+                    pool_window_embeddings_with_padding,
+                    window_repeat_features, 
+                    window_code_change,
+                    done_stuck_counts,
+                    create_single_window_from_messages
+                )
+                
+                # 创建与distance_based_clustering_service相同的窗口
+                window_indices, processed_messages, valid_indices, is_padded = create_single_window_from_messages(
+                    user_messages, target_size=12, min_size=1
+                )
+                
+                # 预处理消息
+                clean_texts, code_hashes_per_msg = preprocess_messages(processed_messages)
+                
+                # 语义编码（只对有效消息）
+                valid_clean_texts = [clean_texts[i] for i in valid_indices]
+                per_msg_embs = encode_messages(valid_clean_texts, model_name="sentence-transformers/all-mpnet-base-v2")
+                
+                # 为padding位置创建零向量
+                if is_padded:
+                    emb_dim = per_msg_embs.shape[1]
+                    full_embs = np.zeros((len(processed_messages), emb_dim), dtype=np.float32)
+                    full_embs[valid_indices] = per_msg_embs
+                    per_msg_embs = full_embs
+                
+                # 计算结构特征
+                repeat_eq, repeat_sim = window_repeat_features(
+                    clean_texts, per_msg_embs, [window_indices], near_sim_thresh=0.92
+                )
+                code_change = window_code_change(code_hashes_per_msg, [window_indices])
+                
+                # 计算done/stuck计数
+                window_doc = " ".join([user_messages[i] for i in valid_indices])
+                done_hits, stuck_hits = done_stuck_counts([window_doc])
+                
+                window_features = {
+                    'repeat_eq': float(repeat_eq[0]),
+                    'repeat_sim': float(repeat_sim[0]),
+                    'code_change': float(code_change[0]),
+                    'done_hits': float(done_hits[0]),
+                    'stuck_hits': float(stuck_hits[0])
+                }
+                
+            except Exception as e:
+                logger.warning(f"窗口特征计算失败: {e}")
+                window_features = {}
+            
+            # 更新用户档案 - 按照其他事件的做法
+            profile, _ = self.get_or_create_profile(participant_id, None)
+            current_time = datetime.now(UTC)
+            
+            # 构建聚类数据
+            clustering_data = {
+                'current_cluster': result['cluster_name'],
+                'cluster_confidence': result['confidence'],
+                'progress_score': result['progress_score'],
+                'last_analysis_timestamp': current_time.isoformat(),
+                'conversation_count_analyzed': result['message_count'],
+                'analysis_type': result['classification_type'],
+                'model_type': 'distance_based',
+                'cluster_distances': result.get('distances', []),
+                'window_features': window_features,
+                'clustering_history': profile.behavior_patterns.get('progress_clustering', {}).get('clustering_history', [])
+            }
+            
+            # 添加历史记录 - 按照其他事件的做法
+            clustering_data['clustering_history'].append({
+                'timestamp': current_time.isoformat(),
+                'cluster_name': result['cluster_name'],
+                'confidence': result['confidence'],
+                'progress_score': result['progress_score'],
+                'message_count': result['message_count'],
+                'analysis_type': result['classification_type'],
+                'model_type': 'distance_based',
+                'cluster_distances': result.get('distances', []),
+                'window_features': window_features
+            })
+            
+            # 保持历史记录数量限制
+            if len(clustering_data['clustering_history']) > 20:
+                clustering_data['clustering_history'] = clustering_data['clustering_history'][-20:]
+            
+            # 更新Redis - 按照其他事件的做法使用set_profile
+            set_dict = {
+                'behavior_patterns.progress_clustering': clustering_data
+            }
+            self.set_profile(profile, set_dict)
+            
+            logger.info(f"距离聚类分析完成: {participant_id} -> {result['cluster_name']} "
+                      f"(置信度: {result['confidence']:.3f}, 类型: {result['classification_type']})")
+            
+            return {
+                'cluster_name': result['cluster_name'],
+                'cluster_confidence': result['confidence'],
+                'progress_score': result['progress_score'],
+                'analysis_type': result['classification_type'],
+                'model_type': 'distance_based',
+                'message_count': result['message_count'],
+                'cluster_distances': result.get('distances', []),
+                'analysis_successful': True
+            }
+                
+        except Exception as e:
+            logger.error(f"距离聚类分析失败: {participant_id} - {e}")
+            # 回退到实时分析
+            return self.analyze_real_time_progress(participant_id, conversation_history)

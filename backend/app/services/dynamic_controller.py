@@ -132,7 +132,35 @@ class DynamicController:
                 # 计数递增失败不影响主流程
                 pass
 
-            # 现在构建用户状态摘要（包含最新行为计数与情感）
+            # 步骤4.5: 进度聚类分析（在构建用户状态摘要前）
+            if request.conversation_history:
+                try:
+                    # 将ConversationMessage转换为字典格式用于聚类分析
+                    conversation_for_clustering = []
+                    for msg in request.conversation_history:
+                        conversation_for_clustering.append({
+                            'role': msg.role,
+                            'content': msg.content
+                        })
+                    
+                    # 触发距离聚类分析（优先）或实时进度分析（回退）
+                    clustering_result = self.user_state_service.analyze_with_distance_clustering(
+                        request.participant_id, 
+                        conversation_for_clustering
+                    )
+                    
+                    if clustering_result and clustering_result.get('analysis_successful'):
+                        model_type = clustering_result.get('model_type', 'unknown')
+                        print(f"✅ 距离聚类分析完成 ({model_type}): {clustering_result['cluster_name']} "
+                              f"(置信度: {clustering_result['cluster_confidence']:.3f}, 类型: {clustering_result['analysis_type']})")
+                    
+                    # 重新获取profile以反映聚类分析结果
+                    profile, _ = self.user_state_service.get_or_create_profile(request.participant_id, db)
+                    
+                except Exception as e:
+                    print(f"⚠️ 进度聚类分析失败，继续正常流程: {e}")
+
+            # 现在构建用户状态摘要（包含最新行为计数、情感和聚类结果）
             user_state_summary = self._build_user_state_summary(profile, sentiment_result)
 
             # 步骤5: 生成提示词
@@ -378,7 +406,35 @@ class DynamicController:
             except Exception as _:
                 pass
 
-            # 现在构建用户状态摘要（包含最新行为计数与情感）
+            # 步骤4.5: 进度聚类分析（在构建用户状态摘要前）
+            if request.conversation_history:
+                try:
+                    # 将ConversationMessage转换为字典格式用于聚类分析
+                    conversation_for_clustering = []
+                    for msg in request.conversation_history:
+                        conversation_for_clustering.append({
+                            'role': msg.role,
+                            'content': msg.content
+                        })
+                    
+                    # 触发距离聚类分析（优先）或实时进度分析（回退）
+                    clustering_result = self.user_state_service.analyze_with_distance_clustering(
+                        request.participant_id, 
+                        conversation_for_clustering
+                    )
+                    
+                    if clustering_result and clustering_result.get('analysis_successful'):
+                        model_type = clustering_result.get('model_type', 'unknown')
+                        print(f"✅ 距离聚类分析完成 (同步-{model_type}): {clustering_result['cluster_name']} "
+                              f"(置信度: {clustering_result['cluster_confidence']:.3f}, 类型: {clustering_result['analysis_type']})")
+                    
+                    # 重新获取profile以反映聚类分析结果
+                    profile, _ = self.user_state_service.get_or_create_profile(request.participant_id, db)
+                    
+                except Exception as e:
+                    print(f"⚠️ 进度聚类分析失败 (同步)，继续正常流程: {e}")
+
+            # 现在构建用户状态摘要（包含最新行为计数、情感和聚类结果）
             user_state_summary = self._build_user_state_summary(profile, sentiment_result)
 
             # 步骤5: 生成提示词
