@@ -1,6 +1,8 @@
 from app.celery_app import celery_app, get_user_state_service
 from app.db.database import SessionLocal
 from app.schemas.behavior import BehaviorEvent
+from app.crud.crud_participant import participant as crud_participant
+from app.schemas.participant import ParticipantCreate
 from app.services.behavior_interpreter_service import behavior_interpreter_service
 import logging
 
@@ -20,6 +22,14 @@ def interpret_behavior_task(event_data: dict):
     user_state_service = get_user_state_service()
     
     try:
+        # 软修复：确保 participants 表存在该用户（若不存在则补录）
+        try:
+            if not crud_participant.get(db, obj_id=event.participant_id):
+                crud_participant.create(db, obj_in=ParticipantCreate(id=event.participant_id, group="experimental"))
+                logger.info(f"行为任务: 已补录 participants 行：{event.participant_id}")
+        except Exception as e:
+            logger.warning(f"行为任务: 补录 participants 失败（忽略继续）: {e}")
+
         behavior_interpreter_service.interpret_event(
             event=event,
             user_state_service=user_state_service,
