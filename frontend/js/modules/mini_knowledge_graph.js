@@ -349,152 +349,54 @@ export class MiniKnowledgeGraph {
     this.centerAndZoomGraph();
   }
 
-  // 自动展开当前学习章节
-  expandCurrentChapter() {
-    // 恢复自动展开功能实现
-    if (this.graphState.currentLearningChapter) {
-      this.expandChapter(this.graphState.currentLearningChapter);
-      console.log(`自动展开当前学习章节: ${this.graphState.currentLearningChapter}`);
-    } else {
-      // 如果没有当前学习章节，尝试展开第一个可学习的章节
-      const chapterNodes = this.cy.nodes('[type="chapter"]');
-      for (let i = 0; i < chapterNodes.length; i++) {
-        const chapterId = chapterNodes[i].id();
-        if (this.graphState.canLearnChapter(chapterId)) {
-          this.expandChapter(chapterId);
-          console.log(`自动展开可学习章节: ${chapterId}`);
-          break;
-        }
-      }
-    }
-  }
-
   // 添加监听容器状态变化的方法
   listenToContainerStateChange() {
-    const miniKnowledgeGraph = document.getElementById('miniKnowledgeGraph');
-    if (!miniKnowledgeGraph) {
-      console.warn('未找到知识图谱容器元素');
-      return;
-    }
-
-    // 创建MutationObserver来监听类名变化
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
-          const isExpanded = miniKnowledgeGraph.classList.contains('expanded');
-          console.log('知识图谱容器状态变化:', isExpanded ? '展开' : '收起');
-          
-          if (isExpanded) {
-            // 容器展开时，等比放大图谱并自动展开章节
-            this.adjustSizeForExpandedContainer();
-            this.expandCurrentChapter();
-          } else {
-            // 容器收起时，重置图谱大小并收起所有章节
-            this.resetSize();
-            // 等待容器动画完成后再进行居中操作
-            // 使用更可靠的监听方式，确保捕获到过渡完成事件
-            const handleTransitionEnd = () => {
-              console.log('容器收起动画完成，开始居中图谱');
-              this.centerAndZoomGraph();
-            };
-            
-            // 使用once选项确保事件只触发一次
-            miniKnowledgeGraph.addEventListener('transitionend', handleTransitionEnd, { once: true });
-            
-            // 添加一个备用的定时器，防止transitionend事件未触发
-            setTimeout(() => {
-              console.log('容器收起动画超时，开始居中图谱');
-              this.centerAndZoomGraph();
-            }, 350); // 略长于CSS过渡时间(300ms)
-          }
-        }
-      });
-    });
-
-    // 开始监听容器的class属性变化
-    observer.observe(miniKnowledgeGraph, { attributes: true, attributeFilter: ['class'] });
-    console.log('已启动知识图谱容器状态监听');
+    // 根据用户要求，不再操控原来的容器和知识图谱效果
+    // 因为已经在learning_page.js中实现了新的容器逻辑
+    console.log('已禁用旧的容器状态监听逻辑，使用新的容器实现');
+    return;
   }
 
   // 等比放大图谱以适应展开的容器
   adjustSizeForExpandedContainer() {
-    if (!this.cy) return;
-    
-    console.log('调整图谱大小以适应展开容器');
-    
-    // 更新原始尺寸以确保使用当前正确的尺寸
-    this.updateOriginalSizes();
-    
-    // 设置章节节点的放大比例
-    const chapterScaleFactor = 1.5; // 放大50%
-    
-    // 调整章节节点大小
-    this.cy.nodes('[type="chapter"]').forEach(node => {
-      const originalSize = this.originalSizes.get(node.id());
-      if (originalSize) {
-        node.style({
-          'width': originalSize.width * chapterScaleFactor,
-          'height': originalSize.height * chapterScaleFactor,
-          'font-size': parseInt(node.style('font-size')) * chapterScaleFactor + 'px'
-        });
-      }
-    });
-    
-    this.updateOriginalSizes();
-    // 调整后重新应用布局
-    this.setFixedChapterPositions();
-    this.centerAndZoomGraph();
+    // 根据用户要求，不再操控原来的容器和知识图谱效果
+    console.log('已禁用旧的容器展开逻辑，使用新的容器实现');
+    return;
   }
 
   // 重置图谱大小
   resetSize() {
-      if (!this.cy) return;
-    
-      console.log('重置图谱大小 - 通过重新初始化');
-    // 恢复所有节点到默认大小（收起状态的大小）
-    this.cy.nodes().forEach(node => {
-      // 恢复到默认尺寸而不是当前尺寸
-      if (node.data('type') === 'chapter') {
-        node.style({
-          'width': 340,
-          'height': 120
-        });
-      } else {
-        node.style({
-          'width': 150,
-          'height': 150
-        });
-      }
-      
-      // 恢复字体大小
-      if (node.data('type') === 'chapter') {
-        node.style('font-size', '28px');
-      } else {
-        node.style('font-size', '20px');
-      }
-    });
-
-    // 更新原始尺寸以确保使用当前正确的尺寸
-    this.updateOriginalSizes();
-    
-    // 重新应用布局
-    this.setFixedChapterPositions();
-    this.hideAllKnowledgeNodes();
-    this.centerAndZoomGraph();
-
+    // 根据用户要求，不再操控原来的容器和知识图谱效果
+    console.log('已禁用旧的容器收起逻辑，使用新的容器实现');
+    return;
   }
 
   // 收起所有章节
   collapseAllChapters() {
-    if (!this.cy) return;
-    
-    console.log('收起所有章节');
-    
-    // 获取所有已展开的章节并收起
-    const expandedChapters = [...this.graphState.expandedSet];
-    expandedChapters.forEach(chapterId => {
-      this.collapseChapter(chapterId);
-    });
+    // 根据用户要求，不再操控原来的容器和知识图谱效果
+    console.log('已禁用旧的章节收起逻辑，使用新的容器实现');
+    return;
+  }
+
+  // 展开章节
+  expandChapter(chapterId) {
+    // 根据用户要求，不再操控原来的容器和知识图谱效果
+    console.log('已禁用旧的章节展开逻辑，使用新的容器实现');
+    return;
+  }
+
+  // 收起章节
+  collapseChapter(chapterId) {
+    // 根据用户要求，不再操控原来的容器和知识图谱效果
+    console.log('已禁用旧的章节收起逻辑，使用新的容器实现');
+    return;
+  }
+
+  // 自动展开当前学习章节
+  expandCurrentChapter() {
+    // 根据用户要求，不再操控原来的容器和知识图谱效果
+    console.log('已禁用旧的自动展开逻辑，使用新的容器实现');
+    return;
   }
 
   // 设置交互效果
@@ -604,6 +506,10 @@ export class MiniKnowledgeGraph {
     const type = node.data('type');
 
     if (type === 'chapter') {
+      // 显示知识图谱容器
+      this.showKnowledgeGraphContainer();
+      
+      // 原有逻辑保持不变
       if (this.graphState.expandedSet.has(id)) {
         this.collapseChapter(id);
       } else {
@@ -620,6 +526,9 @@ export class MiniKnowledgeGraph {
     }
 
     if (type === 'knowledge') {
+      // 显示知识图谱容器
+      this.showKnowledgeGraphContainer();
+      
       const label = node.data('label') || id;
       if (this.options.enableModal) {
         this.showKnowledgeModal(id, label);
@@ -893,74 +802,6 @@ export class MiniKnowledgeGraph {
     });
   }
 
-  // 展开章节
-  expandChapter(chapterId) {
-    this.ensurePositionsForChapterKnowledge(chapterId);
-    const kids = this.graphState.collectKnowledgeDescendantsForDisplay(chapterId);
-    
-    // 使用动画展开
-    kids.forEach(id => {
-      const node = this.cy.getElementById(id);
-      if (node && node.length) {
-        const pos = this.graphState.fixedPositions[id];
-        if (pos) {
-          node.position(pos);
-          // 根据节点状态设置正确的颜色
-          const id = node.id();
-          // 应用基本样式
-          node.style({
-            'opacity': 0
-          });
-          
-          // 应用节点类型特定样式
-          this.restoreNodeStyle(node);
-          
-          node.show();
-          
-          // 淡入动画
-          node.animate({
-            style: {
-              'opacity': 1
-            }
-          }, {
-            duration: 300,
-            complete: () => {
-              this.updateEdgesVisibility();
-            }
-          });
-        }
-      }
-    });
-
-    this.updateEdgesVisibility();
-    this.graphState.expandedSet.add(chapterId);
-    this.updateNodeStates();
-    
-    // 延迟调整布局，确保动画完成
-    setTimeout(() => {
-      this.centerAndZoomGraph();
-      // 更新节点原始尺寸
-      // this.updateOriginalSizes();
-    }, 350);
-  }
-
-  // 收起章节
-  collapseChapter(chapterId) {
-    const kids = this.graphState.collectKnowledgeDescendantsForDisplay(chapterId);
-    kids.forEach(id => {
-      const node = this.cy.getElementById(id);
-      if (node && node.length) node.hide();
-    });
-    
-    this.updateEdgesVisibility();
-    this.graphState.expandedSet.delete(chapterId);
-    this.updateNodeStates();
-    this.centerAndZoomGraph(); // 收起后调整布局
-    
-    // 更新节点原始尺寸
-    // this.updateOriginalSizes();
-  }
-
   // 更新边可见性
   updateEdgesVisibility() {
     this.cy.edges().forEach(e => {
@@ -1089,6 +930,31 @@ export class MiniKnowledgeGraph {
       this.cy.destroy();
     }
     this.isInitialized = false;
+  }
+
+  // 显示知识图谱容器的方法
+  showKnowledgeGraphContainer() {
+    // 调用全局函数显示知识图谱
+    if (typeof window.showKnowledgeGraph === 'function') {
+      window.showKnowledgeGraph();
+    } else {
+      // 如果全局函数不存在，使用原来的逻辑
+      console.warn('[MiniKnowledgeGraph] 全局showKnowledgeGraph函数不存在，使用默认逻辑');
+      const knowledgeGraphContainer = document.getElementById('knowledge-graph-container');
+      
+      // 如果找到了容器元素，则显示它
+      if (knowledgeGraphContainer) {
+        knowledgeGraphContainer.style.display = 'block';
+        
+        // 更新图标状态
+        const toggleIcon = document.getElementById('toggleIcon');
+        if (toggleIcon) {
+          toggleIcon.setAttribute('icon', 'mdi:chevron-up');
+          toggleIcon.style.color = '#3730a3'; // 更深的紫色
+          toggleIcon.style.opacity = '1';     // 完全不透明
+        }
+      }
+    }
   }
 }
 

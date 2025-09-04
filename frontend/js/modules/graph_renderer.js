@@ -9,6 +9,7 @@
 // graphRenderer.js - 图谱渲染与布局
 
 import { LAYOUT_PARAMS } from './graph_data.js';
+import { getUrlParam } from './navigation.js';
 
 // 图谱渲染类
 export class GraphRenderer {
@@ -28,8 +29,7 @@ export class GraphRenderer {
             'height': 120,
             'font-size': '14px',
             'font-family': 'Inter, sans-serif',
-            'font-weight': 500,
-            'font-weight': 'bold',
+            'font-weight': '500',
             'text-max-width': '100px',
             'shape': 'ellipse',
             'border-width': 2,
@@ -220,12 +220,41 @@ export class GraphRenderer {
       const originalSize = this.originalSizes.get(node.id()) || { width: 120, height: 120 };
       const scaleFactor = node.data('type') === 'chapter' ? 1.15 : 1.1;
       
+      // 获取当前学习节点ID
+      let currentLearningNodeId = null;
+      try {
+        const topicData = getUrlParam('topic');
+        if (topicData && topicData.id) {
+          currentLearningNodeId = topicData.id;
+        }
+      } catch (error) {
+        console.warn('获取当前学习节点失败:', error);
+      }
+      
+      // 根据节点类型和是否为当前学习节点/章节设置悬停样式
+      let backgroundColor, borderColor;
+      
+      if (node.id() === currentLearningNodeId) {
+        // 当前学习节点悬停时使用更深的橙色
+        backgroundColor = '#d97706';
+        borderColor = '#b45309';
+      } else if (node.data('type') === 'chapter' && this.graphState.currentLearningChapter === node.id()) {
+        // 当前学习章节悬停时也使用更深的橙色
+        backgroundColor = '#d97706';
+        borderColor = '#b45309';
+      } else if (node.data('type') === 'chapter') {
+        backgroundColor = '#3730a3';
+        borderColor = '#4f46e5';
+      } else {
+        backgroundColor = '#c7d2fe';
+        borderColor = '#4f46e5';
+      }
+      
       // 使用动画过渡效果
       node.stop().animate({
         style: {
-          'background-color': node.data('type') === 'chapter' ? '#3730a3' : '#c7d2fe',
-          'color': node.data('type') === 'chapter' ? '#ffffff' : '#1e293b',
-          'border-color': '#4f46e5',
+          'background-color': backgroundColor,
+          'border-color': borderColor,
           'width': originalSize.width * scaleFactor,
           'height': originalSize.height * scaleFactor
         }
@@ -283,9 +312,33 @@ export class GraphRenderer {
       });
     }
     
+    // 获取当前学习节点ID
+    let currentLearningNodeId = null;
+    try {
+      // 获取URL中的topic参数
+      const topicData = getUrlParam('topic');
+      if (topicData && topicData.id) {
+        currentLearningNodeId = topicData.id;
+      }
+    } catch (error) {
+      console.warn('获取当前学习节点失败:', error);
+    }
+    
+    // 检查节点是否为当前学习节点，优先处理
+    if (id === currentLearningNodeId) {
+      // 当前学习节点始终为橙色，无论其他状态如何
+      node.style({
+        'background-color': '#f59e0b',
+        'border-color': '#d97706'
+      });
+      return; // 直接返回，不再应用其他样式
+    }
+    
     // 然后根据状态设置正确的颜色
     if (type === 'chapter') {
+      // 检查是否为当前学习章节
       if (this.graphState.currentLearningChapter === id) {
+        // 当前学习章节使用橙色
         node.style({
           'background-color': '#f59e0b',
           'border-color': '#d97706'

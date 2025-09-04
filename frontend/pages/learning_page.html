@@ -32,6 +32,41 @@
               <iconify-icon icon="mdi:account-circle" width="36" height="36"></iconify-icon>
             </div>
         </header>
+        
+        <!-- 知识图谱容器 -->
+        <div id="knowledge-graph-container" class="knowledge-graph-container" style="display: none;">
+          <div class="index-container panel">
+            <div class="panel-header">
+              <iconify-icon icon="mdi:progress-check" width="20" height="20"></iconify-icon>
+              <h2>知识图谱</h2>
+              <button id="closeGraph" title="关闭">
+                <iconify-icon icon="mdi:close" width="20" height="20"></iconify-icon>
+              </button>
+            </div>
+            <div class="group" id="cy">
+              <!-- 工具栏 -->
+              <div class="cy-toolbar">
+                <button id="zoomIn" title="放大" class="btn btn-small">
+                  <iconify-icon icon="mdi:magnify-plus" width="16" height="16"></iconify-icon>
+                </button>
+                <button id="zoomOut" title="缩小" class="btn btn-small">
+                  <iconify-icon icon="mdi:magnify-minus" width="16" height="16"></iconify-icon>
+                </button>
+                <button id="centerGraph" title="居中" class="btn btn-small">
+                  <iconify-icon icon="mdi:select-search" width="16" height="16"></iconify-icon>
+                  居中
+                </button>
+              </div>
+              
+              <!-- 提示信息 -->
+              <div class="cy-tip">
+                <iconify-icon icon="mdi:information" width="16" height="16"></iconify-icon>
+                <span>提示: 单击节点展开/收起，双击节点查看详情</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <div class="content-container">
           <!-- 左侧组合列（占 60% 宽） -->
           <div class="left-group">
