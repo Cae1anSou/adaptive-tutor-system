@@ -72,7 +72,7 @@ secrets.ini
 
 save/
 # 模型文件
-models/
+backend/models/
 download_model.log
 
 download_model.log
