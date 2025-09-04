@@ -12,6 +12,8 @@ from app.schemas.behavior import BehaviorEvent
 from app.schemas.chat import ChatHistoryCreate
 from app.schemas.user_progress import UserProgressCreate
 from app.schemas.submission import SubmissionCreate
+from app.crud.crud_participant import participant as crud_participant
+from app.schemas.participant import ParticipantCreate
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +23,13 @@ def update_bkt_and_snapshot_task(participant_id: str, topic_id: str, is_correct:
     db = SessionLocal()
     user_state_service = get_user_state_service()
     try:
+        # 软修复：确保 participants 表存在该用户（若不存在则补录）
+        try:
+            if not crud_participant.get(db, obj_id=participant_id):
+                crud_participant.create(db, obj_in=ParticipantCreate(id=participant_id, group="experimental"))
+                logger.info(f"[update_bkt_and_snapshot_task] 已补录 participants 行：{participant_id}")
+        except Exception as e:
+            logger.warning(f"[update_bkt_and_snapshot_task] 补录 participants 失败（忽略继续）: {e}")
         # 更新BKT模型
         user_state_service.update_bkt_on_submission(
             participant_id=participant_id,
@@ -42,6 +51,13 @@ def save_progress_task(progress_data: dict):
         # 创建用户进度记录
         progress_in = UserProgressCreate(**progress_data)
         logger.info(f"[save_progress_task] 创建进度记录对象: {progress_in}")
+        # 软修复：确保 participants 表存在该用户（若不存在则补录）
+        try:
+            if not crud_participant.get(db, obj_id=progress_in.participant_id):
+                crud_participant.create(db, obj_in=ParticipantCreate(id=progress_in.participant_id, group="experimental"))
+                logger.info(f"[save_progress_task] 已补录 participants 行：{progress_in.participant_id}")
+        except Exception as e:
+            logger.warning(f"[save_progress_task] 补录 participants 失败（忽略继续）: {e}")
         result = crud_progress.create(db=db, obj_in=progress_in)
         logger.info(f"[save_progress_task] 进度记录保存成功: {result}")
         return result
@@ -76,6 +92,14 @@ def save_behavior_task(behavior_data: dict):
         behavior_event = BehaviorEvent(**behavior_data)
         logger.info(f"数据库任务: 保存行为事件 - 参与者ID: {behavior_event.participant_id}, 事件类型: {behavior_event.event_type}")
         
+        # 软修复：确保 participants 表存在该用户（若不存在则补录）
+        try:
+            if not crud_participant.get(db, obj_id=behavior_event.participant_id):
+                crud_participant.create(db, obj_in=ParticipantCreate(id=behavior_event.participant_id, group="experimental"))
+                logger.info(f"数据库任务: 已补录 participants 行：{behavior_event.participant_id}")
+        except Exception as e:
+            logger.warning(f"数据库任务: 补录 participants 失败（忽略继续）: {e}")
+
         # 对于代码行为事件，可以做一些特殊处理或验证
         if behavior_event.event_type in ["significant_edits", "coding_problem", "coding_session_summary"]:
             # 计算事件数量

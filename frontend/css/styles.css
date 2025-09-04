@@ -362,6 +362,15 @@ body {
         overflow: hidden;
         flex: 1;
     }
+    .index-form{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 100%; /* 可以根据需要调整宽度 */
+        height: 100%; /* 可以根据需要调整高度 */
+    }
     .group{
         flex-grow: 1;
         margin: var(--spacing-md);
@@ -417,11 +426,67 @@ body {
     }
     .disabled {
         background-color: var(--text-lighter) !important;
-        cursor: not-allowed !important;
-        transform: none !important;
-    }
-    
-    #knowledgeModal {
+}
+
+/* 知识图谱容器样式 */
+.knowledge-graph-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 85%; /* 增加5% (80% * 1.05 = 84%) */
+  height: 85%; /* 增加5% (80% * 1.05 = 84%) */
+  z-index: 1000;
+  display: none;
+}
+
+.knowledge-graph-container .index-container {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.knowledge-graph-container .group {
+  height: calc(100% - 40px);
+  margin: var(--spacing-md);
+}
+
+.knowledge-graph-container #cy {
+  height: 100%;
+}
+
+/* 知识图谱关闭按钮样式 */
+#closeGraph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 32px;
+  padding: 0;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--border-radius-md);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+}
+
+#closeGraph:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translateX(-2px);
+}
+
+#closeGraph iconify-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+#knowledgeModal {
       display: none;
     }
 /* 知识图谱容器样式增强 */

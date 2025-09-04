@@ -5,6 +5,11 @@ import { AppConfig, buildBackendUrl, initializeConfig } from '../modules/config.
 import { MiniKnowledgeGraph } from '../modules/mini_knowledge_graph.js';
 import { setupHeaderTitle, setupBackButton, getUrlParam, trackReferrer,navigateTo } from '../modules/navigation.js';
 
+// 导入知识图谱相关模块
+import { GraphState } from '../modules/graph_data.js';
+import { GraphRenderer } from '../modules/graph_renderer.js';
+import { getParticipantId } from '../modules/session.js';
+
 // 导入功能模块
 import {
     renderTopicContent,
@@ -49,6 +54,11 @@ let allowedElements = {
 };
 let currentTopicId = '1_1'; // 默认主题ID
 let selectedElementInfo = null; // 保存当前选中的元素信息
+
+// 知识图谱相关变量
+let graphState = null;
+let graphRenderer = null;
+let knowledgeGraphInitialized = false;
 
 // 模块实例
 let knowledgeModule = null;
@@ -731,28 +741,53 @@ function initEventListeners() {
         toggleIcon.style.color = '#4f46e5';
         toggleIcon.style.opacity = '0.8';
         
-        miniGraphToggle.addEventListener('click', () => {
-            // 切换展开状态
-            const isExpanding = !miniKnowledgeGraph.classList.contains('expanded');
-            miniKnowledgeGraph.classList.toggle('expanded');
+        // 获取知识图谱容器元素
+        const knowledgeGraphContainer = document.getElementById('knowledge-graph-container');
+        const closeGraphButton = document.getElementById('closeGraph');
+        
+        miniGraphToggle.addEventListener('click', async () => {
+            // 只控制知识图谱容器的显示/隐藏，不改变头部标题栏中简化知识图谱预览的大小
+            const isExpanding = knowledgeGraphContainer.style.display === 'none' || knowledgeGraphContainer.style.display === '';
             
-            // 更改图标并切换旋转类
+            // 控制知识图谱容器的显示/隐藏
+            if (isExpanding) {
+                // 显示知识图谱容器并初始化渲染知识图谱
+                await showKnowledgeGraph();
+            } else {
+                // 隐藏知识图谱容器
+                if (knowledgeGraphContainer) {
+                    knowledgeGraphContainer.style.display = 'none';
+                }
+            }
+            
+            // 更改图标
             if (isExpanding) {
                 // 展开时，将图标更改为向上箭头
                 toggleIcon.setAttribute('icon', 'mdi:chevron-up');
-                // 移除旋转类以防止重复应用
-                miniGraphToggle.classList.remove('rotated');
                 toggleIcon.style.color = '#3730a3'; // 更深的紫色
                 toggleIcon.style.opacity = '1';     // 完全不透明
             } else {
                 // 收起时，将图标更改为向下箭头
                 toggleIcon.setAttribute('icon', 'mdi:chevron-down');
-                // 移除旋转类以防止重复应用
-                miniGraphToggle.classList.remove('rotated');
                 toggleIcon.style.color = '#4f46e5'; // 恢复默认紫色
                 toggleIcon.style.opacity = '0.8';   // 恢复默认不透明度
             }
         });
+        
+        // 添加关闭知识图谱容器的功能
+        if (closeGraphButton) {
+            closeGraphButton.addEventListener('click', () => {
+                // 隐藏知识图谱容器
+                if (knowledgeGraphContainer) {
+                    knowledgeGraphContainer.style.display = 'none';
+                }
+                
+                // 更改图标
+                toggleIcon.setAttribute('icon', 'mdi:chevron-down');
+                toggleIcon.style.color = '#4f46e5';
+                toggleIcon.style.opacity = '0.8';
+            });
+        }
     }
 
     // 初始化按钮状态：确保询问AI按钮默认隐藏
@@ -960,6 +995,234 @@ function createElementSelectedWithTracking() {
         }
     };
 }
+
+// 初始化知识图谱
+async function initKnowledgeGraph() {
+  // 防止重复初始化
+  if (knowledgeGraphInitialized) {
+    console.log('[KnowledgeGraph] 知识图谱已经初始化过，跳过重复初始化');
+    return;
+  }
+
+  try {
+    console.log('[KnowledgeGraph] 开始初始化知识图谱...');
+    
+    // 获取用户ID并验证
+    const participantId = getParticipantId();
+    if (!participantId) {
+      console.warn('[KnowledgeGraph] 未找到用户ID，无法加载知识图谱');
+      return;
+    }
+
+    // 并行获取图谱数据和用户进度
+    const [graphResponse, progressResponse] = await Promise.all([
+      // 请求知识图谱数据
+      fetch(buildBackendUrl('/knowledge-graph')),
+      fetch(buildBackendUrl(`/progress/participants/${participantId}/progress`))
+    ]);
+
+    // 检查响应状态
+    if (!graphResponse.ok || !progressResponse.ok) {
+      throw new Error('获取数据失败');
+    }
+
+    // 解析JSON数据
+    const [graphResult, progressResult] = await Promise.all([
+      graphResponse.json(),
+      progressResponse.json()
+    ]);
+
+    // 处理数据
+    const graphData = graphResult.data;
+    const learnedNodes = progressResult.data.completed_topics || [];
+
+    // 验证数据格式
+    if (!graphData || !graphData.nodes || !graphData.edges) {
+      throw new Error('图谱数据格式不正确');
+    }
+
+    // 初始化状态管理
+    graphState = new GraphState(graphData, learnedNodes);
+    graphState.initMaps();
+
+    // 设置当前学习章节
+    setCurrentLearningChapter(graphState, currentTopicId);
+
+    // 初始化渲染器
+    graphRenderer = new GraphRenderer('cy', graphState);
+    graphRenderer.addElements([...graphData.nodes, ...graphData.edges]);
+
+    // 设置初始布局
+    graphRenderer.setFixedChapterPositions();
+    graphRenderer.hideAllKnowledgeNodes();
+    graphRenderer.updateNodeColors();
+    
+    // 添加工具栏功能
+    graphRenderer.addToolbarFunctionality();
+    
+    // 添加节点点击事件处理
+    setupGraphEventListeners();
+    
+    // 标记为已初始化
+    knowledgeGraphInitialized = true;
+    
+    console.log('[KnowledgeGraph] 知识图谱初始化完成');
+    
+    // 初始居中
+    setTimeout(() => {
+      if (graphRenderer) {
+        graphRenderer.centerAndZoomGraph();
+      }
+    }, 100);
+
+    // 窗口点击事件处理
+    window.onclick = (event) => {
+      const modal = document.getElementById('knowledgeModal');
+      if (event.target === modal) modal.style.display = 'none';
+    };
+    
+  } catch (error) {
+    console.error('[KnowledgeGraph] 初始化知识图谱失败:', error);
+  }
+}
+
+// 设置知识图谱节点点击事件监听器
+function setupGraphEventListeners() {
+  if (!graphRenderer || !graphRenderer.cy) {
+    console.warn('[KnowledgeGraph] 图渲染器未初始化，无法设置事件监听器');
+    return;
+  }
+  
+  // 单击/双击处理
+  const clickState = { lastId: null, timer: null, ts: 0 };
+  const DBL_DELAY = 280;
+
+  graphRenderer.cy.on('tap', 'node', (evt) => {
+    const node = evt.target;
+    const id = node.id();
+    const now = Date.now();
+
+    if (clickState.lastId === id && (now - clickState.ts) < DBL_DELAY) {
+      clearTimeout(clickState.timer);
+      clickState.timer = null;
+      clickState.lastId = null;
+      handleGraphDoubleClick(node);
+    } else {
+      clickState.lastId = id;
+      clickState.ts = now;
+      clickState.timer = setTimeout(() => {
+        handleGraphSingleClick(node);
+        clickState.timer = null;
+        clickState.lastId = null;
+      }, DBL_DELAY);
+    }
+  });
+}
+
+// 知识图谱节点单击处理
+function handleGraphSingleClick(node) {
+  if (!graphState || !graphRenderer) {
+    console.warn('[KnowledgeGraph] 知识图谱未初始化，无法处理点击事件');
+    return;
+  }
+  
+  const id = node.id();
+  const type = node.data('type');
+
+  if (type === 'chapter') {
+    if (graphState.expandedSet.has(id)) {
+      graphRenderer.collapseChapter(id);
+    } else {
+      graphRenderer.expandChapter(id);
+    }
+
+    if (graphState.currentLearningChapter === null && id === 'chapter1' &&
+      !graphState.learnedNodes.includes(id)) {
+      graphState.currentLearningChapter = id;
+    }
+
+    graphRenderer.updateNodeColors();
+    return;
+  }
+
+  if (type === 'knowledge') {
+    const label = node.data('label') || id;
+    if (graphState.learnedNodes.includes(id)) {// 已学知识点
+      showKnowledgeModal(id, label);
+    } else if (graphState.isKnowledgeUnlocked(id)) {// 可学知识点
+      showKnowledgeModal(id, label);
+    } else {// 未解锁知识点
+      if (confirm("您还未学习前置知识点，是否直接开始测试？")) {
+        navigateTo('/pages/test_page.html', id, true, true);
+      }
+    }
+  }
+}
+
+// 知识图谱节点双击处理
+function handleGraphDoubleClick(node) {
+  if (!graphState || !graphRenderer) {
+    console.warn('[KnowledgeGraph] 知识图谱未初始化，无法处理双击事件');
+    return;
+  }
+  
+  const id = node.id();
+  const type = node.data('type');
+
+  if (type === 'chapter') {
+    if (graphState.isChapterCompleted(id)) {
+      if (confirm("您已学过本章节，是否再次进行测试？")) {
+        navigateTo('/pages/test_page.html', id, true, true);
+      }
+    } else if (graphState.currentLearningChapter === id) {
+      if (confirm("您还未学完当前章节内容，是否直接开始测试？")) {
+        navigateTo('/pages/test_page.html', id, true, true);
+      }
+    } else {
+      if (confirm("您还未解锁前置章节，是否直接开始测试？")) {
+        navigateTo('/pages/test_page.html', id, true, true);
+      }
+    }
+
+    graphState.passChapterTest(id);
+    graphRenderer.updateNodeColors();
+  }
+  
+  if (type === 'knowledge') {
+    const label = node.data('label') || id;
+    // 双击知识点节点直接跳转到学习页面
+    navigateTo('/pages/learning_page.html', id);
+  }
+}
+
+// 显示知识图谱容器并渲染知识图谱
+async function showKnowledgeGraph() {
+  const knowledgeGraphContainer = document.getElementById('knowledge-graph-container');
+  if (!knowledgeGraphContainer) {
+    console.warn('[KnowledgeGraph] 未找到知识图谱容器元素');
+    return;
+  }
+  
+  // 显示容器
+  knowledgeGraphContainer.style.display = 'block';
+  
+  // 如果知识图谱还未初始化，则初始化它
+  if (!knowledgeGraphInitialized) {
+    await initKnowledgeGraph();
+  }
+  
+  // 如果知识图谱已初始化，确保它正确显示
+  if (knowledgeGraphInitialized && graphRenderer) {
+    // 确保图谱正确居中显示
+    setTimeout(() => {
+      graphRenderer.centerAndZoomGraph();
+    }, 100);
+  }
+}
+
+// 将 showKnowledgeGraph 函数设置为全局函数，供其他模块调用
+window.showKnowledgeGraph = showKnowledgeGraph;
+
 // ==================== user_idle智能监控 ====================
 
 document.addEventListener('problemHintNeeded', (event) => {
@@ -1421,4 +1684,113 @@ function extendChatModuleForElementContext() {
     };
 
     console.log('[Learning] 聊天模块已扩展以支持元素上下文');
+}
+
+// 在文件末尾添加新函数
+// 设置当前学习章节
+function setCurrentLearningChapter(graphState, topicId) {
+  try {
+    if (topicId) {
+      // 查找对应的节点
+      const node = graphState.graphData.nodes.find(n => 
+        n.data && n.data.id === topicId
+      );
+      
+      if (node) {
+        // 如果是章节节点，直接设置为当前学习章节
+        if (node.data.type === 'chapter') {
+          graphState.currentLearningChapter = topicId;
+          console.log('[KnowledgeGraph] 设置当前学习章节:', topicId);
+        } 
+        // 如果是知识点节点，需要找到其所属章节
+        else {
+          // 查找父章节
+          const parents = graphState.parentMap[topicId] || [];
+          
+          // 查找第一个章节类型的父节点
+          for (const parentId of parents) {
+            const parentNode = graphState.graphData.nodes.find(n => 
+              n.data && n.data.id === parentId
+            );
+            
+            if (parentNode && parentNode.data.type === 'chapter') {
+              graphState.currentLearningChapter = parentId;
+              console.log('[KnowledgeGraph] 设置当前学习章节(通过知识点查找):', parentId);
+              break;
+            }
+          }
+          
+          // 如果没找到父章节，尝试通过前置关系查找
+          if (!graphState.currentLearningChapter) {
+            const prereqs = graphState.prereqMap[topicId] || [];
+            
+            for (const prereqId of prereqs) {
+              const prereqNode = graphState.graphData.nodes.find(n => 
+                n.data && n.data.id === prereqId
+              );
+              
+              if (prereqNode && prereqNode.data.type === 'chapter') {
+                graphState.currentLearningChapter = prereqId;
+                console.log('[KnowledgeGraph] 设置当前学习章节(通过前置关系查找):', prereqId);
+                break;
+              }
+            }
+          }
+        }
+      } else {
+        console.warn('[KnowledgeGraph] 未找到对应节点:', topicId);
+      }
+    }
+  } catch (error) {
+    console.error('[KnowledgeGraph] 设置当前学习章节失败:', error);
+  }
+}
+
+// 显示知识点弹窗
+function showKnowledgeModal(knowledgeId, nodeLabel) {
+  const modal = document.getElementById('knowledgeModal');
+  const title = document.getElementById('modalTitle');
+  const status = document.getElementById('modalStatus');
+  const learnBtn = document.getElementById('learnBtn');
+  const testBtn = document.getElementById('testBtn');
+
+  title.textContent = nodeLabel || knowledgeId;
+  learnBtn.className = 'learn-btn';
+  learnBtn.disabled = false;
+  learnBtn.textContent = '学习';
+  testBtn.className = 'test-btn';
+
+  if (graphState.learnedNodes.includes(knowledgeId)) {
+    status.textContent = '您已学过该知识点，是否再次复习或重新测试？';
+    learnBtn.textContent = '复习';
+    learnBtn.className = 'review-btn';
+
+    learnBtn.onclick = () => {
+      navigateTo('/pages/learning_page.html', knowledgeId);
+    };
+
+    testBtn.onclick = () => {
+      navigateTo('/pages/test_page.html', knowledgeId, true, true);
+    };
+  } else if (graphState.isKnowledgeUnlocked(knowledgeId)) {
+    status.textContent = '您可以开始学习该知识点或直接进行测试';
+
+    learnBtn.onclick = () => {
+      navigateTo('/pages/learning_page.html', knowledgeId);
+    };
+
+    testBtn.onclick = () => {
+      navigateTo('/pages/test_page.html', knowledgeId, true, true);
+    };
+  } else {
+    status.textContent = '该知识点尚未解锁，您是否要直接开始测试？';
+    learnBtn.disabled = true;
+    learnBtn.className += ' disabled';
+
+    learnBtn.onclick = () => { };
+    testBtn.onclick = () => {
+      navigateTo('/pages/test_page.html', knowledgeId, true, true);
+    };
+  }
+  modal.style.display = 'block';
 }
