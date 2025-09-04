@@ -1137,6 +1137,10 @@ class UserStateService:
             是否应该执行聚类分析
         """
         try:
+            # 首先检查聚类功能是否启用
+            from app.core.config import settings
+            if not settings.ENABLE_CLUSTERING_SERVICE:
+                return False
             # 获取当前对话数量
             current_message_count = len([msg for msg in conversation_history if msg.get('role') == 'user'])
             
@@ -1156,12 +1160,12 @@ class UserStateService:
             # 如果新增消息数量达到8条以上，进行分析（符合滑动窗口步长=batch_size-overlap=12-4=8）
             if current_message_count - last_analyzed_count >= 8:
                 return True
-            
-            # 如果距离上次分析超过30分钟，且有新消息，进行分析
+            #TODO:如果测试时间总共就45分钟，那就设置为15分钟，如果是两个小时，就30分钟
+            # 如果距离上次分析超过15分钟，且有新消息，进行分析
             if last_analysis_time and current_message_count > last_analyzed_count:
                 try:
                     last_time = datetime.fromisoformat(last_analysis_time)
-                    if datetime.now(UTC) - last_time > timedelta(minutes=30):
+                    if datetime.now(UTC) - last_time > timedelta(minutes=15):
                         return True
                 except ValueError:
                     # 如果时间格式解析失败，进行分析
@@ -1287,29 +1291,32 @@ class UserStateService:
             # 无其他备用方法
             return None
 
-    def analyze_with_distance_clustering(self, participant_id: str, conversation_history: List[Dict[str, str]]) -> Optional[Dict[str, Any]]:
+
+    def update_progress_clustering(self, participant_id: str, conversation_history: List[Dict[str, str]], clustering_service=None) -> Optional[Dict[str, Any]]:
         """
-        使用距离聚类算法进行学习进度分析
+        更新用户学习进度聚类状态
         
         Args:
             participant_id: 参与者ID
             conversation_history: 对话历史
+            clustering_service: 注入的聚类服务实例
             
         Returns:
             聚类分析结果或None
         """
         try:
-            logger.info(f"开始为用户 {participant_id} 进行距离聚类分析")
-            
-            # 直接导入距离聚类服务（已在同一目录下）
-            from .distance_based_clustering_service import DistanceBasedClusteringService
-            
-            # 创建距离聚类服务实例
-            clustering_service = DistanceBasedClusteringService()
-            
-            if not clustering_service.is_loaded:
-                logger.warning("距离聚类模型未加载成功，回退到实时分析")
+            # 检查聚类功能是否启用
+            from app.core.config import settings
+            if not settings.ENABLE_CLUSTERING_SERVICE:
+                logger.info(f"聚类服务已禁用，跳过用户 {participant_id} 的聚类分析")
+                return None
+                
+            # 检查是否有聚类服务实例
+            if clustering_service is None:
+                logger.warning(f"聚类服务未注入，回退到实时分析 - 用户 {participant_id}")
                 return self.analyze_real_time_progress(participant_id, conversation_history)
+                
+            logger.info(f"开始为用户 {participant_id} 进行聚类分析（依赖注入版本）")
             
             # 提取用户消息
             user_messages = [msg['content'] for msg in conversation_history if msg.get('role') == 'user']
@@ -1320,65 +1327,15 @@ class UserStateService:
             
             logger.info(f"用户 {participant_id} 有 {len(user_messages)} 条消息待分析")
             
-            # 使用距离聚类进行分类
+            # 使用注入的聚类服务进行分类
             result = clustering_service.classify_with_strategy(user_messages)
             
             if not result.get('analysis_successful'):
-                logger.warning(f"用户 {participant_id} 距离聚类分析失败，回退到实时分析")
+                logger.warning(f"用户 {participant_id} 聚类分析失败，回退到实时分析")
                 return self.analyze_real_time_progress(participant_id, conversation_history)
             
-            # 获取窗口特征（从距离聚类服务的特征提取过程）
-            try:
-                from .clustering_core_service import (
-                    preprocess_messages, 
-                    encode_messages,
-                    pool_window_embeddings_with_padding,
-                    window_repeat_features, 
-                    window_code_change,
-                    done_stuck_counts,
-                    create_single_window_from_messages
-                )
-                
-                # 创建与distance_based_clustering_service相同的窗口
-                window_indices, processed_messages, valid_indices, is_padded = create_single_window_from_messages(
-                    user_messages, target_size=12, min_size=1
-                )
-                
-                # 预处理消息
-                clean_texts, code_hashes_per_msg = preprocess_messages(processed_messages)
-                
-                # 语义编码（只对有效消息）
-                valid_clean_texts = [clean_texts[i] for i in valid_indices]
-                per_msg_embs = encode_messages(valid_clean_texts, model_name="sentence-transformers/all-mpnet-base-v2")
-                
-                # 为padding位置创建零向量
-                if is_padded:
-                    emb_dim = per_msg_embs.shape[1]
-                    full_embs = np.zeros((len(processed_messages), emb_dim), dtype=np.float32)
-                    full_embs[valid_indices] = per_msg_embs
-                    per_msg_embs = full_embs
-                
-                # 计算结构特征
-                repeat_eq, repeat_sim = window_repeat_features(
-                    clean_texts, per_msg_embs, [window_indices], near_sim_thresh=0.92
-                )
-                code_change = window_code_change(code_hashes_per_msg, [window_indices])
-                
-                # 计算done/stuck计数
-                window_doc = " ".join([user_messages[i] for i in valid_indices])
-                done_hits, stuck_hits = done_stuck_counts([window_doc])
-                
-                window_features = {
-                    'repeat_eq': float(repeat_eq[0]),
-                    'repeat_sim': float(repeat_sim[0]),
-                    'code_change': float(code_change[0]),
-                    'done_hits': float(done_hits[0]),
-                    'stuck_hits': float(stuck_hits[0])
-                }
-                
-            except Exception as e:
-                logger.warning(f"窗口特征计算失败: {e}")
-                window_features = {}
+            # 获取窗口特征（从聚类服务中直接返回）
+            window_features = result.get('window_features', {})
             
             # 更新用户档案 - 按照其他事件的做法
             profile, _ = self.get_or_create_profile(participant_id, None)
@@ -1392,7 +1349,7 @@ class UserStateService:
                 'last_analysis_timestamp': current_time.isoformat(),
                 'conversation_count_analyzed': result['message_count'],
                 'analysis_type': result['classification_type'],
-                'model_type': 'distance_based',
+                'model_type': 'distance_based_injected',
                 'cluster_distances': result.get('distances', []),
                 'window_features': window_features,
                 'clustering_history': profile.behavior_patterns.get('progress_clustering', {}).get('clustering_history', [])
@@ -1406,7 +1363,7 @@ class UserStateService:
                 'progress_score': result['progress_score'],
                 'message_count': result['message_count'],
                 'analysis_type': result['classification_type'],
-                'model_type': 'distance_based',
+                'model_type': 'distance_based_injected',
                 'cluster_distances': result.get('distances', []),
                 'window_features': window_features
             })
@@ -1421,7 +1378,7 @@ class UserStateService:
             }
             self.set_profile(profile, set_dict)
             
-            logger.info(f"距离聚类分析完成: {participant_id} -> {result['cluster_name']} "
+            logger.info(f"聚类分析完成（注入版本）: {participant_id} -> {result['cluster_name']} "
                       f"(置信度: {result['confidence']:.3f}, 类型: {result['classification_type']})")
             
             return {
@@ -1429,13 +1386,13 @@ class UserStateService:
                 'cluster_confidence': result['confidence'],
                 'progress_score': result['progress_score'],
                 'analysis_type': result['classification_type'],
-                'model_type': 'distance_based',
+                'model_type': 'distance_based_injected',
                 'message_count': result['message_count'],
                 'cluster_distances': result.get('distances', []),
                 'analysis_successful': True
             }
                 
         except Exception as e:
-            logger.error(f"距离聚类分析失败: {participant_id} - {e}")
+            logger.error(f"聚类分析失败（注入版本）: {participant_id} - {e}")
             # 回退到实时分析
             return self.analyze_real_time_progress(participant_id, conversation_history)

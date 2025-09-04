@@ -16,7 +16,7 @@ import numpy as np
 # 添加项目路径
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from app.services.user_state_service import UserStateService, StudentProfile
+# 移除不必要的循环依赖导入
 
 
 class RealTimeProgressAnalyzer:
@@ -181,45 +181,33 @@ class RealTimeProgressAnalyzer:
         """完整阶段分析（≥12条消息）- 可以尝试完整聚类"""
         print(f"🌳 完整阶段分析: {len(user_messages)}条消息")
         
-        # 首先尝试完整聚类
+        # 尝试使用距离聚类服务进行精确分析
         try:
-            from app.services.user_state_service import PROGRESS_CLUSTERING_AVAILABLE, progress_clustering_pipeline
+            from app.services.distance_based_clustering_service import DistanceBasedClusteringService
             
-            if PROGRESS_CLUSTERING_AVAILABLE:
-                print("🔬 尝试完整聚类分析...")
+            clustering_service = DistanceBasedClusteringService()
+            if clustering_service.is_loaded:
+                print("🔬 尝试距离聚类分析...")
                 
-                # 启用结构特征参与聚类
-                clustering_result = progress_clustering_pipeline(
-                    raw_msgs=user_messages,
-                    batch_size=min(12, len(user_messages)),
-                    overlap=min(4, len(user_messages)//3),
-                    model_name="sentence-transformers/all-mpnet-base-v2",
-                    pca_dim=min(64, len(user_messages)-1),
-                    include_struct_in_clustering=True,  # 启用行为特征
-                    lookback=2,
-                    n_init=20,  # 减少计算量
-                    max_iter=300,
-                    random_state=42,
-                    struct_weight=2.0,
-                    near_sim_thresh=0.95
-                )
-                
-                # 如果聚类成功，返回聚类结果
-                if clustering_result:
-                    latest_window_idx = len(clustering_result['windows']) - 1
+                result = clustering_service.classify_with_strategy(user_messages)
+                if result.get('analysis_successful'):
+                    print(f"✅ 距离聚类成功: {result.get('cluster_name', 'Unknown')}")
                     return {
-                        'analysis_type': 'full_clustering',
-                        'cluster_name': clustering_result['named_labels'][latest_window_idx],
-                        'progress_score': float(clustering_result['progress_score'][latest_window_idx]),
-                        'confidence': float(clustering_result['sims'][latest_window_idx]),
-                        'teaching_strategy': self._get_strategy_from_cluster(clustering_result['named_labels'][latest_window_idx]),
-                        'silhouette_score': clustering_result.get('silhouette', 0.0),
-                        'total_windows': len(clustering_result['windows']),
+                        'analysis_type': 'distance_clustering',
+                        'cluster_name': result.get('cluster_name', 'Unknown'),
+                        'progress_score': result.get('progress_score', 0.0),
+                        'confidence': result.get('confidence', 0.0),
+                        'teaching_strategy': self._get_strategy_from_cluster(result.get('cluster_name', 'Unknown')),
+                        'cluster_distances': result.get('cluster_distances', {}),
                         'message_count': len(user_messages),
                         'stage': 'full'
                     }
+                else:
+                    print(f"⚠️ 距离聚类未成功: {result.get('error', 'Unknown error')}")
+            else:
+                print("⚠️ 距离聚类服务未加载，跳过距离聚类尝试")
         except Exception as e:
-            print(f"⚠️ 完整聚类失败，回退到高级分析: {e}")
+            print(f"⚠️ 距离聚类服务导入失败: {e}")
         
         # 如果聚类失败，使用高级分析
         return self._advanced_analysis_fallback(user_messages, participant_id)
@@ -355,63 +343,7 @@ class RealTimeProgressAnalyzer:
         }
 
 
-# 集成到UserStateService的新方法
-def add_real_time_analysis_to_user_state_service():
-    """为UserStateService添加实时分析方法"""
-    
-    def analyze_real_time_progress_enhanced(self, participant_id: str, conversation_history: List[Dict[str, str]]) -> Optional[Dict[str, Any]]:
-        """
-        增强的实时进度分析（替代原有的analyze_learning_progress）
-        """
-        analyzer = RealTimeProgressAnalyzer()
-        result = analyzer.analyze_real_time_progress(participant_id, conversation_history)
-        
-        if result['analysis_type'] != 'insufficient_data':
-            # 更新用户档案
-            try:
-                profile, _ = self.get_or_create_profile(participant_id, None)
-                current_time = datetime.now(UTC)
-                
-                clustering_data = {
-                    'current_cluster': result['cluster_name'],
-                    'cluster_confidence': result['confidence'],
-                    'progress_score': result['progress_score'],
-                    'last_analysis_timestamp': current_time.isoformat(),
-                    'conversation_count_analyzed': result['message_count'],
-                    'analysis_type': result['analysis_type'],
-                    'teaching_strategy': result['teaching_strategy'],
-                    'clustering_history': profile.behavior_patterns.get('progress_clustering', {}).get('clustering_history', [])
-                }
-                
-                # 添加历史记录
-                clustering_data['clustering_history'].append({
-                    'timestamp': current_time.isoformat(),
-                    'cluster_name': result['cluster_name'],
-                    'confidence': result['confidence'],
-                    'progress_score': result['progress_score'],
-                    'message_count': result['message_count'],
-                    'analysis_type': result['analysis_type']
-                })
-                
-                # 保持历史记录数量限制
-                if len(clustering_data['clustering_history']) > 20:
-                    clustering_data['clustering_history'] = clustering_data['clustering_history'][-20:]
-                
-                # 更新Redis
-                set_dict = {
-                    'behavior_patterns.progress_clustering': clustering_data
-                }
-                self.set_profile(profile, set_dict)
-                
-                logger.info(f"实时进度分析完成: {participant_id} -> {result['cluster_name']} (置信度: {result['confidence']:.3f})")
-                
-            except Exception as e:
-                logger.error(f"更新用户档案时出错: {e}")
-        
-        return result
-    
-    # 添加方法到UserStateService类
-    UserStateService.analyze_real_time_progress_enhanced = analyze_real_time_progress_enhanced
+# 移除了原有的UserStateService集成代码 - 避免循环导入依赖
 
 
 if __name__ == "__main__":

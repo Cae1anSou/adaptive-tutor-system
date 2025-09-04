@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await initializeConfig();
     // 设置标题点击跳转到首页（刷新）
     setupHeaderTitle('/index.html');
-    
+
     const startButton = document.getElementById('start-button');
     const usernameInput = document.getElementById('username-input');
 

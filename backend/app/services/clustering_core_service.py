@@ -191,14 +191,18 @@ def pool_window_embeddings_with_padding(per_msg_embs: np.ndarray,
 def window_repeat_features(clean_texts: List[str],
                            per_msg_embs: np.ndarray,
                            windows: List[List[int]],
-                           near_sim_thresh: float = 0.95) -> Tuple[np.ndarray, np.ndarray]:
+                           near_sim_thresh: float = 0.95,
+                           valid_indices: List[int] = None) -> Tuple[np.ndarray, np.ndarray]:
     """窗口内重复：完全重复率 & 相邻高相似比例（余弦≥near_sim_thresh）"""
     repeat_eq = []
     repeat_sim = []
 
     for idxs in windows:
-        # 只考虑有效消息，padding不参与计算
-        valid_texts = [clean_texts[i].lower() for i in idxs if i < len(clean_texts) and clean_texts[i].strip()]
+        # 如果提供了valid_indices，只考虑有效索引；否则使用原来的逻辑
+        if valid_indices is not None:
+            valid_texts = [clean_texts[i].lower() for i in idxs if i in valid_indices]
+        else:
+            valid_texts = [clean_texts[i].lower() for i in idxs if i < len(clean_texts) and clean_texts[i].strip()]
         total = len(valid_texts)
         uniq = len(set(valid_texts))
         repeat_eq.append(1.0 - (uniq / max(1, total)))
@@ -216,12 +220,16 @@ def window_repeat_features(clean_texts: List[str],
     return np.array(repeat_eq, dtype=np.float32), np.array(repeat_sim, dtype=np.float32)
 
 def window_code_change(code_hashes_per_msg: List[List[str]],
-                       windows: List[List[int]]) -> np.ndarray:
+                       windows: List[List[int]],
+                       valid_indices: List[int] = None) -> np.ndarray:
     """窗口内代码变化率：不同哈希/总哈希；无代码给 0.5 中性值；padding不参与计算"""
     rates = []
     for idxs in windows:
-        # 只考虑有效消息的代码哈希
-        hashes = [h for i in idxs if i < len(code_hashes_per_msg) for h in code_hashes_per_msg[i]]
+        # 如果提供了valid_indices，只考虑有效索引；否则使用原来的逻辑
+        if valid_indices is not None:
+            hashes = [h for i in idxs if i in valid_indices and i < len(code_hashes_per_msg) for h in code_hashes_per_msg[i]]
+        else:
+            hashes = [h for i in idxs if i < len(code_hashes_per_msg) for h in code_hashes_per_msg[i]]
         if not hashes:
             rates.append(0.5)
         else:

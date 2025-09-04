@@ -19,16 +19,23 @@ os.environ["USE_TF"] = "0"
 
 logger = logging.getLogger(__name__)
 
+# 导入配置
+from app.core.config import settings
+
 class DistanceBasedClusteringService:
     """基于距离的聚类服务：直接使用预训练模型文件"""
     
     def __init__(self, model_dir: str = None):
         if model_dir is None:
-            # 默认使用models目录下的预训练模型
-            current_dir = os.path.dirname(__file__)
-            model_dir = os.path.join(current_dir, "..", "..", "models", "progress_clustering")
+            # 使用配置化的模型目录路径
+            model_dir = settings.PROGRESS_CLUSTERING_MODEL_DIR
+            # 如果是相对路径，转换为绝对路径
+            if not os.path.isabs(model_dir):
+                # 相对于项目根目录
+                project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+                model_dir = os.path.join(project_root, model_dir)
         
-        self.model_dir = model_dir
+        self.model_dir = os.path.abspath(model_dir)
         self.is_loaded = False
         
         try:
@@ -54,7 +61,47 @@ class DistanceBasedClusteringService:
             
         except Exception as e:
             logger.error(f"距离聚类服务初始化失败: {e}")
+            logger.warning(f"预训练模型目录: {self.model_dir}")
+            logger.warning("将回退到实时分析模式 (analyze_real_time_progress)")
+            logger.info("如需使用距离聚类功能，请确保以下文件存在:")
+            logger.info(f"  - {os.path.join(self.model_dir, 'config.json')}")
+            logger.info(f"  - {os.path.join(self.model_dir, 'cluster_centers.npy')}")
+            logger.info(f"  - {os.path.join(self.model_dir, 'pca.joblib')}")
+            logger.info(f"  - {os.path.join(self.model_dir, 'struct_scaler.joblib')}")
             self.is_loaded = False
+
+    def get_model_status(self) -> Dict[str, Any]:
+        """获取模型状态信息"""
+        status = {
+            "is_loaded": self.is_loaded,
+            "model_directory": self.model_dir,
+            "required_files": [
+                "config.json",
+                "cluster_centers.npy", 
+                "pca.joblib",
+                "struct_scaler.joblib"
+            ],
+            "missing_files": [],
+            "available_files": []
+        }
+        
+        # 检查每个必需文件
+        for filename in status["required_files"]:
+            file_path = os.path.join(self.model_dir, filename)
+            if os.path.exists(file_path):
+                status["available_files"].append(filename)
+            else:
+                status["missing_files"].append(filename)
+        
+        # 设置状态描述
+        if self.is_loaded:
+            status["status_description"] = "✅ 距离聚类模型已加载，功能正常"
+        elif len(status["missing_files"]) > 0:
+            status["status_description"] = f"❌ 缺失模型文件: {', '.join(status['missing_files'])}"
+        else:
+            status["status_description"] = "⚠️  模型文件存在但加载失败"
+            
+        return status
 
     def _load_config(self) -> Dict[str, Any]:
         """加载配置文件"""
@@ -102,7 +149,12 @@ class DistanceBasedClusteringService:
             聚类结果
         """
         if not self.is_loaded:
-            return {"analysis_successful": False, "error": "模型未加载"}
+            return {
+                "analysis_successful": False, 
+                "error": "预训练模型未加载，已自动回退到实时分析模式",
+                "fallback_mode": "real_time_analysis",
+                "model_status": "missing_or_corrupted"
+            }
         
         if len(user_messages) == 0:
             return {"analysis_successful": False, "error": "无用户消息"}
@@ -116,7 +168,7 @@ class DistanceBasedClusteringService:
             )
             
             # 提取特征
-            feature_vector = self._extract_features_with_core_service(user_messages)
+            feature_vector, window_features = self._extract_features_with_core_service(user_messages)
             
             if feature_vector is None:
                 return self._fallback_classification(user_messages)
@@ -140,6 +192,7 @@ class DistanceBasedClusteringService:
                 "distances": distances.tolist(),
                 "classification_type": "distance_based_full",
                 "message_count": len(user_messages),
+                "window_features": window_features,  # 直接在聚类服务中返回特征
                 "analysis_successful": True
             }
             
@@ -147,7 +200,7 @@ class DistanceBasedClusteringService:
             logger.error(f"距离分类失败: {e}")
             return self._fallback_classification(user_messages)
 
-    def _extract_features_with_core_service(self, user_messages: List[str]) -> Optional[np.ndarray]:
+    def _extract_features_with_core_service(self, user_messages: List[str]) -> tuple[Optional[np.ndarray], Dict[str, float]]:
         """
         使用核心聚类服务提取特征向量（支持padding和mask）
         
@@ -155,7 +208,7 @@ class DistanceBasedClusteringService:
             user_messages: 用户消息
             
         Returns:
-            51维特征向量 [语义48维 + 结构3维]
+            tuple: (51维特征向量 [语义48维 + 结构3维], 窗口特征字典)
         """
         try:
             from .clustering_core_service import (
@@ -203,11 +256,13 @@ class DistanceBasedClusteringService:
                 else:
                     semantic_features = semantic_features[:48]
             
-            # 结构特征提取
+            # 结构特征提取（使用valid_indices排除padding影响）
             repeat_eq, repeat_sim = window_repeat_features(
-                clean_texts, per_msg_embs, [window_indices], near_sim_thresh=self.config['near_sim_thresh']
+                clean_texts, per_msg_embs, [window_indices], 
+                valid_indices=valid_indices,
+                near_sim_thresh=self.config['near_sim_thresh']
             )
-            code_change = window_code_change(code_hashes_per_msg, [window_indices])
+            code_change = window_code_change(code_hashes_per_msg, [window_indices], valid_indices=valid_indices)
             
             # 构建原始结构特征
             struct_raw = np.array([repeat_eq[0], repeat_sim[0], code_change[0]])
@@ -223,18 +278,31 @@ class DistanceBasedClusteringService:
             
             if len(feature_vector) != 51:
                 logger.error(f"特征向量维度错误: {len(feature_vector)}, 期望51维")
-                return None
+                return None, {}
             
             # L2标准化（与训练时保持一致）
             norm = np.linalg.norm(feature_vector)
             if norm > 0:
                 feature_vector = feature_vector / norm
             
-            return feature_vector
+            # 构建窗口特征字典
+            from .clustering_core_service import done_stuck_counts
+            window_doc = " ".join([user_messages[i] for i in valid_indices])
+            done_hits, stuck_hits = done_stuck_counts([window_doc])
+            
+            window_features = {
+                'repeat_eq': float(repeat_eq[0]),
+                'repeat_sim': float(repeat_sim[0]),
+                'code_change': float(code_change[0]),
+                'done_hits': float(done_hits[0]),
+                'stuck_hits': float(stuck_hits[0])
+            }
+            
+            return feature_vector, window_features
             
         except Exception as e:
             logger.error(f"核心服务特征提取失败: {e}")
-            return None
+            return None, {}
     
     def _extract_features_legacy(self, user_messages: List[str], cluster_module) -> Optional[np.ndarray]:
         """
@@ -268,7 +336,7 @@ class DistanceBasedClusteringService:
                 if len(semantic_features) < 48:
                     semantic_features = np.pad(semantic_features, (0, 48 - len(semantic_features)))
                 else:
-                    semantic_features = semantic_features[:48]
+                    semantc_features = semantic_features[:48]
             
             # 2. 结构特征提取（简化版）
             struct_features = self._extract_structural_features_simple(user_messages)

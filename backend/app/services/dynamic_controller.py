@@ -27,7 +27,8 @@ class DynamicController:
                  sentiment_service: SentimentAnalysisService,
                  rag_service: RAGService,
                  prompt_generator: PromptGenerator,
-                 llm_gateway: LLMGateway,):
+                 llm_gateway: LLMGateway,
+                 clustering_service = None):
         """
         初始化动态控制器
 
@@ -37,6 +38,7 @@ class DynamicController:
             rag_service: RAG服务
             prompt_generator: 提示词生成器
             llm_gateway: LLM网关服务
+            clustering_service: 聚类服务（可选）
         """
         # 验证必需的服务
         if user_state_service is None:
@@ -51,6 +53,7 @@ class DynamicController:
         self.rag_service = rag_service
         self.prompt_generator = prompt_generator
         self.llm_gateway = llm_gateway
+        self.clustering_service = clustering_service
 
     async def generate_adaptive_response(
         self,
@@ -134,31 +137,37 @@ class DynamicController:
 
             # 步骤4.5: 进度聚类分析（在构建用户状态摘要前）
             if request.conversation_history:
-                try:
-                    # 将ConversationMessage转换为字典格式用于聚类分析
-                    conversation_for_clustering = []
-                    for msg in request.conversation_history:
-                        conversation_for_clustering.append({
-                            'role': msg.role,
-                            'content': msg.content
-                        })
-                    
-                    # 触发距离聚类分析（优先）或实时进度分析（回退）
-                    clustering_result = self.user_state_service.analyze_with_distance_clustering(
-                        request.participant_id, 
-                        conversation_for_clustering
-                    )
-                    
-                    if clustering_result and clustering_result.get('analysis_successful'):
-                        model_type = clustering_result.get('model_type', 'unknown')
-                        print(f"✅ 距离聚类分析完成 ({model_type}): {clustering_result['cluster_name']} "
-                              f"(置信度: {clustering_result['cluster_confidence']:.3f}, 类型: {clustering_result['analysis_type']})")
-                    
-                    # 重新获取profile以反映聚类分析结果
-                    profile, _ = self.user_state_service.get_or_create_profile(request.participant_id, db)
-                    
-                except Exception as e:
-                    print(f"⚠️ 进度聚类分析失败，继续正常流程: {e}")
+                # 将ConversationMessage转换为字典格式用于聚类分析
+                conversation_for_clustering = []
+                for msg in request.conversation_history:
+                    conversation_for_clustering.append({
+                        'role': msg.role,
+                        'content': msg.content
+                    })
+                
+                # 使用节流逻辑：仅在满足条件时才触发聚类分析
+                should_cluster = self.user_state_service._should_perform_clustering(profile, conversation_for_clustering)
+                if should_cluster:
+                    try:
+                        # 触发聚类分析：使用注入的聚类服务
+                        clustering_result = self.user_state_service.update_progress_clustering(
+                            request.participant_id, 
+                            conversation_for_clustering,
+                            clustering_service=self.clustering_service
+                        )
+                        
+                        if clustering_result and clustering_result.get('analysis_successful'):
+                            model_type = clustering_result.get('model_type', 'unknown')
+                            print(f"✅ 距离聚类分析完成 ({model_type}): {clustering_result['cluster_name']} "
+                                  f"(置信度: {clustering_result['cluster_confidence']:.3f}, 类型: {clustering_result['analysis_type']})")
+                        
+                        # 重新获取profile以反映聚类分析结果
+                        profile, _ = self.user_state_service.get_or_create_profile(request.participant_id, db)
+                        
+                    except Exception as e:
+                        print(f"⚠️ 进度聚类分析失败，继续正常流程: {e}")
+                else:
+                    print(f"🚦 聚类分析节流：跳过此次请求（消息数未达到步长8或时间间隔不足）")
 
             # 现在构建用户状态摘要（包含最新行为计数、情感和聚类结果）
             user_state_summary = self._build_user_state_summary(profile, sentiment_result)
@@ -408,31 +417,37 @@ class DynamicController:
 
             # 步骤4.5: 进度聚类分析（在构建用户状态摘要前）
             if request.conversation_history:
-                try:
-                    # 将ConversationMessage转换为字典格式用于聚类分析
-                    conversation_for_clustering = []
-                    for msg in request.conversation_history:
-                        conversation_for_clustering.append({
-                            'role': msg.role,
-                            'content': msg.content
-                        })
-                    
-                    # 触发距离聚类分析（优先）或实时进度分析（回退）
-                    clustering_result = self.user_state_service.analyze_with_distance_clustering(
-                        request.participant_id, 
-                        conversation_for_clustering
-                    )
-                    
-                    if clustering_result and clustering_result.get('analysis_successful'):
-                        model_type = clustering_result.get('model_type', 'unknown')
-                        print(f"✅ 距离聚类分析完成 (同步-{model_type}): {clustering_result['cluster_name']} "
-                              f"(置信度: {clustering_result['cluster_confidence']:.3f}, 类型: {clustering_result['analysis_type']})")
-                    
-                    # 重新获取profile以反映聚类分析结果
-                    profile, _ = self.user_state_service.get_or_create_profile(request.participant_id, db)
-                    
-                except Exception as e:
-                    print(f"⚠️ 进度聚类分析失败 (同步)，继续正常流程: {e}")
+                # 将ConversationMessage转换为字典格式用于聚类分析
+                conversation_for_clustering = []
+                for msg in request.conversation_history:
+                    conversation_for_clustering.append({
+                        'role': msg.role,
+                        'content': msg.content
+                    })
+                
+                # 使用节流逻辑：仅在满足条件时才触发聚类分析
+                should_cluster = self.user_state_service._should_perform_clustering(profile, conversation_for_clustering)
+                if should_cluster:
+                    try:
+                        # 触发聚类分析：使用注入的聚类服务
+                        clustering_result = self.user_state_service.update_progress_clustering(
+                            request.participant_id, 
+                            conversation_for_clustering,
+                            clustering_service=self.clustering_service
+                        )
+                        
+                        if clustering_result and clustering_result.get('analysis_successful'):
+                            model_type = clustering_result.get('model_type', 'unknown')
+                            print(f"✅ 距离聚类分析完成 (同步-{model_type}): {clustering_result['cluster_name']} "
+                                  f"(置信度: {clustering_result['cluster_confidence']:.3f}, 类型: {clustering_result['analysis_type']})")
+                        
+                        # 重新获取profile以反映聚类分析结果
+                        profile, _ = self.user_state_service.get_or_create_profile(request.participant_id, db)
+                        
+                    except Exception as e:
+                        print(f"⚠️ 进度聚类分析失败 (同步)，继续正常流程: {e}")
+                else:
+                    print(f"🚦 聚类分析节流 (同步)：跳过此次请求（消息数未达到步长8或时间间隔不足）")
 
             # 现在构建用户状态摘要（包含最新行为计数、情感和聚类结果）
             user_state_summary = self._build_user_state_summary(profile, sentiment_result)

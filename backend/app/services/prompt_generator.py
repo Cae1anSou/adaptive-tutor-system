@@ -294,7 +294,6 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
                         "LEARNING FOCUS:\n- Knowledge Level Exploration:\n" + "\n".join(topic_summaries)
                     )
 
-<<<<<<< HEAD
             # 进度聚类分析结果 (Enhanced)
             if behavior_patterns.get('progress_clustering'):
                 progress_clustering = behavior_patterns['progress_clustering']
@@ -417,7 +416,7 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
                         progress_parts.append(f"- Learning trend: {trend}{trend_analysis}")
                     
                     student_parts.append("\n".join(progress_parts))
-=======
+       
         # 学习掌握度概览（BKT/mastery）
         if hasattr(user_state, 'bkt_models') and user_state.bkt_models:
             mastery_items: List[str] = []
@@ -436,7 +435,6 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
             except Exception:
                 # 容错：不阻断整体提示构建
                 pass
->>>>>>> upstream/main
 
         if student_parts:
             context_messages.append({
