@@ -609,6 +609,51 @@ body {
         display: flex;
         flex-direction: column;
     }
+
+    /* 面板底部样式 */
+    .panel-footer {
+        padding: var(--spacing-md);
+        border-top: 1px solid var(--border-color);
+        background-color: var(--panel-background);
+        border-bottom-left-radius: var(--border-radius-md);
+        border-bottom-right-radius: var(--border-radius-md);
+    }
+
+    /* 解题思路按钮样式 */
+    #problem-solving-hint-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--spacing-sm);
+        width: 100%;
+        padding: var(--spacing-md);
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius-md);
+        font-weight: 600;
+        font-size: var(--font-size-sm);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-light);
+    }
+
+    #problem-solving-hint-btn:hover {
+        background-color: #6366f1;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-medium);
+    }
+
+    #problem-solving-hint-btn:active {
+        transform: translateY(0);
+        box-shadow: var(--shadow-light);
+    }
+
+    #problem-solving-hint-btn:focus {
+        outline: 2px solid rgba(99, 102, 241, 0.5);
+        outline-offset: 2px;
+    }
+
     /* 中间面板样式 */
     .mid-panel {
         width: 45%;
@@ -649,6 +694,55 @@ body {
         text-align: center;
     }
 
+/* 询问AI按钮样式 */
+#ask-ai-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    width: 100%;
+    padding: var(--spacing-md);
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#ask-ai-btn:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+}
+
+#ask-ai-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-light);
+}
+
+#ask-ai-btn:focus {
+    outline: 2px solid rgba(79, 70, 229, 0.5);
+    outline-offset: 2px;
+}
+
+#ask-ai-btn:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+}
+
+#ask-ai-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-light);
+}
+
+#ask-ai-btn:focus {
+    outline: 2px solid rgba(79, 70, 229, 0.5);
+    outline-offset: 2px;
+}
 
 /* learn页面栏目布局 */
 /* 左侧组合列（占 60% 宽） */
@@ -658,7 +752,7 @@ body {
     width: 70%;
     min-width: 400px;
     gap: var(--spacing-md);
-    height: 100%;
+    height: calc(100vh - var(--header-height) - var(--spacing-md) * 2); /* 固定高度，与右侧保持一致 */
 }
 
 /* 上排：预览 + 代码（等分） */
@@ -667,6 +761,7 @@ body {
     gap: var(--spacing-md);
     height: auto;
     min-height: 200px; /* 减少最小高度从240px到200px */
+    max-height: 60%; /* 限制上排最大高度，给下排留出空间 */
     align-items: stretch;
 }
     /* 合并的预览和代码展示面板样式 */
@@ -756,6 +851,7 @@ body {
     /* 聊天面板样式 */
     .chat-panel {
         width: 30%;
+        height: calc(100vh - var(--header-height) - var(--spacing-md) * 2); /* 固定高度，与左侧保持一致 */
         overflow: hidden;
         /* 确保聊天面板不会覆盖知识点面板 */
         position: relative;
@@ -765,8 +861,9 @@ body {
     /* 知识点展示（下排跨两列，宽度=左+中） */
 .knowledge-panel {
     height: auto;
-    flex: 1 1 0;
-    min-height: 200px; /* 确保最小高度 */
+    flex: 1 1 0; /* 改为拉伸填满剩余空间，与右侧聊天面板底部对齐 */
+    min-height: 180px; /* 减少最小高度，缩小按钮容器 */
+    max-height: none; /* 移除最大高度限制，让它能拉伸到底部 */
     box-sizing: border-box;
     overflow: hidden;
     /* 与上排 preview-code-panel 右边界对齐 */
@@ -838,7 +935,7 @@ body {
     
     .info-content {
         flex: 1;
-        padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg); /* 统一四个方向的内边距 */
+        padding: var(--spacing-lg) var(--spacing-lg) 0 var(--spacing-lg); /* 移除底部内边距，让按钮贴底 */
         overflow-y: auto;
         max-height: none; /* 移除高度限制 */
         width: calc(100% + var(--spacing-xs)); /* 稍微扩宽内容区域，让代码展示框与按钮对齐 */
@@ -872,9 +969,9 @@ body {
     .levels-container {
         height: 100%; /* 占满父容器高度 */
         display: flex;
-        align-items: center; /* 垂直居中 */
+        align-items: center; /* 改为垂直居中 */
         justify-content: center; /* 水平居中 */
-        padding: var(--spacing-md);
+        padding: var(--spacing-xs) var(--spacing-xs) 0 var(--spacing-xs); /* 移除底部内边距，让按钮贴近底部 */
         box-sizing: border-box;
     }
 
@@ -883,11 +980,11 @@ body {
         display: flex;
         align-items: center;
         /* 移除justify-content，让flex和gap自然控制分布 */
-        gap: var(--spacing-md); /* 减少卡片间距，让卡片更宽 */
+        gap: var(--spacing-sm); /* 减少卡片间距，让布局更紧凑 */
         width: 100%; /* 占满整个容器宽度 */
-        height: 75%; /* 增加高度比例到75% */
-        max-height: 250px; /* 适当增加最大高度 */
-        min-height: 130px; /* 适当增加最小高度 */
+        height: auto; /* 让容器根据内容自动增高 */
+        max-height: 180px; /* 添加最大高度限制，让容器更小 */
+        min-height: 120px; /* 减少最小高度，让容器更紧凑 */
         box-sizing: border-box;
     }
 
@@ -924,7 +1021,7 @@ body {
     @media (max-width: 1024px) {
         .levels-flow {
             width: 100%; /* 小屏幕上也占满宽 */
-            height: 80%; /* 增加高度比例 */
+            height: auto; /* 根据内容自动增高 */
             gap: var(--spacing-md); /* 减少间距 */
         }
         
@@ -943,7 +1040,7 @@ body {
         .levels-flow {
             flex-direction: column;
             width: 100%; /* 手机上也占满宽 */
-            height: 85%; /* 增加高度比例 */
+            height: auto; /* 根据内容自动增高 */
             gap: var(--spacing-sm); /* 进一步减小间距 */
         }
         
@@ -1075,7 +1172,9 @@ body {
 
     .start-button {
         align-self: flex-end;
-        margin: var(--spacing-md) var(--spacing-xl) var(--spacing-md) auto;
+        margin: var(--spacing-sm) var(--spacing-lg) var(--spacing-sm) auto; /* 添加适度的上下边距 */
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--font-size-sm);
     }
   
 

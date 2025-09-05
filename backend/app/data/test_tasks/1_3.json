@@ -1,7 +1,7 @@
 {
   "topic_id": "1_3",
-  "title": "构建页面基本结构",
-  "description_md": "# 任务描述：\n## 任务一：\n请完成HTML文档的基本结构，包含<!DOCTYPE html>声明、<html>和<head>标签。\n## 任务二：\n将<html>标签的语言属性设置为中文。\n## 任务三：\n在<head>标签内添加<meta charset=\"UTF-8\">，定义字符编码为UTF-8。\n## 任务四：\n添加<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">，设置响应式布局。\n## 任务五：\n在<head>标签内添加<title>标签，设置网页标题为\"编程学习教程\"。\n## 任务六：\n添加<body>标签，作为页面内容的容器。\n## 任务七：\n在<body>标签内添加<footer>标签，用于显示页面底部信息。\n## 示例代码：\n\n```html\n<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <footer>© 2025 编程学习教程</footer>\n</body>\n</html>\n```",
+  "title": "1_3 构建页面基本结构",
+  "description_md": "# 任务描述：\n请编写一个完整的 HTML 文档结构，包含必要的声明、基础标签以及页面的标题和底部信息，目标是掌握 HTML 文档的基本组成部分。\n\n## 要求：\n1. 在文档开头添加 `<!DOCTYPE html>` 声明，并使用 `<html>` 标签包裹所有内容。\n2. 将 `<html>` 标签的语言属性设置为中文（`lang=\"zh\"`）。\n3. 在 `<head>` 标签内添加 `<meta charset=\"UTF-8\">`，定义字符编码为 UTF-8。\n4. 在 `<head>` 标签内添加 `<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">`，以支持响应式布局。\n5. 在 `<head>` 标签内添加 `<title>` 标签，内容为“编程学习教程”。\n6. 在 `<body>` 标签中添加 `<footer>` 元素，用于显示页面底部信息。\n7. 保持 HTML 标签层次完整、结构规范。\n\n## 示例代码：\n```html\n<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <footer>© 2025 编程学习教程</footer>\n</body>\n</html>\n```",
   "start_code": {
     "html": "#请在此处完成HTML基础结构的定义！",
     "css": "",
