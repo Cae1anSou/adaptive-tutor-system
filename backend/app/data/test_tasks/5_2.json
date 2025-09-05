@@ -1,7 +1,7 @@
 {
   "topic_id": "5_2",
   "title": "5_2 在网页中嵌入背景音乐",
-  "description_md": "请在网页中添加一段背景音乐，提升页面氛围。\n\n- 使用 `<audio>` 标签，并启用 `controls`\n- 添加 `<source>` 元素，设置音频文件为 `background.mp3`，类型为 `audio/mpeg`\n- 提供备选格式 `<source>`，设置音频文件为 `background.ogg`，类型为 `audio/ogg`\n- 添加后备文本提示浏览器不支持音频播放",
+  "description_md": "# 任务描述：\n请在网页中添加背景音乐，提升页面氛围。\n\n## 要求：\n1. 使用 `<audio>` 标签并启用 `controls` 属性。\n2. 添加 `<source>` 元素，音频文件为 `background.mp3`，类型为 `audio/mpeg`。\n3. 添加 `<source>` 元素，音频文件为 `background.ogg`，类型为 `audio/ogg`。\n4. 提供后备文本，提示浏览器不支持音频播放。",
   "start_code": {
     "html": "<div class=\"list-demo\">\n  <h3>背景音乐播放器</h3>\n  <!-- 在此处添加音频 -->\n</div>",
     "css": "",

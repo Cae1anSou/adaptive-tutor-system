@@ -1,7 +1,7 @@
 {
   "topic_id": "2_3",
   "title": "2_3 创建无序列表",
-  "description_md": "# 任务描述\n请在h3元素下方添加一个无序列表，并在其中添加三个项目：1.学习HTML基础，2.练习CSS样式，3.构建简单网页\n",
+  "description_md": "# 任务描述：\n请在 `<h3>` 元素下方添加一个无序列表，用于展示学习计划，目标是掌握无序列表 `<ul>` 与 `<li>` 标签的基本用法。\n\n## 要求：\n1. 在 `<h3>` 元素下方创建一个无序列表。\n2. 在列表中依次添加三个项目：学习HTML基础、练习CSS样式、构建简单网页。",
   "start_code": {
     "html": "<h3>前端学习计划</h3>\n",
     "css": "",
@@ -11,7 +11,7 @@
     {
       "name": "无序列表ul元素位置检查",
       "type": "custom_script",
-      "script": "return document.querySelector('h3').getBoundingClientRect().top < document.querySelector('ul').getBoundingClientRect().top",
+      "script": "const h3 = document.querySelector('h3'); const ul = document.querySelector('ul'); if (!h3 || !ul) return false; return h3.getBoundingClientRect().top < ul.getBoundingClientRect().top;",
       "feedback": "ul元素应该在h3元素下方。"
     },
     {

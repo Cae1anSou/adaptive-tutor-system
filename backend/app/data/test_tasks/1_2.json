@@ -1,7 +1,7 @@
 {
   "topic_id": "1_2",
   "title": "1_2 应用文本格式（加粗、斜体）",
-  "description_md": "# 任务描述：\n请使用CSS样式中的`font-weight`属性和`font-style`属性，分别将下面的`h2`元素设置为粗体和斜体样式。\n\n## 要求：\n1. 使用`font-weight`使标题文字加粗\n2. 使用`font-style`使标题文字变为斜体\n3. 不要修改HTML结构",
+  "description_md": "# 任务描述：\n请在 CSS 中为页面中的 `<h2>` 元素添加样式，使其同时呈现粗体和斜体，目标是学会使用 `font-weight` 与 `font-style` 属性。\n\n## 要求：\n1. 使用 `font-weight` 属性将 `<h2>` 元素设置为粗体。\n2. 使用 `font-style` 属性将 `<h2>` 元素设置为斜体。\n3. 不要修改 HTML 结构，仅在 CSS 中添加或修改样式。",
   "start_code": {
     "html": "<h2>Web开发基础教程</h2>",
     "css": "",

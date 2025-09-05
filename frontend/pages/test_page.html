@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI HTML学习平台 - 代码编辑器</title>
+    <title>AI HTML Learning Platform - Code Editor</title>
     <link rel="stylesheet" href="../css/styles.css">
     <!-- Iconify图标库 -->
     <script src="../js/modules/iconify-icon.min.js"></script>
@@ -21,7 +21,7 @@
         <header class="top-header">
             <h1 class="header-title" id="headerTitle">
                 <iconify-icon icon="mdi:test-tube" width="24" height="24"></iconify-icon>
-                加载中...
+                loading...
             </h1>
             <!-- 中英文切换按钮 -->
             <button id="language-toggle-test" class="back-button" style="position: absolute; right: 120px; display: flex; align-items: center; gap: var(--spacing-xs); padding: var(--spacing-sm) var(--spacing-md); background-color: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: var(--border-radius-md); color: white; cursor: pointer; transition: all 0.2s ease; font-size: var(--font-size-sm); font-weight: 500;">
@@ -31,7 +31,7 @@
             <div class="user-profile">
                 <button class="back-button" id="backButton">
                     <iconify-icon icon="mdi:arrow-left"></iconify-icon>
-                    返回
+                    return
                 </button>
                 <p>hello👋：</p>
                 <P id="participant_id"></P>
@@ -47,19 +47,19 @@
                 <div class="test-requirements-container panel">
                     <div class="panel-header">
                         <iconify-icon icon="mdi:clipboard-list" width="18" height="18"></iconify-icon>
-                        <h2>测试要求</h2>
+                        <h2>Programming Requirements</h2>
                     </div>
                     <div class="panel-content markdown-content" id="test-requirements-content">
                         <!-- 测试要求内容 -->
                         <div class="requirement-content">
-                            <p>加载中...</p>
+                            <p>loading...</p>
                         </div>
                     </div>
                     <!-- 解题思路按钮 -->
                     <div class="panel-footer">
                         <button id="problem-solving-hint-btn" class="btn btn-primary">
                             <iconify-icon icon="mdi:lightbulb-on-outline" width="18" height="18"></iconify-icon>
-                            给点灵感
+                            Give me some inspiration
                         </button>
                     </div>
                 </div>
@@ -68,12 +68,12 @@
                 <div class="test-results-container panel">
                     <div class="panel-header">
                         <iconify-icon icon="mdi:chart-box" width="18" height="18"></iconify-icon>
-                        <h2>测试结果</h2>
+                        <h2>Execution Result</h2>
                     </div>
                     <div class="panel-content" id="test-results-content">
                         <div class="result-placeholder">
                             <iconify-icon icon="mdi:progress-clock" width="32" height="32" style="color: var(--text-light);"></iconify-icon>
-                            <p>请先开始写代码，然后点击"提交"，稍等后就会出现测试结果</p>
+                            <p>Please start writing code first, then click "Submit", and the test results will appear after a while</p>
                         </div>
                         <!-- 测试结果内容，初始为空 -->
                     </div>
@@ -81,7 +81,7 @@
                     <div class="panel-footer" id="ask-ai-container" style="display: none;">
                         <button id="ask-ai-btn" class="btn btn-primary">
                             <iconify-icon icon="mdi:robot" width="18" height="18"></iconify-icon>
-                            询问AI
+                            Ask the AI
                         </button>
                     </div>
                 </div>
@@ -91,7 +91,7 @@
             <div class="mid-panel panel">
                 <!-- 编辑器工具栏 -->
                 <div class="panel-header">
-                    <h2>编译器</h2>
+                    <h2>Programming Editing and Preview</h2>
                     <div class="editor-tabs">
                         <div class="editor-tabs-left">
                             <button class="tab-button active" data-tab="html">
@@ -106,7 +106,7 @@
                         </div>
                         <div class="editor-tabs-right">
                             <button class="tab-button" data-tab="preview">
-                                preview
+                                Preview
                             </button>
                         </div>
                     </div>
@@ -141,7 +141,7 @@
                 <div class="editor-actions">
                     <button id="submit-button" class="btn btn-secondary">
                         <iconify-icon icon="mdi:check-all" width="16" height="16"></iconify-icon>
-                        提交
+                        submit
                     </button>
                 </div>
             </div>
@@ -149,7 +149,7 @@
             <div class="chat-panel panel">
                     <div class="panel-header">
                         <iconify-icon icon="mdi:lightbulb-on" width="18" height="18"></iconify-icon>
-                        <h2>修改建议</h2>
+                        <h2>Al Teaching Assistant Module</h2>
                     </div>
                     <div class="chat-history">
                         <!-- 修改建议内容 -->
