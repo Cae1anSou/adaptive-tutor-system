@@ -1,4 +1,5 @@
-/* 统一样式：添加修改元素样式的时候请尽量使用规定好的样式，修改前先查看样式，避免重复定义 */
+
+    /* 统一样式：添加修改元素样式的时候请尽量使用规定好的样式，修改前先查看样式，避免重复定义 */
 :root {
     --background-color: #f8fafc;
     --panel-background: #ffffff;
@@ -23,7 +24,7 @@
     --title-font-size: 18px;
     --ai-messages: #a4fc95;
     --user-messages: #ababab;
-
+    
     /* AI消息配色 */
     --ai-message-bg: #f1f5f9;
     --ai-message-text: #1e293b;
@@ -31,7 +32,7 @@
     --user-message-bg: #2563eb;
     --user-message-text: #ffffff;
     --user-message-border: #7c3aed;
-
+            
     /* 字体 */
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
     --font-size-xs: 12px;
@@ -41,7 +42,7 @@
     --font-size-xl: 20px;
     --font-size-2xl: 24px;
     --font-size-3xl: 30px;
-
+            
     /* 间距 */
     --spacing-xs: 4px;
     --spacing-sm: 8px;
@@ -49,7 +50,7 @@
     --spacing-lg: 24px;
     --spacing-xl: 32px;
     --spacing-2xl: 40px;
-
+            
     /* 圆角 */
     --border-radius-sm: 6px;
     --border-radius-md: 8px;
@@ -79,8 +80,7 @@ body {
     width: 100%;
     height: 100vh;
     overflow: hidden;
-    position: relative;
-    /* 添加相对定位，使其子元素可以使用绝对定位 */
+    position: relative; /* 添加相对定位，使其子元素可以使用绝对定位 */
 }
 
 /* 顶部标题栏样式 */
@@ -89,9 +89,8 @@ body {
     justify-content: space-between;
     align-items: center;
     height: var(--header-height);
-    padding: 0 var(--spacing-xl);
-    ;
-    background: var(--head-background);
+    padding: 0 var(--spacing-xl);;
+    background:var(--head-background);
     color: white;
     box-shadow: var(--shadow-light);
     position: relative;
@@ -104,14 +103,10 @@ body {
     font-weight: 600;
     color: white;
     letter-spacing: -0.025em;
-    z-index: 10;
-    /* 确保标题在最上层 */
-    flex-shrink: 0;
-    /* 防止标题被压缩 */
-    position: absolute;
-    /* 添加绝对定位 */
-    left: 20px;
-    /* 设置左侧固定位置 */
+    z-index: 10; /* 确保标题在最上层 */
+    flex-shrink: 0; /* 防止标题被压缩 */
+    position: absolute; /* 添加绝对定位 */
+    left: 20px; /* 设置左侧固定位置 */
 }
 
 .user-profile {
@@ -119,14 +114,10 @@ body {
     align-items: center;
     gap: var(--spacing-sm);
     font-size: var(--font-size-sm);
-    z-index: 10;
-    /* 确保用户信息在最上层 */
-    flex-shrink: 0;
-    /* 防止用户信息被压缩 */
-    position: absolute;
-    /* 添加绝对定位 */
-    right: 20px;
-    /* 设置右侧固定位置 */
+    z-index: 10; /* 确保用户信息在最上层 */
+    flex-shrink: 0; /* 防止用户信息被压缩 */
+    position: absolute; /* 添加绝对定位 */
+    right: 20px; /* 设置右侧固定位置 */
 }
 
 .top-header-lean {
@@ -138,33 +129,30 @@ body {
     background: var(--head-background);
     color: white;
     box-shadow: var(--shadow-light);
-    position: absolute;
-    /* 保持绝对定位 */
+    position: absolute; /* 保持绝对定位 */
     top: 0;
     left: 0;
     right: 0;
-    z-index: 20;
-    /* 确保标题栏位于较高层级 */
+    z-index: 20; /* 确保标题栏位于较高层级 */
     transition: height 0.3s ease;
 }
 
-.top-header-lean:hover {
-    height: 64px;
-    /* 保持原始高度 */
-    transition: height 0.3s ease;
-    position: absolute;
-    width: 100%;
-    z-index: 100;
+.top-header-lean:hover{
+  height: 64px; /* 保持原始高度 */
+  transition: height 0.3s ease;
+  position: absolute;
+  width: 100%;
+  z-index: 100;
 }
 
 .mini-knowledge-graph {
     /* 修改为在标题栏内居中显示 */
     position: absolute !important;
     top: 50% !important;
-    left: 50% !important;
+    left: 50% !important; 
     transform: translate(-50%, -50%) !important;
-    margin-left: 0 !important;
-    width: 60% !important;
+    margin-left: 0 !important; 
+    width: 60% !important; 
     height: 40px !important;
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     border: 1px solid var(--border-color);
@@ -195,34 +183,25 @@ body {
     z-index: 15;
     border-radius: 50%;
     transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
-    background-color: #ffffff;
-    /* 完全不透明的白色背景 */
-    border: 1px solid rgba(79, 70, 229, 0.3);
-    /* 边框使用品牌色 */
-    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.15);
-    /* 阴影使用品牌色 */
+    background-color: #ffffff; /* 完全不透明的白色背景 */
+    border: 1px solid rgba(79, 70, 229, 0.3); /* 边框使用品牌色 */
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.15); /* 阴影使用品牌色 */
 }
 
 .mini-graph-toggle iconify-icon {
-    color: #4f46e5 !important;
-    /* 确保图标使用品牌色 */
-    opacity: 1 !important;
-    /* 确保完全不透明 */
-    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
-    /* 添加微小阴影提高可见度 */
+    color: #4f46e5 !important; /* 确保图标使用品牌色 */
+    opacity: 1 !important; /* 确保完全不透明 */
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1)); /* 添加微小阴影提高可见度 */
 }
 
 .mini-graph-toggle:hover {
-    background-color: rgba(79, 70, 229, 0.1);
-    /* 悬停时改变背景色 */
+    background-color: rgba(79, 70, 229, 0.1); /* 悬停时改变背景色 */
     transform: scale(1.1);
-    box-shadow: 0 3px 8px rgba(79, 70, 229, 0.25);
-    /* 悬停时增强阴影效果 */
+    box-shadow: 0 3px 8px rgba(79, 70, 229, 0.25); /* 悬停时增强阴影效果 */
 }
 
 .mini-graph-toggle:hover iconify-icon {
-    color: #3730a3 !important;
-    /* 悬停时加深图标颜色 */
+    color: #3730a3 !important; /* 悬停时加深图标颜色 */
 }
 
 /* 修改旋转方向 */
@@ -231,13 +210,11 @@ body {
 }
 
 .mini-graph-container {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    padding: 0;
-    /* 移除内边距 */
-    box-sizing: border-box;
-    /* 确保边框和内边距不会增加元素尺寸 */
+  width: 100%;
+  height: 100%;
+  position: relative;
+  padding: 0; /* 移除内边距 */
+  box-sizing: border-box; /* 确保边框和内边距不会增加元素尺寸 */
 }
 
 
@@ -257,104 +234,91 @@ body {
 
 /* 简化图谱的节点样式 */
 .mini-node {
-    font-family: var(--font-family);
+  font-family: var(--font-family);
 }
 
 .mini-node[type="chapter"] {
-    width: 50px !important;
-    /* 显著增大章节节点 */
+    width: 50px !important; /* 显著增大章节节点 */
     height: 50px !important;
     font-size: 12px !important;
     font-weight: bold;
 }
 
 .mini-node[type="knowledge"] {
-    width: 35px !important;
-    /* 显著增大知识点节点 */
+    width: 35px !important; /* 显著增大知识点节点 */
     height: 35px !important;
     font-size: 10px !important;
 }
 
 .mini-node.learned {
-    background-color: #10b981 !important;
-    border-color: #059669 !important;
+  background-color: #10b981 !important;
+  border-color: #059669 !important;
 }
 
 .mini-node.unlocked {
-    background-color: #3b82f6 !important;
-    border-color: #2563eb !important;
+  background-color: #3b82f6 !important;
+  border-color: #2563eb !important;
 }
 
 .mini-node.locked {
-    background-color: #9ca3af !important;
-    border-color: #6b7280 !important;
+  background-color: #9ca3af !important;
+  border-color: #6b7280 !important;
 }
 
 .mini-node.current {
-    background-color: #f59e0b !important;
-    border-color: #d97706 !important;
+  background-color: #f59e0b !important;
+  border-color: #d97706 !important;
 }
 
 /* 简化图谱的边样式 */
 .mini-edge {
-    width: 3px;
-    line-color: var(--primary-color);
-    target-arrow-shape: triangle;
-    target-arrow-color: var(--primary-color);
-    arrow-scale: 2;
-    curve-style: bezier !important;
+  width: 3px;
+  line-color: var(--primary-color);
+  target-arrow-shape: triangle;
+  target-arrow-color:  var(--primary-color);
+  arrow-scale: 2;
+  curve-style: bezier !important;
 }
 
 /* 响应式调整 */
 @media (max-width: 1024px) {
     .mini-knowledge-graph {
-        width: calc(100% - 250px) !important;
-        /* 进一步减小宽度 */
-        height: 90%;
-        /* 高度保持一致 */
+        width: calc(100% - 250px) !important; /* 进一步减小宽度 */
+        height: 90%; /* 高度保持一致 */
         margin-left: 2%;
     }
 }
 
 @media (max-width: 768px) {
     .mini-knowledge-graph {
-        width: calc(100% - 230px) !important;
-        /* 在小屏幕上预留空间但稍少一点 */
-        height: 90%;
-        /* 高度保持一致 */
+        width: calc(100% - 230px) !important; /* 在小屏幕上预留空间但稍少一点 */
+        height: 90%; /* 高度保持一致 */
         margin-left: 2%;
     }
-
+    
     .top-header-lean:hover {
-        height: 200px;
-        /* 保持一致的高度 */
+        height: 200px; /* 保持一致的高度 */
     }
 }
 
 /* 修改为不改变位置的悬停效果 */
-.mini-knowledge-graph:hover,
-.top-header-lean:hover .mini-knowledge-graph:hover {
+.mini-knowledge-graph:hover, .top-header-lean:hover .mini-knowledge-graph:hover {
     box-shadow: var(--card-shadow) !important;
 }
 
 /* 内容容器样式 */
 .content-container {
     display: flex;
-    gap: var(--spacing-md);
-    /* 主内容区域与侧边栏之间的间距 */
-    padding-top: calc(var(--header-height) + var(--spacing-md));
-    /* 为顶部标题栏留出空间 */
+    gap: var(--spacing-md); /* 主内容区域与侧边栏之间的间距 */
+    padding-top: calc(var(--header-height) + var(--spacing-md)); /* 为顶部标题栏留出空间 */
     padding-left: var(--spacing-md);
     padding-right: var(--spacing-md);
     padding-bottom: var(--spacing-md);
-    height: 100vh;
-    /* 使用全屏高度 */
+    height: 100vh; /* 使用全屏高度 */
     overflow: hidden;
     width: 100%;
-    box-sizing: border-box;
-    /* 确保内边距不会增加元素实际大小 */
+    box-sizing: border-box; /* 确保内边距不会增加元素实际大小 */
 }
-
 /* 栏目容器样式 */
 .panel {
     background: var(--card-bg);
@@ -362,16 +326,12 @@ body {
     box-shadow: var(--card-shadow);
     border: 1px solid var(--border-color);
     margin: var(--spacing-);
-    display: flex;
-    /* 水平布局 */
-    flex-direction: column;
-    /* 垂直布局 */
+    display: flex;          /* 水平布局 */
+    flex-direction: column; /* 垂直布局 */
 }
-
 .panel-header {
     display: flex;
-    max-height: 40px;
-    /* 从60px减少到50px，让标题栏更紧凑 */
+    max-height: 40px; /* 从60px减少到50px，让标题栏更紧凑 */
     justify-content: space-between;
     background: var(--head-background);
     align-items: center;
@@ -380,7 +340,6 @@ body {
     padding: var(--spacing-md) var(--spacing-lg);
     border-bottom: 1px solid var(--border-color);
 }
-
 .panel-header h2 {
     font-size: var(--font-size-lg);
     font-weight: 600;
@@ -395,94 +354,78 @@ body {
     background-color: var(--content-background);
     font-size: var(--font-size-sm);
 }
-
 /* 栏目容器布局 */
 /* index页面布局样式 */
-.index-container {
-    width: 60%;
-    margin: 1% 8%;
-    overflow: hidden;
-    flex: 1;
-}
-
-.index-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    width: 100%;
-    /* 可以根据需要调整宽度 */
-    height: 100%;
-    /* 可以根据需要调整高度 */
-}
-
-.group {
-    flex-grow: 1;
-    margin: var(--spacing-md);
-    border-radius: var(--border-radius-md);
-    min-width: 80%;
-    max-width: 100%;
-    border: 1px solid var(--border-color);
-    background: var(--panel-background);
-}
-
-/* 自定义弹窗样式 */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(4px);
-}
-
-.modal-content {
-    background-color: var(--content-background);
-    margin: 15% auto;
-    padding: var(--spacing-xl);
-    border-radius: var(--border-radius-lg);
-    width: 400px;
-    text-align: center;
-    box-shadow: var(--card-shadow);
-}
-
-.modal-actions {
-    margin-top: var(--spacing-lg);
-    display: flex;
-    gap: var(--spacing-md);
-    justify-content: center;
-}
-
-.modal-actions button {
-    padding: var(--spacing-sm) var(--spacing-lg);
-    border-radius: var(--border-radius-md);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: var(--font-size-sm);
-    border: none;
-}
-
-.learn-btn,
-.test-btn,
-.review-btn {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-.learn-btn:hover,
-.test-btn:hover,
-.review-btn:hover {
-    background-color: var(--primary-hover);
-    transform: translateY(-2px);
-}
-
-.disabled {
-    background-color: var(--text-lighter) !important;
+    .index-container { 
+        width: 60%;
+        margin: 1% 8%;
+        overflow: hidden;
+        flex: 1;
+    }
+    .index-form{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 100%; /* 可以根据需要调整宽度 */
+        height: 100%; /* 可以根据需要调整高度 */
+    }
+    .group{
+        flex-grow: 1;
+        margin: var(--spacing-md);
+        border-radius: var(--border-radius-md);
+        min-width: 80%;
+        max-width: 100%;
+        border: 1px solid var(--border-color);
+        background: var(--panel-background);
+    }
+    /* 自定义弹窗样式 */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.4);
+      backdrop-filter: blur(4px);
+    }
+    .modal-content {
+        background-color: var(--content-background);
+        margin: 15% auto;
+        padding: var(--spacing-xl);
+        border-radius: var(--border-radius-lg);
+        width: 400px;
+        text-align: center;
+        box-shadow: var(--card-shadow);
+    }
+    .modal-actions {
+        margin-top: var(--spacing-lg);
+        display: flex;
+        gap: var(--spacing-md);
+        justify-content: center;
+    }
+    .modal-actions button {
+        padding: var(--spacing-sm) var(--spacing-lg);
+        border-radius: var(--border-radius-md);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: var(--font-size-sm);
+        border: none;
+    }
+    .learn-btn, .test-btn, .review-btn {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    .learn-btn:hover, .test-btn:hover, .review-btn:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-2px);
+    }
+    .disabled {
+        background-color: var(--text-lighter) !important;
 }
 
 /* 中英文切换按钮样式 */
@@ -532,195 +475,274 @@ body {
 
 /* 知识图谱容器样式 */
 .knowledge-graph-container {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 85%;
-    /* 增加5% (80% * 1.05 = 84%) */
-    height: 85%;
-    /* 增加5% (80% * 1.05 = 84%) */
-    z-index: 1000;
-    display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 85%; /* 增加5% (80% * 1.05 = 84%) */
+  height: 85%; /* 增加5% (80% * 1.05 = 84%) */
+  z-index: 1000;
+  display: none;
 }
 
 .knowledge-graph-container .index-container {
-    width: 100%;
-    height: 100%;
-    margin: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
 }
 
 .knowledge-graph-container .group {
-    height: calc(100% - 40px);
-    margin: var(--spacing-md);
+  height: calc(100% - 40px);
+  margin: var(--spacing-md);
 }
 
 .knowledge-graph-container #cy {
-    height: 100%;
+  height: 100%;
 }
 
 /* 知识图谱关闭按钮样式 */
 #closeGraph {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 50px;
-    height: 32px;
-    padding: 0;
-    background-color: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: var(--border-radius-md);
-    color: white;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: var(--font-size-sm);
-    font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 32px;
+  padding: 0;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--border-radius-md);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: var(--font-size-sm);
+  font-weight: 400;
 }
 
 #closeGraph:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-    transform: translateX(-2px);
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translateX(-2px);
 }
 
 #closeGraph iconify-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
 }
 
 #knowledgeModal {
-    display: none;
-}
-
+      display: none;
+    }
 /* 知识图谱容器样式增强 */
 #cy {
-    border-radius: var(--border-radius-lg);
-    overflow: hidden;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    box-shadow: var(--card-shadow);
-    border: 1px solid var(--border-color);
-    position: relative;
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-color);
+  position: relative;
 }
 
 /* 图谱工具栏样式（如果需要添加工具栏） */
 .cy-toolbar {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    z-index: 1000;
-    display: flex;
-    gap: 6px;
-    padding: 8px;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: var(--border-radius-md);
-    box-shadow: var(--shadow-medium);
-    backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1000;
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-medium);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .cy-toolbar button {
-    padding: 6px 10px;
-    border: 1px solid var(--border-color);
-    background: white;
-    border-radius: var(--border-radius-sm);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: var(--font-size-xs);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-color);
+  padding: 6px 10px;
+  border: 1px solid var(--border-color);
+  background: white;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: var(--font-size-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
 }
 
 .cy-toolbar button:hover {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-light);
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-light);
 }
 
 /* 图谱提示信息样式 */
 .cy-tip {
-    position: absolute;
-    bottom: 12px;
-    left: 12px;
-    z-index: 1000;
-    padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: var(--border-radius-md);
-    font-size: var(--font-size-xs);
-    color: var(--text-light);
-    box-shadow: var(--shadow-light);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 1000;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-xs);
+  color: var(--text-light);
+  box-shadow: var(--shadow-light);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
-
 /* ide页面布局样式 */
-/* 左侧面板样式 */
-.left-panel {
-    width: 25%;
-    min-width: 300px;
-    overflow-y: auto;
+    /* 左侧面板样式 */
+    .left-panel {
+        width: 25%;
+        min-width: 300px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* 面板底部样式 */
+    .panel-footer {
+        padding: var(--spacing-md);
+        border-top: 1px solid var(--border-color);
+        background-color: var(--panel-background);
+        border-bottom-left-radius: var(--border-radius-md);
+        border-bottom-right-radius: var(--border-radius-md);
+    }
+
+    /* 解题思路按钮样式 */
+    #problem-solving-hint-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--spacing-sm);
+        width: 100%;
+        padding: var(--spacing-md);
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius-md);
+        font-weight: 600;
+        font-size: var(--font-size-sm);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-light);
+    }
+
+    #problem-solving-hint-btn:hover {
+        background-color: #6366f1;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-medium);
+    }
+
+    #problem-solving-hint-btn:active {
+        transform: translateY(0);
+        box-shadow: var(--shadow-light);
+    }
+
+    #problem-solving-hint-btn:focus {
+        outline: 2px solid rgba(99, 102, 241, 0.5);
+        outline-offset: 2px;
+    }
+
+    /* 中间面板样式 */
+    .mid-panel {
+        width: 45%;
+        overflow: hidden;
+        flex: 1;
+    }
+    /* 右侧面板样式 */
+    .right-panel {
+        width: 30%;
+        overflow: hidden;
+        flex: 1;
+    }
+    /* 测试要求区域 */
+    .test-requirements-container{
+        margin-bottom: var(--spacing-md);
+        height: 50%;
+        overflow: hidden;
+        background: var(--panel-background);
+    }
+    .test-results-container {
+        height: 50%;
+        overflow: hidden;
+        background: var(--panel-background);
+    }
+    #test-results-content {
+    max-height: 300px; /* 根据需要调整最大高度 */
+    overflow-y: auto;  /* 当内容超出容器高度时，显示垂直滚动条 */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #888 #eee; /* 滚动条轨道和滑块的颜色 */
+    }
+    .requirement-content{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: var(--spacing-md); /* 减小内边距 */
+        color: var(--text-light);
+        text-align: center;
+    }
+
+/* 询问AI按钮样式 */
+#ask-ai-btn {
     display: flex;
-    flex-direction: column;
-}
-
-/* 中间面板样式 */
-.mid-panel {
-    width: 45%;
-    overflow: hidden;
-    flex: 1;
-}
-
-/* 右侧面板样式 */
-.right-panel {
-    width: 30%;
-    overflow: hidden;
-    flex: 1;
-}
-
-/* 测试要求区域 */
-.test-requirements-container {
-    margin-bottom: var(--spacing-md);
-    height: 50%;
-    overflow: hidden;
-    background: var(--panel-background);
-}
-
-.test-results-container {
-    height: 50%;
-    overflow: hidden;
-    background: var(--panel-background);
-}
-
-#test-results-content {
-    max-height: 300px;
-    /* 根据需要调整最大高度 */
-    overflow-y: auto;
-    /* 当内容超出容器高度时，显示垂直滚动条 */
-    scrollbar-width: thin;
-    /* Firefox */
-    scrollbar-color: #888 #eee;
-    /* 滚动条轨道和滑块的颜色 */
-}
-
-.requirement-content {
-    display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: var(--spacing-sm);
+    width: 100%;
     padding: var(--spacing-md);
-    /* 减小内边距 */
-    color: var(--text-light);
-    text-align: center;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
+#ask-ai-btn:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+}
+
+#ask-ai-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-light);
+}
+
+#ask-ai-btn:focus {
+    outline: 2px solid rgba(79, 70, 229, 0.5);
+    outline-offset: 2px;
+}
+
+#ask-ai-btn:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+}
+
+#ask-ai-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-light);
+}
+
+#ask-ai-btn:focus {
+    outline: 2px solid rgba(79, 70, 229, 0.5);
+    outline-offset: 2px;
+}
 
 /* learn页面栏目布局 */
 /* 左侧组合列（占 60% 宽） */
@@ -730,7 +752,7 @@ body {
     width: 70%;
     min-width: 400px;
     gap: var(--spacing-md);
-    height: 100%;
+    height: calc(100vh - var(--header-height) - var(--spacing-md) * 2); /* 固定高度，与右侧保持一致 */
 }
 
 /* 上排：预览 + 代码（等分） */
@@ -738,127 +760,110 @@ body {
     display: flex;
     gap: var(--spacing-md);
     height: auto;
-    min-height: 200px;
-    /* 减少最小高度从240px到200px */
+    min-height: 200px; /* 减少最小高度从240px到200px */
+    max-height: 60%; /* 限制上排最大高度，给下排留出空间 */
     align-items: stretch;
 }
+    /* 合并的预览和代码展示面板样式 */
+    .preview-code-panel {
+        flex: 1 1 0;
+        display: flex;
+        border-radius: var(--border-radius-lg);
+        overflow: hidden;
+        min-height: 240px;
+    }
+    
+    /* 新的示例页面探索面板样式 */
+    .example-exploration-panel {
+        flex: 1 1 0;
+        min-height: 200px; /* 减少最小高度从240px到200px */
+        border-radius: var(--border-radius-lg); /* 确保整个面板有圆角 */
+        overflow: hidden; /* 确保内容不会超出圆角边界 */
+    }
+    
+    /* 探索内容区域 - 水平布局：左侧预览 + 右侧代码 */
+    .exploration-content {
+        display: flex;
+        height: calc(100% - 60px); /* 减去标题栏高度 */
+        border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+        overflow: hidden;
+    }
+    
+    /* 修复代码区域内的info-content样式 */
+    .code-section .info-content {
+        flex: 1;
+        padding: var(--spacing-lg) var(--spacing-xl);
+        overflow-y: auto;
+        min-height: 0; /* 允许flex子元素收缩 */
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* 预览区域样式 - 适应新的exploration-content布局 */
+    .preview-section {
+        flex: 2 1 0;
+        min-width: 300px;
+        box-sizing: border-box;
+        background: var(--content-background);
+    }
+    
+    /* 代码展示区域样式 - 适应新的exploration-content布局 */
+    .code-section {
+        flex: 1 1 0;
+        overflow: hidden;
+        min-width: 250px;
+        background: var(--content-background);
+        border-left: 1px solid var(--border-color); /* 添加分隔线 */
+        display: flex;
+        flex-direction: column;
+    }
 
-/* 合并的预览和代码展示面板样式 */
-.preview-code-panel {
-    flex: 1 1 0;
-    display: flex;
-    border-radius: var(--border-radius-lg);
-    overflow: hidden;
-    min-height: 240px;
-}
+    /* 代码展示面板底部区域 */
+    .code-panel-footer {
+        margin-top: auto;
+        padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg); /* 使用统一的左右内边距 */
+        background: var(--content-background);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end; /* 确保按钮靠右对齐 */
+        border-top: 1px solid var(--border-color); /* 添加顶部分隔线 */
+        gap: var(--spacing-sm); /* 在按钮区域和开关区域之间添加间隔 */
+        width: calc(100% + var(--spacing-xs)); /* 稍微扩宽底部区域，与上面的内容区域一致 */
+        margin-right: -var(--spacing-xs); /* 根据宽度增加调整偏移量 */
+        box-sizing: border-box; /* 确保宝箱模型计算正确 */
+    }
 
-/* 新的示例页面探索面板样式 */
-.example-exploration-panel {
-    flex: 1 1 0;
-    min-height: 200px;
-    /* 减少最小高度从240px到200px */
-    border-radius: var(--border-radius-lg);
-    /* 确保整个面板有圆角 */
-    overflow: hidden;
-    /* 确保内容不会超出圆角边界 */
-}
+    .selector-controls {
+        display: flex;
+        gap: var(--spacing-sm);
+        margin-bottom: var(--spacing-md);
+        justify-content: flex-end;
+        align-items: center; /* 确保按钮垂直对齐 */
+        width: 100%; /* 让容器占满全宽，确保右对齐有效 */
+    }
 
-/* 探索内容区域 - 水平布局：左侧预览 + 右侧代码 */
-.exploration-content {
-    display: flex;
-    height: calc(100% - 60px);
-    /* 减去标题栏高度 */
-    border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
-    overflow: hidden;
-}
+    .selector-controls .btn {
+        flex: 0 0 auto;
+        min-width: 100px;
+        margin: 0; /* 移除所有margin，使用gap控制间距 */
+    }
 
-/* 修复代码区域内的info-content样式 */
-.code-section .info-content {
-    flex: 1;
-    padding: var(--spacing-lg) var(--spacing-xl);
-    overflow-y: auto;
-    min-height: 0;
-    /* 允许flex子元素收缩 */
-    display: flex;
-    flex-direction: column;
-}
-
-/* 预览区域样式 - 适应新的exploration-content布局 */
-.preview-section {
-    flex: 2 1 0;
-    min-width: 300px;
-    box-sizing: border-box;
-    background: var(--content-background);
-}
-
-/* 代码展示区域样式 - 适应新的exploration-content布局 */
-.code-section {
-    flex: 1 1 0;
-    overflow: hidden;
-    min-width: 250px;
-    background: var(--content-background);
-    border-left: 1px solid var(--border-color);
-    /* 添加分隔线 */
-    display: flex;
-    flex-direction: column;
-}
-
-/* 代码展示面板底部区域 */
-.code-panel-footer {
-    margin-top: auto;
-    padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
-    /* 使用统一的左右内边距 */
-    background: var(--content-background);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    /* 确保按钮靠右对齐 */
-    border-top: 1px solid var(--border-color);
-    /* 添加顶部分隔线 */
-    gap: var(--spacing-sm);
-    /* 在按钮区域和开关区域之间添加间隔 */
-    width: calc(100% + var(--spacing-xs));
-    /* 稍微扩宽底部区域，与上面的内容区域一致 */
-    margin-right: -var(--spacing-xs);
-    /* 根据宽度增加调整偏移量 */
-    box-sizing: border-box;
-    /* 确保宝箱模型计算正确 */
-}
-
-.selector-controls {
-    display: flex;
-    gap: var(--spacing-sm);
-    margin-bottom: var(--spacing-md);
-    justify-content: flex-end;
-    align-items: center;
-    /* 确保按钮垂直对齐 */
-    width: 100%;
-    /* 让容器占满全宽，确保右对齐有效 */
-}
-
-.selector-controls .btn {
-    flex: 0 0 auto;
-    min-width: 100px;
-    margin: 0;
-    /* 移除所有margin，使用gap控制间距 */
-}
-
-/* 聊天面板样式 */
-.chat-panel {
-    width: 30%;
-    overflow: hidden;
-    /* 确保聊天面板不会覆盖知识点面板 */
-    position: relative;
-    z-index: 5;
-}
-
-/* 知识区域 */
-/* 知识点展示（下排跨两列，宽度=左+中） */
+    /* 聊天面板样式 */
+    .chat-panel {
+        width: 30%;
+        height: calc(100vh - var(--header-height) - var(--spacing-md) * 2); /* 固定高度，与左侧保持一致 */
+        overflow: hidden;
+        /* 确保聊天面板不会覆盖知识点面板 */
+        position: relative;
+        z-index: 5;
+    }
+    /* 知识区域 */
+    /* 知识点展示（下排跨两列，宽度=左+中） */
 .knowledge-panel {
     height: auto;
-    flex: 1 1 0;
-    min-height: 200px;
-    /* 确保最小高度 */
+    flex: 1 1 0; /* 改为拉伸填满剩余空间，与右侧聊天面板底部对齐 */
+    min-height: 180px; /* 减少最小高度，缩小按钮容器 */
+    max-height: none; /* 移除最大高度限制，让它能拉伸到底部 */
     box-sizing: border-box;
     overflow: hidden;
     /* 与上排 preview-code-panel 右边界对齐 */
@@ -904,356 +909,287 @@ body {
     opacity: 1 !important;
     visibility: visible !important;
 }
-
-.ratio-16x9 {
-    position: relative;
-    width: 100%;
-    /* 16:9 高/宽 = 9/16 → 用 padding-top 支撑高度 */
-    padding-top: 56.25%;
-    background: transparent;
-    overflow: hidden;
-}
-
-.ratio-16x9>iframe#element-selector-iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
-    display: block;
-}
-
-.info-tabs {
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.info-content {
-    flex: 1;
-    padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
-    /* 统一四个方向的内边距 */
-    overflow-y: auto;
-    max-height: none;
-    /* 移除高度限制 */
-    width: calc(100% + var(--spacing-xs));
-    /* 稍微扩宽内容区域，让代码展示框与按钮对齐 */
-    box-sizing: border-box;
-    /* 确保宝箱模型计算正确 */
-    margin-right: -var(--spacing-xs);
-    /* 向右微调，让内容框稍微超出容器 */
-}
-
-.info-content h2 {
-    margin-top: 0;
-    font-size: var(--font-size-lg);
-    color: var(--text-color);
-}
-
-.info-content ul {
-    padding-left: var(--spacing-lg);
-}
-
-.info-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--spacing-lg) var(--spacing-xl);
-    border-top: 1px solid var(--border-color);
-}
-
-.info-footer select {
-    font-size: var(--font-size-base);
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--border-radius-md);
-    border: 1px solid var(--border-color);
-    background: var(--panel-background);
-}
-
-/* 等级容器样式 */
-.levels-container {
-    height: 100%;
-    /* 占满父容器高度 */
-    display: flex;
-    align-items: center;
-    /* 垂直居中 */
-    justify-content: center;
-    /* 水平居中 */
-    padding: var(--spacing-md);
-    box-sizing: border-box;
-}
-
-/* 等级流展示 */
-.levels-flow {
-    display: flex;
-    align-items: center;
-    /* 移除justify-content，让flex和gap自然控制分布 */
-    gap: var(--spacing-md);
-    /* 减少卡片间距，让卡片更宽 */
-    width: 100%;
-    /* 占满整个容器宽度 */
-    height: 75%;
-    /* 增加高度比例到75% */
-    max-height: 250px;
-    /* 适当增加最大高度 */
-    min-height: 130px;
-    /* 适当增加最小高度 */
-    box-sizing: border-box;
-}
-
-.levels-flow .arrow {
-    font-size: calc(var(--font-size-xl) + 4px);
-    /* 响应式箭头大小 */
-    color: var(--text-lighter);
-    flex: 0 0 var(--spacing-lg);
-    /* 减小箭头宽度，给卡片更多空间 */
-    text-align: center;
-    /* 箭头居中 */
-    line-height: 1;
-}
-
-.level-card {
-    flex: 1 1 0;
-    /* 保持弹性布局 */
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-lg);
-    padding: var(--spacing-md);
-    /* 默认使用collapsed状态的padding，避免刷新时闪烁 */
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-    /* 减少内部元素间距从spacing-sm到spacing-xs */
-    /* 响应式高度：使用父容器的100%高度 */
-    height: 100%;
-    min-height: 100px;
-    /* 最小高度保障 */
-    cursor: pointer;
-    transition: all 0.2s ease;
-    /* 加快过渡速度到 0.2s */
-    position: relative;
-    z-index: 50;
-    /* 确保卡片在最上层 */
-    /* 强制所有卡片等宽 */
-    width: 0;
-    /* 强制宽度由flex计算 */
-    box-sizing: border-box;
-}
-
-/* 在小屏幕上调整卡片布局 */
-@media (max-width: 1024px) {
-    .levels-flow {
+    .ratio-16x9 {
+        position: relative;
         width: 100%;
-        /* 小屏幕上也占满宽 */
-        height: 80%;
-        /* 增加高度比例 */
-        gap: var(--spacing-md);
-        /* 减少间距 */
+        /* 16:9 高/宽 = 9/16 → 用 padding-top 支撑高度 */
+        padding-top: 56.25%;
+        background: transparent;
+        overflow: hidden;
     }
 
-    .level-card {
-        /* 保持响应式高度 */
-        min-height: 90px;
+    .ratio-16x9 > iframe#element-selector-iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
     }
-
-    .levels-flow .arrow {
+    .info-tabs {
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .info-content {
+        flex: 1;
+        padding: var(--spacing-lg) var(--spacing-lg) 0 var(--spacing-lg); /* 移除底部内边距，让按钮贴底 */
+        overflow-y: auto;
+        max-height: none; /* 移除高度限制 */
+        width: calc(100% + var(--spacing-xs)); /* 稍微扩宽内容区域，让代码展示框与按钮对齐 */
+        box-sizing: border-box; /* 确保宝箱模型计算正确 */
+        margin-right: -var(--spacing-xs); /* 向右微调，让内容框稍微超出容器 */
+    }
+    .info-content h2 {
+        margin-top: 0;
         font-size: var(--font-size-lg);
-        /* 减小箭头大小 */
-        flex: 0 0 var(--spacing-lg);
-        /* 减小箭头宽度 */
+        color: var(--text-color);
     }
-}
+    .info-content ul {
+        padding-left: var(--spacing-lg);
+    }
+    .info-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--spacing-lg) var(--spacing-xl);
+        border-top: 1px solid var(--border-color);
+    }
+    .info-footer select {
+        font-size: var(--font-size-base);
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-radius: var(--border-radius-md);
+        border: 1px solid var(--border-color);
+        background: var(--panel-background);
+    }
 
-@media (max-width: 768px) {
+    /* 等级容器样式 */
+    .levels-container {
+        height: 100%; /* 占满父容器高度 */
+        display: flex;
+        align-items: center; /* 改为垂直居中 */
+        justify-content: center; /* 水平居中 */
+        padding: var(--spacing-xs) var(--spacing-xs) 0 var(--spacing-xs); /* 移除底部内边距，让按钮贴近底部 */
+        box-sizing: border-box;
+    }
+
+    /* 等级流展示 */
     .levels-flow {
-        flex-direction: column;
-        width: 100%;
-        /* 手机上也占满宽 */
-        height: 85%;
-        /* 增加高度比例 */
-        gap: var(--spacing-sm);
-        /* 进一步减小间距 */
-    }
-
-    .level-card {
-        /* 在垂直布局中使用固定高度 */
-        width: 100%;
-        height: auto;
-        min-height: 90px;
-        flex: 0 0 auto;
-        /* 不拉伸 */
+        display: flex;
+        align-items: center;
+        /* 移除justify-content，让flex和gap自然控制分布 */
+        gap: var(--spacing-sm); /* 减少卡片间距，让布局更紧凑 */
+        width: 100%; /* 占满整个容器宽度 */
+        height: auto; /* 让容器根据内容自动增高 */
+        max-height: 180px; /* 添加最大高度限制，让容器更小 */
+        min-height: 120px; /* 减少最小高度，让容器更紧凑 */
+        box-sizing: border-box;
     }
 
     .levels-flow .arrow {
-        transform: rotate(90deg);
-        font-size: var(--font-size-base);
-        flex: 0 0 var(--spacing-md);
+        font-size: calc(var(--font-size-xl) + 4px); /* 响应式箭头大小 */
+        color: var(--text-lighter);
+        flex: 0 0 var(--spacing-lg); /* 减小箭头宽度，给卡片更多空间 */
+        text-align: center; /* 箭头居中 */
+        line-height: 1;
     }
-}
 
-.level-card:hover {
-    box-shadow: var(--card-shadow);
-    transform: translateY(-2px);
-}
+    .level-card {
+        flex: 1 1 0; /* 保持弹性布局 */
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-lg);
+        padding: var(--spacing-md); /* 默认使用collapsed状态的padding，避免刷新时闪烁 */
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-xs); /* 减少内部元素间距从spacing-sm到spacing-xs */
+        /* 响应式高度：使用父容器的100%高度 */
+        height: 100%;
+        min-height: 100px; /* 最小高度保障 */
+        cursor: pointer;
+        transition: all 0.2s ease; /* 加快过渡速度到 0.2s */
+        position: relative;
+        z-index: 50; /* 确保卡片在最上层 */
+        /* 强制所有卡片等宽 */
+        width: 0; /* 强制宽度由flex计算 */
+        box-sizing: border-box;
+    }
 
-.level-card.collapsed {
-    /* collapsed状态使用默认样式，不需要特别设置高度 */
-    padding: var(--spacing-md);
-}
+    /* 在小屏幕上调整卡片布局 */
+    @media (max-width: 1024px) {
+        .levels-flow {
+            width: 100%; /* 小屏幕上也占满宽 */
+            height: auto; /* 根据内容自动增高 */
+            gap: var(--spacing-md); /* 减少间距 */
+        }
+        
+        .level-card {
+            /* 保持响应式高度 */
+            min-height: 90px;
+        }
+        
+        .levels-flow .arrow {
+            font-size: var(--font-size-lg); /* 减小箭头大小 */
+            flex: 0 0 var(--spacing-lg); /* 减小箭头宽度 */
+        }
+    }
 
-.level-card.expanded {
-    /* 展开时使用更紧凑的高度和内边距 */
-    height: auto;
-    min-height: auto;
-    /* 完全由内容决定高度 */
-    max-height: 800px;
-    /* 存留最大高度限制 */
-    padding: var(--spacing-xs) var(--spacing-md) 0 var(--spacing-md);
-    /* 移除底部内边距 */
-    z-index: 10;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
+    @media (max-width: 768px) {
+        .levels-flow {
+            flex-direction: column;
+            width: 100%; /* 手机上也占满宽 */
+            height: auto; /* 根据内容自动增高 */
+            gap: var(--spacing-sm); /* 进一步减小间距 */
+        }
+        
+        .level-card {
+            /* 在垂直布局中使用固定高度 */
+            width: 100%;
+            height: auto;
+            min-height: 90px;
+            flex: 0 0 auto; /* 不拉伸 */
+        }
+        
+        .levels-flow .arrow {
+            transform: rotate(90deg);
+            font-size: var(--font-size-base);
+            flex: 0 0 var(--spacing-md);
+        }
+    }
 
-.level-header {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    flex: 0 0 auto;
-    /* 不让header根据内容拉伸，保持固定大小 */
-    text-align: center;
-    /* 响应式高度：根据容器大小自适应 */
-    min-height: calc(var(--spacing-xs) * 2);
-    /* 大幅减少标题区域的最小高度 */
-    padding: 0;
-    /* 减少内边距 */
-    margin-bottom: 0;
-    /* 移除底部边距 */
-}
+    .level-card:hover {
+        box-shadow: var(--card-shadow);
+        transform: translateY(-2px);
+    }
 
-.level-content {
-    opacity: 1;
-    max-height: 500px;
-    /* 增加最大高度限制，让内容能够完全显示 */
-    overflow-y: auto;
-    /* 添加垂直滚动条 */
-    transition: all 0.2s ease;
-    /* 加快过渡速度 */
-    word-wrap: break-word;
-    /* 确保文本能换行 */
-    overflow-wrap: break-word;
-}
+    .level-card.collapsed {
+        /* collapsed状态使用默认样式，不需要特别设置高度 */
+        padding: var(--spacing-md);
+    }
 
-.level-card.collapsed .level-content {
-    opacity: 0;
-    max-height: 0;
-    overflow: hidden;
-    transform: translateY(-10px);
-}
+    .level-card.expanded {
+        /* 展开时使用更紧凑的高度和内边距 */
+        height: auto;
+        min-height: auto; /* 完全由内容决定高度 */
+        max-height: 800px; /* 存留最大高度限制 */
+        padding: var(--spacing-xs) var(--spacing-md) 0 var(--spacing-md); /* 移除底部内边距 */
+        z-index: 10;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
 
-.level-card.expanded .level-content {
-    opacity: 1;
-    max-height: none;
-    /* 移除最大高度限制，让内容完全显示 */
-    margin-top: 0;
-    /* 移除顶部边距，使内容紧距标题 */
-    margin-bottom: 0;
-    /* 移除底部边距 */
-    transform: translateY(0);
-    overflow-y: auto;
-    /* 添加垂直滚动条，确保过长内容可滚动查看 */
-    word-wrap: break-word;
-    /* 确保文本能够换行 */
-    overflow-wrap: break-word;
-    /* 确保长单词能够换行 */
-    padding-bottom: 0;
-    /* 移除底部内边距 */
-}
+    .level-header {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        flex: 0 0 auto; /* 不让header根据内容拉伸，保持固定大小 */
+        text-align: center;
+        /* 响应式高度：根据容器大小自适应 */
+        min-height: calc(var(--spacing-xs) * 2); /* 大幅减少标题区域的最小高度 */
+        padding: 0; /* 减少内边距 */
+        margin-bottom: 0; /* 移除底部边距 */
+    }
 
-.level-card h3 {
-    margin: 0;
-    font-size: var(--font-size-sm);
-    /* 使用稍小的字体大小 */
-    color: var(--text-color);
-    font-weight: 600;
-    color: #2c3e50;
-    line-height: 1.2;
-    /* 减小行高，使标题更紧凑 */
-    padding: 0;
-    /* 移除内边距 */
-}
+    .level-content {
+        opacity: 1;
+        max-height: 500px; /* 增加最大高度限制，让内容能够完全显示 */
+        overflow-y: auto; /* 添加垂直滚动条 */
+        transition: all 0.2s ease; /* 加快过渡速度 */
+        word-wrap: break-word; /* 确保文本能换行 */
+        overflow-wrap: break-word;
+    }
 
-.level-description {
-    font-size: var(--font-size-sm);
-    color: var(--text-light);
-    text-align: center;
-    margin: calc(var(--spacing-xs) / 2) 0;
-    /* 减小上下边距 */
-    line-height: 1.4;
-    flex: 0 0 auto;
-    /* 不让描述拉伸 */
-    /* 响应式高度：自适应内容 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    /* 超出部分隐藏 */
-    padding: 0 var(--spacing-xs);
-    /* 左右内边距 */
-}
+    .level-card.collapsed .level-content {
+        opacity: 0;
+        max-height: 0;
+        overflow: hidden;
+        transform: translateY(-10px);
+    }
 
-.click-hint {
-    font-size: var(--font-size-xs);
-    color: var(--primary-color);
-    text-align: center;
-    margin-top: auto;
-    /* 自动推到底部 */
-    padding: var(--spacing-xs) 0;
-    opacity: 0.8;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    flex: 0 0 auto;
-    /* 不让提示拉伸 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-xs);
-}
+    .level-card.expanded .level-content {
+        opacity: 1;
+        max-height: none; /* 移除最大高度限制，让内容完全显示 */
+        margin-top: 0; /* 移除顶部边距，使内容紧距标题 */
+        margin-bottom: 0; /* 移除底部边距 */
+        transform: translateY(0);
+        overflow-y: auto; /* 添加垂直滚动条，确保过长内容可滚动查看 */
+        word-wrap: break-word; /* 确保文本能够换行 */
+        overflow-wrap: break-word; /* 确保长单词能够换行 */
+        padding-bottom: 0; /* 移除底部内边距 */
+    }
 
-.level-card.collapsed .click-hint {
-    opacity: 1;
-}
+    .level-card h3 {
+        margin: 0;
+        font-size: var(--font-size-sm); /* 使用稍小的字体大小 */
+        color: var(--text-color);
+        font-weight: 600;
+        color: #2c3e50;
+        line-height: 1.2; /* 减小行高，使标题更紧凑 */
+        padding: 0; /* 移除内边距 */
+    }
 
-.level-card.expanded .click-hint {
-    opacity: 0;
-}
+    .level-description {
+        font-size: var(--font-size-sm);
+        color: var(--text-light);
+        text-align: center;
+        margin: calc(var(--spacing-xs) / 2) 0; /* 减小上下边距 */
+        line-height: 1.4;
+        flex: 0 0 auto; /* 不让描述拉伸 */
+        /* 响应式高度：自适应内容 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden; /* 超出部分隐藏 */
+        padding: 0 var(--spacing-xs); /* 左右内边距 */
+    }
 
-.start-button {
-    align-self: flex-end;
-    margin: var(--spacing-md) var(--spacing-xl) var(--spacing-md) auto;
-}
+    .click-hint {
+        font-size: var(--font-size-xs);
+        color: var(--primary-color);
+        text-align: center;
+        margin-top: auto; /* 自动推到底部 */
+        padding: var(--spacing-xs) 0;
+        opacity: 0.8;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        flex: 0 0 auto; /* 不让提示拉伸 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--spacing-xs);
+    }
 
+    .level-card.collapsed .click-hint {
+        opacity: 1;
+    }
+
+    .level-card.expanded .click-hint {
+        opacity: 0;
+    }
+
+    .start-button {
+        align-self: flex-end;
+        margin: var(--spacing-sm) var(--spacing-lg) var(--spacing-sm) auto; /* 添加适度的上下边距 */
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--font-size-sm);
+    }
+  
 
 /* 为防止内容未能完全展示，增加内容区域的自适应宽度设置 */
 .content-text {
     white-space: pre-wrap;
-    word-wrap: break-word;
-    /* 确保长文本能换行 */
+    word-wrap: break-word; /* 确保长文本能换行 */
     overflow-wrap: break-word;
-    max-width: 100%;
-    /* 确保内容不会超出容器宽度 */
+    max-width: 100%; /* 确保内容不会超出容器宽度 */
     font-size: var(--font-size-sm);
-    line-height: 1.3;
-    /* 进一步减小行高，使文本更紧凑 */
+    line-height: 1.3; /* 进一步减小行高，使文本更紧凑 */
     color: var(--text-color);
-    margin: 0;
-    /* 移除内容文本的外边距 */
-    padding: 0;
-    /* 移除内容文本的内边距 */
-    margin-bottom: 0;
-    /* 确保底部无边距 */
+    margin: 0; /* 移除内容文本的外边距 */
+    padding: 0; /* 移除内容文本的内边距 */
+    margin-bottom: 0; /* 确保底部无边距 */
 }
 
 /* 测试结果状态样式 */
@@ -1344,17 +1280,14 @@ body {
     width: auto;
     gap: var(--spacing-lg);
 }
-
 .editor-tabs-left {
     display: flex;
     gap: var(--spacing-sm);
 }
-
 .editor-tabs-right {
     display: flex;
     gap: var(--spacing-sm);
 }
-
 .tab-button {
     padding: var(--spacing-sm) var(--spacing-md);
     border-radius: var(--border-radius-md);
@@ -1387,15 +1320,11 @@ body {
     flex-grow: 1;
     overflow: hidden;
     gap: var(--spacing-md);
-    height: calc(100% - 90px);
-    /* 减去工具栏和底部按钮的高度 */
+    height: calc(100% - 90px); /* 减去工具栏和底部按钮的高度 */
 }
 
 /* 编辑器容器相关样式 */
-#editor-html,
-#editor-css,
-#editor-js,
-#editor-preview {
+#editor-html, #editor-css, #editor-js, #editor-preview {
     width: 100%;
     height: 100%;
 }
@@ -1466,11 +1395,11 @@ body {
     font-size: var(--font-size-sm);
 }
 
-.markdown-content h1,
-.markdown-content h2,
-.markdown-content h3,
-.markdown-content h4,
-.markdown-content h5,
+.markdown-content h1, 
+.markdown-content h2, 
+.markdown-content h3, 
+.markdown-content h4, 
+.markdown-content h5, 
 .markdown-content h6 {
     margin-bottom: var(--spacing-sm);
     font-weight: 600;
@@ -1521,7 +1450,7 @@ body {
     text-decoration: underline;
 }
 
-.markdown-content ul,
+.markdown-content ul, 
 .markdown-content ol {
     padding-left: var(--spacing-xl);
     margin-top: 0;
@@ -1580,7 +1509,7 @@ body {
     font-weight: 600;
 }
 
-.markdown-content table th,
+.markdown-content table th, 
 .markdown-content table td {
     padding: 6px 13px;
     border: 1px solid var(--border-color);
@@ -1608,9 +1537,8 @@ body {
     background-color: #e1e4e8;
     border: 0;
 }
-
 /* 修改建议区域 */
-.chat-history {
+.chat-history{
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -1618,7 +1546,6 @@ body {
     height: 100%;
     position: relative;
 }
-
 /* AI聊天部分样式调整 */
 .chat-bubble.user {
     background: #e3f2fd;
@@ -1645,8 +1572,7 @@ body {
     margin-bottom: var(--spacing-lg);
 }
 
-.ai-avatar,
-.user-avatar {
+.ai-avatar, .user-avatar {
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -1710,13 +1636,13 @@ body {
     position: relative;
 }
 
-.ai-content .markdown-content h3,
+.ai-content .markdown-content h3, 
 .ai-content .markdown-content h4 {
     margin-top: var(--spacing-md);
     margin-bottom: var(--spacing-sm);
 }
 
-.ai-content .markdown-content ul,
+.ai-content .markdown-content ul, 
 .ai-content .markdown-content ol {
     margin-bottom: var(--spacing-sm);
     padding-left: var(--spacing-lg);
@@ -1799,17 +1725,13 @@ body {
     border-radius: 3px;
 }
 
-.ai-content h1,
-.ai-content h2,
-.ai-content h3,
-.ai-content h4 {
+.ai-content h1, .ai-content h2, .ai-content h3, .ai-content h4 {
     margin-top: var(--spacing-md);
     margin-bottom: var(--spacing-sm);
     font-weight: 600;
 }
 
-.ai-content ul,
-.ai-content ol {
+.ai-content ul, .ai-content ol {
     padding-left: var(--spacing-lg);
     margin-bottom: var(--spacing-sm);
 }
@@ -1932,8 +1854,7 @@ body {
     font-size: var(--font-size-xs);
     background-color: rgb(245, 225, 161);
 }
-
-.btn-small:hover {
+.btn-small:hover { 
     font-size: var(--font-size-xs);
     background-color: rgb(246, 213, 105);
     transform: translateY(-1px);
@@ -1955,62 +1876,49 @@ body {
     font-size: var(--font-size-sm);
     background-color: var(--primary-color);
     color: white;
-    margin: 0;
-    /* 移除margin，避免位置偏移 */
+    margin: 0; /* 移除margin，避免位置偏移 */
 }
-
-.btn-select:hover {
+.btn-select:hover { 
     background-color: var(--primary-hover);
     transform: translateY(-2px);
 }
-
 .btn-stop-selector {
     background: var(--error-color);
     border-color: var(--error-color);
     color: white;
     margin: 0;
 }
-
 .btn-stop-selector:hover {
     background: #dc2626;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
-    /* 与清除按钮保持一致 */
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3); /* 与清除按钮保持一致 */
 }
 
 /* 询问AI按钮样式 */
 .btn-ai {
-    background: linear-gradient(90deg, var(--accent-color), var(--secondary-color));
-    /* 使用项目已定义的紫色系列 */
+    background: linear-gradient(90deg, var(--accent-color), var(--secondary-color)); /* 使用项目已定义的紫色系列 */
     border-color: var(--accent-color);
     color: white;
     margin: 0;
 }
-
 .btn-ai:hover {
     background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(167, 139, 250, 0.3);
-    /* 使用accent-color的透明度 */
+    box-shadow: 0 4px 8px rgba(167, 139, 250, 0.3); /* 使用accent-color的透明度 */
 }
 
 /* 清除选择按钮样式 - 与停止选择完全一致 */
 .btn-clear {
-    background: var(--error-color);
-    /* 与停止选择相同 */
+    background: var(--error-color); /* 与停止选择相同 */
     border-color: var(--error-color);
     color: white;
     margin: 0;
 }
-
 .btn-clear:hover {
-    background: #dc2626;
-    /* 与停止按钮悬停效果完全一致 */
+    background: #dc2626; /* 与停止按钮悬停效果完全一致 */
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
-    /* 与停止按钮阴影效果完全一致 */
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3); /* 与停止按钮阴影效果完全一致 */
 }
-
 /* 返回按钮样式 */
 .back-button {
     display: flex;
@@ -2046,7 +1954,6 @@ body {
     opacity: 0.8;
     transform: scale(1.02);
 }
-
 .info-tab {
     padding: var(--spacing-sm) var(--spacing-lg);
     font-size: var(--font-size-base);
@@ -2057,12 +1964,10 @@ body {
     border-bottom: 2px solid transparent;
     color: var(--text-color);
 }
-
-.info-tab:hover {
+.info-tab:hover  {
     border-bottom: 2px solid var(--primary-color);
     color: var(--primary-color);
 }
-
 .info-tab.active {
     background: var(--primary-color);
     color: #ffffff;
@@ -2105,43 +2010,38 @@ body {
     .content-container {
         flex-direction: column;
     }
-
+    
     .left-panel,
     .right-panel {
         width: 100%;
         height: 50%;
     }
-
+    
     .editor-preview-area {
         flex-direction: column;
     }
-
+    
     .editor-container {
         height: 200px;
     }
-
+    
     .preview-container {
         height: 150px;
     }
-
+    
     /* 优化小屏幕上的标签显示 */
     .element-info {
-        gap: 4px;
-        /* 减小间距 */
+        gap: 4px; /* 减小间距 */
     }
-
+    
     .element-info span {
-        font-size: 10px;
-        /* 减小字体 */
-        padding: 2px 6px;
-        /* 减小内边距 */
-        max-width: 120px;
-        /* 限制最大宽度 */
+        font-size: 10px; /* 减小字体 */
+        padding: 2px 6px; /* 减小内边距 */
+        max-width: 120px; /* 限制最大宽度 */
     }
-
+    
     .code-header h4 {
-        font-size: var(--font-size-sm);
-        /* 减小标题字体 */
+        font-size: var(--font-size-sm); /* 减小标题字体 */
     }
 }
 
@@ -2200,7 +2100,7 @@ body {
     border-top-color: #333;
 }
 
-.selector-toggle-container .toggle-label:hover+.toggle-description {
+.selector-toggle-container .toggle-label:hover + .toggle-description {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
@@ -2233,17 +2133,13 @@ body {
     padding: var(--spacing-md);
     min-height: 60px;
     border: 1px solid var(--border-color);
-    font-size: var(--font-size-sm);
-    /* 确保代码字体比标题小 */
+    font-size: var(--font-size-sm); /* 确保代码字体比标题小 */
     font-family: 'Courier New', monospace;
     line-height: 1.4;
     color: var(--text-color);
-    margin-right: 0;
-    /* 确保与按钮右侧对齐 */
-    width: calc(100% + var(--spacing-xs));
-    /* 微调宽度，使其与按钮右侧对齐 */
-    box-sizing: border-box;
-    /* 确保宝箱模型正确 */
+    margin-right: 0; /* 确保与按钮右侧对齐 */
+    width: calc(100% + var(--spacing-xs)); /* 微调宽度，使其与按钮右侧对齐 */
+    box-sizing: border-box; /* 确保宝箱模型正确 */
 }
 
 /* 选择器相关样式 */
@@ -2285,17 +2181,17 @@ html.sw-selector-active * {
 }
 
 /* 但保持按钮等交互元素的正常光标 */
-body.sw-selector-active button,
-body.sw-selector-active input,
-body.sw-selector-active select,
-body.sw-selector-active textarea,
-body.sw-selector-active a,
+body.sw-selector-active button, 
+body.sw-selector-active input, 
+body.sw-selector-active select, 
+body.sw-selector-active textarea, 
+body.sw-selector-active a, 
 body.sw-selector-active .clickable,
-html.sw-selector-active button,
-html.sw-selector-active input,
-html.sw-selector-active select,
-html.sw-selector-active textarea,
-html.sw-selector-active a,
+html.sw-selector-active button, 
+html.sw-selector-active input, 
+html.sw-selector-active select, 
+html.sw-selector-active textarea, 
+html.sw-selector-active a, 
 html.sw-selector-active .clickable {
     cursor: pointer !important;
 }
@@ -2312,10 +2208,8 @@ html.sw-selector-active .clickable {
 /* 代码面板样式 */
 .code-header {
     display: flex;
-    flex-direction: column;
-    /* 改为垂直布局，给标签更多空间 */
-    gap: var(--spacing-sm);
-    /* 添加间距 */
+    flex-direction: column; /* 改为垂直布局，给标签更多空间 */
+    gap: var(--spacing-sm); /* 添加间距 */
     margin-bottom: var(--spacing-md);
     padding-bottom: var(--spacing-sm);
     border-bottom: 1px solid var(--border-color);
@@ -2330,14 +2224,11 @@ html.sw-selector-active .clickable {
 
 .element-info {
     display: flex;
-    flex-wrap: wrap;
-    /* 允许标签换行 */
+    flex-wrap: wrap; /* 允许标签换行 */
     gap: var(--spacing-xs);
     align-items: center;
-    max-width: 100%;
-    /* 限制最大宽度 */
-    overflow-wrap: break-word;
-    /* 允许单词换行 */
+    max-width: 100%; /* 限制最大宽度 */
+    overflow-wrap: break-word; /* 允许单词换行 */
 }
 
 .element-info span {
@@ -2345,16 +2236,11 @@ html.sw-selector-active .clickable {
     border-radius: var(--border-radius-sm);
     font-size: var(--font-size-xs);
     font-weight: 500;
-    white-space: nowrap;
-    /* 保持单个标签不换行 */
-    flex-shrink: 0;
-    /* 防止标签被压缩 */
-    max-width: 100%;
-    /* 限制最大宽度 */
-    overflow: hidden;
-    /* 隐藏超出部分 */
-    text-overflow: ellipsis;
-    /* 超出时显示省略号 */
+    white-space: nowrap; /* 保持单个标签不换行 */
+    flex-shrink: 0; /* 防止标签被压缩 */
+    max-width: 100%; /* 限制最大宽度 */
+    overflow: hidden; /* 隐藏超出部分 */
+    text-overflow: ellipsis; /* 超出时显示省略号 */
 }
 
 .tag-name {
@@ -2406,8 +2292,7 @@ html.sw-selector-active .clickable {
     font-weight: 600;
     margin-bottom: var(--spacing-md);
     color: var(--text-color);
-    padding-right: var(--spacing-lg);
-    /* 确保右侧有足够的空间与按钮区域对齐 */
+    padding-right: var(--spacing-lg); /* 确保右侧有足够的空间与按钮区域对齐 */
 }
 
 /* 代码示例样式 */
@@ -2438,12 +2323,9 @@ html.sw-selector-active .clickable {
 }
 
 .knowledge-panel.expanded .info-content {
-    padding: var(--spacing-xs) var(--spacing-lg) var(--spacing-xs) var(--spacing-lg);
-    /* 减少底部内边距 */
-    min-height: auto;
-    /* 移除最小高度限制 */
-    max-height: none;
-    /* 移除最大高度限制 */
+    padding: var(--spacing-xs) var(--spacing-lg) var(--spacing-xs) var(--spacing-lg); /* 减少底部内边距 */
+    min-height: auto; /* 移除最小高度限制 */
+    max-height: none; /* 移除最大高度限制 */
 }
 
 .knowledge-panel.expanded .levels-flow {
@@ -2468,31 +2350,20 @@ html.sw-selector-active .clickable {
 
 /* 展开时调整内容区域 */
 .knowledge-panel.expanded .level-content {
-    max-height: none;
-    /* 移除最大高度限制，让内容可以完全显示 */
-    margin-top: 0;
-    /* 移除上边距，让内容紧距标题 */
-    margin-bottom: 0;
-    /* 移除底部边距 */
-    overflow-y: auto;
-    /* 添加垂直滚动条，确保内容可以滚动查看 */
-    padding-bottom: 0;
-    /* 移除底部内边距 */
+    max-height: none; /* 移除最大高度限制，让内容可以完全显示 */
+    margin-top: 0; /* 移除上边距，让内容紧距标题 */
+    margin-bottom: 0; /* 移除底部边距 */
+    overflow-y: auto; /* 添加垂直滚动条，确保内容可以滚动查看 */
+    padding-bottom: 0; /* 移除底部内边距 */
 }
 
 .knowledge-panel.expanded .level-card.expanded {
-    min-height: auto;
-    /* 移除最小高度限制，完全由内容决定高度 */
-    max-height: none;
-    /* 移除最大高度限制，允许卡片自适应内容高度 */
-    height: auto;
-    /* 确保高度自适应内容 */
-    padding: var(--spacing-xs) var(--spacing-md);
-    /* 使用更紧凑的内边距 */
-    margin-bottom: 0;
-    /* 删除底部边距 */
+    min-height: auto; /* 移除最小高度限制，完全由内容决定高度 */
+    max-height: none; /* 移除最大高度限制，允许卡片自适应内容高度 */
+    height: auto; /* 确保高度自适应内容 */
+    padding: var(--spacing-xs) var(--spacing-md); /* 使用更紧凑的内边距 */
+    margin-bottom: 0; /* 删除底部边距 */
 }
-
 /* 图标相关样式 */
 iconify-icon {
     display: inline-flex;
@@ -2592,27 +2463,27 @@ iconify-icon {
     .input-with-icon {
         max-width: 100%;
     }
-
+    
     .btn iconify-icon {
         margin-right: 4px;
     }
-
+    
     .panel-header iconify-icon {
         margin-right: 6px;
     }
-
+    
     /* 在小屏幕上优化知识点卡片内容显示 */
     .level-card.expanded {
         max-height: none;
         height: auto;
     }
-
+    
     .level-card.expanded .level-content {
         max-height: none;
         height: auto;
         overflow-y: auto;
     }
-
+    
     .knowledge-panel.expanded .level-card.expanded {
         min-height: auto;
         max-height: none;
@@ -2626,7 +2497,7 @@ iconify-icon {
         width: 100%;
         padding: var(--spacing-xl);
     }
-
+    
     .level-card.expanded .level-content {
         max-height: 800px;
         padding: var(--spacing-md);
@@ -2640,12 +2511,10 @@ iconify-icon {
 }
 
 .test-page .content-container {
-    padding-top: var(--spacing-xs);
-    /* 添加小型间距，避免太近 */
+    padding-top: var(--spacing-xs); /* 添加小型间距，避免太近 */
 }
 
 /* 确保标题栏与内容紧密连接 */
 .test-page .top-header {
-    margin-bottom: 0;
-    /* 移除底部边距 */
+    margin-bottom: 0; /* 移除底部边距 */
 }
