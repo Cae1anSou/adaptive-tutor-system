@@ -1,7 +1,7 @@
 {
   "topic_id": "4_3",
-  "title": "使用 Flex 布局构建响应式导航栏",
-  "description_md": "使用 Flexbox 布局创建一个响应式导航栏。\n\n- 请为 `header` 设置 `display: flex`，并使用 `justify-content: space-between` 让标题与导航链接分列左右\n- 为 `.nav-links` 添加 Flex 布局，使其中链接横向排列、居中显示、自动换行、链接之间有 `gap: 1.5rem`",
+  "title": "4_3 使用 Flex 布局构建响应式导航栏",
+  "description_md": "# 任务描述：\n请使用 Flexbox 创建一个响应式导航栏，使标题和导航链接布局合理。\n\n## 要求：\n1. 为 `header` 元素设置 `display: flex`。\n2. 使用 `justify-content: space-between` 让标题与导航链接分列左右。\n3. 为 `.nav-links` 添加 Flex 布局，使其中的链接横向排列、居中显示、支持自动换行，并设置 `gap: 1.5rem`。",
   "start_code": {
     "html": "<header>\n  <h2>编程学习教程</h2>\n  <nav class=\"nav-links\">\n    <a href=\"#\" class=\"nav-link\">首页</a>\n    <a href=\"#\" class=\"nav-link\">课程</a>\n    <a href=\"#\" class=\"nav-link\">资源</a>\n    <a href=\"#\" class=\"nav-link\">联系</a>\n  </nav>\n</header>",
     "css": "",
