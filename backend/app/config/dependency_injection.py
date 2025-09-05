@@ -140,6 +140,27 @@ def get_rag_service():
         return None
 
 
+def get_clustering_service():
+    """
+    获取聚类服务实例
+    """
+    from app.core.config import settings
+    if not settings.ENABLE_CLUSTERING_SERVICE:
+        return None
+    
+    try:
+        from app.services.distance_based_clustering_service import DistanceBasedClusteringService
+        service = DistanceBasedClusteringService()
+        if service.is_loaded:
+            return service
+        else:
+            print(f"Warning: Clustering service initialized but pretrained models not loaded - will fallback to real-time analysis")
+            return service  # 返回服务但会使用回退模式
+    except Exception as e:
+        print(f"Warning: Clustering service initialization failed: {e}")
+        return None
+
+
 def create_dynamic_controller(redis_client: redis.Redis):
     """
     创建动态控制器实例，注入所有依赖
@@ -151,7 +172,8 @@ def create_dynamic_controller(redis_client: redis.Redis):
         sentiment_service=get_sentiment_analysis_service(),
         rag_service=get_rag_service(),
         prompt_generator=get_prompt_generator(),
-        llm_gateway=get_llm_gateway()
+        llm_gateway=get_llm_gateway(),
+        clustering_service=get_clustering_service()
     )
 
 

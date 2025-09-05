@@ -27,6 +27,13 @@ class WebSocketManager {
                 this.subscribers[type] = this.subscribers[type].filter(cb => cb !== callback);
             }}
 
+            // 取消所有特定类型的消息订阅
+            unsubscribeAll(type) {
+                if (this.subscribers[type]) {
+                    this.subscribers[type] = [];
+                }
+            }
+
             _dispatch_message(rawMessage){
                 const { type, taskid, message, error, timestamp } = rawMessage;
                 if (this.subscribers[type]) {
