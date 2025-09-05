@@ -1,77 +1,81 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>模块集成模板 - AI HTML学习平台</title>
+  <title>模块集成模板 -sync-PBL学习平台</title>
   <script src="../js/modules/cytoscape.min.js"></script>
   <link rel="stylesheet" href="../css/styles.css">
   <!-- Iconify图标库 -->
   <script src="../js/modules/iconify-icon.min.js"></script>
 </head>
+
 <body>
   <div class="main-container">
-        <!-- 顶部标题栏 -->
-        <header class="top-header">
-            <h1 class="header-title" id="headerTitle">
-              <iconify-icon icon="mdi:graph" width="24" height="24"></iconify-icon>
-              标题
-            </h1>
-            <div class="user-profile">
-              <iconify-icon icon="mdi:account-circle" width="36" height="36"></iconify-icon>
-            </div>
-        </header>
+    <!-- 顶部标题栏 -->
+    <header class="top-header">
+      <h1 class="header-title" id="headerTitle">
+        <iconify-icon icon="mdi:graph" width="24" height="24"></iconify-icon>
+        标题
+      </h1>
+      <div class="user-profile">
+        <iconify-icon icon="mdi:account-circle" width="36" height="36"></iconify-icon>
+      </div>
+    </header>
 
-        <!-- 内容区域 -->
-        <div class="content-container">
-          <div class="index-container panel">
-            <div class="panel-header">
-              <iconify-icon icon="mdi:progress-check" width="20" height="20"></iconify-icon>
-              <h2>学习情况 </h2>
-            </div>
-            <div class="group" id="cy">
-              <!-- 工具栏 -->
-              <div class="cy-toolbar">
-                <button id="zoomIn" title="放大" class="btn btn-small">
-                  <iconify-icon icon="mdi:magnify-plus" width="16" height="16"></iconify-icon>
+    <!-- 内容区域 -->
+    <div class="content-container">
+      <div class="index-container panel">
+        <div class="panel-header">
+          <iconify-icon icon="mdi:progress-check" width="20" height="20"></iconify-icon>
+          <h2>学习情况 </h2>
+        </div>
+        <div class="group" id="cy">
+          <!-- 工具栏 -->
+          <div class="cy-toolbar">
+            <button id="zoomIn" title="放大" class="btn btn-small">
+              <iconify-icon icon="mdi:magnify-plus" width="16" height="16"></iconify-icon>
+            </button>
+            <button id="zoomOut" title="缩小" class="btn btn-small">
+              <iconify-icon icon="mdi:magnify-minus" width="16" height="16"></iconify-icon>
+            </button>
+            <button id="centerGraph" title="居中" class="btn btn-small">
+              <iconify-icon icon="mdi:select-search" width="16" height="16"></iconify-icon>
+              居中
+            </button>
+          </div>
+
+          <!-- 提示信息 -->
+          <div class="cy-tip">
+            <iconify-icon icon="mdi:information" width="16" height="16"></iconify-icon>
+            <span>提示: 单击节点展开/收起，双击节点查看详情</span>
+          </div>
+          <!-- 知识点详情弹窗 -->
+          <div id="knowledgeModal" class="modal">
+            <div class="modal-content">
+              <iconify-icon icon="mdi:book-open" width="32" height="32"
+                style="color: var(--primary-color);"></iconify-icon>
+              <h2 id="modalTitle"></h2>
+              <p id="modalStatus"></p>
+              <div class="modal-actions">
+                <button id="learnBtn" class="btn btn-primary">
+                  学习
                 </button>
-                <button id="zoomOut" title="缩小" class="btn btn-small">
-                  <iconify-icon icon="mdi:magnify-minus" width="16" height="16"></iconify-icon>
+                <button id="testBtn" class="btn btn-primary">
+                  测试
                 </button>
-                <button id="centerGraph" title="居中" class="btn btn-small">
-                  <iconify-icon icon="mdi:select-search" width="16" height="16"></iconify-icon>
-                  居中
-                </button>
-              </div>
-              
-              <!-- 提示信息 -->
-              <div class="cy-tip">
-                <iconify-icon icon="mdi:information" width="16" height="16"></iconify-icon>
-                <span>提示: 单击节点展开/收起，双击节点查看详情</span>
-              </div>
-              <!-- 知识点详情弹窗 -->
-              <div id="knowledgeModal" class="modal">
-                <div class="modal-content">
-                  <iconify-icon icon="mdi:book-open" width="32" height="32" style="color: var(--primary-color);"></iconify-icon>
-                  <h2 id="modalTitle"></h2>
-                  <p id="modalStatus"></p>
-                  <div class="modal-actions">
-                    <button id="learnBtn"class="btn btn-primary">
-                      学习
-                    </button>
-                    <button id="testBtn" class="btn btn-primary">
-                      测试
-                    </button>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
+    </div>
   </div>
   <!-- Cytoscape -->
 
-<!-- 加载知识图谱模块逻辑 -->
-<script type="module" src="../js/pages/knowledge_graph.js"></script>
+  <!-- 加载知识图谱模块逻辑 -->
+  <script type="module" src="../js/pages/knowledge_graph.js"></script>
 </body>
+
 </html>
