@@ -23,29 +23,29 @@ async function initializePage() {
         }
     }
     // 获取并解密URL参数
-     // 获取URL参数（带错误处理）
-        const topicData = getUrlParam('topic');
-        
-        if (topicData && topicData.id) {
-            console.log('测试主题ID:', topicData.id, '有效期:', topicData.isValid ? '有效' : '已过期');
-                
-            // 更新页面标题
-            document.getElementById('headerTitle').textContent = `测试 - ${topicData.id}`;
-            
-            // 即使过期也继续加载内容，但提示用户
-            if (!topicData.isValid) {
-               console.warn('参数已过期，但仍继续加载内容');
-            }
-                
-            // 加载对应的测试内容
-            chatModule.init('test', topicData.id);
-        } else {
-            console.warn('未找到有效的主题参数，使用默认内容');
-            console.log('加载默认测试内容');
+    // 获取URL参数（带错误处理）
+    const topicData = getUrlParam('topic');
+
+    if (topicData && topicData.id) {
+        console.log('测试主题ID:', topicData.id, '有效期:', topicData.isValid ? '有效' : '已过期');
+
+        // 更新页面标题
+        document.getElementById('headerTitle').textContent = `测试 - ${topicData.id}`;
+
+        // 即使过期也继续加载内容，但提示用户
+        if (!topicData.isValid) {
+            console.warn('参数已过期，但仍继续加载内容');
         }
-    
+
+        // 加载对应的测试内容
+        chatModule.init('test', topicData.id);
+    } else {
+        console.warn('未找到有效的主题参数，使用默认内容');
+        console.log('加载默认测试内容');
+    }
+
     let topicId = topicData.id;
-    
+
     // 如果没有topic参数，且查询字符串只有一个值，则使用该值
     if (!topicId) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -85,11 +85,11 @@ async function initializePage() {
         alert('无法加载测试任务: ' + (error.message || '未知错误'));
     }
 
-    try{
+    try {
         websocket.connect();
         console.log('[MainApp] WebSocket模块初始化完成');
     }
-    catch(error){
+    catch (error) {
         console.error('[MainApp] WebSocket模块初始化失败:', error);
     }
 }
@@ -314,7 +314,7 @@ function setupSubmitLogic() {
                     problem_count: finalBehaviorAnalysis.problemEventsCount || 0
                 }
             };
-            
+
             // 提交测试并等待响应
             const result = await window.apiClient.post('/submission/submit-test2', submissionData);
 
@@ -324,51 +324,55 @@ function setupSubmitLogic() {
                 // 恢复按钮状态
                 restoreButton();
                 displayTestResult(msg);
-                if(msg.passed) {
+                if (msg.passed) {
                     // 获取当前topic参数
                     const topicData = getUrlParam('topic');
                     let currentTopicId = topicData && topicData.id ? topicData.id : null;
-                    let nextTopicId = null;
-                    let shouldNavigateToLearning = false;
-                    
+
                     if (currentTopicId) {
-                        // 检查是否已经是最后一小节(6_3)
-                        if (currentTopicId === '6_3') {
-                            // 如果已经是6_3，跳转回6_3的学习页面
-                            nextTopicId = '6_3';
-                            shouldNavigateToLearning = true;
-                        } else {
-                            // 计算下一小节的topic_id
-                            const [chapter, section] = currentTopicId.split('_').map(Number);
-                            let nextChapter = chapter;
-                            let nextSection = section + 1;
-                            
-                            // 处理章节边界情况
-                            if (nextSection > 3) {
-                                nextChapter += 1;
-                                nextSection = 1;
+                        // 标记当前知识点为已学习
+                        markKnowledgeAsLearned(currentTopicId);
+
+                        // 检查是否是章节的最后一个测试
+                        const isLastTestInChapter = isLastTestInCurrentChapter(currentTopicId);
+
+                        if (isLastTestInChapter) {
+                            // 完成章节测试，标记章节为已完成
+                            const currentChapter = getChapterFromTopicId(currentTopicId);
+                            markChapterAsCompleted(currentChapter);
+
+                            // 获取下一个章节的第一个知识点
+                            const nextChapterFirstKnowledge = getNextChapterFirstKnowledge(currentChapter);
+
+                            if (nextChapterFirstKnowledge) {
+                                // 显示章节完成弹窗
+                                showChapterCompletionModal(currentChapter, nextChapterFirstKnowledge);
+                            } else {
+                                // 没有下一个章节，显示完成信息
+                                alert("恭喜！您已完成所有章节！");
+                                setTimeout(() => {
+                                    window.location.href = '/pages/knowledge_graph.html';
+                                }, 100);
                             }
-                            
-                            // 确保不超过最大章节
-                            if (nextChapter <= 6) {
-                                nextTopicId = `${nextChapter}_${nextSection}`;
-                                shouldNavigateToLearning = true;
+                        } else {
+                            // 获取下一个知识点信息
+                            const nextKnowledgeInfo = getNextKnowledgeInfo(currentTopicId);
+
+                            if (nextKnowledgeInfo) {
+                                // 显示完成测试的弹窗
+                                showTestCompletionModal(currentTopicId, nextKnowledgeInfo);
+                            } else {
+                                // 没有下一个知识点，显示完成信息
+                                alert("恭喜！您已完成所有测试！");
+                                setTimeout(() => {
+                                    window.location.href = '/pages/knowledge_graph.html';
+                                }, 100);
                             }
                         }
-                    }
-                    
-                    // 显示提示信息
-                    if (shouldNavigateToLearning) {
-                        alert(`测试完成！即将跳转到${nextTopicId}学习界面`);
-                        // 立即开始倒计时跳转
-                        setTimeout(() => { 
-                            navigateTo('/pages/learning_page.html', nextTopicId, true); 
-                        }, 100);
                     } else {
-                        alert("测试完成！即将跳转回到注册页面");
-                        // 立即开始倒计时跳转
-                        setTimeout(() => { 
-                            window.location.href = '/pages/index.html'; 
+                        alert("测试完成！");
+                        setTimeout(() => {
+                            window.location.href = '/pages/knowledge_graph.html';
                         }, 100);
                     }
                 } else {
@@ -382,11 +386,11 @@ function setupSubmitLogic() {
                     // 测试未通过，给用户一些鼓励和建议
                     alert("测试未通过，请查看详细结果并继续改进代码。");
                 }
-                
+
                 // 取消订阅，避免重复触发
                 websocket.unsubscribe("submission_result", submissionCallback);
             };
-            
+
             // 先取消之前的订阅（如果有的话），然后再订阅新的回调
             if (submissionCallbackRef) {
                 websocket.unsubscribe("submission_result", submissionCallbackRef);
@@ -454,3 +458,266 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+// 标记知识点为已学习
+function markKnowledgeAsLearned(knowledgeId) {
+    try {
+        // 从localStorage获取已学习的知识点列表
+        let learnedNodes = JSON.parse(localStorage.getItem('learnedNodes') || '[]');
+
+        // 如果还没有学习过这个知识点，添加到列表中
+        if (!learnedNodes.includes(knowledgeId)) {
+            learnedNodes.push(knowledgeId);
+            localStorage.setItem('learnedNodes', JSON.stringify(learnedNodes));
+            console.log(`知识点 ${knowledgeId} 已标记为已学习`);
+        }
+    } catch (error) {
+        console.error('标记知识点为已学习时出错:', error);
+    }
+}
+
+// 获取下一个知识点信息
+function getNextKnowledgeInfo(currentTopicId) {
+    try {
+        // 解析当前知识点ID
+        const [chapter, section] = currentTopicId.split('_').map(Number);
+        let nextChapter = chapter;
+        let nextSection = section + 1;
+
+        // 处理章节边界情况
+        if (nextSection > 3) {
+            nextChapter += 1;
+            nextSection = 1;
+        }
+
+        // 确保不超过最大章节
+        if (nextChapter <= 6) {
+            const nextTopicId = `${nextChapter}_${nextSection}`;
+
+            // 从知识图谱数据中获取下一个知识点的标题
+            const nextKnowledgeLabel = getKnowledgeLabel(nextTopicId);
+
+            if (nextKnowledgeLabel) {
+                return {
+                    id: nextTopicId,
+                    label: nextKnowledgeLabel
+                };
+            }
+        }
+
+        return null;
+    } catch (error) {
+        console.error('获取下一个知识点信息时出错:', error);
+        return null;
+    }
+}
+
+// 从知识图谱数据中获取知识点的标题
+function getKnowledgeLabel(knowledgeId) {
+    try {
+        // 这里应该从实际的知识图谱数据中获取
+        // 为了简化，我们使用一个映射表
+        const knowledgeLabels = {
+            '1_1': '使用h元素和p元素体验标题与段落',
+            '1_2': '应用文本格式(加粗、斜体)',
+            '1_3': '构建页面头部结构',
+            '2_1': '使用盒子元素进行内容划分',
+            '2_2': '创建有序列表',
+            '2_3': '创建无序列表',
+            '3_1': '文本框与按钮的使用',
+            '3_2': '复选框与单选框',
+            '3_3': '表单提交机制',
+            '4_1': '设置颜色与字体',
+            '4_2': '理解盒模型',
+            '4_3': '使用 Flex 进行布局',
+            '5_1': '插入与管理图片',
+            '5_2': '引入音频文件',
+            '5_3': '嵌入视频内容',
+            '6_1': '按钮点击事件',
+            '6_2': '获取用户输入',
+            '6_3': '修改页面元素（DOM 操作）'
+        };
+
+        return knowledgeLabels[knowledgeId] || knowledgeId;
+    } catch (error) {
+        console.error('获取知识点标题时出错:', error);
+        return knowledgeId;
+    }
+}
+
+// 显示测试完成弹窗
+function showTestCompletionModal(currentTopicId, nextKnowledgeInfo) {
+    // 创建弹窗HTML
+    const modalHtml = `
+        <div id="testCompletionModal" class="modal" style="display: block;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <iconify-icon icon="mdi:check-circle" width="32" height="32" style="color: #4CAF50;"></iconify-icon>
+                    <h2>测试完成！</h2>
+                </div>
+                <div class="modal-body">
+                    <p>您已完成测试，现在可以开始学习"${nextKnowledgeInfo.label}"</p>
+                </div>
+                <div class="modal-actions">
+                    <button id="returnToGraphBtn" class="btn btn-secondary">返回</button>
+                    <button id="continueLearningBtn" class="btn btn-primary">确认</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // 移除已存在的弹窗
+    const existingModal = document.getElementById('testCompletionModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // 添加新弹窗到页面
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // 绑定事件
+    const modal = document.getElementById('testCompletionModal');
+    const returnBtn = document.getElementById('returnToGraphBtn');
+    const continueBtn = document.getElementById('continueLearningBtn');
+
+    // 返回按钮 - 回到知识图谱导航页
+    returnBtn.addEventListener('click', () => {
+        modal.remove();
+        window.location.href = '/pages/knowledge_graph.html';
+    });
+
+    // 确认按钮 - 跳转到下一个学习页面
+    continueBtn.addEventListener('click', () => {
+        modal.remove();
+        navigateTo('/pages/learning_page.html', nextKnowledgeInfo.id, true);
+    });
+
+    // 点击背景关闭弹窗
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+            window.location.href = '/pages/knowledge_graph.html';
+        }
+    });
+}
+
+// 检查是否是当前章节的最后一个测试
+function isLastTestInCurrentChapter(topicId) {
+    try {
+        const [chapter, section] = topicId.split('_').map(Number);
+        return section === 3; // 每个章节有3个测试，第3个是最后一个
+    } catch (error) {
+        console.error('检查是否是章节最后一个测试时出错:', error);
+        return false;
+    }
+}
+
+// 从知识点ID获取章节ID
+function getChapterFromTopicId(topicId) {
+    try {
+        const [chapter] = topicId.split('_').map(Number);
+        return `chapter${chapter}`;
+    } catch (error) {
+        console.error('获取章节ID时出错:', error);
+        return null;
+    }
+}
+
+// 标记章节为已完成
+function markChapterAsCompleted(chapterId) {
+    try {
+        // 从localStorage获取已完成的章节
+        const completedChapters = JSON.parse(localStorage.getItem('completedChapters') || '[]');
+
+        if (!completedChapters.includes(chapterId)) {
+            completedChapters.push(chapterId);
+            localStorage.setItem('completedChapters', JSON.stringify(completedChapters));
+            console.log(`章节 ${chapterId} 已标记为完成`);
+        }
+    } catch (error) {
+        console.error('标记章节完成时出错:', error);
+    }
+}
+
+// 获取下一个章节的第一个知识点
+function getNextChapterFirstKnowledge(currentChapter) {
+    try {
+        const currentChapterNum = parseInt(currentChapter.replace('chapter', ''));
+        const nextChapterNum = currentChapterNum + 1;
+
+        // 确保不超过最大章节数
+        if (nextChapterNum <= 6) {
+            const nextChapterFirstTopicId = `${nextChapterNum}_1`;
+            const nextChapterFirstLabel = getKnowledgeLabel(nextChapterFirstTopicId);
+
+            if (nextChapterFirstLabel) {
+                return {
+                    id: nextChapterFirstTopicId,
+                    label: nextChapterFirstLabel,
+                    chapter: `chapter${nextChapterNum}`
+                };
+            }
+        }
+
+        return null;
+    } catch (error) {
+        console.error('获取下一个章节第一个知识点时出错:', error);
+        return null;
+    }
+}
+
+// 显示章节完成弹窗
+function showChapterCompletionModal(completedChapter, nextChapterFirstKnowledge) {
+    // 创建弹窗HTML
+    const modalHtml = `
+        <div id="chapterCompletionModal" class="modal" style="display: block;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <iconify-icon icon="mdi:trophy" width="32" height="32" style="color: #FFD700;"></iconify-icon>
+                    <h2>章节完成！</h2>
+                </div>
+                <div class="modal-body">
+                    <p>您已完成测试，现在可以开始学习"${nextChapterFirstKnowledge.label}"</p>
+                </div>
+                <div class="modal-actions">
+                    <button id="returnToGraphBtn" class="btn btn-secondary">返回</button>
+                    <button id="continueLearningBtn" class="btn btn-primary">确认</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // 移除已存在的弹窗
+    const existingModal = document.getElementById('chapterCompletionModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // 添加新弹窗到页面
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // 绑定事件
+    const modal = document.getElementById('chapterCompletionModal');
+    const returnBtn = document.getElementById('returnToGraphBtn');
+    const continueBtn = document.getElementById('continueLearningBtn');
+
+    // 返回按钮 - 回到知识图谱导航页
+    returnBtn.addEventListener('click', () => {
+        modal.remove();
+        window.location.href = '/pages/knowledge_graph.html';
+    });
+
+    // 确认按钮 - 跳转到下一个章节的第一个学习页面
+    continueBtn.addEventListener('click', () => {
+        modal.remove();
+        navigateTo('/pages/learning_page.html', nextChapterFirstKnowledge.id, true);
+    });
+
+    // 点击背景关闭弹窗
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+            window.location.href = '/pages/knowledge_graph.html';
+        }
+    });
+}

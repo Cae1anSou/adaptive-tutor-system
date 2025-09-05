@@ -3,7 +3,7 @@
 // 导入配置模块
 import { AppConfig, buildBackendUrl, initializeConfig } from '../modules/config.js';
 import { MiniKnowledgeGraph } from '../modules/mini_knowledge_graph.js';
-import { setupHeaderTitle, setupBackButton, getUrlParam, trackReferrer,navigateTo } from '../modules/navigation.js';
+import { setupHeaderTitle, setupBackButton, getUrlParam, trackReferrer, navigateTo } from '../modules/navigation.js';
 
 // 导入知识图谱相关模块
 import { GraphState } from '../modules/graph_data.js';
@@ -71,10 +71,10 @@ const AppState = {
 };
 
 const miniGraph = new MiniKnowledgeGraph('containerId', {
-  height: 200,
-  nodeSize: 20,
-  chapterNodeSize: 30,
-  fontSize: 10
+    height: 200,
+    nodeSize: 20,
+    chapterNodeSize: 30,
+    fontSize: 10
 });
 
 // 应用数据存储，用于管理API数据
@@ -85,25 +85,25 @@ const AppDataStore = {
         allowedElements: null,   // 可选元素数据
         userProgress: null       // 用户进度数据
     },
-    
+
     // 设置数据
     setData(key, data) {
         this.apiData[key] = data;
         console.log(`[AppDataStore] 设置数据 ${key}:`, data);
     },
-    
+
     // 获取数据
     getData(key) {
         const data = this.apiData[key];
         console.log(`[AppDataStore] 获取数据 ${key}:`, data);
         return data;
     },
-    
+
     // 检查数据是否已加载
     isDataLoaded(key) {
         return this.apiData[key] !== null;
     },
-    
+
     // 清空数据
     clearData() {
         this.apiData = {
@@ -136,27 +136,27 @@ async function initMainApp() {
         console.log('主应用已经初始化过，跳过重复初始化');
         return;
     }
-    
+
     // 如果正在初始化，等待完成
     if (AppState.initPromise) {
         console.log('主应用正在初始化中，等待完成');
         return AppState.initPromise;
     }
-    
+
     // 创建初始化Promise
     AppState.initPromise = (async () => {
         try {
             // 标记为已初始化（立即设置，防止重复执行）
             AppState.isInitialized = true;
-            
+
             console.log('开始初始化主应用...');
-            
+
             // 获取必要的DOM元素
             const { startButton, stopButton, iframe } = getRequiredDOMElements();
             if (!startButton || !stopButton || !iframe) {
                 throw new Error('必要的DOM元素未找到');
             }
-            
+
             // 初始化按钮状态
             startButton.disabled = true;
 
@@ -289,21 +289,21 @@ async function initializeModules(topicId) {
     knowledgeModule = new KnowledgeModule();
     console.log('[MainApp] 知识点模块初始化完成');
 
-  // 初始化简化知识图谱 - 启用完整交互功能
-  try {
-    const miniGraph = new MiniKnowledgeGraph('miniGraphContainer', {
-      height: 200,
-      nodeSize: 20,
-      chapterNodeSize: 30,
-      fontSize: 10,
-      enableInteractions: true,  // 启用完整交互
-      enableModal: true          // 启用模态框
-    });
-    await miniGraph.init();
-    console.log('[MainApp] 简化知识图谱初始化完成');
-  } catch (error) {
-    console.error('[MainApp] 简化知识图谱初始化失败:', error);
-  }
+    // 初始化简化知识图谱 - 启用完整交互功能
+    try {
+        const miniGraph = new MiniKnowledgeGraph('miniGraphContainer', {
+            height: 200,
+            nodeSize: 20,
+            chapterNodeSize: 30,
+            fontSize: 10,
+            enableInteractions: true,  // 启用完整交互
+            enableModal: true          // 启用模态框
+        });
+        await miniGraph.init();
+        console.log('[MainApp] 简化知识图谱初始化完成');
+    } catch (error) {
+        console.error('[MainApp] 简化知识图谱初始化失败:', error);
+    }
 
 
     // 初始化聊天模块
@@ -327,11 +327,11 @@ async function initializeModules(topicId) {
     }
 
     //初始化websocket模块
-    try{
+    try {
         websocket.connect();
         console.log('[MainApp] WebSocket模块初始化完成');
     }
-    catch(error){
+    catch (error) {
         console.error('[MainApp] WebSocket模块初始化失败:', error);
     }
 
@@ -421,7 +421,7 @@ function unifyAIAvatars() {
     if (chatModule && typeof chatModule.addMessageToUI === 'function') {
         const originalAddMessageToUI = chatModule.addMessageToUI.bind(chatModule);
 
-        chatModule.addMessageToUI = function(sender, content) {
+        chatModule.addMessageToUI = function (sender, content) {
             // 调用原始方法
             originalAddMessageToUI(sender, content);
 
@@ -740,15 +740,15 @@ function initEventListeners() {
         // 确保图标默认有颜色和可见性
         toggleIcon.style.color = '#4f46e5';
         toggleIcon.style.opacity = '0.8';
-        
+
         // 获取知识图谱容器元素
         const knowledgeGraphContainer = document.getElementById('knowledge-graph-container');
         const closeGraphButton = document.getElementById('closeGraph');
-        
+
         miniGraphToggle.addEventListener('click', async () => {
             // 只控制知识图谱容器的显示/隐藏，不改变头部标题栏中简化知识图谱预览的大小
             const isExpanding = knowledgeGraphContainer.style.display === 'none' || knowledgeGraphContainer.style.display === '';
-            
+
             // 控制知识图谱容器的显示/隐藏
             if (isExpanding) {
                 // 显示知识图谱容器并初始化渲染知识图谱
@@ -759,7 +759,7 @@ function initEventListeners() {
                     knowledgeGraphContainer.style.display = 'none';
                 }
             }
-            
+
             // 更改图标
             if (isExpanding) {
                 // 展开时，将图标更改为向上箭头
@@ -773,7 +773,7 @@ function initEventListeners() {
                 toggleIcon.style.opacity = '0.8';   // 恢复默认不透明度
             }
         });
-        
+
         // 添加关闭知识图谱容器的功能
         if (closeGraphButton) {
             closeGraphButton.addEventListener('click', () => {
@@ -781,7 +781,7 @@ function initEventListeners() {
                 if (knowledgeGraphContainer) {
                     knowledgeGraphContainer.style.display = 'none';
                 }
-                
+
                 // 更改图标
                 toggleIcon.setAttribute('icon', 'mdi:chevron-down');
                 toggleIcon.style.color = '#4f46e5';
@@ -849,7 +849,7 @@ function initEventListeners() {
             // 隐藏清除选择按钮
             clearSelectionButton.style.display = 'none';
             clearSelectionButton.style.visibility = 'hidden';
-            
+
             // 显示选取元素按钮
             const startButton = document.getElementById('startSelector');
             if (startButton) {
@@ -932,20 +932,20 @@ function initBehaviorTracker() {
 
 // 创建带行为追踪的元素选择处理函数
 function createElementSelectedWithTracking() {
-    return function(elementInfo, showStatus) {
+    return function (elementInfo, showStatus) {
         console.log('元素选择处理函数被调用，选中的元素信息:', elementInfo);
 
         // 保存选中的元素信息
         selectedElementInfo = elementInfo;
         console.log('[DEBUG] selectedElementInfo 已更新为:', selectedElementInfo);
-        
+
         // 自动切换按钮状态
         const startButton = document.getElementById('startSelector');
         const stopButton = document.getElementById('stopSelector');
         const askAIButton = document.getElementById('askAIButton');
         const clearSelectionButton = document.getElementById('clearSelectionButton');
 
-        console.log('获取到的按钮元素:', {startButton, stopButton, askAIButton, clearSelectionButton});
+        console.log('获取到的按钮元素:', { startButton, stopButton, askAIButton, clearSelectionButton });
 
         // 选中元素后，不显示选取元素按钮
         if (startButton && stopButton) {
@@ -998,226 +998,242 @@ function createElementSelectedWithTracking() {
 
 // 初始化知识图谱
 async function initKnowledgeGraph() {
-  // 防止重复初始化
-  if (knowledgeGraphInitialized) {
-    console.log('[KnowledgeGraph] 知识图谱已经初始化过，跳过重复初始化');
-    return;
-  }
-
-  try {
-    console.log('[KnowledgeGraph] 开始初始化知识图谱...');
-    
-    // 获取实验编号并验证
-    const participantId = getParticipantId();
-    if (!participantId) {
-      console.warn('[KnowledgeGraph] 未找到实验编号，无法加载知识图谱');
-      return;
+    // 防止重复初始化
+    if (knowledgeGraphInitialized) {
+        console.log('[KnowledgeGraph] 知识图谱已经初始化过，跳过重复初始化');
+        return;
     }
 
-    // 并行获取图谱数据和用户进度
-    const [graphResponse, progressResponse] = await Promise.all([
-      // 请求知识图谱数据
-      fetch(buildBackendUrl('/knowledge-graph')),
-      fetch(buildBackendUrl(`/progress/participants/${participantId}/progress`))
-    ]);
+    try {
+        console.log('[KnowledgeGraph] 开始初始化知识图谱...');
 
-    // 检查响应状态
-    if (!graphResponse.ok || !progressResponse.ok) {
-      throw new Error('获取数据失败');
+        // 获取实验编号并验证
+        const participantId = getParticipantId();
+        if (!participantId) {
+            console.warn('[KnowledgeGraph] 未找到实验编号，无法加载知识图谱');
+            return;
+        }
+
+        // 并行获取图谱数据和用户进度
+        const [graphResponse, progressResponse] = await Promise.all([
+            // 请求知识图谱数据
+            fetch(buildBackendUrl('/knowledge-graph')),
+            fetch(buildBackendUrl(`/progress/participants/${participantId}/progress`))
+        ]);
+
+        // 检查响应状态
+        if (!graphResponse.ok || !progressResponse.ok) {
+            throw new Error('获取数据失败');
+        }
+
+        // 解析JSON数据
+        const [graphResult, progressResult] = await Promise.all([
+            graphResponse.json(),
+            progressResponse.json()
+        ]);
+
+        // 处理数据
+        const graphData = graphResult.data;
+        const learnedNodes = progressResult.data.completed_topics || [];
+
+        // 验证数据格式
+        if (!graphData || !graphData.nodes || !graphData.edges) {
+            throw new Error('图谱数据格式不正确');
+        }
+
+        // 初始化状态管理
+        graphState = new GraphState(graphData, learnedNodes);
+        graphState.initMaps();
+
+        // 设置当前学习章节
+        setCurrentLearningChapter(graphState, currentTopicId);
+
+        // 初始化渲染器
+        graphRenderer = new GraphRenderer('cy', graphState);
+        graphRenderer.addElements([...graphData.nodes, ...graphData.edges]);
+
+        // 设置初始布局
+        graphRenderer.setFixedChapterPositions();
+        graphRenderer.hideAllKnowledgeNodes();
+        graphRenderer.updateNodeColors();
+
+        // 添加工具栏功能
+        graphRenderer.addToolbarFunctionality();
+
+        // 添加节点点击事件处理
+        setupGraphEventListeners();
+
+        // 标记为已初始化
+        knowledgeGraphInitialized = true;
+
+        console.log('[KnowledgeGraph] 知识图谱初始化完成');
+
+        // 初始居中
+        setTimeout(() => {
+            if (graphRenderer) {
+                graphRenderer.centerAndZoomGraph();
+            }
+        }, 100);
+
+        // 窗口点击事件处理
+        window.onclick = (event) => {
+            const modal = document.getElementById('knowledgeModal');
+            if (event.target === modal) modal.style.display = 'none';
+        };
+
+    } catch (error) {
+        console.error('[KnowledgeGraph] 初始化知识图谱失败:', error);
     }
-
-    // 解析JSON数据
-    const [graphResult, progressResult] = await Promise.all([
-      graphResponse.json(),
-      progressResponse.json()
-    ]);
-
-    // 处理数据
-    const graphData = graphResult.data;
-    const learnedNodes = progressResult.data.completed_topics || [];
-
-    // 验证数据格式
-    if (!graphData || !graphData.nodes || !graphData.edges) {
-      throw new Error('图谱数据格式不正确');
-    }
-
-    // 初始化状态管理
-    graphState = new GraphState(graphData, learnedNodes);
-    graphState.initMaps();
-
-    // 设置当前学习章节
-    setCurrentLearningChapter(graphState, currentTopicId);
-
-    // 初始化渲染器
-    graphRenderer = new GraphRenderer('cy', graphState);
-    graphRenderer.addElements([...graphData.nodes, ...graphData.edges]);
-
-    // 设置初始布局
-    graphRenderer.setFixedChapterPositions();
-    graphRenderer.hideAllKnowledgeNodes();
-    graphRenderer.updateNodeColors();
-    
-    // 添加工具栏功能
-    graphRenderer.addToolbarFunctionality();
-    
-    // 添加节点点击事件处理
-    setupGraphEventListeners();
-    
-    // 标记为已初始化
-    knowledgeGraphInitialized = true;
-    
-    console.log('[KnowledgeGraph] 知识图谱初始化完成');
-    
-    // 初始居中
-    setTimeout(() => {
-      if (graphRenderer) {
-        graphRenderer.centerAndZoomGraph();
-      }
-    }, 100);
-
-    // 窗口点击事件处理
-    window.onclick = (event) => {
-      const modal = document.getElementById('knowledgeModal');
-      if (event.target === modal) modal.style.display = 'none';
-    };
-    
-  } catch (error) {
-    console.error('[KnowledgeGraph] 初始化知识图谱失败:', error);
-  }
 }
 
 // 设置知识图谱节点点击事件监听器
 function setupGraphEventListeners() {
-  if (!graphRenderer || !graphRenderer.cy) {
-    console.warn('[KnowledgeGraph] 图渲染器未初始化，无法设置事件监听器');
-    return;
-  }
-  
-  // 单击/双击处理
-  const clickState = { lastId: null, timer: null, ts: 0 };
-  const DBL_DELAY = 280;
-
-  graphRenderer.cy.on('tap', 'node', (evt) => {
-    const node = evt.target;
-    const id = node.id();
-    const now = Date.now();
-
-    if (clickState.lastId === id && (now - clickState.ts) < DBL_DELAY) {
-      clearTimeout(clickState.timer);
-      clickState.timer = null;
-      clickState.lastId = null;
-      handleGraphDoubleClick(node);
-    } else {
-      clickState.lastId = id;
-      clickState.ts = now;
-      clickState.timer = setTimeout(() => {
-        handleGraphSingleClick(node);
-        clickState.timer = null;
-        clickState.lastId = null;
-      }, DBL_DELAY);
+    if (!graphRenderer || !graphRenderer.cy) {
+        console.warn('[KnowledgeGraph] 图渲染器未初始化，无法设置事件监听器');
+        return;
     }
-  });
+
+    // 单击/双击处理
+    const clickState = { lastId: null, timer: null, ts: 0 };
+    const DBL_DELAY = 280;
+
+    graphRenderer.cy.on('tap', 'node', (evt) => {
+        const node = evt.target;
+        const id = node.id();
+        const now = Date.now();
+
+        if (clickState.lastId === id && (now - clickState.ts) < DBL_DELAY) {
+            clearTimeout(clickState.timer);
+            clickState.timer = null;
+            clickState.lastId = null;
+            handleGraphDoubleClick(node);
+        } else {
+            clickState.lastId = id;
+            clickState.ts = now;
+            clickState.timer = setTimeout(() => {
+                handleGraphSingleClick(node);
+                clickState.timer = null;
+                clickState.lastId = null;
+            }, DBL_DELAY);
+        }
+    });
 }
 
 // 知识图谱节点单击处理
 function handleGraphSingleClick(node) {
-  if (!graphState || !graphRenderer) {
-    console.warn('[KnowledgeGraph] 知识图谱未初始化，无法处理点击事件');
-    return;
-  }
-  
-  const id = node.id();
-  const type = node.data('type');
-
-  if (type === 'chapter') {
-    if (graphState.expandedSet.has(id)) {
-      graphRenderer.collapseChapter(id);
-    } else {
-      graphRenderer.expandChapter(id);
+    if (!graphState || !graphRenderer) {
+        console.warn('[KnowledgeGraph] 知识图谱未初始化，无法处理点击事件');
+        return;
     }
 
-    if (graphState.currentLearningChapter === null && id === 'chapter1' &&
-      !graphState.learnedNodes.includes(id)) {
-      graphState.currentLearningChapter = id;
+    const id = node.id();
+    const type = node.data('type');
+
+    if (type === 'chapter') {
+        if (graphState.expandedSet.has(id)) {
+            graphRenderer.collapseChapter(id);
+        } else {
+            graphRenderer.expandChapter(id);
+        }
+
+        if (graphState.currentLearningChapter === null && id === 'chapter1' &&
+            !graphState.learnedNodes.includes(id)) {
+            graphState.currentLearningChapter = id;
+        }
+
+        graphRenderer.updateNodeColors();
+        return;
     }
 
-    graphRenderer.updateNodeColors();
-    return;
-  }
-
-  if (type === 'knowledge') {
-    const label = node.data('label') || id;
-    if (graphState.learnedNodes.includes(id)) {// 已学知识点
-      showKnowledgeModal(id, label);
-    } else if (graphState.isKnowledgeUnlocked(id)) {// 可学知识点
-      showKnowledgeModal(id, label);
-    } else {// 未解锁知识点
-      if (confirm("您还未学习前置知识点，是否直接开始测试？")) {
-        navigateTo('/pages/test_page.html', id, true, true);
-      }
+    if (type === 'knowledge') {
+        const label = node.data('label') || id;
+        if (graphState.learnedNodes.includes(id)) {// 已学知识点
+            showKnowledgeModal(id, label);
+        } else if (graphState.isKnowledgeUnlocked(id)) {// 可学知识点
+            showKnowledgeModal(id, label);
+        } else {// 未解锁知识点
+            // 检查是否是跨章节的学习需求
+            const chapterCheckResult = checkChapterPrerequisite(id);
+            if (chapterCheckResult.requiresChapterCompletion) {
+                if (confirm(`您还未完成前置章节"${chapterCheckResult.requiredChapter}"的测试，需要先完成该章节的最后一个测试才能学习"${label}"。是否现在开始测试前置章节？`)) {
+                    navigateTo('/pages/test_page.html', chapterCheckResult.lastTestId, true, true);
+                }
+            } else {
+                // 获取前置知识点信息
+                const prerequisiteInfo = getPrerequisiteInfo(id);
+                if (prerequisiteInfo) {
+                    if (confirm(`您还未学习前置知识点"${prerequisiteInfo.label}"，需要先完成该知识点的测试才能学习"${label}"。是否现在开始测试前置知识点？`)) {
+                        navigateTo('/pages/test_page.html', prerequisiteInfo.id, true, true);
+                    }
+                } else {
+                    if (confirm("您还未学习前置知识点，是否直接开始测试？")) {
+                        navigateTo('/pages/test_page.html', id, true, true);
+                    }
+                }
+            }
+        }
     }
-  }
 }
 
 // 知识图谱节点双击处理
 function handleGraphDoubleClick(node) {
-  if (!graphState || !graphRenderer) {
-    console.warn('[KnowledgeGraph] 知识图谱未初始化，无法处理双击事件');
-    return;
-  }
-  
-  const id = node.id();
-  const type = node.data('type');
-
-  if (type === 'chapter') {
-    if (graphState.isChapterCompleted(id)) {
-      if (confirm("您已学过本章节，是否再次进行测试？")) {
-        navigateTo('/pages/test_page.html', id, true, true);
-      }
-    } else if (graphState.currentLearningChapter === id) {
-      if (confirm("您还未学完当前章节内容，是否直接开始测试？")) {
-        navigateTo('/pages/test_page.html', id, true, true);
-      }
-    } else {
-      if (confirm("您还未解锁前置章节，是否直接开始测试？")) {
-        navigateTo('/pages/test_page.html', id, true, true);
-      }
+    if (!graphState || !graphRenderer) {
+        console.warn('[KnowledgeGraph] 知识图谱未初始化，无法处理双击事件');
+        return;
     }
 
-    graphState.passChapterTest(id);
-    graphRenderer.updateNodeColors();
-  }
-  
-  if (type === 'knowledge') {
-    const label = node.data('label') || id;
-    // 双击知识点节点直接跳转到学习页面
-    navigateTo('/pages/learning_page.html', id);
-  }
+    const id = node.id();
+    const type = node.data('type');
+
+    if (type === 'chapter') {
+        if (graphState.isChapterCompleted(id)) {
+            if (confirm("您已学过本章节，是否再次进行测试？")) {
+                navigateTo('/pages/test_page.html', id, true, true);
+            }
+        } else if (graphState.currentLearningChapter === id) {
+            if (confirm("您还未学完当前章节内容，是否直接开始测试？")) {
+                navigateTo('/pages/test_page.html', id, true, true);
+            }
+        } else {
+            if (confirm("您还未解锁前置章节，是否直接开始测试？")) {
+                navigateTo('/pages/test_page.html', id, true, true);
+            }
+        }
+
+        graphState.passChapterTest(id);
+        graphRenderer.updateNodeColors();
+    }
+
+    if (type === 'knowledge') {
+        const label = node.data('label') || id;
+        // 双击知识点节点直接跳转到学习页面
+        navigateTo('/pages/learning_page.html', id);
+    }
 }
 
 // 显示知识图谱容器并渲染知识图谱
 async function showKnowledgeGraph() {
-  const knowledgeGraphContainer = document.getElementById('knowledge-graph-container');
-  if (!knowledgeGraphContainer) {
-    console.warn('[KnowledgeGraph] 未找到知识图谱容器元素');
-    return;
-  }
-  
-  // 显示容器
-  knowledgeGraphContainer.style.display = 'block';
-  
-  // 如果知识图谱还未初始化，则初始化它
-  if (!knowledgeGraphInitialized) {
-    await initKnowledgeGraph();
-  }
-  
-  // 如果知识图谱已初始化，确保它正确显示
-  if (knowledgeGraphInitialized && graphRenderer) {
-    // 确保图谱正确居中显示
-    setTimeout(() => {
-      graphRenderer.centerAndZoomGraph();
-    }, 100);
-  }
+    const knowledgeGraphContainer = document.getElementById('knowledge-graph-container');
+    if (!knowledgeGraphContainer) {
+        console.warn('[KnowledgeGraph] 未找到知识图谱容器元素');
+        return;
+    }
+
+    // 显示容器
+    knowledgeGraphContainer.style.display = 'block';
+
+    // 如果知识图谱还未初始化，则初始化它
+    if (!knowledgeGraphInitialized) {
+        await initKnowledgeGraph();
+    }
+
+    // 如果知识图谱已初始化，确保它正确显示
+    if (knowledgeGraphInitialized && graphRenderer) {
+        // 确保图谱正确居中显示
+        setTimeout(() => {
+            graphRenderer.centerAndZoomGraph();
+        }, 100);
+    }
 }
 
 // 将 showKnowledgeGraph 函数设置为全局函数，供其他模块调用
@@ -1256,7 +1272,7 @@ function showProblemHintInChat(message, editorType, editCount) {
       </div>
     `;
 
-    
+
 
     // ✅ ceq关键：永远追加到末尾（保持时间顺序）
     chatMessages.appendChild(aiMessage);
@@ -1481,7 +1497,7 @@ function formatHTML(html) {
 // ==================== 调试工具函数 ====================
 
 // 显示当前保存的元素信息（调试用）
-window.showElementInfo = function() {
+window.showElementInfo = function () {
     console.log('==== 当前保存的元素信息 ====');
     console.log('selectedElementInfo:', selectedElementInfo);
     console.log('window.pendingElementContext:', window.pendingElementContext);
@@ -1615,7 +1631,7 @@ function extendChatModuleForElementContext() {
     const originalSendMessage = chatModule.sendMessage.bind(chatModule);
 
     // 重写sendMessage方法
-    chatModule.sendMessage = async function(mode, contentId) {
+    chatModule.sendMessage = async function (mode, contentId) {
         const message = this.inputElement.value.trim();
         if (!message || this.isLoading) return;
 
@@ -1689,108 +1705,174 @@ function extendChatModuleForElementContext() {
 // 在文件末尾添加新函数
 // 设置当前学习章节
 function setCurrentLearningChapter(graphState, topicId) {
-  try {
-    if (topicId) {
-      // 查找对应的节点
-      const node = graphState.graphData.nodes.find(n => 
-        n.data && n.data.id === topicId
-      );
-      
-      if (node) {
-        // 如果是章节节点，直接设置为当前学习章节
-        if (node.data.type === 'chapter') {
-          graphState.currentLearningChapter = topicId;
-          console.log('[KnowledgeGraph] 设置当前学习章节:', topicId);
-        } 
-        // 如果是知识点节点，需要找到其所属章节
-        else {
-          // 查找父章节
-          const parents = graphState.parentMap[topicId] || [];
-          
-          // 查找第一个章节类型的父节点
-          for (const parentId of parents) {
-            const parentNode = graphState.graphData.nodes.find(n => 
-              n.data && n.data.id === parentId
+    try {
+        if (topicId) {
+            // 查找对应的节点
+            const node = graphState.graphData.nodes.find(n =>
+                n.data && n.data.id === topicId
             );
-            
-            if (parentNode && parentNode.data.type === 'chapter') {
-              graphState.currentLearningChapter = parentId;
-              console.log('[KnowledgeGraph] 设置当前学习章节(通过知识点查找):', parentId);
-              break;
+
+            if (node) {
+                // 如果是章节节点，直接设置为当前学习章节
+                if (node.data.type === 'chapter') {
+                    graphState.currentLearningChapter = topicId;
+                    console.log('[KnowledgeGraph] 设置当前学习章节:', topicId);
+                }
+                // 如果是知识点节点，需要找到其所属章节
+                else {
+                    // 查找父章节
+                    const parents = graphState.parentMap[topicId] || [];
+
+                    // 查找第一个章节类型的父节点
+                    for (const parentId of parents) {
+                        const parentNode = graphState.graphData.nodes.find(n =>
+                            n.data && n.data.id === parentId
+                        );
+
+                        if (parentNode && parentNode.data.type === 'chapter') {
+                            graphState.currentLearningChapter = parentId;
+                            console.log('[KnowledgeGraph] 设置当前学习章节(通过知识点查找):', parentId);
+                            break;
+                        }
+                    }
+
+                    // 如果没找到父章节，尝试通过前置关系查找
+                    if (!graphState.currentLearningChapter) {
+                        const prereqs = graphState.prereqMap[topicId] || [];
+
+                        for (const prereqId of prereqs) {
+                            const prereqNode = graphState.graphData.nodes.find(n =>
+                                n.data && n.data.id === prereqId
+                            );
+
+                            if (prereqNode && prereqNode.data.type === 'chapter') {
+                                graphState.currentLearningChapter = prereqId;
+                                console.log('[KnowledgeGraph] 设置当前学习章节(通过前置关系查找):', prereqId);
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else {
+                console.warn('[KnowledgeGraph] 未找到对应节点:', topicId);
             }
-          }
-          
-          // 如果没找到父章节，尝试通过前置关系查找
-          if (!graphState.currentLearningChapter) {
-            const prereqs = graphState.prereqMap[topicId] || [];
-            
-            for (const prereqId of prereqs) {
-              const prereqNode = graphState.graphData.nodes.find(n => 
-                n.data && n.data.id === prereqId
-              );
-              
-              if (prereqNode && prereqNode.data.type === 'chapter') {
-                graphState.currentLearningChapter = prereqId;
-                console.log('[KnowledgeGraph] 设置当前学习章节(通过前置关系查找):', prereqId);
-                break;
-              }
-            }
-          }
         }
-      } else {
-        console.warn('[KnowledgeGraph] 未找到对应节点:', topicId);
-      }
+    } catch (error) {
+        console.error('[KnowledgeGraph] 设置当前学习章节失败:', error);
     }
-  } catch (error) {
-    console.error('[KnowledgeGraph] 设置当前学习章节失败:', error);
-  }
 }
 
 // 显示知识点弹窗
 function showKnowledgeModal(knowledgeId, nodeLabel) {
-  const modal = document.getElementById('knowledgeModal');
-  const title = document.getElementById('modalTitle');
-  const status = document.getElementById('modalStatus');
-  const learnBtn = document.getElementById('learnBtn');
-  const testBtn = document.getElementById('testBtn');
+    const modal = document.getElementById('knowledgeModal');
+    const title = document.getElementById('modalTitle');
+    const status = document.getElementById('modalStatus');
+    const learnBtn = document.getElementById('learnBtn');
+    const testBtn = document.getElementById('testBtn');
 
-  title.textContent = nodeLabel || knowledgeId;
-  learnBtn.className = 'learn-btn';
-  learnBtn.disabled = false;
-  learnBtn.textContent = '学习';
-  testBtn.className = 'test-btn';
+    title.textContent = nodeLabel || knowledgeId;
+    learnBtn.className = 'learn-btn';
+    learnBtn.disabled = false;
+    learnBtn.textContent = '学习';
+    testBtn.className = 'test-btn';
 
-  if (graphState.learnedNodes.includes(knowledgeId)) {
-    status.textContent = '您已学过该知识点，是否再次复习或重新测试？';
-    learnBtn.textContent = '复习';
-    learnBtn.className = 'review-btn';
+    if (graphState.learnedNodes.includes(knowledgeId)) {
+        status.textContent = '您已学过该知识点，是否再次复习或重新测试？';
+        learnBtn.textContent = '复习';
+        learnBtn.className = 'review-btn';
 
-    learnBtn.onclick = () => {
-      navigateTo('/pages/learning_page.html', knowledgeId);
-    };
+        learnBtn.onclick = () => {
+            navigateTo('/pages/learning_page.html', knowledgeId);
+        };
 
-    testBtn.onclick = () => {
-      navigateTo('/pages/test_page.html', knowledgeId, true, true);
-    };
-  } else if (graphState.isKnowledgeUnlocked(knowledgeId)) {
-    status.textContent = '您可以开始学习该知识点或直接进行测试';
+        testBtn.onclick = () => {
+            navigateTo('/pages/test_page.html', knowledgeId, true, true);
+        };
+    } else if (graphState.isKnowledgeUnlocked(knowledgeId)) {
+        status.textContent = '您可以开始学习该知识点或直接进行测试';
 
-    learnBtn.onclick = () => {
-      navigateTo('/pages/learning_page.html', knowledgeId);
-    };
+        learnBtn.onclick = () => {
+            navigateTo('/pages/learning_page.html', knowledgeId);
+        };
 
-    testBtn.onclick = () => {
-      navigateTo('/pages/test_page.html', knowledgeId, true, true);
-    };
-  } else {
-    status.textContent = '该知识点尚未解锁，您是否要直接开始测试？';
-    learnBtn.disabled = true;
-    learnBtn.className += ' disabled';
+        testBtn.onclick = () => {
+            navigateTo('/pages/test_page.html', knowledgeId, true, true);
+        };
+    } else {
+        status.textContent = '该知识点尚未解锁，您是否要直接开始测试？';
+        learnBtn.disabled = true;
+        learnBtn.className += ' disabled';
 
-    learnBtn.onclick = () => { };
-    testBtn.onclick = () => {
-      navigateTo('/pages/test_page.html', knowledgeId, true, true);
-    };
-  }
-  modal.style.display = 'block';
+        learnBtn.onclick = () => { };
+        testBtn.onclick = () => {
+            navigateTo('/pages/test_page.html', knowledgeId, true, true);
+        };
+    }
+    modal.style.display = 'block';
+}
+
+// 获取前置知识点信息
+function getPrerequisiteInfo(knowledgeId) {
+    try {
+        // 根据知识图谱的依赖关系获取前置知识点
+        const prerequisiteMap = {
+            '1_2': { id: '1_1', label: '使用h元素和p元素体验标题与段落' },
+            '1_3': { id: '1_2', label: '应用文本格式(加粗、斜体)' },
+            '2_2': { id: '2_1', label: '使用盒子元素进行内容划分' },
+            '2_3': { id: '2_2', label: '创建有序列表' },
+            '3_2': { id: '3_1', label: '文本框与按钮的使用' },
+            '3_3': { id: '3_2', label: '复选框与单选框' },
+            '4_2': { id: '4_1', label: '设置颜色与字体' },
+            '4_3': { id: '4_2', label: '理解盒模型' },
+            '5_2': { id: '5_1', label: '插入与管理图片' },
+            '5_3': { id: '5_2', label: '引入音频文件' },
+            '6_2': { id: '6_1', label: '按钮点击事件' },
+            '6_3': { id: '6_2', label: '获取用户输入' }
+        };
+
+        return prerequisiteMap[knowledgeId] || null;
+    } catch (error) {
+        console.error('获取前置知识点信息时出错:', error);
+        return null;
+    }
+}
+
+// 检查章节前置条件
+function checkChapterPrerequisite(knowledgeId) {
+    try {
+        const [chapter, section] = knowledgeId.split('_').map(Number);
+
+        // 如果是第一章的第一个知识点，不需要前置条件
+        if (chapter === 1 && section === 1) {
+            return { requiresChapterCompletion: false };
+        }
+
+        // 如果是第一章的其他知识点，检查章节内前置条件
+        if (chapter === 1) {
+            return { requiresChapterCompletion: false };
+        }
+
+        // 如果是其他章节的第一个知识点，需要检查前一章节是否完成
+        if (section === 1) {
+            const previousChapter = chapter - 1;
+            const previousChapterId = `chapter${previousChapter}`;
+
+            // 检查前一章节是否已完成
+            const completedChapters = JSON.parse(localStorage.getItem('completedChapters') || '[]');
+            const isPreviousChapterCompleted = completedChapters.includes(previousChapterId);
+
+            if (!isPreviousChapterCompleted) {
+                return {
+                    requiresChapterCompletion: true,
+                    requiredChapter: `第${previousChapter}章`,
+                    lastTestId: `${previousChapter}_3` // 前一章节的最后一个测试
+                };
+            }
+        }
+
+        return { requiresChapterCompletion: false };
+    } catch (error) {
+        console.error('检查章节前置条件时出错:', error);
+        return { requiresChapterCompletion: false };
+    }
 }
