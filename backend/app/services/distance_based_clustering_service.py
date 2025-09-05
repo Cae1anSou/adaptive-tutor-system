@@ -79,7 +79,8 @@ class DistanceBasedClusteringService:
                 "config.json",
                 "cluster_centers.npy", 
                 "pca.joblib",
-                "struct_scaler.joblib"
+                "struct_scaler.joblib",
+                 "cluster_report.json"
             ],
             "missing_files": [],
             "available_files": []
@@ -184,12 +185,27 @@ class DistanceBasedClusteringService:
             cluster_name = self.names_map.get(closest_cluster_id, f"聚类-{closest_cluster_id}")
             progress_score = self.cluster_means_progress.get(closest_cluster_id, 0.0)
             
+            # 构建距离字典，避免顺序混乱
+            cluster_distances_dict = {}
+            cluster_distances_list = distances.tolist()
+            for cluster_id, distance in enumerate(cluster_distances_list):
+                cluster_label = self.names_map.get(cluster_id, f"聚类-{cluster_id}")
+                # 同时提供中英文映射
+                if cluster_label == "正常":
+                    cluster_distances_dict["Normal"] = distance
+                elif cluster_label == "超进度":
+                    cluster_distances_dict["Advanced"] = distance
+                elif cluster_label == "低进度":
+                    cluster_distances_dict["Struggling"] = distance
+                cluster_distances_dict[cluster_label] = distance  # 保留原始标签
+            
             return {
                 "cluster_id": int(closest_cluster_id),
                 "cluster_name": cluster_name,
                 "progress_score": float(progress_score),
                 "confidence": float(confidence),
-                "distances": distances.tolist(),
+                "distances": distances.tolist(),  # 保留原数组以向后兼容
+                "cluster_distances_dict": cluster_distances_dict,  # 新的字典格式
                 "classification_type": "distance_based_full",
                 "message_count": len(user_messages),
                 "window_features": window_features,  # 直接在聚类服务中返回特征

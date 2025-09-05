@@ -1206,6 +1206,49 @@ class UserStateService:
             logger.error(f"获取用户 {participant_id} 聚类信息失败: {e}")
             return None
 
+    def _normalize_cluster_name(self, cluster_name: str) -> str:
+        """
+        将所有聚类名称（包括实时回退和距离聚类）归一化为英文标准格式
+        采用用户建议的直接映射策略：一步到位，减少转换层次
+        
+        优点：
+        - 简洁高效：一步映射，无需二次转换
+        - 统一格式：整个系统使用相同的英文标准格式
+        - 性能优化：减少翻译开销
+        """
+        # 统一映射表：所有聚类名称 -> 英文标准格式
+        direct_mapping = {
+            # 实时分析阶段映射
+            "早期正面": "Normal",      # 早期表现良好 -> 正常进度  
+            "早期困难": "Struggling",  # 早期遇到困难 -> 需要支持
+            "早期探索": "Normal",      # 早期探索状态 -> 正常进度
+            
+            "中期进展": "Advanced",    # 中期有进展 -> 表现优秀
+            "中期困难": "Struggling",  # 中期困难 -> 需要支持
+            "中期稳定": "Normal",      # 中期稳定 -> 正常进度
+            
+            "高级进展": "Advanced",    # 高级进展 -> 表现优秀
+            "稳定进展": "Normal",      # 稳定进展 -> 正常进度  
+            "需要支持": "Struggling",  # 明确需要支持
+            "需要干预": "Struggling",  # 需要干预 -> 需要支持
+            
+            # 距离聚类结果映射（统一格式）
+            "低进度": "Struggling",
+            "正常": "Normal", 
+            "超进度": "Advanced",
+            
+            # 已经是英文标准格式的保持不变
+            "Struggling": "Struggling",
+            "Normal": "Normal",
+            "Advanced": "Advanced"
+        }
+        
+        normalized = direct_mapping.get(cluster_name, cluster_name)
+        if normalized != cluster_name:
+            logger.info(f"聚类名称统一映射: '{cluster_name}' -> '{normalized}' (采用英文标准格式)")
+        
+        return normalized
+
     def analyze_real_time_progress(self, participant_id: str, conversation_history: List[Dict[str, str]]) -> Optional[Dict[str, Any]]:
         """
         实时学习进度分析 - 无需等待大量数据
@@ -1223,7 +1266,9 @@ class UserStateService:
             import os
             
             # 动态导入实时分析器类
-            real_time_analyzer_path = os.path.join(os.path.dirname(__file__), '..', '..', 'real_time_progress_analyzer.py')
+            # 构建路径：backend/real_time_progress_analyzer.py
+            backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))  # 到 backend/
+            real_time_analyzer_path = os.path.join(backend_dir, 'real_time_progress_analyzer.py')
             if os.path.exists(real_time_analyzer_path):
                 import importlib.util
                 spec = importlib.util.spec_from_file_location("real_time_progress_analyzer", real_time_analyzer_path)
@@ -1238,8 +1283,12 @@ class UserStateService:
                     profile, _ = self.get_or_create_profile(participant_id, None)
                     current_time = datetime.now(UTC)
                     
+                    # 归一化聚类名称到标准的三个类别，确保策略函数能够识别
+                    normalized_cluster = self._normalize_cluster_name(result['cluster_name'])
+                    
                     clustering_data = {
-                        'current_cluster': result['cluster_name'],
+                        'current_cluster': normalized_cluster,
+                        'original_cluster': result['cluster_name'],  # 保留原始分类结果
                         'cluster_confidence': result['confidence'],
                         'progress_score': result['progress_score'],
                         'last_analysis_timestamp': current_time.isoformat(),
@@ -1252,7 +1301,8 @@ class UserStateService:
                     # 添加历史记录
                     clustering_data['clustering_history'].append({
                         'timestamp': current_time.isoformat(),
-                        'cluster_name': result['cluster_name'],
+                        'cluster_name': normalized_cluster,  # 使用归一化后的名称
+                        'original_cluster': result['cluster_name'],  # 保留原始名称
                         'confidence': result['confidence'],
                         'progress_score': result['progress_score'],
                         'message_count': result['message_count'],
@@ -1269,10 +1319,11 @@ class UserStateService:
                     }
                     self.set_profile(profile, set_dict)
                     
-                    logger.info(f"实时进度分析完成: {participant_id} -> {result['cluster_name']} (置信度: {result['confidence']:.3f}, 消息数: {result['message_count']})")
+                    logger.info(f"实时进度分析完成: {participant_id} -> {normalized_cluster} (原始: {result['cluster_name']}) (置信度: {result['confidence']:.3f}, 消息数: {result['message_count']})")
                     
                     return {
-                        'cluster_name': result['cluster_name'],
+                        'cluster_name': normalized_cluster,  # 返回归一化后的聚类名称
+                        'original_cluster': result['cluster_name'],  # 保留原始分类结果
                         'cluster_confidence': result['confidence'],
                         'progress_score': result['progress_score'],
                         'analysis_type': result['analysis_type'],
@@ -1315,7 +1366,7 @@ class UserStateService:
             if clustering_service is None:
                 logger.warning(f"聚类服务未注入，回退到实时分析 - 用户 {participant_id}")
                 return self.analyze_real_time_progress(participant_id, conversation_history)
-                
+            
             logger.info(f"开始为用户 {participant_id} 进行聚类分析（依赖注入版本）")
             
             # 提取用户消息
@@ -1334,6 +1385,9 @@ class UserStateService:
                 logger.warning(f"用户 {participant_id} 聚类分析失败，回退到实时分析")
                 return self.analyze_real_time_progress(participant_id, conversation_history)
             
+            # 统一归一化聚类名称为英文标准格式（距离聚类也需要统一）
+            result['cluster_name'] = self._normalize_cluster_name(result['cluster_name'])
+            
             # 获取窗口特征（从聚类服务中直接返回）
             window_features = result.get('window_features', {})
             
@@ -1350,7 +1404,8 @@ class UserStateService:
                 'conversation_count_analyzed': result['message_count'],
                 'analysis_type': result['classification_type'],
                 'model_type': 'distance_based_injected',
-                'cluster_distances': result.get('distances', []),
+                'cluster_distances': result.get('distances', []),  # 保留原数组以向后兼容
+                'cluster_distances_dict': result.get('cluster_distances_dict', {}),  # 新的字典格式
                 'window_features': window_features,
                 'clustering_history': profile.behavior_patterns.get('progress_clustering', {}).get('clustering_history', [])
             }
@@ -1364,7 +1419,8 @@ class UserStateService:
                 'message_count': result['message_count'],
                 'analysis_type': result['classification_type'],
                 'model_type': 'distance_based_injected',
-                'cluster_distances': result.get('distances', []),
+                'cluster_distances': result.get('distances', []),  # 保留原数组以向后兼容
+                'cluster_distances_dict': result.get('cluster_distances_dict', {}),  # 新的字典格式
                 'window_features': window_features
             })
             
@@ -1388,7 +1444,8 @@ class UserStateService:
                 'analysis_type': result['classification_type'],
                 'model_type': 'distance_based_injected',
                 'message_count': result['message_count'],
-                'cluster_distances': result.get('distances', []),
+                'cluster_distances': result.get('distances', []),  # 保留原数组以向后兼容
+                'cluster_distances_dict': result.get('cluster_distances_dict', {}),  # 新的字典格式
                 'analysis_successful': True
             }
                 

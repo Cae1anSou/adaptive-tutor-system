@@ -1,8 +1,11 @@
 # backend/app/services/prompt_generator.py
 import json
+import logging
 from typing import List, Dict, Any, Tuple
 from ..schemas.chat import UserStateSummary
 from ..schemas.content import CodeContent
+
+logger = logging.getLogger(__name__)
 
 
 class PromptGenerator:
@@ -193,7 +196,7 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
             guide_lines.append("- If user code is provided, read HTML/CSS/JS; reference exact locations; ensure cross-layer consistency; propose minimal diffs.")
 
         if guide_lines:
-            prompt_parts.append("CONTEXT INTERPRETATION GUIDE:\n" + "\-s-n".join(guide_lines))
+            prompt_parts.append("CONTEXT INTERPRETATION GUIDE:\n" + "\n".join(guide_lines))
 
         return "\n\n".join(prompt_parts)
 
@@ -302,19 +305,13 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
                 progress_score = progress_clustering.get('progress_score', 0.0)
                 last_analysis = progress_clustering.get('last_analysis_timestamp')
                 conversation_count = progress_clustering.get('conversation_count_analyzed', 0)
-                cluster_distances = progress_clustering.get('cluster_distances', [])
+                cluster_distances = progress_clustering.get('cluster_distances', [])  # 保留原数组以向后兼容
+                cluster_distances_dict = progress_clustering.get('cluster_distances_dict', {})  # 新的字典格式
                 window_features = progress_clustering.get('window_features', {})
                 
                 if cluster_name and cluster_confidence > 0.1:  # 只有在有一定置信度时才显示
-                    # 中英文映射
-                    def translate_cluster_name(name):
-                        mapping = {
-                            '低进度': 'Struggling', '正常': 'Normal', '超进度': 'Advanced',
-                            'Struggling': 'Struggling', 'Normal': 'Normal', 'Advanced': 'Advanced'
-                        }
-                        return mapping.get(name, name)
-                    
-                    cluster_name_en = translate_cluster_name(cluster_name)
+                    # 聚类名称现已统一为英文标准格式，无需翻译
+                    cluster_name_en = cluster_name  # 直接使用，已经是英文格式
                     
                     progress_parts = [
                         f"LEARNING PROGRESS ANALYSIS:",
@@ -332,18 +329,28 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
                     
                     progress_parts.append(f"- Progress score: {progress_score:.3f} (higher = faster progress)")
                     
-                    # 聚类距离分析（如果有距离数据）
-                    if cluster_distances and len(cluster_distances) == 3:
-                        cluster_names = ['Advanced', 'Normal', 'Struggling']  # 对应超进度、正常、低进度
-                        min_idx = cluster_distances.index(min(cluster_distances))
-                        closest_cluster = cluster_names[min_idx]
+                    # 聚类距离分析（优先使用字典格式避免顺序混乱）
+                    distance_data = cluster_distances_dict if cluster_distances_dict else {}
+                    if not distance_data and cluster_distances and len(cluster_distances) == 3:
+                        # 向后兼容：如果没有字典格式，使用原数组（但这是不安全的）
+                        logger.warning("使用不安全的固定顺序解析cluster_distances，建议更新到字典格式")
+                        # 注意：这里的顺序可能不准确！
+                        distance_data = {
+                            'Normal': cluster_distances[0],
+                            'Advanced': cluster_distances[1], 
+                            'Struggling': cluster_distances[2]
+                        }
+                    
+                    if distance_data:
+                        min_distance = min(distance_data.values())
+                        closest_cluster_name = [name for name, dist in distance_data.items() if dist == min_distance][0]
                         
                         progress_parts.append("- Distance analysis:")
-                        progress_parts.append(f"  * Closest to [{closest_cluster}] cluster (distance: {min(cluster_distances):.2f})")
+                        progress_parts.append(f"  * Closest to [{closest_cluster_name}] cluster (distance: {min_distance:.2f})")
                         
                         # 显示其他相关距离
-                        for i, (name, dist) in enumerate(zip(cluster_names, cluster_distances)):
-                            if i != min_idx and dist < 0.5:  # 只显示相对接近的距离
+                        for name, dist in distance_data.items():
+                            if name != closest_cluster_name and dist < 0.5:  # 只显示相对接近的距离
                                 progress_parts.append(f"  * Distance to [{name}]: {dist:.2f}")
                     
                     # 特征分析（如果有窗口特征数据）
@@ -504,21 +511,15 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
             cluster_name = progress_clustering.get('current_cluster')
             cluster_confidence = progress_clustering.get('cluster_confidence', 0.0)
             progress_score = progress_clustering.get('progress_score', 0.0)
-            cluster_distances = progress_clustering.get('cluster_distances', [])
+            cluster_distances = progress_clustering.get('cluster_distances', [])  # 保留原数组以向后兼容
+            cluster_distances_dict = progress_clustering.get('cluster_distances_dict', {})  # 新的字典格式
             
             # 如果没有聚类信息或置信度过低，返回空字符串
             if not cluster_name or cluster_confidence < 0.3:
                 return ""
             
-            # 中英文映射
-            def translate_cluster_name(name):
-                mapping = {
-                    '低进度': 'Struggling', '正常': 'Normal', '超进度': 'Advanced',
-                    'Struggling': 'Struggling', 'Normal': 'Normal', 'Advanced': 'Advanced'
-                }
-                return mapping.get(name, name)
-            
-            cluster_name_en = translate_cluster_name(cluster_name)
+            # 聚类名称现已统一为英文标准格式，无需翻译
+            cluster_name_en = cluster_name  # 直接使用英文格式
             
             # 增强的策略描述
             base_strategies = {
@@ -547,10 +548,17 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
             confidence_level = "High" if cluster_confidence > 0.8 else "Medium" if cluster_confidence > 0.6 else "Low"
             confidence_note = f" (Analysis confidence: {confidence_level} - {cluster_confidence:.2f}"
             
-            # 如果有距离信息，添加边界情况提醒
-            if cluster_distances and len(cluster_distances) == 3:
-                min_distance = min(cluster_distances)
-                second_min = sorted(cluster_distances)[1]
+            # 如果有距离信息，添加边界情况提醒 - 优先使用字典格式
+            distance_values = []
+            if cluster_distances_dict:
+                distance_values = list(cluster_distances_dict.values())
+            elif cluster_distances and len(cluster_distances) == 3:
+                distance_values = cluster_distances
+            
+            if len(distance_values) >= 2:
+                min_distance = min(distance_values)
+                sorted_distances = sorted(distance_values)
+                second_min = sorted_distances[1]
                 if second_min - min_distance < 0.2:  # 如果距离很接近
                     confidence_note += f", close to boundary - monitor for changes"
             

@@ -8,6 +8,7 @@
 import os
 import re
 import hashlib
+import threading
 from typing import List, Tuple, Dict, Any, Optional
 import numpy as np
 from sklearn.decomposition import PCA
@@ -26,6 +27,72 @@ except Exception as e:
         "无法导入 sentence-transformers，请先安装依赖并确保未加载 TensorFlow。\n"
         f"原始错误: {e}"
     )
+
+# ---------------------------
+# SentenceTransformer 全局缓存
+# ---------------------------
+
+class SentenceTransformerCache:
+    """
+    线程安全的SentenceTransformer模型缓存
+    避免重复加载模型权重，大幅提升性能
+    """
+    
+    def __init__(self):
+        self._models = {}
+        self._lock = threading.Lock()
+    
+    def get_model(self, model_name: str, device: str = "cpu"):
+        """
+        获取或创建SentenceTransformer模型实例
+        
+        Args:
+            model_name: 模型名称
+            device: 设备类型
+            
+        Returns:
+            SentenceTransformer实例
+        """
+        cache_key = f"{model_name}:{device}"
+        
+        # 快速路径：如果模型已存在，直接返回
+        if cache_key in self._models:
+            return self._models[cache_key]
+        
+        # 慢路径：需要加载模型，使用锁保证线程安全
+        with self._lock:
+            # 双重检查，避免重复加载
+            if cache_key in self._models:
+                return self._models[cache_key]
+            
+            print(f"[cache] Loading SentenceTransformer: {model_name} (device: {device})")
+            model = SentenceTransformer(model_name, device=device)
+            
+            # 获取并打印embedding维度信息
+            try:
+                dim = model.get_sentence_embedding_dimension()
+                print(f"[cache] Cached model {model_name}, embedding_dim = {dim}")
+            except Exception:
+                print(f"[cache] Cached model {model_name}, embedding_dim = unknown")
+            
+            self._models[cache_key] = model
+            return model
+    
+    def clear_cache(self):
+        """清空缓存（用于测试或内存管理）"""
+        with self._lock:
+            print(f"[cache] Clearing {len(self._models)} cached models")
+            self._models.clear()
+    
+    def get_cache_info(self):
+        """获取缓存状态信息"""
+        return {
+            "cached_models": list(self._models.keys()),
+            "cache_size": len(self._models)
+        }
+
+# 全局缓存实例（单例）
+_model_cache = SentenceTransformerCache()
 
 # ---------------------------
 # 文本/代码 预处理
@@ -122,13 +189,14 @@ def encode_messages(clean_texts: List[str],
                     model_name: str = "sentence-transformers/all-mpnet-base-v2",
                     device: str = "cpu",
                     batch_size: int = 64) -> np.ndarray:
-    print(f"[encoder] Loading SentenceTransformer: {model_name}")
-    model = SentenceTransformer(model_name, device=device)
-    try:
-        dim = model.get_sentence_embedding_dimension()
-    except Exception:
-        dim = None
-    print(f"[encoder] embedding_dim = {dim}")
+    """
+    使用缓存的SentenceTransformer模型对文本进行编码
+    大幅提升性能，避免重复加载模型权重
+    """
+    # 使用全局缓存获取模型实例（首次加载会有日志输出）
+    model = _model_cache.get_model(model_name, device)
+    
+    # 编码文本
     embs = model.encode(clean_texts, batch_size=batch_size, normalize_embeddings=True, show_progress_bar=False)
     return np.asarray(embs, dtype=np.float32)
 
@@ -337,3 +405,23 @@ def create_single_window_from_messages(user_messages: List[str],
     window_indices = list(range(len(processed_messages)))  # 总是[0,1,2,...,target_size-1]
     
     return window_indices, processed_messages, valid_indices, is_padded
+
+# ---------------------------
+# 缓存管理便利函数
+# ---------------------------
+
+def clear_model_cache():
+    """
+    清空SentenceTransformer模型缓存
+    用于内存管理或测试场景
+    """
+    _model_cache.clear_cache()
+
+def get_cached_model_info():
+    """
+    获取当前缓存的模型信息
+    
+    Returns:
+        Dict包含缓存状态信息
+    """
+    return _model_cache.get_cache_info()
