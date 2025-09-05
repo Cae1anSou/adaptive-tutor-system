@@ -81,6 +81,26 @@ body {
     overflow: hidden;
     position: relative;
     /* 添加相对定位，使其子元素可以使用绝对定位 */
+    background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c, #4facfe, #00f2fe);
+    background-size: 400% 400%;
+    animation: gradientShift 8s ease-in-out infinite;
+}
+
+.main-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    z-index: 1;
+}
+
+.main-container>* {
+    position: relative;
+    z-index: 2;
 }
 
 /* 顶部标题栏样式 */
@@ -433,6 +453,7 @@ body {
     text-align: center;
 }
 
+
 /* 欢迎区域 */
 .welcome-section {
     margin-bottom: var(--spacing-2xl);
@@ -456,7 +477,7 @@ body {
     color: var(--text-light);
     font-size: var(--font-size-base);
     line-height: 1.6;
-    max-width: 400px;
+    max-width: 600px;
     margin: 0 auto;
 }
 
@@ -621,6 +642,28 @@ body {
     animation: spin 1s linear infinite;
 }
 
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    25% {
+        background-position: 100% 50%;
+    }
+
+    50% {
+        background-position: 100% 100%;
+    }
+
+    75% {
+        background-position: 0% 100%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -690,6 +733,20 @@ body {
 @media (max-width: 768px) {
     .index-container {
         width: 95%;
+    }
+
+    .entry-container {
+        padding: var(--spacing-lg);
+        min-height: 300px;
+    }
+
+    .entry-content {
+        max-width: 100%;
+    }
+
+    .welcome-section p {
+        max-width: 90%;
+        font-size: var(--font-size-sm);
     }
 
     .welcome-content {
@@ -2954,3 +3011,5 @@ iconify-icon {
     margin-bottom: 0;
     /* 移除底部边距 */
 }
+
+

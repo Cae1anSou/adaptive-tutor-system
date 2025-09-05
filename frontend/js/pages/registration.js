@@ -17,6 +17,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const nicknameInput = document.getElementById('nickname-input');
     const themeSelector = document.getElementById('theme-selector');
 
+    // 重置按钮状态（处理页面后退的情况）
+    if (startButton) {
+        startButton.disabled = false;
+        startButton.innerHTML = '<iconify-icon icon="mdi:play" width="20" height="20"></iconify-icon> 开始学习';
+    }
+
     // 监听输入变化
     if (nicknameInput) {
         nicknameInput.addEventListener('input', checkFormValid);
@@ -64,28 +70,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 if (result.code === 200 || result.code === 201) {
                     saveParticipantId(result.data.participant_id);
-                    // 成功提示
-                    showSuccess(`欢迎 ${nickname}！正在进入${getThemeName(theme)}学习...`);
-
-                    // 延迟跳转，让用户看到欢迎信息
-                    setTimeout(() => {
-                        navigateTo('/pages/learning_page.html', '1_1', true);
-                    }, 1500);
+                    // 直接跳转到学习页面
+                    navigateTo('/pages/learning_page.html', '1_1', true);
                 } else {
                     showError(result.message || '启动失败，请重试');
+                    // 恢复按钮状态
+                    startButton.disabled = false;
+                    startButton.innerHTML = originalText;
+                    checkFormValid();
                 }
             } catch (error) {
                 console.error('启动请求失败:', error);
                 showError('网络错误，请检查网络连接后重试');
-            } finally {
                 // 恢复按钮状态
-                setTimeout(() => {
-                    if (startButton) {
-                        startButton.disabled = false;
-                        startButton.innerHTML = originalText;
-                        checkFormValid(); // 重新检查表单状态
-                    }
-                }, 1500);
+                startButton.disabled = false;
+                startButton.innerHTML = originalText;
+                checkFormValid();
             }
         });
     }
@@ -111,27 +111,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         return true;
     }
 
-    // 生成基于昵称和主题的参与者ID
+    // 生成参与者ID（直接使用昵称）
     function generateParticipantId(nickname, theme) {
-        const timestamp = Date.now().toString().slice(-6);
-        const themePrefix = getThemePrefix(theme);
         // 清理昵称，只保留字母数字和中文
-        const cleanNickname = nickname.replace(/[^\w\u4e00-\u9fa5]/g, '').slice(0, 10);
-        return `${themePrefix}_${cleanNickname}_${timestamp}`;
+        const cleanNickname = nickname.replace(/[^\w\u4e00-\u9fa5]/g, '').trim();
+        return cleanNickname;
     }
 
-    // 获取主题前缀
-    function getThemePrefix(theme) {
-        const prefixes = {
-            'pets': 'PET',
-            'shopping': 'SHOP',
-            'travel': 'TRAVEL',
-            'food': 'FOOD',
-            'fitness': 'FIT',
-            'music': 'MUSIC'
-        };
-        return prefixes[theme] || 'USER';
-    }
 
     // 获取主题名称
     function getThemeName(theme) {
@@ -160,4 +146,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 初始化检查表单状态
     checkFormValid();
+});
+
+// 监听页面显示事件（包括从缓存恢复）
+window.addEventListener('pageshow', (event) => {
+    const startButton = document.getElementById('start-button');
+    if (startButton) {
+        // 重置按钮状态
+        startButton.disabled = false;
+        startButton.innerHTML = '<iconify-icon icon="mdi:play" width="20" height="20"></iconify-icon> 开始学习';
+
+        // 重新检查表单有效性
+        const nicknameInput = document.getElementById('nickname-input');
+        const themeSelector = document.getElementById('theme-selector');
+        if (nicknameInput && themeSelector) {
+            const nickname = nicknameInput.value.trim() || '';
+            const theme = themeSelector.value || '';
+            const isValid = nickname.length >= 2 && theme;
+            startButton.disabled = !isValid;
+        }
+    }
 });
