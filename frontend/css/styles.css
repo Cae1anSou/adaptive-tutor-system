@@ -134,7 +134,17 @@
         left: 20px;
         /* 设置左侧固定位置 */
     }
+    
+    /* 标题链接样式 */
+    .header-title {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
 
+    .header-title:hover {
+        opacity: 0.8;
+        transform: scale(1.02);
+    }
     .user-profile {
         display: flex;
         align-items: center;
@@ -846,51 +856,6 @@
 
     .disabled {
         background-color: var(--text-lighter) !important;
-    }
-
-    /* 中英文切换按钮样式 */
-    #language-toggle {
-        position: absolute;
-        margin-right: 40px;
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-xs);
-        padding: var(--spacing-sm) var(--spacing-md);
-        background-color: rgba(255, 255, 255, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: var(--border-radius-md);
-        color: white;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-size: var(--font-size-sm);
-        font-weight: 500;
-    }
-
-    #language-toggle:hover {
-        background-color: rgba(255, 255, 255, 0.3);
-        transform: translateX(-2px);
-    }
-
-    #language-toggle-test {
-        position: absolute;
-        margin-right: 110px;
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-xs);
-        padding: var(--spacing-sm) var(--spacing-md);
-        background-color: rgba(255, 255, 255, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: var(--border-radius-md);
-        color: white;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-size: var(--font-size-sm);
-        font-weight: 500;
-    }
-
-    #language-toggle-test:hover {
-        background-color: rgba(255, 255, 255, 0.3);
-        transform: translateX(-2px);
     }
 
     /* 知识图谱容器样式 */
@@ -2397,17 +2362,6 @@
 
     .back-button i {
         font-size: var(--font-size-base);
-    }
-
-    /* 标题链接样式 */
-    .header-title {
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .header-title:hover {
-        opacity: 0.8;
-        transform: scale(1.02);
     }
 
     .info-tab {
