@@ -1,0 +1,86 @@
+{
+  "names_map": {
+    "2": "低进度",
+    "0": "正常",
+    "1": "超进度"
+  },
+  "cluster_means_progress": {
+    "0": 0.1237446591258049,
+    "1": 0.43358758091926575,
+    "2": -0.5700506567955017
+  },
+  "silhouette_cosine": 0.5094529390335083,
+  "prototypes": {
+    "0": [
+      140,
+      172,
+      185,
+      218,
+      246,
+      224,
+      204,
+      114
+    ],
+    "1": [
+      49,
+      230,
+      129,
+      164,
+      31,
+      51,
+      3,
+      93
+    ],
+    "2": [
+      88,
+      65,
+      264,
+      16,
+      55,
+      274,
+      282,
+      37
+    ]
+  },
+  "feature_means_per_cluster": {
+    "0": {
+      "count": 162,
+      "repeat_eq_mean": 0.018314316868782043,
+      "repeat_sim_mean": 0.054433222860097885,
+      "code_change_mean": 0.5039682388305664,
+      "done_hits_mean": 2.617284059524536,
+      "stuck_hits_mean": 0.7777777910232544,
+      "cw_persist_mean": 0.28923675417900085
+    },
+    "1": {
+      "count": 55,
+      "repeat_eq_mean": 0.019820937886834145,
+      "repeat_sim_mean": 0.04628099128603935,
+      "code_change_mean": 0.982077956199646,
+      "done_hits_mean": 2.909090995788574,
+      "stuck_hits_mean": 1.5636364221572876,
+      "cw_persist_mean": 0.375975638628006
+    },
+    "2": {
+      "count": 77,
+      "repeat_eq_mean": 0.02465471252799034,
+      "repeat_sim_mean": 0.3978748619556427,
+      "code_change_mean": 0.9617965221405029,
+      "done_hits_mean": 3.9350650310516357,
+      "stuck_hits_mean": 2.701298713684082,
+      "cw_persist_mean": 0.4267096519470215
+    }
+  },
+  "config": {
+    "model_name": "sentence-transformers/all-mpnet-base-v2",
+    "pca_dim": 48,
+    "include_struct": true,
+    "struct_weight": 1.0,
+    "near_sim_thresh": 0.92,
+    "batch_size": 12,
+    "overlap": 4,
+    "n_init": 200,
+    "max_iter": 1000,
+    "uncertain": 0.6
+  }
+}
