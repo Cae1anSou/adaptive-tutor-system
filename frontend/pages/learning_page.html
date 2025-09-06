@@ -19,12 +19,6 @@
         <iconify-icon icon="mdi:book-education" width="24" height="24"></iconify-icon>
         加载中...
       </h1>
-      <!-- 中英文切换按钮 -->
-      <button id="language-toggle" class="back-button"
-        style="position: absolute; right: 120px; display: flex; align-items: center; gap: var(--spacing-xs); padding: var(--spacing-sm) var(--spacing-md); background-color: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: var(--border-radius-md); color: white; cursor: pointer; transition: all 0.2s ease; font-size: var(--font-size-sm); font-weight: 500;">
-        <iconify-icon icon="mdi:translate" width="20" height="20"></iconify-icon>
-        EN
-      </button>
       <!-- 简化的知识图谱预览 -->
       <div class="mini-knowledge-graph" id="miniKnowledgeGraph">
         <div class="mini-graph-toggle" id="miniGraphToggle">
@@ -33,6 +27,11 @@
         <div class="mini-graph-container" id="miniGraphContainer"></div>
       </div>
       <div class="user-profile">
+        <!-- 中英文切换按钮 -->
+        <button id="language-toggle" class="back-button">
+          <iconify-icon icon="mdi:translate" width="20" height="20"></iconify-icon>
+          EN
+        </button>
         <button class="back-button" id="backButton">
           <iconify-icon icon="mdi:arrow-left" width="20" height="20"></iconify-icon>
           返回
