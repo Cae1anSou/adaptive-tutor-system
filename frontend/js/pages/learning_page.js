@@ -1190,11 +1190,6 @@ function handleGraphDoubleClick(node) {
         graphRenderer.updateNodeColors();
     }
 
-    if (type === 'knowledge') {
-        const label = node.data('label') || id;
-        // 双击知识点节点直接跳转到学习页面
-        navigateTo('/pages/learning_page.html', id);
-    }
 }
 
 // 显示知识图谱容器并渲染知识图谱
