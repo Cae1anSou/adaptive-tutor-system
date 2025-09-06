@@ -19,7 +19,7 @@
         --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
         --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.1);
         --header-height: 64px;
-        --header-font-size: 20px;
+        --header-font-size: 18px;
         --title-font-size: 18px;
         --ai-messages: #a4fc95;
         --user-messages: #ababab;
@@ -37,7 +37,7 @@
         --font-size-xs: 12px;
         --font-size-sm: 14px;
         --font-size-base: 16px;
-        --font-size-lg: 18px;
+        --font-size-lg: 17px;
         --font-size-xl: 20px;
         --font-size-2xl: 24px;
         --font-size-3xl: 30px;
