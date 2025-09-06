@@ -1154,22 +1154,14 @@ function handleGraphSingleClick(node) {
         } else {// 未解锁知识点
             // 检查是否是跨章节的学习需求
             const chapterCheckResult = checkChapterPrerequisite(id);
-            if (chapterCheckResult.requiresChapterCompletion) {
-                if (confirm(`您还未完成前置章节"${chapterCheckResult.requiredChapter}"的测试，需要先完成该章节的最后一个测试才能学习"${label}"。是否现在开始测试前置章节？`)) {
-                    navigateTo('/pages/test_page.html', chapterCheckResult.lastTestId, true, true);
-                }
+            const previousChapterId = chapterCheckResult.requiredChapterId;// 前置章节ID
+            if (chapterCheckResult.requiresChapterCompletion) {// 前置章节未解锁
+                console.log(`前置章节: ${previousChapterId}`);
+                showKnowledgeModal_2(id,previousChapterId,chapterCheckResult.requiredChapter, label);// 提示前置章节的弹窗-未满足章节测试条件则提示测试前置章节最后一个知识点测试的弹窗
             } else {
                 // 获取前置知识点信息
                 const prerequisiteInfo = getPrerequisiteInfo(id);
-                if (prerequisiteInfo) {
-                    if (confirm(`您还未学习前置知识点"${prerequisiteInfo.label}"，需要先完成该知识点的测试才能学习"${label}"。是否现在开始测试前置知识点？`)) {
-                        navigateTo('/pages/test_page.html', prerequisiteInfo.id, true, true);
-                    }
-                } else {
-                    if (confirm("您还未学习前置知识点，是否直接开始测试？")) {
-                        navigateTo('/pages/test_page.html', id, true, true);
-                    }
-                }
+                showKnowledgeModal_3(id,prerequisiteInfo.id,prerequisiteInfo.label, label);// 提示前置知识点的弹窗
             }
         }
     }
@@ -1187,17 +1179,11 @@ function handleGraphDoubleClick(node) {
 
     if (type === 'chapter') {
         if (graphState.isChapterCompleted(id)) {
-            if (confirm("您已学过本章节，是否再次进行测试？")) {
-                navigateTo('/pages/test_page.html', id, true, true);
-            }
+            showChapterModal(id);//已学过本章节
         } else if (graphState.currentLearningChapter === id) {
-            if (confirm("您还未学完当前章节内容，是否直接开始测试？")) {
-                navigateTo('/pages/test_page.html', id, true, true);
-            }
+            showChapterModal_2(id);//未学完章节
         } else {
-            if (confirm("您还未解锁前置章节，是否直接开始测试？")) {
-                navigateTo('/pages/test_page.html', id, true, true);
-            }
+            showChapterModal_3(id);//未解锁章节
         }
 
         graphState.passChapterTest(id);
@@ -1790,6 +1776,8 @@ function showKnowledgeModal(knowledgeId, nodeLabel) {
         };
     } else if (graphState.isKnowledgeUnlocked(knowledgeId)) {
         status.textContent = '您可以开始学习该知识点或直接进行测试';
+        testBtn.textContent = '测试';
+        testBtn.className = 'review-btn';
 
         learnBtn.onclick = () => {
             navigateTo('/pages/learning_page.html', knowledgeId);
@@ -1810,7 +1798,143 @@ function showKnowledgeModal(knowledgeId, nodeLabel) {
     }
     modal.style.display = 'block';
 }
+function showKnowledgeModal_2(knowledgeId,previousChapterId,requiredChapter, nodeLabel) {
+    const modal = document.getElementById('knowledgeModal');
+    const title = document.getElementById('modalTitle');
+    const status = document.getElementById('modalStatus');
+    const learnBtn = document.getElementById('learnBtn');
+    const testBtn = document.getElementById('testBtn');
 
+    title.textContent = nodeLabel || knowledgeId;// 使用传入的nodeLabel或knowledgeId
+    learnBtn.className = 'learn-btn';
+    learnBtn.disabled = false;
+    learnBtn.textContent = '是';
+    testBtn.textContent = '否';
+    testBtn.className = 'test-btn';
+                    
+    status.textContent = `您还未完成前置章节"${requiredChapter}"的测试，需要先完成该章节的测试才能学习本知识点。是否现在开始测试前置章节？`;
+
+    learnBtn.onclick = () => {
+        ('/pages/test_page.html', previousChapterId, true, true);
+     };
+
+    testBtn.onclick = () => {
+        document.getElementById('knowledgeModal').style.display = 'none';
+    };
+    
+    modal.style.display = 'block';
+}
+function showKnowledgeModal_3(knowledgeId,lastTestId,requiredKnowledge, nodeLabel) {
+    const modal = document.getElementById('knowledgeModal');
+    const title = document.getElementById('modalTitle');
+    const status = document.getElementById('modalStatus');
+    const learnBtn = document.getElementById('learnBtn');
+    const testBtn = document.getElementById('testBtn');
+
+    title.textContent = nodeLabel || knowledgeId;// 使用传入的nodeLabel或knowledgeId
+    learnBtn.className = 'learn-btn';
+    learnBtn.disabled = false;
+    learnBtn.textContent = '是';
+    testBtn.textContent = '否';
+    testBtn.className = 'test-btn';
+                    
+    status.textContent = `您还未学习前置知识点"${requiredKnowledge}"，需要先完成该知识点的测试才能学习本知识点。是否现在开始测试前置知识点？`;
+
+    learnBtn.onclick = () => {
+        navigateTo('/pages/test_page.html',lastTestId, true, true);
+
+     };
+
+    testBtn.onclick = () => {
+        document.getElementById('knowledgeModal').style.display = 'none';
+    };
+    
+    modal.style.display = 'block';
+}
+function showChapterModal(Id) {
+    const modal = document.getElementById('knowledgeModal');
+    const title = document.getElementById('modalTitle');
+    const status = document.getElementById('modalStatus');
+    const learnBtn = document.getElementById('learnBtn');
+    const testBtn = document.getElementById('testBtn');
+
+    // 只显示章节号，去掉"_end"后缀
+    const chapterNumber = Id.split('_')[0];
+    title.textContent = `第${chapterNumber}章`
+    learnBtn.className = 'learn-btn';
+    learnBtn.disabled = false;
+    learnBtn.textContent = '是';
+    testBtn.textContent = '否';
+    testBtn.className = 'test-btn';
+                    
+    status.textContent = `您已学过本章节，是否再次进行测试？`;
+
+    learnBtn.onclick = () => {
+        ('/pages/test_page.html', Id, true, true);
+     };
+
+    testBtn.onclick = () => {
+        document.getElementById('knowledgeModal').style.display = 'none';
+    };
+    
+    modal.style.display = 'block';
+}
+function showChapterModal_2(Id) {
+    const modal = document.getElementById('knowledgeModal');
+    const title = document.getElementById('modalTitle');
+    const status = document.getElementById('modalStatus');
+    const learnBtn = document.getElementById('learnBtn');
+    const testBtn = document.getElementById('testBtn');
+
+    // 只显示章节号，去掉"_end"后缀
+    const chapterNumber = Id.split('_')[0];
+    title.textContent = `第${chapterNumber}章`;
+    learnBtn.className = 'learn-btn';
+    learnBtn.disabled = false;
+    learnBtn.textContent = '是';
+    testBtn.textContent = '否';
+    testBtn.className = 'test-btn';
+                    
+    status.textContent = `您还未学完当前章节内容，是否直接开始测试？`;
+
+    learnBtn.onclick = () => {
+        ('/pages/test_page.html', Id, true, true);
+     };
+
+    testBtn.onclick = () => {
+        document.getElementById('knowledgeModal').style.display = 'none';
+    };
+    
+    modal.style.display = 'block';
+}
+function showChapterModal_3(Id) {
+    const modal = document.getElementById('knowledgeModal');
+    const title = document.getElementById('modalTitle');
+    const status = document.getElementById('modalStatus');
+    const learnBtn = document.getElementById('learnBtn');
+    const testBtn = document.getElementById('testBtn');
+
+    // 只显示章节号，去掉"_end"后缀
+    const chapterNumber = Id.split('_')[0];
+    title.textContent = `第${chapterNumber}章`;
+    learnBtn.className = 'learn-btn';
+    learnBtn.disabled = false;
+    learnBtn.textContent = '是';
+    testBtn.textContent = '否';
+    testBtn.className = 'test-btn';
+                    
+    status.textContent = `您还未解锁前置章节，是否直接开始测试？`;
+
+    learnBtn.onclick = () => {
+        ('/pages/test_page.html', Id, true, true);
+     };
+
+    testBtn.onclick = () => {
+        document.getElementById('knowledgeModal').style.display = 'none';
+    };
+    
+    modal.style.display = 'block';
+}
 // 获取前置知识点信息
 function getPrerequisiteInfo(knowledgeId) {
     try {
@@ -1856,6 +1980,9 @@ function checkChapterPrerequisite(knowledgeId) {
         if (section === 1) {
             const previousChapter = chapter - 1;
             const previousChapterId = `chapter${previousChapter}`;
+            const ChapterId = `${previousChapter}_end`;
+            console.log(`前置章节: ${ChapterId}`);
+            console.log(`章节: ${previousChapter}`);
 
             // 检查前一章节是否已完成
             const completedChapters = JSON.parse(localStorage.getItem('completedChapters') || '[]');
@@ -1865,6 +1992,7 @@ function checkChapterPrerequisite(knowledgeId) {
                 return {
                     requiresChapterCompletion: true,
                     requiredChapter: `第${previousChapter}章`,
+                    requiredChapterId: ChapterId,
                     lastTestId: `${previousChapter}_3` // 前一章节的最后一个测试
                 };
             }
