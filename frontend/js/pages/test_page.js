@@ -10,6 +10,26 @@ tracker.init({
     user_idle: true,
     page_click: true,
 });
+
+// 获取下一个知识点ID
+function getNextTopicId(currentTopicId) {
+    // 定义知识点顺序
+    const topicSequence = [
+        '1_1', '1_2', '1_3',  // 第一章
+        '2_1', '2_2', '2_3',  // 第二章
+        '3_1', '3_2', '3_3',  // 第三章
+        '4_1', '4_2', '4_3',  // 第四章
+        '5_1', '5_2', '5_3'   // 第五章
+    ];
+
+    const currentIndex = topicSequence.indexOf(currentTopicId);
+    if (currentIndex === -1 || currentIndex === topicSequence.length - 1) {
+        // 如果找不到当前知识点或已经是最后一个，返回null
+        return null;
+    }
+
+    return topicSequence[currentIndex + 1];
+}
 // 初始化函数
 async function initializePage() {
     const participantId = getParticipantId();
@@ -20,29 +40,29 @@ async function initializePage() {
         }
     }
     // 获取并解密URL参数
-     // 获取URL参数（带错误处理）
-        const topicData = getUrlParam('topic');
-        
-        if (topicData && topicData.id) {
-            console.log('测试主题ID:', topicData.id, '有效期:', topicData.isValid ? '有效' : '已过期');
-                
-            // 更新页面标题
-            document.getElementById('headerTitle').textContent = `测试 - ${topicData.id}`;
-            
-            // 即使过期也继续加载内容，但提示用户
-            if (!topicData.isValid) {
-               console.warn('参数已过期，但仍继续加载内容');
-            }
-                
-            // 加载对应的测试内容
-            chatModule.init('test', topicData.id);
-        } else {
-            console.warn('未找到有效的主题参数，使用默认内容');
-            console.log('加载默认测试内容');
+    // 获取URL参数（带错误处理）
+    const topicData = getUrlParam('topic');
+
+    if (topicData && topicData.id) {
+        console.log('测试主题ID:', topicData.id, '有效期:', topicData.isValid ? '有效' : '已过期');
+
+        // 更新页面标题
+        document.getElementById('headerTitle').textContent = `测试 - ${topicData.id}`;
+
+        // 即使过期也继续加载内容，但提示用户
+        if (!topicData.isValid) {
+            console.warn('参数已过期，但仍继续加载内容');
         }
-    
+
+        // 加载对应的测试内容
+        chatModule.init('test', topicData.id);
+    } else {
+        console.warn('未找到有效的主题参数，使用默认内容');
+        console.log('加载默认测试内容');
+    }
+
     let topicId = topicData.id;
-    
+
     // 如果没有topic参数，且查询字符串只有一个值，则使用该值
     if (!topicId) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -82,11 +102,11 @@ async function initializePage() {
         alert('无法加载测试任务: ' + (error.message || '未知错误'));
     }
 
-    try{
+    try {
         websocket.connect();
         console.log('[MainApp] WebSocket模块初始化完成');
     }
-    catch(error){
+    catch (error) {
         console.error('[MainApp] WebSocket模块初始化失败:', error);
     }
 }
@@ -228,7 +248,7 @@ function setupSubmitLogic() {
                     problem_count: finalBehaviorAnalysis.problemEventsCount || 0
                 }
             };
-            
+
             // 提交测试并等待响应
             const result = await window.apiClient.post('/submission/submit-test2', submissionData);
 
@@ -238,9 +258,18 @@ function setupSubmitLogic() {
                 // 恢复按钮状态
                 restoreButton();
                 displayTestResult(msg);
-                if(msg.passed) {
-                    alert("测试完成！即将跳转回到知识图谱界面");
-                    setTimeout(() => { window.location.href = '/pages/knowledge_graph.html'; }, 3000);
+                if (msg.passed) {
+                    // 获取下一个知识点
+                    const nextTopicId = getNextTopicId(topicId);
+                    if (nextTopicId) {
+                        alert(`测试完成！即将跳转到下一节：${nextTopicId}`);
+                        setTimeout(() => {
+                            window.location.href = `/pages/learning_page.html?topic=${nextTopicId}`;
+                        }, 3000);
+                    } else {
+                        alert("测试完成！恭喜您已完成所有学习内容！");
+                        setTimeout(() => { window.location.href = '/index.html'; }, 3000);
+                    }
                 } else {
                     // 统一为 test_submission，标记失败阶段
                     tracker.logEvent('test_submission', {
@@ -300,13 +329,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 设置标题和返回按钮
-    setupHeaderTitle('/pages/knowledge_graph.html');
+    setupHeaderTitle('/index.html');
     // 设置返回按钮
     setupBackButton();
     // 调试信息
     debugUrlParams();
-        require(['vs/editor/editor.main'], function () {
-            initializePage();
-            setupSubmitLogic();
-        });
+    require(['vs/editor/editor.main'], function () {
+        initializePage();
+        setupSubmitLogic();
     });
+});
