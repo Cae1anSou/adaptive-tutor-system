@@ -297,20 +297,47 @@ class BehaviorInterpreterService:
             logger.error(f"BehaviorInterpreterService: 轻量事件处理异常：{e}")
 
     def _handle_knowledge_level_access(self, participant_id, event_data, user_state_service, is_replay):
-        """处理知识点访问事件"""
+        """处理知识点访问事件（兼容 dict 与模型）"""
         if user_state_service is None:
             return
-        
-        level = event_data.level
-        action = event_data.action
-        duration_ms = event_data.duration_ms
-        
-        logger.info(f"Participant {participant_id} accessed knowledge level {level}, action: {action}, duration: {duration_ms}ms")
-        
-        # 调用UserStateService更新用户模型
-        if user_state_service and not is_replay:
-            # Pydantic模型需要转换为字典才能传递
-            user_state_service.handle_knowledge_level_access(participant_id, event_data.__dict__)
+
+        # 兼容两种输入：Pydantic 模型 或 普通 dict
+        try:
+            if hasattr(event_data, 'level'):
+                topic_id = getattr(event_data, 'topic_id', None)
+                level = getattr(event_data, 'level', None)
+                action = getattr(event_data, 'action', None)
+                duration_ms = getattr(event_data, 'duration_ms', None)
+                payload = {
+                    'topic_id': topic_id,
+                    'level': level,
+                    'action': action,
+                    'duration_ms': duration_ms,
+                }
+            elif isinstance(event_data, dict):
+                payload = {
+                    'topic_id': event_data.get('topic_id'),
+                    'level': event_data.get('level'),
+                    'action': event_data.get('action'),
+                    'duration_ms': event_data.get('duration_ms'),
+                }
+                level = payload['level']
+                action = payload['action']
+                duration_ms = payload['duration_ms']
+            else:
+                logger.warning("knowledge_level_access 事件数据格式不支持: %s", type(event_data))
+                return
+
+            logger.info(
+                "Participant %s accessed knowledge level %s, action: %s, duration: %sms",
+                participant_id, level, action, duration_ms
+            )
+
+            # 实时更新用户状态（避免提示词缺失最新的访问统计）
+            if not is_replay:
+                user_state_service.handle_knowledge_level_access(participant_id, payload)
+        except Exception as e:
+            logger.error("处理 knowledge_level_access 事件时出错: %s", e)
 
 
 # 单例导出
