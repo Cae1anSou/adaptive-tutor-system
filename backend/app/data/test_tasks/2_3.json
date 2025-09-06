@@ -11,7 +11,7 @@
     {
       "name": "无序列表ul元素位置检查",
       "type": "custom_script",
-      "script": "const h3 = document.querySelector('h3'); const ul = document.querySelector('ul'); if (!h3 || !ul) return false; return h3.getBoundingClientRect().top < ul.getBoundingClientRect().top;",
+      "script": "const elements = Array.from(document.querySelectorAll('h3, ul')); const h3Index = elements.indexOf(document.querySelector('h3')); const ulIndex = elements.indexOf(document.querySelector('ul')); return h3Index < ulIndex;",
       "feedback": "ul元素应该在h3元素下方。"
     },
     {
