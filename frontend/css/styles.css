@@ -129,8 +129,6 @@
         /* 确保标题在最上层 */
         flex-shrink: 0;
         /* 防止标题被压缩 */
-        position: absolute;
-        /* 添加绝对定位 */
         left: 20px;
         /* 设置左侧固定位置 */
     }
@@ -154,8 +152,6 @@
         /* 确保用户信息在最上层 */
         flex-shrink: 0;
         /* 防止用户信息被压缩 */
-        position: absolute;
-        /* 添加绝对定位 */
         right: 20px;
         /* 设置右侧固定位置 */
     }
@@ -190,11 +186,7 @@
 
     .mini-knowledge-graph {
         /* 修改为在标题栏内居中显示 */
-        position: absolute !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        margin-left: 0 !important;
+        margin: auto;
         width: 60% !important;
         height: 40px !important;
         background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
@@ -205,6 +197,7 @@
         z-index: 5;
         overflow: hidden;
         transition: height 0.3s ease, box-shadow 0.3s ease, top 0.3s ease;
+        position: relative;
     }
 
     .mini-knowledge-graph.expanded {
