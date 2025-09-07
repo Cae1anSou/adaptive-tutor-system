@@ -1583,7 +1583,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         trackReferrer();
         // 设置标题点击跳转到知识图谱页面
-        setupHeaderTitle('/pages/knowledge_graph.html');
+        // setupHeaderTitle('/pages/knowledge_graph.html');
         // 设置返回按钮（固定返回知识图谱）
         setupBackButton();
         // 先初始化配置
