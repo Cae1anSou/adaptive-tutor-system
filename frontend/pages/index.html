@@ -1,38 +1,69 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI HTML学习平台 - 用户注册</title>
+  <title>HTML学习平台 - 用户注册</title>
   <link rel="stylesheet" href="../css/styles.css">
   <!-- Iconify图标库 -->
   <script src="../js/modules/iconify-icon.min.js"></script>
 </head>
-<body>
+
+<body class="login-page">
   <div class="main-container">
     <!-- 顶部标题栏 -->
     <header class="top-header">
-      <iconify-icon icon="mdi:code-braces" width="28" height="28"></iconify-icon>
-      <h1 class="header-title" id="headerTitle" >AI HTML学习平台</h1>
+      <h1 class="header-title" id="headerTitle">HTML学习平台</h1>
+      <button id="language-toggle" class="language-toggle-button">
+        <iconify-icon icon="mdi:translate" width="20" height="20"></iconify-icon>
+        EN
+      </button>
+
     </header>
 
     <!-- 内容区域 -->
     <div class="content-container">
       <div class="index-container panel">
         <div class="panel-header">
-          <iconify-icon icon="mdi:rocket-launch" width="24" height="24"></iconify-icon>
-          <h2>欢迎使用AI HTML学习平台</h2>
-          <p>请输入您的用户ID开始学习之旅</p>
+          <iconify-icon icon="mdi:sparkles" width="24" height="24"></iconify-icon>
+          <h2>欢迎使用HTML学习平台</h2>
         </div>
-        <div class="index-form">
-          <div class="input-with-icon">
-            <iconify-icon icon="mdi:account" width="20" height="20"></iconify-icon>
-            <input type="text" id="username-input" placeholder="请输入您的用户ID" />
+
+        <!-- 学习入口 -->
+        <div class="entry-container">
+          <div class="entry-content">
+            <!-- 欢迎区域 -->
+            <div class="welcome-section">
+              <iconify-icon icon="mdi:book-education" width="64" height="64" class="welcome-icon"></iconify-icon>
+              <h2>HTML学习平台</h2>
+              <p>选择学习主题，开始你的HTML学习之旅</p>
+            </div>
+
+            <!-- 表单区域 -->
+            <div class="form-section">
+              <div class="input-row">
+                <div class="input-group">
+                  <iconify-icon icon="mdi:account" width="20" height="20"></iconify-icon>
+                  <input type="text" id="nickname-input" placeholder="输入你的昵称" maxlength="20" />
+                </div>
+                <div class="select-group">
+                  <iconify-icon icon="mdi:star" width="20" height="20"></iconify-icon>
+                  <select id="theme-selector">
+                    <option value="">选择学习主题</option>
+                    <option value="pets">🐱 萌宠乐园</option>
+                    <option value="shopping">🛒 时尚购物</option>
+                    <option value="music">🎵 影音娱乐</option>
+                  </select>
+                </div>
+              </div>
+
+              <button id="start-button" class="start-button" disabled>
+                <iconify-icon icon="mdi:play" width="20" height="20"></iconify-icon>
+                开始学习
+              </button>
+            </div>
           </div>
-          <button id="start-button" class="btn btn-primary">
-            <iconify-icon icon="mdi:login" width="18" height="18"></iconify-icon>
-            开始学习
-          </button>
         </div>
       </div>
     </div>
@@ -41,4 +72,5 @@
   <!-- 引入注册页面逻辑 -->
   <script type="module" src="../js/pages/registration.js"></script>
 </body>
+
 </html>

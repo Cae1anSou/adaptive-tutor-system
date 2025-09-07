@@ -18,7 +18,6 @@ celery_app = Celery(
         "app.tasks.behavior_tasks",
         "app.tasks.db_tasks",
         "app.tasks.submission_tasks",
-        "app.tasks.wakeup_embedding_task"
     ]
 )
 
@@ -128,7 +127,8 @@ celery_app.conf.update(
     enable_utc=True,
     
     # 队列配置
-    task_routes={
+    task_routes=(
+        {
         'app.tasks.chat_tasks.process_chat_request': {'queue': 'chat_queue'},
         'app.tasks.behavior_tasks.interpret_behavior_task': {'queue': 'behavior_queue'},
         'app.tasks.submission_tasks.process_submission_task': {'queue': 'submit_queue'},
@@ -136,15 +136,20 @@ celery_app.conf.update(
         'app.tasks.db_tasks.save_behavior_task': {'queue': 'db_writer_queue'},
         'app.tasks.db_tasks.log_ai_event_task': {'queue': 'db_writer_queue'},
         'app.tasks.db_tasks.save_chat_message_task': {'queue': 'db_writer_queue'},
-        'app.tasks.wakeup_embedding_task.wakeup_embedding_model': {'queue': 'db_writer_queue'},
-    },
+        }
+        if True else {}
+    ),
     task_default_queue='default',
     
     # 定时任务配置
-    beat_schedule={
-        'wakeup-embedding-model': {
-            'task': 'app.tasks.wakeup_embedding_task.wakeup_embedding_model',
-            'schedule': 300.0,  # 每300秒（5分钟）执行一次
-        },
-    },
+    beat_schedule=(
+        {
+            'wakeup-embedding-model': {
+                'task': 'app.tasks.wakeup_embedding_task.wakeup_embedding_model',
+                'schedule': 300.0,  # 每300秒（5分钟）执行一次
+            }
+        }
+        if settings.ENABLE_RAG_SERVICE
+        else {}
+    ),
 )

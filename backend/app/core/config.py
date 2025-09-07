@@ -55,10 +55,13 @@ class Settings(BaseSettings):
     # LLM Settings
     LLM_MAX_TOKENS: int = 65536
     LLM_TEMPERATURE: float = 0.7
+    BASIC_SYSTEM_PROMPT: str = (
+        "You are a helpful assistant. Answer clearly and concisely."
+    )
 
     # Module enable/disable flags
-    ENABLE_RAG_SERVICE: bool = True
-    ENABLE_SENTIMENT_ANALYSIS: bool = True
+    ENABLE_RAG_SERVICE: bool = False
+    ENABLE_SENTIMENT_ANALYSIS: bool = False
     ENABLE_TRANSLATION_SERVICE: bool = False
     
     # Redis 配置

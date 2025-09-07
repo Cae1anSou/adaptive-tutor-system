@@ -103,23 +103,6 @@ services:
       - backend
     restart: unless-stopped
 
-  # Celery Beat
-  celery-beat:
-    build:
-      context: .
-      dockerfile: Dockerfile.backend
-    container_name: celery-beat
-    command: celery -A app.celery_app beat -l info
-    environment:
-      - REDIS_URL=redis://redis:6379/0
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-    volumes:
-      - ./backend:/app/backend
-    depends_on:
-      - redis
-      - backend
-    restart: unless-stopped
 
   # 前端服务
   frontend:

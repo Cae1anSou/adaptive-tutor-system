@@ -3,7 +3,6 @@ import redis
 from app.core.config import settings
 from app.services.sandbox_service import SandboxService, DefaultPlaywrightManager
 from app.services.user_state_service import UserStateService
-from app.services.sentiment_analysis_service import sentiment_analysis_service
 from app.services.llm_gateway import llm_gateway
 from app.services.prompt_generator import prompt_generator
 from app.db.database import get_db
@@ -92,13 +91,8 @@ def get_user_state_service(redis_client: redis.Redis) -> UserStateService:
 # --- AI服务依赖注入 ---
 
 def get_sentiment_analysis_service():
-    """
-    获取情感分析服务实例
-    """
-    from app.core.config import settings
-    if not settings.ENABLE_SENTIMENT_ANALYSIS:
-        return None
-    return sentiment_analysis_service
+    """控制组：不提供情感分析服务"""
+    return None
 
 
 def get_llm_gateway():
@@ -116,28 +110,8 @@ def get_prompt_generator():
 
 
 def get_rag_service():
-    """
-    获取RAG服务实例
-    """
-    from app.core.config import settings
-    if not settings.ENABLE_RAG_SERVICE:
-        return None
-    
-    try:
-        from app.services.rag_service import RAGService
-        # 根据配置决定是否提供翻译服务
-        translation_service = None
-        if settings.ENABLE_TRANSLATION_SERVICE:
-            try:
-                from app.services.translation_service import TranslationService
-                translation_service = TranslationService()
-            except Exception as e:
-                print(f"Warning: Translation service initialization failed: {e}")
-        
-        return RAGService(translation_service)
-    except Exception as e:
-        print(f"Warning: RAG service initialization failed: {e}")
-        return None
+    """控制组：不提供RAG服务"""
+    return None
 
 
 def create_dynamic_controller(redis_client: redis.Redis):
@@ -169,5 +143,4 @@ def get_dynamic_controller():
             _redis_client_instance = get_redis_client()
         _dynamic_controller_instance = create_dynamic_controller(redis_client=_redis_client_instance)
     return _dynamic_controller_instance
-
 
