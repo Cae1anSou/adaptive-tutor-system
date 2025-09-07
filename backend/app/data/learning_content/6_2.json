@@ -1,6 +1,6 @@
 {
     "topic_id": "6_2",
-    "title": "获取用户输入",
+    "title": "6_2 获取用户输入",
     "levels": [
             {
                 "level": 1,
@@ -38,15 +38,5 @@
         {"topic_id": "6_1", "select_element": []},
         {"topic_id": "6_2", "select_element": []},
         {"topic_id": "6_3", "select_element": []}
-    ],
-    "example_code_snippets": [
-        {
-            "element": "用户输入框设置",
-            "snippet": "<input type=\"text\" id=\"form_input_name\" placeholder=\"Your Name\" required>\n<input type=\"email\" id=\"form_input_email\" placeholder=\"Your Email\" required>"
-        },
-        {
-            "element": "提交按钮设置",
-            "snippet": "<button class=\"btn\" type=\"submit\" data-target=\"form-submit\">Join the Cat Family</button>"
-        }
     ]
 }

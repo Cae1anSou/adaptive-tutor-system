@@ -1,6 +1,6 @@
 {
     "topic_id": "2_1",
-    "title": "使用盒子元素进行内容划分",
+    "title": "2_1 使用盒子元素进行内容划分",
     "levels": [
             {
                 "level": 1,
@@ -38,11 +38,5 @@
         {"topic_id": "6_1", "select_element": []},
         {"topic_id": "6_2", "select_element": []},
         {"topic_id": "6_3", "select_element": []}
-    ],
-    "example_code_snippets": [
-        {
-            "element": "容器元素设置 (div)",
-            "code": "<div class=\"container\">\n    <header>\n        <h1 class=\"header-title\" id=\"structure_header_header\">WCF Best Cat Exhibition</h1>\n    </header>\n    <div class=\"flex-container\">\n        <div class=\"main\">\n            <!-- 主要内容 -->\n        </div>\n        <aside class=\"sidebar\">\n            <!-- 侧边栏内容 -->\n        </aside>\n    </div>\n</div>"
-        }
     ]
 }

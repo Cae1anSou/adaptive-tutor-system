@@ -1,6 +1,6 @@
 {
     "topic_id": "4_3",
-    "title": "使用 Flex 进行布局",
+    "title": "4_3 使用 Flex 进行布局",
     "levels": [
             {
                 "level": 1,
@@ -38,31 +38,5 @@
         {"topic_id": "6_1", "select_element": []},
         {"topic_id": "6_2", "select_element": []},
         {"topic_id": "6_3", "select_element": []}
-    ],
-    "example_code_snippets": [
-        {
-            "element": "弹性布局设置 (display: flex)",
-            "snippet": ".container {\n    display: flex;\n}"
-        },
-        {
-            "element": "主轴方向设置 (flex-direction)",
-            "snippet": ".flex-container {\n    display: flex;\n    flex-direction: column;\n}"
-        },
-        {
-            "element": "主轴对齐方式 (justify-content)",
-            "snippet": ".flex-container {\n    display: flex;\n    justify-content: space-between;\n}"
-        },
-        {
-            "element": "交叉轴对齐方式 (align-items)",
-            "snippet": ".flex-container {\n    display: flex;\n    align-items: center;\n}"
-        },
-        {
-            "element": "换行设置 (flex-wrap)",
-            "snippet": ".gallery {\n    display: flex;\n    flex-wrap: wrap;\n}"
-        },
-        {
-            "element": "项目间距设置 (gap)",
-            "snippet": ".gallery {\n    display: grid;\n    grid-template-columns: repeat(3, 1fr);\n    gap: 12px;\n}"
-        }
     ]
 }

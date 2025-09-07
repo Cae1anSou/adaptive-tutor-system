@@ -1,6 +1,6 @@
 {
     "topic_id": "1_2",
-    "title": "应用文本格式（加粗、斜体）",
+    "title": "1_2 应用文本格式（加粗、斜体）",
     "levels": [
             {
                 "level": 1,
@@ -38,15 +38,5 @@
         {"topic_id": "6_1", "select_element": []},
         {"topic_id": "6_2", "select_element": []},
         {"topic_id": "6_3", "select_element": []}
-    ],
-    "example_code_snippets": [
-        {
-            "element": "字体粗细设置 (font-weight)",
-            "snippet": "p {\n    font-weight: bold;\n}"
-        },
-        {
-            "element": "字体样式设置 (font-style)",
-            "snippet": "p {\n    font-style: italic;\n}"
-        }
     ]
 }

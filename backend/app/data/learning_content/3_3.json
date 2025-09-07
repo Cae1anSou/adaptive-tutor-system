@@ -1,6 +1,6 @@
 {
-    "topic_id": "3.3",
-    "title": "表单提交机制",
+    "topic_id": "3_3",
+    "title": "3_3 表单提交机制",
     "levels": [
             {
                 "level": 1,
@@ -38,11 +38,5 @@
         {"topic_id": "6_1", "select_element": []},
         {"topic_id": "6_2", "select_element": []},
         {"topic_id": "6_3", "select_element": []}
-    ],
-    "example_code_snippets": [
-        {
-            "element": "表单设置 (form)",
-            "code": "<form id=\"form_submit_form\">\n    <input type=\"text\" id=\"form_input_name\" placeholder=\"Your Name\" required>\n    <input type=\"email\" id=\"form_input_email\" placeholder=\"Your Email\" required>\n    <label><input type=\"checkbox\" id=\"form_checkbox_news\" checked> Subscribe to newsletter</label>\n    <button class=\"btn\" type=\"submit\" data-target=\"form-submit\">Join the Cat Family</button>\n</form>"
-        }
     ]
 }

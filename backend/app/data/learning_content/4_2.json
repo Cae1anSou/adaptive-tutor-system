@@ -1,6 +1,6 @@
 {
     "topic_id": "4_2",
-    "title": "理解盒模型",
+    "title": "4_2 理解盒模型",
     "levels": [
             {
                 "level": 1,
@@ -38,31 +38,5 @@
         {"topic_id": "6_1", "select_element": []},
         {"topic_id": "6_2", "select_element": []},
         {"topic_id": "6_3", "select_element": []}
-    ],
-    "example_code_snippets": [
-        {
-            "element": "盒模型类型设置 (box-sizing)",
-            "snippet": ".container {\n    box-sizing: border-box;\n}"
-        },
-        {
-            "element": "内边距设置 (padding)",
-            "snippet": ".media-container {\n    padding: 16px;\n}"
-        },
-        {
-            "element": "边框设置 (border)",
-            "snippet": ".media-container {\n    border: 1px solid #e0e0e0;\n}"
-        },
-        {
-            "element": "外边距设置 (margin)",
-            "snippet": ".media-container {\n    margin-bottom: 20px;\n}"
-        },
-        {
-            "element": "圆角设置 (border-radius)",
-            "snippet": ".media-container {\n    border-radius: 8px;\n}"
-        },
-        {
-            "element": "阴影设置 (box-shadow)",
-            "snippet": ".media-container {\n    box-shadow: 0 4px 8px rgba(0,0,0,0.1);\n}"
-        }
     ]
 }

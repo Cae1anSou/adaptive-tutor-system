@@ -1,6 +1,6 @@
 {
     "topic_id": "1_3",
-    "title": "构建页面基本结构",
+    "title": "1_3 构建页面基本结构",
     "levels": [
             {
                 "level": 1,
@@ -38,11 +38,5 @@
         {"topic_id": "6_1", "select_element": []},
         {"topic_id": "6_2", "select_element": []},
         {"topic_id": "6_3", "select_element": []}
-    ],
-    "example_code_snippets": [
-        {
-            "element": "完整HTML结构示例",
-            "snippet": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>WCF Best Cat - Cat Exhibition</title>\n</head>\n<body>\n    <div class=\"container\">\n        <header>\n            <h1 class=\"header-title\" id=\"structure_header_header\">WCF Best Cat Exhibition</h1>\n        </header>\n        <div class=\"flex-container\">\n            <div class=\"main\">\n                <!-- 主要内容 -->\n            </div>\n            <aside class=\"sidebar\">\n                <!-- 侧边栏内容 -->\n            </aside>\n        </div>\n        <footer>\n            <!-- 页脚内容 -->\n        </footer>\n    </div>\n</body>\n</html>"
-        }
     ]
 }

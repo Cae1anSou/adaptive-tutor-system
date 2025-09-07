@@ -1,6 +1,6 @@
 {
     "topic_id": "4_1",
-    "title": "设置颜色与字体",
+    "title": "4_1 设置颜色与字体",
     "levels": [
             {
                 "level": 1,
@@ -38,23 +38,5 @@
         {"topic_id": "6_1", "select_element": []},
         {"topic_id": "6_2", "select_element": []},
         {"topic_id": "6_3", "select_element": []}
-    ],
-    "example_code_snippets": [
-        {
-            "element": "颜色设置 (color/background)",
-            "snippet": "body {\n    color: #333;\n    background: linear-gradient(to bottom, #e8f5e8, #ffffff);\n}"
-        },
-        {
-            "element": "字体设置 (font-family)",
-            "snippet": "body {\n    font-family: \"Roboto\", sans-serif;\n}"
-        },
-        {
-            "element": "标题颜色 (color)",
-            "snippet": "h1, h2, h3 {\n    color: #b88a44;\n}"
-        },
-        {
-            "element": "行高设置 (line-height)",
-            "snippet": "p {\n    line-height: 1.6;\n}"
-        }
     ]
 }

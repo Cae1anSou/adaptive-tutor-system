@@ -1,7 +1,7 @@
 {
   "topic_id": "6_3",
-  "title": "修改页面元素内容与样式（DOM 操作）",
-  "description_md": "使用 JavaScript 修改页面内容：\n\n- 获取表单中的复选框和单选框值；\n- 使用 `event.preventDefault()` 阻止默认提交；\n- 将结果以文本形式展示在 `<div id=\"result\">` 中；\n- 格式示例：`爱好：阅读, 游戏；性别：女`",
+  "title": "6_3 修改页面元素内容与样式（DOM 操作）",
+  "description_md": "# 任务描述：\n请使用 JavaScript 修改页面内容，展示表单选择结果。\n\n## 要求：\n1. 获取表单中的复选框和单选框值。\n2. 使用 `event.preventDefault()` 阻止表单默认提交行为。\n3. 将结果以文本形式展示在 `<div id=\"result\">` 中。\n4. 输出格式示例：`爱好：阅读, 游戏；性别：女`。",
   "start_code": {
     "html": "<section class=\"form-demo\">\n  <h3>用户偏好调查</h3>\n  <form id=\"userForm\">\n    <label><input type=\"checkbox\" name=\"hobbies\" value=\"阅读\"> 爱好阅读</label>\n    <label><input type=\"checkbox\" name=\"hobbies\" value=\"游戏\"> 喜欢游戏</label>\n\n    <label>性别：</label>\n    <label><input type=\"radio\" name=\"gender\" value=\"男\"> 男</label>\n    <label><input type=\"radio\" name=\"gender\" value=\"女\"> 女</label>\n\n    <button type=\"submit\">提交</button>\n  </form>\n  <div id=\"result\"></div>\n</section>",
     "css": "",
