@@ -11,7 +11,11 @@
       "Bash(dir:*)",
       "WebSearch",
       "Bash(docker exec:*)",
-      "Bash(docker logs:*)"
+      "Bash(docker logs:*)",
+      "Bash(docker compose -p exp ps)",
+      "Bash(docker compose:*)",
+      "Bash(curl:*)",
+      "Bash(docker inspect:*)"
     ],
     "deny": []
   }
