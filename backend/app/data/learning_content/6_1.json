@@ -38,5 +38,11 @@
         {"topic_id": "6_1", "select_element": []},
         {"topic_id": "6_2", "select_element": []},
         {"topic_id": "6_3", "select_element": []}
+    ],
+    "example_code_snippets": [
+        {
+            "element": "表单提交事件处理",
+            "code": "<script>\n    document.querySelector('form').addEventListener('submit', (e) => {\n        e.preventDefault();\n        const name = document.getElementById('form_input_name').value;\n        const email = document.getElementById('form_input_email').value;\n        alert(`Thank you, ${name}, for joining us! We've sent a confirmation to ${email}.`);\n    });\n</script>"
+        }
     ]
 }

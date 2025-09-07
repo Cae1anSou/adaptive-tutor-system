@@ -38,5 +38,15 @@
         {"topic_id": "6_1", "select_element": []},
         {"topic_id": "6_2", "select_element": []},
         {"topic_id": "6_3", "select_element": []}
+    ],
+    "example_code_snippets": [
+        {
+            "element": "视频插入设置 (video)",
+            "code": "<video id=\"media_video_video\" controls>\n    <source src=\"https://www.w3schools.com/html/mov_bbb.mp4\" type=\"video/mp4\">\n    Your browser does not support the video element.\n</video>"
+        },
+        {
+            "element": "视频源设置 (source)",
+            "code": "<source src=\"https://www.w3schools.com/html/mov_bbb.mp4\" type=\"video/mp4\">"
+        }
     ]
 }
