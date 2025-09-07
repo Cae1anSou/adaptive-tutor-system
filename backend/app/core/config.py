@@ -51,6 +51,10 @@ class Settings(BaseSettings):
     VECTOR_STORE_DIR: str = "./app/data/vector_store"
     KB_ANN_FILENAME: str = "kb.ann"
     KB_CHUNKS_FILENAME: str = "kb_chunks.json"
+    
+    # ML Models paths
+    MODELS_BASE_DIR: str = "./models"
+    PROGRESS_CLUSTERING_MODEL_DIR: str = "./models/progress_clustering"
 
     # LLM Settings
     LLM_MAX_TOKENS: int = 65536
@@ -59,6 +63,7 @@ class Settings(BaseSettings):
     # Module enable/disable flags
     ENABLE_RAG_SERVICE: bool = True
     ENABLE_SENTIMENT_ANALYSIS: bool = True
+    ENABLE_CLUSTERING_SERVICE: bool = True
     ENABLE_TRANSLATION_SERVICE: bool = False
     
     # Redis 配置

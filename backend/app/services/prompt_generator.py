@@ -1,8 +1,11 @@
 # backend/app/services/prompt_generator.py
 import json
+import logging
 from typing import List, Dict, Any, Tuple
 from ..schemas.chat import UserStateSummary
 from ..schemas.content import CodeContent
+
+logger = logging.getLogger(__name__)
 
 
 class PromptGenerator:
@@ -111,11 +114,12 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
         emotion_strategy = PromptGenerator._get_emotion_strategy(emotion)
         prompt_parts.append(f"STRATEGY: {emotion_strategy}")
 
-        # 学生标识（简短）
-        if user_state.is_new_user:
-            prompt_parts.append("STUDENT: new; start with basics and be patient.")
-        else:
-            prompt_parts.append("STUDENT: existing; build upon prior knowledge.")
+        # 学生新/老标识已移除，不再在系统提示中注入该信息
+
+        # 进度聚类策略（简短）
+        progress_strategy = PromptGenerator._get_progress_strategy(user_state)
+        if progress_strategy:
+            prompt_parts.append(f"PROGRESS: {progress_strategy}")
 
         # 安全约束（系统优先）
         prompt_parts.append(
@@ -150,12 +154,23 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
             has_question_count = q_key in behavior_patterns
         has_learning_focus = bool(behavior_patterns.get('knowledge_level_history'))
 
-        # mastery 存在判定
+        # mastery 存在判定（兼容 dict 与对象）
         has_mastery = False
         bkt_models = getattr(user_state, 'bkt_models', {}) or {}
         if isinstance(bkt_models, dict):
             for _, model in bkt_models.items():
-                if isinstance(model, dict) and isinstance(model.get('mastery_prob'), (int, float)):
+                prob = None
+                if isinstance(model, dict):
+                    prob = model.get('mastery_prob')
+                else:
+                    # 支持对象形式（如 BKTModel）
+                    prob = getattr(model, 'mastery_prob', None)
+                    if prob is None and hasattr(model, 'get_mastery_prob'):
+                        try:
+                            prob = model.get_mastery_prob()
+                        except Exception:
+                            prob = None
+                if isinstance(prob, (int, float)):
                     has_mastery = True
                     break
 
@@ -173,7 +188,7 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
         if has_question_count:
             guide_lines.append("- Use QUESTION COUNT for directness: 0–1 Socratic; 2–3 targeted hints; >=4 step-by-step; in test mode allow direct solutions when clearly blocked.")
         if has_learning_focus:
-            guide_lines.append("- Use LEARNING FOCUS history to connect with explored levels; avoid repetition unless needed; bridge gaps or extend appropriately.")
+            guide_lines.append("- Analyze LEARNING FOCUS across the four progressive levels (1→4) using visit order, repetition patterns, and dwell-time distribution to infer study habits and current mastery; if repeatedly returning to lower levels or showing disproportionately long dwell at higher levels, slow the pace and reinforce prerequisites; if dwell time at higher levels is at least comparable to lower levels and progress is coherent, extend and increase challenge.")
         if has_mastery:
             guide_lines.append("- Use MASTERY OVERVIEW to adjust depth and practice: beginner -> fundamentals and simple examples; intermediate -> connect and extend; advanced -> challenge and best practices.")
 
@@ -188,7 +203,7 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
             guide_lines.append("- If user code is provided, read HTML/CSS/JS; reference exact locations; ensure cross-layer consistency; propose minimal diffs.")
 
         if guide_lines:
-            prompt_parts.append("CONTEXT INTERPRETATION GUIDE:\n" + "\-s-n".join(guide_lines))
+            prompt_parts.append("CONTEXT INTERPRETATION GUIDE:\n" + "\n".join(guide_lines))
 
         return "\n\n".join(prompt_parts)
 
@@ -289,6 +304,133 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
                         "LEARNING FOCUS:\n- Knowledge Level Exploration:\n" + "\n".join(topic_summaries)
                     )
 
+            # 进度聚类分析结果 (Enhanced)
+            if behavior_patterns.get('progress_clustering'):
+                progress_clustering = behavior_patterns['progress_clustering']
+                cluster_name = progress_clustering.get('current_cluster')
+                cluster_confidence = progress_clustering.get('cluster_confidence', 0.0)
+                progress_score = progress_clustering.get('progress_score', 0.0)
+                last_analysis = progress_clustering.get('last_analysis_timestamp')
+                conversation_count = progress_clustering.get('conversation_count_analyzed', 0)
+                cluster_distances = progress_clustering.get('cluster_distances', [])  # 保留原数组以向后兼容
+                cluster_distances_dict = progress_clustering.get('cluster_distances_dict', {})  # 新的字典格式
+                window_features = progress_clustering.get('window_features', {})
+                
+                if cluster_name and cluster_confidence > 0.1:  # 只有在有一定置信度时才显示
+                    # 聚类名称现已统一为英文标准格式，无需翻译
+                    cluster_name_en = cluster_name  # 直接使用，已经是英文格式
+                    
+                    progress_parts = [
+                        f"LEARNING PROGRESS ANALYSIS:",
+                        f"- Current progress cluster: {cluster_name_en}",
+                        f"- Cluster confidence: {cluster_confidence:.3f}"
+                    ]
+                    
+                    # 置信度评级和建议
+                    confidence_level = "High" if cluster_confidence > 0.8 else "Medium" if cluster_confidence > 0.6 else "Low"
+                    confidence_advice = "Reliable classification" if cluster_confidence > 0.7 else "Use with caution - potential misclassification"
+                    progress_parts.extend([
+                        f"  * Confidence level: {confidence_level}",
+                        f"  * Reliability: {confidence_advice}"
+                    ])
+                    
+                    progress_parts.append(f"- Progress score: {progress_score:.3f} (higher = faster progress)")
+                    
+                    # 聚类距离分析（优先使用字典格式避免顺序混乱）
+                    distance_data = cluster_distances_dict if cluster_distances_dict else {}
+                    if not distance_data and cluster_distances and len(cluster_distances) == 3:
+                        # 向后兼容：如果没有字典格式，使用原数组（但这是不安全的）
+                        logger.warning("使用不安全的固定顺序解析cluster_distances，建议更新到字典格式")
+                        # 注意：这里的顺序可能不准确！
+                        distance_data = {
+                            'Normal': cluster_distances[0],
+                            'Advanced': cluster_distances[1], 
+                            'Struggling': cluster_distances[2]
+                        }
+                    
+                    if distance_data:
+                        min_distance = min(distance_data.values())
+                        closest_cluster_name = [name for name, dist in distance_data.items() if dist == min_distance][0]
+                        
+                        progress_parts.append("- Distance analysis:")
+                        progress_parts.append(f"  * Closest to [{closest_cluster_name}] cluster (distance: {min_distance:.2f})")
+                        
+                        # 显示其他相关距离
+                        for name, dist in distance_data.items():
+                            if name != closest_cluster_name and dist < 0.5:  # 只显示相对接近的距离
+                                progress_parts.append(f"  * Distance to [{name}]: {dist:.2f}")
+                    
+                    # 特征分析（如果有窗口特征数据）
+                    if window_features:
+                        progress_parts.append("- Classification factors:")
+                        
+                        # 重复率分析
+                        repeat_eq = window_features.get('repeat_eq', 0)
+                        if repeat_eq > 0.3:
+                            progress_parts.append(f"  * High repetition rate ({repeat_eq:.2f}) - indicates learning difficulty")
+                        elif repeat_eq > 0.1:
+                            progress_parts.append(f"  * Moderate repetition rate ({repeat_eq:.2f}) - normal learning pace")
+                        
+                        # 代码变化分析
+                        code_change = window_features.get('code_change', 0)
+                        if code_change > 0.5:
+                            progress_parts.append(f"  * Active code practice ({code_change:.2f}) - good engagement")
+                        elif code_change < 0.2:
+                            progress_parts.append(f"  * Limited code practice ({code_change:.2f}) - may need encouragement")
+                        
+                        # 困难信号
+                        stuck_hits = window_features.get('stuck_hits', 0)
+                        if stuck_hits > 2:
+                            progress_parts.append(f"  * Multiple difficulty signals ({stuck_hits}) - needs additional support")
+                        elif stuck_hits > 0:
+                            progress_parts.append(f"  * Some difficulty signals ({stuck_hits}) - within normal range")
+                    
+                    progress_parts.append(f"- Analyzed {conversation_count} conversations")
+                    
+                    if last_analysis:
+                        try:
+                            from datetime import datetime
+                            analysis_time = datetime.fromisoformat(last_analysis)
+                            progress_parts.append(f"- Last analysis: {analysis_time.strftime('%Y-%m-%d %H:%M:%S')}")
+                        except ValueError:
+                            pass
+                    
+                    # 增强的聚类历史趋势分析
+                    clustering_history = progress_clustering.get('clustering_history', [])
+                    if len(clustering_history) > 1:
+                        # 中英文映射
+                        def translate_cluster_name(name):
+                            mapping = {
+                                '低进度': 'Struggling', '正常': 'Normal', '超进度': 'Advanced',
+                                'Struggling': 'Struggling', 'Normal': 'Normal', 'Advanced': 'Advanced'
+                            }
+                            return mapping.get(name, name)
+                        
+                        recent_clusters = [translate_cluster_name(h.get('cluster_name')) for h in clustering_history[-3:]]
+                        trend = ' → '.join(recent_clusters)
+                        
+                        # 趋势分析
+                        trend_analysis = ""
+                        if len(clustering_history) >= 2:
+                            prev_cluster = translate_cluster_name(clustering_history[-2].get('cluster_name'))
+                            curr_cluster = translate_cluster_name(clustering_history[-1].get('cluster_name'))
+                            
+                            if prev_cluster != curr_cluster:
+                                if (prev_cluster == 'Struggling' and curr_cluster == 'Normal') or \
+                                   (prev_cluster == 'Normal' and curr_cluster == 'Advanced'):
+                                    trend_analysis = " (positive improvement - continue current approach)"
+                                elif (prev_cluster == 'Normal' and curr_cluster == 'Struggling') or \
+                                     (prev_cluster == 'Advanced' and curr_cluster == 'Normal'):
+                                    trend_analysis = " (declining - may need additional support and encouragement)"
+                                else:
+                                    trend_analysis = " (fluctuating performance - monitor closely)"
+                            else:
+                                trend_analysis = " (stable performance - consistent learning pace)"
+                        
+                        progress_parts.append(f"- Learning trend: {trend}{trend_analysis}")
+                    
+                    student_parts.append("\n".join(progress_parts))
+       
         # 学习掌握度概览（BKT/mastery）
         if hasattr(user_state, 'bkt_models') and user_state.bkt_models:
             mastery_items: List[str] = []
@@ -297,6 +439,14 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
                     prob = None
                     if isinstance(model, dict):
                         prob = model.get('mastery_prob')
+                    else:
+                        # 支持对象形式（如 BKTModel）
+                        prob = getattr(model, 'mastery_prob', None)
+                        if prob is None and hasattr(model, 'get_mastery_prob'):
+                            try:
+                                prob = model.get_mastery_prob()
+                            except Exception:
+                                prob = None
                     if isinstance(prob, (int, float)):
                         level = 'advanced' if prob > 0.8 else ('intermediate' if prob > 0.5 else 'beginner')
                         mastery_items.append(f"{topic_id}: {level} ({prob:.2f})")
@@ -366,6 +516,77 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
         }
 
         return strategies.get(emotion.upper(), strategies['NEUTRAL'])
+
+    @staticmethod
+    def _get_progress_strategy(user_state: UserStateSummary) -> str:
+        """根据学习进度聚类结果获取教学策略 (Enhanced)"""
+        try:
+            # 从behavior_patterns中获取进度聚类信息
+            progress_clustering = user_state.behavior_patterns.get('progress_clustering', {})
+            cluster_name = progress_clustering.get('current_cluster')
+            cluster_confidence = progress_clustering.get('cluster_confidence', 0.0)
+            progress_score = progress_clustering.get('progress_score', 0.0)
+            cluster_distances = progress_clustering.get('cluster_distances', [])  # 保留原数组以向后兼容
+            cluster_distances_dict = progress_clustering.get('cluster_distances_dict', {})  # 新的字典格式
+            
+            # 如果没有聚类信息或置信度过低，返回空字符串
+            if not cluster_name or cluster_confidence < 0.3:
+                return ""
+            
+            # 聚类名称现已统一为英文标准格式，无需翻译
+            cluster_name_en = cluster_name  # 直接使用英文格式
+            
+            # 增强的策略描述
+            base_strategies = {
+                'Struggling': f"Student classified as struggling learner (progress score: {progress_score:.2f}). "
+                             "Provide foundational support, break concepts into smaller digestible steps, "
+                             "offer frequent encouragement and check understanding regularly. "
+                             "Use concrete examples and avoid abstract concepts initially. "
+                             "Consider revisiting prerequisites and provide additional practice opportunities.",
+                
+                'Normal': f"Student showing normal learning progress (progress score: {progress_score:.2f}). "
+                         "Maintain current teaching pace and complexity level. "
+                         "Continue with balanced explanations and guided practice sessions. "
+                         "Gradually increase challenge level as student demonstrates mastery. "
+                         "Provide both theoretical concepts and practical applications.",
+                
+                'Advanced': f"Student demonstrating advanced learning capability (progress score: {progress_score:.2f}). "
+                           "Increase challenge level and introduce more sophisticated concepts. "
+                           "Provide enrichment activities and connect topics to broader applications. "
+                           "Encourage independent exploration, critical thinking, and creative problem-solving. "
+                           "Consider introducing advanced topics and real-world scenarios."
+            }
+            
+            base_strategy = base_strategies.get(cluster_name_en, "")
+            
+            # 添加置信度和距离信息
+            confidence_level = "High" if cluster_confidence > 0.8 else "Medium" if cluster_confidence > 0.6 else "Low"
+            confidence_note = f" (Analysis confidence: {confidence_level} - {cluster_confidence:.2f}"
+            
+            # 如果有距离信息，添加边界情况提醒 - 优先使用字典格式
+            distance_values = []
+            if cluster_distances_dict:
+                distance_values = list(cluster_distances_dict.values())
+            elif cluster_distances and len(cluster_distances) == 3:
+                distance_values = cluster_distances
+            
+            if len(distance_values) >= 2:
+                min_distance = min(distance_values)
+                sorted_distances = sorted(distance_values)
+                second_min = sorted_distances[1]
+                if second_min - min_distance < 0.2:  # 如果距离很接近
+                    confidence_note += f", close to boundary - monitor for changes"
+            
+            confidence_note += ")"
+            
+            return base_strategy + confidence_note
+            
+        except Exception as e:
+            # 如果获取策略时出错，记录错误但不影响主流程
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(f"获取进度策略时出错: {e}")
+            return ""
 
     def _build_message_history(
         self,

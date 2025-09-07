@@ -1,0 +1,10 @@
+{
+  "model_name": "sentence-transformers/all-mpnet-base-v2",
+  "pca_dim": 48,
+  "include_struct": true,
+  "struct_weight": 1.0,
+  "near_sim_thresh": 0.92,
+  "batch_size": 12,
+  "overlap": 4,
+  "uncertain": 0.6
+}

@@ -33,7 +33,7 @@ export class GraphState {
     this.expandedSet = new Set();
     this.currentLearningChapter = null;
     this.fixedPositions = {};
-    
+
     // 初始化映射关系
     this.displayMap = {};
     this.depMap = {};
@@ -53,7 +53,7 @@ export class GraphState {
     this.graphData.edges = this.graphData.edges || [];
     this.graphData.dependent_edges = this.graphData.dependent_edges || [];
     this.graphData.nodes = this.graphData.nodes || [];
-    
+
     // 确保learnedNodes是数组
     this.learnedNodes = Array.isArray(this.learnedNodes) ? this.learnedNodes : [];
 
@@ -120,17 +120,17 @@ export class GraphState {
     if (!data) return false;
     if (!Array.isArray(data.nodes)) return false;
     if (!Array.isArray(data.edges)) return false;
-    
+
     // 检查edges基本结构
-    const edgesValid = data.edges.every(edge => 
+    const edgesValid = data.edges.every(edge =>
       edge && edge.data && edge.data.source && edge.data.target
     );
-    
+
     // 检查nodes基本结构
     const nodesValid = data.nodes.every(node =>
       node && node.data && node.data.id
     );
-    
+
     return edgesValid && nodesValid;
   }
   // 更新学习状态
@@ -140,9 +140,9 @@ export class GraphState {
 
   // 节点类型判断
   isKnowledge(id) {
-    return id.startsWith('text_') || id.startsWith('structure_') || 
-           id.startsWith('form_') || id.startsWith('style_') || 
-           id.startsWith('media_') || id.startsWith('js_');
+    return id.startsWith('text_') || id.startsWith('structure_') ||
+      id.startsWith('form_') || id.startsWith('style_') ||
+      id.startsWith('media_') || id.startsWith('js_');
   }
 
   // 收集知识点后代
@@ -154,10 +154,10 @@ export class GraphState {
       (this.displayMap[u] || []).forEach(v => {
         if (visited.has(v)) return;
         visited.add(v);
-        
+
         const node = this.graphData.nodes.find(n => n.data && n.data.id === v);
         const type = node && node.data && node.data.type ? node.data.type : '';
-        
+
         if (type === 'chapter') {
           return; // 跳过章节节点
         } else {
@@ -173,6 +173,9 @@ export class GraphState {
 
   // 知识点解锁判断
   isKnowledgeUnlocked(knowledgeId) {
+    // 同步localStorage中的已学习知识点
+    this.syncLearnedNodesFromStorage();
+
     const pres = this.prereqMap[knowledgeId] || [];
     const node = this.graphData.nodes.find(n => n.data && n.data.id === knowledgeId);
     const type = node && node.data && node.data.type ? node.data.type : '';
@@ -180,7 +183,7 @@ export class GraphState {
     return pres.every(pid => {
       const preNode = this.graphData.nodes.find(n => n.data && n.data.id === pid);
       const preType = preNode && preNode.data && preNode.data.type ? preNode.data.type : '';
-      
+
       if (preType === 'chapter') {
         return this.canLearnChapter(pid); // 如果是章节节点，检查章节是否可学
       } else {
@@ -198,6 +201,17 @@ export class GraphState {
 
   // 章节完成判断
   isChapterCompleted(chapterId) {
+    // 首先检查localStorage中的已完成章节
+    try {
+      const completedChapters = JSON.parse(localStorage.getItem('completedChapters') || '[]');
+      if (completedChapters.includes(chapterId)) {
+        return true;
+      }
+    } catch (error) {
+      console.error('读取已完成章节时出错:', error);
+    }
+
+    // 然后检查原有的逻辑
     const ks = this.collectKnowledgeDescendantsForDep(chapterId);
     if (ks.length === 0) return false;
     const allLearned = ks.every(id => this.learnedNodes.includes(id));
@@ -218,7 +232,7 @@ export class GraphState {
       (this.depMap[currentId] || []).forEach(cid => {
         const node = this.graphData.nodes.find(n => n.data && n.data.id === cid);
         const type = node && node.data && node.data.type ? node.data.type : '';
-        
+
         if (type !== 'chapter') {
           out.add(cid);
           queue.push(cid);
@@ -232,17 +246,32 @@ export class GraphState {
   passChapterTest(chapterId) {
     const ks = this.collectKnowledgeDescendantsForDep(chapterId);
     const allLearned = ks.length > 0 && ks.every(id => this.learnedNodes.includes(id));
-    
+
     if (!allLearned) {
       console.log("该章节仍有知识点未学完");
       return false;
     }
-    
+
     this.chaptersPassed.add(chapterId);
     if (this.currentLearningChapter === chapterId) {
       this.currentLearningChapter = null;
     }
     console.log(`恭喜！你已通过 ${chapterId} 的章节测试`);
     return true;
+  }
+
+  // 从localStorage同步已学习的知识点
+  syncLearnedNodesFromStorage() {
+    try {
+      const storedLearnedNodes = JSON.parse(localStorage.getItem('learnedNodes') || '[]');
+      // 合并已学习的知识点，避免重复
+      storedLearnedNodes.forEach(nodeId => {
+        if (!this.learnedNodes.includes(nodeId)) {
+          this.learnedNodes.push(nodeId);
+        }
+      });
+    } catch (error) {
+      console.error('从localStorage同步已学习知识点时出错:', error);
+    }
   }
 }

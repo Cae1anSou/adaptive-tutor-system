@@ -65,6 +65,7 @@ celerybeat-schedule.bak
 celerybeat-schedule.dat
 celerybeat-schedule.dir
 celerybeat-schedule
+backend/celerybeat-schedule
 
 # 敏感信息 (secrets)
 *.env
@@ -72,10 +73,17 @@ secrets.ini
 
 save/
 # 模型文件
-models/
+
+# 默认忽略 backend/models 下所有内容
+backend/models/*
 download_model.log
 
-download_model.log
+# 放行 progress_clustering
+!backend/models/progress_clustering/
+!backend/models/progress_clustering/**
+
+
+
 backend/models/sentiment_bert/config.json
 backend/models/sentiment_bert/model.safetensors
 backend/models/sentiment_bert/special_tokens_map.json

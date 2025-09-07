@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 设置返回按钮
   setupBackButton();
   try {
-    // 获取用户ID并验证
+    // 获取实验编号并验证
     const participantId = getParticipantId();
     if (!participantId) {
       window.location.href = '/pages/index.html';
@@ -193,8 +193,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else if (graphState.isKnowledgeUnlocked(id)) {// 可学知识点
           showKnowledgeModal(id, label);
         } else {// 未解锁知识点
-          if (confirm("您还未学习前置知识点，是否直接开始测试？")) {
-            navigateTo('/pages/test_page.html', id, true, true);
+          // 检查是否是跨章节的学习需求
+          const chapterCheckResult = checkChapterPrerequisite(id);
+          if (chapterCheckResult.requiresChapterCompletion) {
+            if (confirm(`您还未完成前置章节"${chapterCheckResult.requiredChapter}"的测试，需要先完成该章节的最后一个测试才能学习"${label}"。是否现在开始测试前置章节？`)) {
+              navigateTo('/pages/test_page.html', chapterCheckResult.lastTestId, true, true);
+            }
+          } else {
+            // 获取前置知识点信息
+            const prerequisiteInfo = getPrerequisiteInfo(id);
+            if (prerequisiteInfo) {
+              if (confirm(`您还未学习前置知识点"${prerequisiteInfo.label}"，需要先完成该知识点的测试才能学习"${label}"。是否现在开始测试前置知识点？`)) {
+                navigateTo('/pages/test_page.html', prerequisiteInfo.id, true, true);
+              }
+            } else {
+              if (confirm("您还未学习前置知识点，是否直接开始测试？")) {
+                navigateTo('/pages/test_page.html', id, true, true);
+              }
+            }
           }
         }
       }
@@ -230,3 +246,69 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
 });
+
+// 获取前置知识点信息
+function getPrerequisiteInfo(knowledgeId) {
+  try {
+    // 根据知识图谱的依赖关系获取前置知识点
+    const prerequisiteMap = {
+      '1_2': { id: '1_1', label: '使用h元素和p元素体验标题与段落' },
+      '1_3': { id: '1_2', label: '应用文本格式(加粗、斜体)' },
+      '2_2': { id: '2_1', label: '使用盒子元素进行内容划分' },
+      '2_3': { id: '2_2', label: '创建有序列表' },
+      '3_2': { id: '3_1', label: '文本框与按钮的使用' },
+      '3_3': { id: '3_2', label: '复选框与单选框' },
+      '4_2': { id: '4_1', label: '设置颜色与字体' },
+      '4_3': { id: '4_2', label: '理解盒模型' },
+      '5_2': { id: '5_1', label: '插入与管理图片' },
+      '5_3': { id: '5_2', label: '引入音频文件' },
+      '6_2': { id: '6_1', label: '按钮点击事件' },
+      '6_3': { id: '6_2', label: '获取用户输入' }
+    };
+
+    return prerequisiteMap[knowledgeId] || null;
+  } catch (error) {
+    console.error('获取前置知识点信息时出错:', error);
+    return null;
+  }
+}
+
+// 检查章节前置条件
+function checkChapterPrerequisite(knowledgeId) {
+  try {
+    const [chapter, section] = knowledgeId.split('_').map(Number);
+
+    // 如果是第一章的第一个知识点，不需要前置条件
+    if (chapter === 1 && section === 1) {
+      return { requiresChapterCompletion: false };
+    }
+
+    // 如果是第一章的其他知识点，检查章节内前置条件
+    if (chapter === 1) {
+      return { requiresChapterCompletion: false };
+    }
+
+    // 如果是其他章节的第一个知识点，需要检查前一章节是否完成
+    if (section === 1) {
+      const previousChapter = chapter - 1;
+      const previousChapterId = `chapter${previousChapter}`;
+
+      // 检查前一章节是否已完成
+      const completedChapters = JSON.parse(localStorage.getItem('completedChapters') || '[]');
+      const isPreviousChapterCompleted = completedChapters.includes(previousChapterId);
+
+      if (!isPreviousChapterCompleted) {
+        return {
+          requiresChapterCompletion: true,
+          requiredChapter: `第${previousChapter}章`,
+          lastTestId: `${previousChapter}_3` // 前一章节的最后一个测试
+        };
+      }
+    }
+
+    return { requiresChapterCompletion: false };
+  } catch (error) {
+    console.error('检查章节前置条件时出错:', error);
+    return { requiresChapterCompletion: false };
+  }
+}

@@ -37,66 +37,66 @@ export class MiniKnowledgeGraph {
         console.warn(`知识图谱容器元素 #${this.containerId} 不存在`);
         return;
       }
-      
+
       const participantId = getParticipantId();
       if (!participantId) {
-        console.warn('未找到用户ID，无法加载简化知识图谱');
+        console.warn('未找到实验编号，无法加载简化知识图谱');
         return;
       }
-      
+
       // 获取图谱数据和用户进度
       const [graphResponse, progressResponse] = await Promise.all([
         fetch(buildBackendUrl('/knowledge-graph')),
         fetch(buildBackendUrl(`/progress/participants/${participantId}/progress`))
       ]);
-      
+
       if (!graphResponse.ok || !progressResponse.ok) {
         throw new Error('获取数据失败');
       }
-      
+
       const [graphResult, progressResult] = await Promise.all([
         graphResponse.json(),
         progressResponse.json()
       ]);
-      
+
       const graphData = graphResult.data;
       const learnedNodes = progressResult.data.completed_topics || [];
-      
+
       if (!graphData || !graphData.nodes || !graphData.edges) {
         throw new Error('图谱数据格式不正确');
       }
-      
+
       // 初始化状态管理
       this.graphState = new GraphState(graphData, learnedNodes);
       this.graphState.initMaps();
-      
+
       // 设置当前学习节点
       this.setCurrentLearningNode();
-      
+
       // 创建Cytoscape实例
       this.createCytoscapeInstance();
-      
+
       // 添加元素
       this.cy.add([...graphData.nodes, ...graphData.edges]);
-      
+
       // 更新节点状态
       this.updateNodeStates();
-      
+
       // 设置布局
       this.applyLayout();
-      
+
       // 添加交互效果
       this.setupInteractions();
-      
+
       // 启动监听容器状态变化
       this.listenToContainerStateChange();
-      
+
       // 绑定布局事件监听器
       this.bindLayoutEvents();
-      
+
       this.isInitialized = true;
       console.log('简化知识图谱初始化完成');
-      
+
     } catch (error) {
       console.error('初始化简化知识图谱失败:', error);
     }
@@ -108,52 +108,52 @@ export class MiniKnowledgeGraph {
       // 获取URL中的topic参数
       const topicData = getUrlParam('topic');
       console.log('URL解密结果:', topicData);
-      
+
       if (topicData && topicData.id) {
         const nodeId = topicData.id;
         console.log('当前学习节点ID:', nodeId);
-        
+
         // 查找对应的节点
-        const node = this.graphState.graphData.nodes.find(n => 
+        const node = this.graphState.graphData.nodes.find(n =>
           n.data && n.data.id === nodeId
         );
-        
+
         if (node) {
           console.log('找到当前学习节点:', node);
           // 如果是章节节点，直接设置为当前学习章节
           if (node.data.type === 'chapter') {
             this.graphState.currentLearningChapter = nodeId;
             console.log('设置当前学习章节:', nodeId);
-          } 
+          }
           // 如果是知识点节点，需要找到其所属章节
           else {
             // 查找父章节
             const parents = this.graphState.parentMap[nodeId] || [];
             console.log('知识点的父节点:', parents);
-            
+
             // 查找第一个章节类型的父节点
             for (const parentId of parents) {
-              const parentNode = this.graphState.graphData.nodes.find(n => 
+              const parentNode = this.graphState.graphData.nodes.find(n =>
                 n.data && n.data.id === parentId
               );
-              
+
               if (parentNode && parentNode.data.type === 'chapter') {
                 this.graphState.currentLearningChapter = parentId;
                 console.log('设置当前学习章节(通过知识点查找):', parentId);
                 break;
               }
             }
-            
+
             // 如果没找到父章节，尝试通过前置关系查找
             if (!this.graphState.currentLearningChapter) {
               const prereqs = this.graphState.prereqMap[nodeId] || [];
               console.log('知识点的前置节点:', prereqs);
-              
+
               for (const prereqId of prereqs) {
-                const prereqNode = this.graphState.graphData.nodes.find(n => 
+                const prereqNode = this.graphState.graphData.nodes.find(n =>
                   n.data && n.data.id === prereqId
                 );
-                
+
                 if (prereqNode && prereqNode.data.type === 'chapter') {
                   this.graphState.currentLearningChapter = prereqId;
                   console.log('设置当前学习章节(通过前置关系查找):', prereqId);
@@ -180,7 +180,7 @@ export class MiniKnowledgeGraph {
     if (!container) {
       throw new Error(`知识图谱容器元素 #${this.containerId} 不存在`);
     }
-    
+
     this.cy = cytoscape({
       container: container,
       style: [
@@ -282,7 +282,7 @@ export class MiniKnowledgeGraph {
   updateNodeStates() {
     // 首先获取当前学习节点ID
     let currentLearningNodeId = null;
-    
+
     try {
       // 获取URL中的topic参数
       const topicData = getUrlParam('topic');
@@ -292,17 +292,17 @@ export class MiniKnowledgeGraph {
     } catch (error) {
       console.warn('获取当前学习节点失败:', error);
     }
-    
+
     this.cy.nodes().forEach(node => {
       const id = node.id();
       const type = node.data('type');
-      
+
       // 清除所有状态类，确保状态互斥
       node.removeClass('learned');
       node.removeClass('unlocked');
       node.removeClass('locked');
       node.removeClass('current');
-      
+
       // 当前学习节点优先级最高
       if (id === currentLearningNodeId) {
         node.addClass('current');
@@ -320,8 +320,8 @@ export class MiniKnowledgeGraph {
         }
       } else {
         // 如果属于当前学习章节，则标记为当前
-        if (this.graphState.currentLearningChapter && 
-            this.graphState.collectKnowledgeDescendantsForDisplay(this.graphState.currentLearningChapter).includes(id)) {
+        if (this.graphState.currentLearningChapter &&
+          this.graphState.collectKnowledgeDescendantsForDisplay(this.graphState.currentLearningChapter).includes(id)) {
           // 只有在没有明确指定当前学习节点时才标记为当前章节的知识点
           if (!currentLearningNodeId) {
             node.addClass('current');
@@ -341,10 +341,10 @@ export class MiniKnowledgeGraph {
   applyLayout() {
     // 设置章节固定位置
     this.setFixedChapterPositions();
-    
+
     // 隐藏所有知识点
     this.hideAllKnowledgeNodes();
-    
+
     // 居中缩放图谱
     this.centerAndZoomGraph();
   }
@@ -409,7 +409,7 @@ export class MiniKnowledgeGraph {
       const node = evt.target;
       const originalSize = this.originalSizes.get(node.id()) || { width: 120, height: 120 };
       const scaleFactor = node.data('type') === 'chapter' ? 1.15 : 1.1;
-      
+
       // 使用动画过渡效果
       node.stop().animate({
         style: {
@@ -508,7 +508,7 @@ export class MiniKnowledgeGraph {
     if (type === 'chapter') {
       // 显示知识图谱容器
       this.showKnowledgeGraphContainer();
-      
+
       // 原有逻辑保持不变
       if (this.graphState.expandedSet.has(id)) {
         this.collapseChapter(id);
@@ -528,7 +528,7 @@ export class MiniKnowledgeGraph {
     if (type === 'knowledge') {
       // 显示知识图谱容器
       this.showKnowledgeGraphContainer();
-      
+
       const label = node.data('label') || id;
       if (this.options.enableModal) {
         this.showKnowledgeModal(id, label);
@@ -620,14 +620,29 @@ export class MiniKnowledgeGraph {
         this.navigateTo('/pages/test_page.html', knowledgeId, true, true);
       };
     } else {
-      status.textContent = '该知识点尚未解锁，您是否要直接开始测试？';
-      learnBtn.disabled = true;
-      learnBtn.className += ' disabled';
+      // 获取前置知识点信息
+      const prerequisiteInfo = this.getPrerequisiteInfo(knowledgeId);
+      if (prerequisiteInfo) {
+        status.textContent = `该知识点尚未解锁，需要先完成"${prerequisiteInfo.label}"的测试`;
+        learnBtn.disabled = true;
+        learnBtn.className += ' disabled';
 
-      learnBtn.onclick = () => { };
-      testBtn.onclick = () => {
-        this.navigateTo('/pages/test_page.html', knowledgeId, true, true);
-      };
+        learnBtn.onclick = () => { };
+        testBtn.onclick = () => {
+          if (confirm(`您还未学习前置知识点"${prerequisiteInfo.label}"，需要先完成该知识点的测试才能学习"${nodeLabel}"。是否现在开始测试前置知识点？`)) {
+            this.navigateTo('/pages/test_page.html', prerequisiteInfo.id, true, true);
+          }
+        };
+      } else {
+        status.textContent = '该知识点尚未解锁，您是否要直接开始测试？';
+        learnBtn.disabled = true;
+        learnBtn.className += ' disabled';
+
+        learnBtn.onclick = () => { };
+        testBtn.onclick = () => {
+          this.navigateTo('/pages/test_page.html', knowledgeId, true, true);
+        };
+      }
     }
     modal.style.display = 'block';
 
@@ -651,7 +666,7 @@ export class MiniKnowledgeGraph {
     const id = node.id();
     const type = node.data('type');
     const originalSize = this.originalSizes.get(id);
-    
+
     // 先恢复到原始尺寸
     if (originalSize) {
       node.style({
@@ -659,7 +674,7 @@ export class MiniKnowledgeGraph {
         'height': originalSize.height
       });
     }
-    
+
     // 获取当前学习节点ID
     let currentLearningNodeId = null;
     try {
@@ -671,7 +686,7 @@ export class MiniKnowledgeGraph {
     } catch (error) {
       console.warn('获取当前学习节点失败:', error);
     }
-    
+
     // 检查节点是否为当前学习节点，优先处理
     if (id === currentLearningNodeId) {
       // 当前学习节点始终为橙色，无论其他状态如何
@@ -681,7 +696,7 @@ export class MiniKnowledgeGraph {
       });
       return; // 直接返回，不再应用其他样式
     }
-    
+
     // 处理非当前学习状态的节点
     if (type === 'chapter') {
       if (this.graphState.currentLearningChapter === id) {
@@ -751,7 +766,7 @@ export class MiniKnowledgeGraph {
     chapterNodes.forEach((node, idx) => {
       // 使用调整后的间距
       const x = (idx + 1) * actualSpacing;
-      
+
       // 所有节点都使用同一个 y 坐标
       node.position({ x, y });
       node.lock();
@@ -786,7 +801,7 @@ export class MiniKnowledgeGraph {
     const isTop = idx % 2 === 0;
 
     // 减小知识点与章节之间的距离，使连线更短
-    const baseY =  chapterPos.y + this.layoutParams.KNOWLEDGE_ROW_DELTA_Y * 0.6;
+    const baseY = chapterPos.y + this.layoutParams.KNOWLEDGE_ROW_DELTA_Y * 0.6;
 
     const n = kids.length;
     const maxWidth = this.cy.container().clientWidth * 1;  // 减小横向宽度，使知识点更集中
@@ -815,7 +830,7 @@ export class MiniKnowledgeGraph {
           'arrow-scale': 2  // 保持一致的箭头尺寸
         });
         e.show();
-        
+
         // 淡入动画
         e.animate({
           style: {
@@ -854,59 +869,59 @@ export class MiniKnowledgeGraph {
   centerAndZoomGraph() {
     const nodes = this.cy.nodes().filter(node => node.visible());
     if (nodes.length === 0) return;
-    
+
     let minX = Infinity, maxX = -Infinity;
     let minY = Infinity, maxY = -Infinity;
-    
+
     nodes.forEach(node => {
       const pos = node.position();
       const width = parseFloat(node.style('width')) || 0;
       const height = parseFloat(node.style('height')) || 0;
-      
-      minX = Math.min(minX, pos.x - width/2);
-      maxX = Math.max(maxX, pos.x + width/2);
-      minY = Math.min(minY, pos.y - height/2);
-      maxY = Math.max(maxY, pos.y + height/2);
+
+      minX = Math.min(minX, pos.x - width / 2);
+      maxX = Math.max(maxX, pos.x + width / 2);
+      minY = Math.min(minY, pos.y - height / 2);
+      maxY = Math.max(maxY, pos.y + height / 2);
     });
-    
+
     // 减少边距，创建更紧凑的布局
     const margin = 20; // 减少边距
-    minX -= margin+20;
+    minX -= margin + 20;
     maxX += margin;
     minY -= margin;
     maxY += margin;
-    
+
     const centerX = (minX + maxX) / 2;
     const centerY = (minY + maxY) / 2;
     const width = maxX - minX;
     const height = maxY - minY;
-    
+
     const container = this.cy.container();
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
-    
+
     // 检查是否处于收起状态（高度接近40px）
     const isCollapsed = containerHeight <= 50; // 收起状态高度阈值
-    
+
     let scale, panX, panY;
-    
+
     if (isCollapsed) {
       // 使用固定的缩放比例，确保图谱可见
       scale = Math.min(0.3, 1.2) * 0.95; // 收起时使用较小但可见的缩放比例
-      
+
       // 在收起状态下居中显示
       panX = -centerX * scale + containerWidth / 2;
-      panY = -centerY * scale + containerHeight / 2; 
+      panY = -centerY * scale + containerHeight / 2;
     } else {
       // 展开状态下的正常处理
       const scaleX = containerWidth / width;
       const scaleY = containerHeight / height;
       scale = Math.min(scaleX, scaleY, 1.2) * 0.95; // 稍微增加缩放比例
-      
+
       panX = -centerX * scale + containerWidth / 2;
       panY = -centerY * scale + containerHeight / 2;
     }
-    
+
     this.cy.animate({
       zoom: scale,
       pan: { x: panX, y: panY },
@@ -941,11 +956,11 @@ export class MiniKnowledgeGraph {
       // 如果全局函数不存在，使用原来的逻辑
       console.warn('[MiniKnowledgeGraph] 全局showKnowledgeGraph函数不存在，使用默认逻辑');
       const knowledgeGraphContainer = document.getElementById('knowledge-graph-container');
-      
+
       // 如果找到了容器元素，则显示它
       if (knowledgeGraphContainer) {
         knowledgeGraphContainer.style.display = 'block';
-        
+
         // 更新图标状态
         const toggleIcon = document.getElementById('toggleIcon');
         if (toggleIcon) {
@@ -954,6 +969,32 @@ export class MiniKnowledgeGraph {
           toggleIcon.style.opacity = '1';     // 完全不透明
         }
       }
+    }
+  }
+
+  // 获取前置知识点信息
+  getPrerequisiteInfo(knowledgeId) {
+    try {
+      // 根据知识图谱的依赖关系获取前置知识点
+      const prerequisiteMap = {
+        '1_2': { id: '1_1', label: '使用h元素和p元素体验标题与段落' },
+        '1_3': { id: '1_2', label: '应用文本格式(加粗、斜体)' },
+        '2_2': { id: '2_1', label: '使用盒子元素进行内容划分' },
+        '2_3': { id: '2_2', label: '创建有序列表' },
+        '3_2': { id: '3_1', label: '文本框与按钮的使用' },
+        '3_3': { id: '3_2', label: '复选框与单选框' },
+        '4_2': { id: '4_1', label: '设置颜色与字体' },
+        '4_3': { id: '4_2', label: '理解盒模型' },
+        '5_2': { id: '5_1', label: '插入与管理图片' },
+        '5_3': { id: '5_2', label: '引入音频文件' },
+        '6_2': { id: '6_1', label: '按钮点击事件' },
+        '6_3': { id: '6_2', label: '获取用户输入' }
+      };
+
+      return prerequisiteMap[knowledgeId] || null;
+    } catch (error) {
+      console.error('获取前置知识点信息时出错:', error);
+      return null;
     }
   }
 }

@@ -28,7 +28,7 @@ class SocketRequest(BaseModel):
     
     Attributes:
         type: 消息类型，如 "message"(普通消息), "ping"(心跳检测), "ai_message"(AI请求消息)
-        userId: 用户ID，标识消息发送者
+        userId: 实验编号，标识消息发送者
         message: 消息内容，文本格式
         timestamp: 时间戳，记录消息发送时间
         conversation_history: 对话历史，可选字段
@@ -72,7 +72,7 @@ class SocketResponse(BaseModel):
     Attributes:
         type: 消息类型，如 "message"(普通消息), "stream_start"(流式传输开始), 
               "stream"(流式传输中), "stream_end"(流式传输结束), "pong"(心跳响应)
-        sender: 发送者标识，如 "AI", "system" 或具体的用户ID
+        sender: 发送者标识，如 "AI", "system" 或具体的实验编号
         message: 消息内容，文本格式
         status: 响应状态，'success'表示成功，'error'表示错误
         error_message: 错误信息，可选字段

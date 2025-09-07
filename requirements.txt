@@ -114,6 +114,8 @@ cryptography==45.0.7
 stack-data==0.6.3
 starlette==0.47.2
 sympy==1.14.0
+scikit-learn
+sentence-transformers
 tenacity==9.1.2
 tinycss2==1.4.0
 tokenizers==0.21.4
