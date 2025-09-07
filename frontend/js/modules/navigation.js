@@ -20,7 +20,7 @@ export function trackReferrer() {
  */
 export function navigateTo(url, id = null, encryptData = true, addReturn = false) {
     let targetUrl = url;
-    
+
     if (id) {
         let paramValue;
         if (encryptData) {
@@ -29,7 +29,7 @@ export function navigateTo(url, id = null, encryptData = true, addReturn = false
             paramValue = id;
         }
         targetUrl += `?topic=${encodeURIComponent(paramValue)}`;
-        
+
         // 只有在测试页面且明确要求时才添加返回参数
         if (addReturn && url.includes('test_page.html')) {
             const returnUrl = lastReferrer || '/pages/knowledge_graph.html';
@@ -37,8 +37,9 @@ export function navigateTo(url, id = null, encryptData = true, addReturn = false
             console.log('添加返回参数:', returnUrl);
         }
     }
-    
-    console.log('跳转到:', targetUrl);
+
+    console.log('[DEBUG] navigateTo被调用，参数:', { url, id, encryptData, addReturn });
+    console.log('[DEBUG] 最终URL:', targetUrl);
     window.location.href = targetUrl;
 }
 
@@ -51,17 +52,17 @@ export function navigateTo(url, id = null, encryptData = true, addReturn = false
 export function getUrlParam(name, decryptData = true) {
     const urlParams = new URLSearchParams(window.location.search);
     const param = urlParams.get(name);
-    
+
     if (!param) return null;
-    
+
     if (decryptData) {
         try {
             // 先解码URL编码
             const decodedParam = decodeURIComponent(param);
-            
+
             // 尝试解密
             const result = decryptWithTimestamp(decodedParam);
-            
+
             if (result.isValid) {
                 return result;
             } else {
@@ -74,7 +75,7 @@ export function getUrlParam(name, decryptData = true) {
             return simpleParamDecode(param);
         }
     }
-    
+
     // 不解密时直接返回
     return param;
 }
@@ -85,11 +86,11 @@ export function getUrlParam(name, decryptData = true) {
 export function getReturnUrl() {
     const urlParams = new URLSearchParams(window.location.search);
     const returnUrl = urlParams.get('return');
-    
+
     if (returnUrl) {
         return decodeURIComponent(returnUrl);
     }
-    
+
     // 默认返回知识图谱
     return '/pages/knowledge_graph.html';
 }
@@ -99,12 +100,12 @@ export function getReturnUrl() {
  */
 export function goBack() {
     const returnUrl = getReturnUrl();
-    
+
     // 如果当前是测试页面且有返回URL，使用快速返回
     if (window.location.pathname.includes('test_page.html') && returnUrl) {
         console.log('快速返回到:', returnUrl);
         window.location.href = returnUrl;
-    } 
+    }
     // 如果是学习页面，固定返回知识图谱
     else if (window.location.pathname.includes('learning_page.html')) {
         console.log('返回知识图谱');
@@ -149,7 +150,7 @@ export function setupBackButton() {
 export function debugUrlParams() {
     const params = new URLSearchParams(window.location.search);
     console.log('URL参数:', Object.fromEntries(params.entries()));
-    
+
     if (window.location.pathname.includes('test_page.html')) {
         console.log('返回URL:', getReturnUrl());
     }
