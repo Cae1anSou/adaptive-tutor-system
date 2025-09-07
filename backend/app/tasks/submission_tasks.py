@@ -39,12 +39,17 @@ def process_submission_task(self, submission_data: dict):
             topic_id=submission_in.topic_id
         )
 
-        # 3. 异步更新学生模型和快照
-        from app.tasks.db_tasks import update_bkt_and_snapshot_task
-        update_bkt_and_snapshot_task.apply_async(
-            args=[submission_in.participant_id, submission_in.topic_id, evaluation_result["passed"]],
-            queue='db_writer_queue'
-        )
+        # 3. 在提交 Worker 内直接更新 BKT 与快照（避免跨队列初始化问题）
+        try:
+            user_state_service.update_bkt_on_submission(
+                participant_id=submission_in.participant_id,
+                topic_id=submission_in.topic_id,
+                is_correct=evaluation_result["passed"]
+            )
+            # 触发一次快照检查
+            user_state_service.maybe_create_snapshot(submission_in.participant_id, db)
+        except Exception as e:
+            logger.error(f"Failed to update BKT/snapshot in submit worker: {e}", exc_info=True)
 
         # 4. 如果测试通过，异步更新用户进度记录
         if evaluation_result["passed"]:

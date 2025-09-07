@@ -114,11 +114,7 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
         emotion_strategy = PromptGenerator._get_emotion_strategy(emotion)
         prompt_parts.append(f"STRATEGY: {emotion_strategy}")
 
-        # 学生标识（简短）
-        if user_state.is_new_user:
-            prompt_parts.append("STUDENT: new; start with basics and be patient.")
-        else:
-            prompt_parts.append("STUDENT: existing; build upon prior knowledge.")
+        # 学生新/老标识已移除，不再在系统提示中注入该信息
 
         # 进度聚类策略（简短）
         progress_strategy = PromptGenerator._get_progress_strategy(user_state)
@@ -158,12 +154,23 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
             has_question_count = q_key in behavior_patterns
         has_learning_focus = bool(behavior_patterns.get('knowledge_level_history'))
 
-        # mastery 存在判定
+        # mastery 存在判定（兼容 dict 与对象）
         has_mastery = False
         bkt_models = getattr(user_state, 'bkt_models', {}) or {}
         if isinstance(bkt_models, dict):
             for _, model in bkt_models.items():
-                if isinstance(model, dict) and isinstance(model.get('mastery_prob'), (int, float)):
+                prob = None
+                if isinstance(model, dict):
+                    prob = model.get('mastery_prob')
+                else:
+                    # 支持对象形式（如 BKTModel）
+                    prob = getattr(model, 'mastery_prob', None)
+                    if prob is None and hasattr(model, 'get_mastery_prob'):
+                        try:
+                            prob = model.get_mastery_prob()
+                        except Exception:
+                            prob = None
+                if isinstance(prob, (int, float)):
                     has_mastery = True
                     break
 
@@ -181,7 +188,7 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
         if has_question_count:
             guide_lines.append("- Use QUESTION COUNT for directness: 0–1 Socratic; 2–3 targeted hints; >=4 step-by-step; in test mode allow direct solutions when clearly blocked.")
         if has_learning_focus:
-            guide_lines.append("- Use LEARNING FOCUS history to connect with explored levels; avoid repetition unless needed; bridge gaps or extend appropriately.")
+            guide_lines.append("- Analyze LEARNING FOCUS across the four progressive levels (1→4) using visit order, repetition patterns, and dwell-time distribution to infer study habits and current mastery; if repeatedly returning to lower levels or showing disproportionately long dwell at higher levels, slow the pace and reinforce prerequisites; if dwell time at higher levels is at least comparable to lower levels and progress is coherent, extend and increase challenge.")
         if has_mastery:
             guide_lines.append("- Use MASTERY OVERVIEW to adjust depth and practice: beginner -> fundamentals and simple examples; intermediate -> connect and extend; advanced -> challenge and best practices.")
 
@@ -432,6 +439,14 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
                     prob = None
                     if isinstance(model, dict):
                         prob = model.get('mastery_prob')
+                    else:
+                        # 支持对象形式（如 BKTModel）
+                        prob = getattr(model, 'mastery_prob', None)
+                        if prob is None and hasattr(model, 'get_mastery_prob'):
+                            try:
+                                prob = model.get_mastery_prob()
+                            except Exception:
+                                prob = None
                     if isinstance(prob, (int, float)):
                         level = 'advanced' if prob > 0.8 else ('intermediate' if prob > 0.5 else 'beginner')
                         mastery_items.append(f"{topic_id}: {level} ({prob:.2f})")

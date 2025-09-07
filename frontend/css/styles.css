@@ -129,12 +129,20 @@
         /* 确保标题在最上层 */
         flex-shrink: 0;
         /* 防止标题被压缩 */
-        position: absolute;
-        /* 添加绝对定位 */
         left: 20px;
         /* 设置左侧固定位置 */
     }
+    
+    /* 标题链接样式 */
+    .header-title {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
 
+    .header-title:hover {
+        opacity: 0.8;
+        transform: scale(1.02);
+    }
     .user-profile {
         display: flex;
         align-items: center;
@@ -144,8 +152,6 @@
         /* 确保用户信息在最上层 */
         flex-shrink: 0;
         /* 防止用户信息被压缩 */
-        position: absolute;
-        /* 添加绝对定位 */
         right: 20px;
         /* 设置右侧固定位置 */
     }
@@ -180,11 +186,7 @@
 
     .mini-knowledge-graph {
         /* 修改为在标题栏内居中显示 */
-        position: absolute !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        margin-left: 0 !important;
+        margin: auto;
         width: 60% !important;
         height: 40px !important;
         background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
@@ -195,6 +197,7 @@
         z-index: 5;
         overflow: hidden;
         transition: height 0.3s ease, box-shadow 0.3s ease, top 0.3s ease;
+        position: relative;
     }
 
     .mini-knowledge-graph.expanded {
@@ -848,56 +851,11 @@
         background-color: var(--text-lighter) !important;
     }
 
-    /* 中英文切换按钮样式 */
-    #language-toggle {
-        position: absolute;
-        margin-right: 40px;
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-xs);
-        padding: var(--spacing-sm) var(--spacing-md);
-        background-color: rgba(255, 255, 255, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: var(--border-radius-md);
-        color: white;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-size: var(--font-size-sm);
-        font-weight: 500;
-    }
-
-    #language-toggle:hover {
-        background-color: rgba(255, 255, 255, 0.3);
-        transform: translateX(-2px);
-    }
-
-    #language-toggle-test {
-        position: absolute;
-        margin-right: 110px;
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-xs);
-        padding: var(--spacing-sm) var(--spacing-md);
-        background-color: rgba(255, 255, 255, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: var(--border-radius-md);
-        color: white;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-size: var(--font-size-sm);
-        font-weight: 500;
-    }
-
-    #language-toggle-test:hover {
-        background-color: rgba(255, 255, 255, 0.3);
-        transform: translateX(-2px);
-    }
-
     /* 知识图谱容器样式 */
     .knowledge-graph-container {
         position: fixed;
         top: 50%;
-        left: 50%;
+        left: 53%;
         transform: translate(-50%, -50%);
         width: 85%;
         /* 增加5% (80% * 1.05 = 84%) */
@@ -2397,17 +2355,6 @@
 
     .back-button i {
         font-size: var(--font-size-base);
-    }
-
-    /* 标题链接样式 */
-    .header-title {
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .header-title:hover {
-        opacity: 0.8;
-        transform: scale(1.02);
     }
 
     .info-tab {

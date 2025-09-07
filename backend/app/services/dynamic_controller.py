@@ -1,5 +1,6 @@
 # backend/app/services/dynamic_controller.py
 import json
+import logging
 from typing import Any, Optional
 from sqlalchemy.orm import Session
 from app.schemas.chat import ChatRequest, ChatResponse, UserStateSummary, SentimentAnalysisResult
@@ -54,6 +55,7 @@ class DynamicController:
         self.prompt_generator = prompt_generator
         self.llm_gateway = llm_gateway
         self.clustering_service = clustering_service
+        self.logger = logging.getLogger(__name__)
 
     async def generate_adaptive_response(
         self,
@@ -172,6 +174,33 @@ class DynamicController:
             # 现在构建用户状态摘要（包含最新行为计数、情感和聚类结果）
             user_state_summary = self._build_user_state_summary(profile, sentiment_result)
 
+            # 诊断日志：输出本次对话可见的BKT快照与上下文注入情况
+            try:
+                bkt = getattr(user_state_summary, 'bkt_models', {}) or {}
+                topic_details = []
+                for topic_id, model in (bkt.items() if isinstance(bkt, dict) else []):
+                    prob = None
+                    if isinstance(model, dict):
+                        prob = model.get('mastery_prob')
+                    else:
+                        prob = getattr(model, 'mastery_prob', None)
+                        if prob is None and hasattr(model, 'get_mastery_prob'):
+                            try:
+                                prob = model.get_mastery_prob()
+                            except Exception:
+                                prob = None
+                    if isinstance(prob, (int, float)):
+                        topic_details.append(f"{topic_id}={prob:.3f}")
+                    else:
+                        topic_details.append(f"{topic_id}=None")
+                topic_str = "; ".join(topic_details) if topic_details else "none"
+                self.logger.info(
+                    f"BKT snapshot for {request.participant_id} (mode={request.mode}, content_id={request.content_id}): "
+                    f"topics={len(bkt) if isinstance(bkt, dict) else 0}; {topic_str}"
+                )
+            except Exception as e:
+                self.logger.warning(f"Failed to log BKT snapshot: {e}")
+
             # 步骤5: 生成提示词
             # 将ConversationMessage转换为字典格式
             conversation_history_dicts = []
@@ -186,6 +215,15 @@ class DynamicController:
                 conversation_history_dicts = []
 
             retrieved_knowledge_content = [item['content'] for item in retrieved_knowledge if isinstance(item, dict) and 'content' in item]
+            # 诊断日志：上下文注入规模
+            try:
+                test_count = len(request.test_results) if request.test_results else 0
+                self.logger.info(
+                    f"Context inputs -> RAG={len(retrieved_knowledge_content)}, content_json={'yes' if loaded_content_json else 'no'}, "
+                    f"test_results={test_count}"
+                )
+            except Exception:
+                pass
             system_prompt, messages, context_snapshot = self.prompt_generator.create_prompts(
                 user_state=user_state_summary,
                 retrieved_context=retrieved_knowledge_content,
