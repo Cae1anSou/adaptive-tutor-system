@@ -1983,28 +1983,23 @@ function checkChapterPrerequisite(knowledgeId) {
             return { requiresChapterCompletion: false };
         }
 
-        // 如果是其他章节的第一个知识点，需要检查前一章节是否完成
-        if (section === 1) {
-            const previousChapter = chapter - 1;
-            const previousChapterId = `chapter${previousChapter}`;
-            const ChapterId = `${previousChapter}_end`;
-            console.log(`前置章节: ${ChapterId}`);
-            console.log(`章节: ${previousChapter}`);
-
-            // 检查前一章节是否已完成
-            const completedChapters = JSON.parse(localStorage.getItem('completedChapters') || '[]');
-            const isPreviousChapterCompleted = completedChapters.includes(previousChapterId);
-
-            if (!isPreviousChapterCompleted) {
+        // 检查章节间的前置条件
+        const completedChapters = JSON.parse(localStorage.getItem('completedChapters') || '[]');
+        
+        // 查找最早的未完成章节
+        for (let i = 1; i < chapter; i++) {
+            const checkChapterId = `chapter${i}`;
+            if (!completedChapters.includes(checkChapterId)) {
                 return {
                     requiresChapterCompletion: true,
-                    requiredChapter: `第${previousChapter}章`,
-                    requiredChapterId: ChapterId,
-                    lastTestId: `${previousChapter}_3` // 前一章节的最后一个测试
+                    requiredChapter: `第${i}章`,
+                    requiredChapterId: `${i}_end`,
+                    lastTestId: `${i}_3` // 该章节的最后一个测试
                 };
             }
         }
 
+        // 如果当前章节不是第一章且所有前置章节都已完成
         return { requiresChapterCompletion: false };
     } catch (error) {
         console.error('检查章节前置条件时出错:', error);

@@ -488,7 +488,7 @@ function smartEscapeHtmlTagsWithRegex(html) {
             return line;
         } else {
             // 需要转义，处理HTML标签
-            return line.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return line.replace(/</g, '<').replace(/>/g, '>');
         }
     });
 
