@@ -291,7 +291,7 @@ class SandboxService:
                         return False, f"元素 '{selector}' 的文本 '{actual_text}' 不匹配正则表达式 '{expected_value}'"
                 elif assertion_op == 'equals':
                     # 比较时去除前后空格，增强健壮性
-                    if actual_text.strip() != expected_value.strip():
+                    if actual_text.strip().replace(' ', '') != expected_value.strip().replace(' ', ''):
                         return False, f"元素 '{selector}' 的文本为 '{actual_text}'，不等于期望的 '{expected_value}'"
                 else:
                     return False, f"不支持的文本断言类型: '{assertion_op}'"

@@ -283,21 +283,21 @@ async function initializeModules(topicId) {
     knowledgeModule = new KnowledgeModule();
     console.log('[MainApp] 知识点模块初始化完成');
 
-    // 初始化简化知识图谱 - 启用完整交互功能
-    try {
-        const miniGraph = new MiniKnowledgeGraph('miniGraphContainer', {
-            height: 200,
-            nodeSize: 20,
-            chapterNodeSize: 30,
-            fontSize: 10,
-            enableInteractions: true,  // 启用完整交互
-            enableModal: true          // 启用模态框
-        });
-        await miniGraph.init();
-        console.log('[MainApp] 简化知识图谱初始化完成');
-    } catch (error) {
-        console.error('[MainApp] 简化知识图谱初始化失败:', error);
-    }
+    // 简化知识图谱已移除
+    // try {
+    //     const miniGraph = new MiniKnowledgeGraph('miniGraphContainer', {
+    //         height: 200,
+    //         nodeSize: 20,
+    //         chapterNodeSize: 30,
+    //         fontSize: 10,
+    //         enableInteractions: true,  // 启用完整交互
+    //         enableModal: true          // 启用模态框
+    //     });
+    //     await miniGraph.init();
+    //     console.log('[MainApp] 简化知识图谱初始化完成');
+    // } catch (error) {
+    //     console.error('[MainApp] 简化知识图谱初始化失败:', error);
+    // }
 
 
     // 初始化聊天模块
@@ -726,62 +726,104 @@ function initEventListeners() {
     const clearSelectionButton = document.getElementById('clearSelectionButton');
 
     // 添加知识图谱展开/收起功能
-    const miniGraphToggle = document.getElementById('miniGraphToggle');
-    const miniKnowledgeGraph = document.getElementById('miniKnowledgeGraph');
-    const toggleIcon = document.getElementById('toggleIcon');
-
-    if (miniGraphToggle && miniKnowledgeGraph && toggleIcon) {
-        // 确保图标默认有颜色和可见性
-        toggleIcon.style.color = '#4f46e5';
-        toggleIcon.style.opacity = '0.8';
-
-        // 获取知识图谱容器元素
-        const knowledgeGraphContainer = document.getElementById('knowledge-graph-container');
-        const closeGraphButton = document.getElementById('closeGraph');
-
-        miniGraphToggle.addEventListener('click', async () => {
-            // 只控制知识图谱容器的显示/隐藏，不改变头部标题栏中简化知识图谱预览的大小
+    // 监听标题和图标容器实现展开/收起
+    const expandElement1 = document.getElementById('headerTitle');
+    const expandElement2 = document.querySelector('.header-icon-container');
+    const knowledgeGraphContainer = document.getElementById('knowledge-graph-container');
+    
+    // 创建或获取图标的函数
+    function getOrCreateToggleIcon() {
+        let toggleIcon = document.getElementById('toggleIcon');
+        if (!toggleIcon) {
+            toggleIcon = document.createElement('iconify-icon');
+            toggleIcon.id = 'toggleIcon';
+            toggleIcon.setAttribute('icon', 'mdi:chevron-down');
+            toggleIcon.setAttribute('width', '24');
+            toggleIcon.setAttribute('height', '24');
+            toggleIcon.style.color = '#4f46e5';
+            toggleIcon.style.opacity = '0.8';
+            toggleIcon.style.marginLeft = '8px';
+            toggleIcon.style.transition = 'all 0.3s ease';
+        }
+        return toggleIcon;
+    }
+    
+    // 确保图标存在
+    if (expandElement2) {
+        let toggleIcon = getOrCreateToggleIcon();
+        if (!expandElement2.contains(toggleIcon)) {
+            expandElement2.appendChild(toggleIcon);
+        }
+    }
+    
+    // 为标题添加点击事件
+    if (expandElement1) {
+        expandElement1.style.cursor = 'pointer';
+        expandElement1.addEventListener('click', async () => {
+            if (!knowledgeGraphContainer) return;
+            
             const isExpanding = knowledgeGraphContainer.style.display === 'none' || knowledgeGraphContainer.style.display === '';
-
-            // 控制知识图谱容器的显示/隐藏
+            
             if (isExpanding) {
-                // 显示知识图谱容器并初始化渲染知识图谱
                 await showKnowledgeGraph();
             } else {
-                // 隐藏知识图谱容器
-                if (knowledgeGraphContainer) {
-                    knowledgeGraphContainer.style.display = 'none';
-                }
+                knowledgeGraphContainer.style.display = 'none';
             }
-
-            // 更改图标
+            
+            // 更新图标
+            const toggleIcon = getOrCreateToggleIcon();
             if (isExpanding) {
-                // 展开时，将图标更改为向上箭头
                 toggleIcon.setAttribute('icon', 'mdi:chevron-up');
-                toggleIcon.style.color = '#3730a3'; // 更深的紫色
-                toggleIcon.style.opacity = '1';     // 完全不透明
+                toggleIcon.style.color = '#3730a3';
+                toggleIcon.style.opacity = '1';
             } else {
-                // 收起时，将图标更改为向下箭头
-                toggleIcon.setAttribute('icon', 'mdi:chevron-down');
-                toggleIcon.style.color = '#4f46e5'; // 恢复默认紫色
-                toggleIcon.style.opacity = '0.8';   // 恢复默认不透明度
-            }
-        });
-
-        // 添加关闭知识图谱容器的功能
-        if (closeGraphButton) {
-            closeGraphButton.addEventListener('click', () => {
-                // 隐藏知识图谱容器
-                if (knowledgeGraphContainer) {
-                    knowledgeGraphContainer.style.display = 'none';
-                }
-
-                // 更改图标
                 toggleIcon.setAttribute('icon', 'mdi:chevron-down');
                 toggleIcon.style.color = '#4f46e5';
                 toggleIcon.style.opacity = '0.8';
-            });
-        }
+            }
+        });
+    }
+    
+    // 为图标容器添加点击事件
+    if (expandElement2) {
+        expandElement2.style.cursor = 'pointer';
+        expandElement2.addEventListener('click', async () => {
+            if (!knowledgeGraphContainer) return;
+            
+            const isExpanding = knowledgeGraphContainer.style.display === 'none' || knowledgeGraphContainer.style.display === '';
+            
+            if (isExpanding) {
+                await showKnowledgeGraph();
+            } else {
+                knowledgeGraphContainer.style.display = 'none';
+            }
+            
+            // 更新图标
+            const toggleIcon = getOrCreateToggleIcon();
+            if (isExpanding) {
+                toggleIcon.setAttribute('icon', 'mdi:chevron-up');
+                toggleIcon.style.color = '#3730a3';
+                toggleIcon.style.opacity = '1';
+            } else {
+                toggleIcon.setAttribute('icon', 'mdi:chevron-down');
+                toggleIcon.style.color = '#4f46e5';
+                toggleIcon.style.opacity = '0.8';
+            }
+        });
+    }
+    
+    // 为关闭按钮添加点击事件
+    const closeGraphButton = document.getElementById('closeGraph');
+    if (closeGraphButton && knowledgeGraphContainer) {
+        closeGraphButton.addEventListener('click', () => {
+            knowledgeGraphContainer.style.display = 'none';
+            
+            // 更新图标
+            const toggleIcon = getOrCreateToggleIcon();
+            toggleIcon.setAttribute('icon', 'mdi:chevron-down');
+            toggleIcon.style.color = '#4f46e5';
+            toggleIcon.style.opacity = '0.8';
+        });
     }
 
     // 初始化按钮状态：确保询问AI按钮默认隐藏
