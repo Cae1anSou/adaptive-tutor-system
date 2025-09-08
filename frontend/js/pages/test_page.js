@@ -701,6 +701,7 @@ function setupSubmitLogic() {
                         // 检查是否是章节的最后一个测试
                         const isLastTestInChapter = isLastTestInCurrentChapter(currentTopicId);
 
+                        // # TODO: 冲突，以下为enqi
                         // 测试通过后的跳转逻辑
                         handleTestSuccess(currentTopicId);
                     } else {
@@ -717,6 +718,51 @@ function setupSubmitLogic() {
                                 window.location.href = '/pages/knowledge_graph.html';
                             }, 100);
                         }
+                        // #以下为jiadi
+                        //     if (isLastTestInChapter) {
+                        //         // 完成章节测试，标记章节为已完成
+                        //         const currentChapter = getChapterFromTopicId(currentTopicId);
+                        //         markChapterAsCompleted(currentChapter);
+
+                        //         // 获取下一个章节的第一个知识点
+                        //         const nextChapterFirstKnowledge = getNextChapterFirstKnowledge(currentChapter);
+
+                        //         if (nextChapterFirstKnowledge) {
+                        //             // 显示章节完成弹窗
+                        //             showChapterCompletionModal(currentChapter, nextChapterFirstKnowledge);
+                        //         } else {
+                        //             // 没有下一个章节，显示完成信息
+                        //             alert("恭喜！您已完成所有章节！");
+                        //             setTimeout(() => {
+                        //                 window.location.href = '/pages/index.html';
+                        //             }, 100);
+                        //         }
+                        //     } else {
+                        //         // 获取下一个知识点信息
+                        //         const nextKnowledgeInfo = getNextKnowledgeInfo(currentTopicId);
+
+                        //         if (nextKnowledgeInfo) {
+                        //             // 显示完成测试的弹窗
+                        //             showTestCompletionModal(currentTopicId, nextKnowledgeInfo);
+                        //         } else {
+                        //             // 没有下一个知识点，显示完成信息
+                        //             alert("恭喜！您已完成所有测试！");
+                        //             setTimeout(() => {
+                        //                 window.location.href = '/pages/index.html';
+                        //             }, 100);
+                        //         }
+                        //     }
+                        // } else {
+                        //     alert("测试完成！");
+                        //     setTimeout(() => {
+                        //         // 返回到当前topicId对应的学习页面
+                        //         if (topicId) {
+                        //             navigateTo('/pages/learning_page.html', topicId, true);
+                        //         } else {
+                        //             window.location.href = '/pages/knowledge_graph.html';
+                        //         }
+                        //     }, 100);
+                        // # 冲突结束
                     }
                 } else {
                     tracker.logEvent('test_failed', {
@@ -856,7 +902,7 @@ ${(testResult.details || []).join('\n') || '无详细信息'}
 // 主程序入口
 document.addEventListener('DOMContentLoaded', function () {
     // 设置标题和返回按钮
-    setupHeaderTitle('/pages/learning_page.html');
+    setupHeaderTitle('/pages/knowledge_graph.html');
     // 设置返回按钮
     setupBackButton();
     // 调试信息
@@ -1001,11 +1047,11 @@ function showTestCompletionModal(currentTopicId, nextKnowledgeInfo) {
     const returnBtn = document.getElementById('returnToGraphBtn');
     const continueBtn = document.getElementById('continueLearningBtn');
 
-    // 返回按钮 - 返回到当前topicId的学习页面
+    // 返回按钮 - 回到知识图谱导航页
     returnBtn.addEventListener('click', () => {
         modal.remove();
-        // 返回到当前topicId对应的学习页面
-        navigateTo('/pages/learning_page.html', currentTopicId, true);
+        // 返回到之前的知识图谱页面
+        window.location.href = '/pages/knowledge_graph.html';
     });
 
     // 确认按钮 - 跳转到下一个页面（学习或测试）
@@ -1024,7 +1070,7 @@ function showTestCompletionModal(currentTopicId, nextKnowledgeInfo) {
         if (e.target === modal) {
             modal.remove();
             // 返回到当前topicId对应的学习页面
-            navigateTo('/pages/learning_page.html', currentTopicId, true);
+            window.location.href = '/pages/knowledge_graph.html';
         }
     });
 }
@@ -1129,17 +1175,10 @@ function showChapterCompletionModal(completedChapter, nextChapterFirstKnowledge)
     const returnBtn = document.getElementById('returnToGraphBtn');
     const continueBtn = document.getElementById('continueLearningBtn');
 
-    // 返回按钮 - 返回到当前topicId的学习页面
+    // 返回按钮 - 回到知识图谱导航页
     returnBtn.addEventListener('click', () => {
         modal.remove();
-        // 获取当前topicId
-        const topicData = getUrlParam('topic');
-        const currentTopicId = topicData && topicData.id ? topicData.id : null;
-        if (currentTopicId) {
-            navigateTo('/pages/learning_page.html', currentTopicId, true);
-        } else {
-            window.location.href = '/pages/index.html';
-        }
+        window.location.href = '/pages/knowledge_graph.html';
     });
 
     // 确认按钮 - 跳转到下一个章节的第一个学习页面
@@ -1152,14 +1191,7 @@ function showChapterCompletionModal(completedChapter, nextChapterFirstKnowledge)
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
             modal.remove();
-            // 获取当前topicId
-            const topicData = getUrlParam('topic');
-            const currentTopicId = topicData && topicData.id ? topicData.id : null;
-            if (currentTopicId) {
-                navigateTo('/pages/learning_page.html', currentTopicId, true);
-            } else {
-                window.location.href = '/pages/index.html';
-            }
+            window.location.href = '/pages/knowledge_graph.html';
         }
     });
 }
@@ -1727,6 +1759,4 @@ async function showJumpLearningFailureModal(currentTopicId, returnUrl) {
         // 返回到最近一个能学习的节点
         navigateTo('/pages/learning_page.html', nearestLearnableNode, true, false);
     });
-
 }
-
