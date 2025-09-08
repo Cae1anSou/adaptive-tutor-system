@@ -215,96 +215,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 处理跳跃学习场景
-    function handleJumpLearningScenario(scenarioResult, knowledgeId, nodeLabel) {
-      const modal = document.getElementById('knowledgeModal');
-      const title = document.getElementById('modalTitle');
-      const status = document.getElementById('modalStatus');
-      const learnBtn = document.getElementById('learnBtn');
-      const testBtn = document.getElementById('testBtn');
-
-      title.textContent = nodeLabel || knowledgeId;
-
-      // 重置按钮状态
-      learnBtn.className = 'learn-btn';
-      learnBtn.disabled = false;
-      learnBtn.textContent = '是';
-      testBtn.className = 'test-btn';
-      testBtn.textContent = '否';
-
-      switch (scenarioResult.scenario) {
-        case 'direct_access':
-          // 情况一：完成了所有前置条件，可以直接进入目标知识点
-          status.textContent = '您已完成所有前置条件，可以直接进入该知识点学习';
-          learnBtn.textContent = '是';
-          testBtn.textContent = '否';
-
-          learnBtn.onclick = () => {
-            navigateTo('/pages/learning_page.html', knowledgeId);
-          };
-
-          testBtn.onclick = () => {
-            document.getElementById('knowledgeModal').style.display = 'none';
-          };
-          break;
-
-        case 'knowledge_required':
-          // 情况二：需要先完成前置知识点测试
-          if (scenarioResult.intermediateKnowledge) {
-            // 需要先进入中间知识点
-            status.textContent = `需要先完成"${scenarioResult.requiredTest}"的测试。您可以选择进入"${scenarioResult.intermediateKnowledge}"学习，或直接测试前置知识点。`;
-
-            learnBtn.textContent = `进入${scenarioResult.intermediateKnowledge}`;
-            learnBtn.onclick = () => {
-              navigateTo('/pages/learning_page.html', scenarioResult.intermediateKnowledge);
-            };
-
-            testBtn.textContent = `测试${scenarioResult.requiredTest}`;
-            testBtn.onclick = () => {
-              navigateTo('/pages/test_page.html', scenarioResult.requiredTest, true, true);
-            };
-          } else {
-            // 直接需要前置知识点测试
-            status.textContent = `需要先完成"${scenarioResult.requiredTest}"的测试`;
-            learnBtn.disabled = true;
-            learnBtn.className += ' disabled';
-            learnBtn.onclick = () => { };
-
-            testBtn.textContent = `测试${scenarioResult.requiredTest}`;
-            testBtn.onclick = () => {
-              navigateTo('/pages/test_page.html', scenarioResult.requiredTest, true, true);
-            };
-          }
-          break;
-
-        case 'chapter_locked':
-          // 情况三：章节未解锁
-          status.textContent = scenarioResult.message;
-          learnBtn.disabled = true;
-          learnBtn.className += ' disabled';
-          learnBtn.onclick = () => { };
-
-          testBtn.textContent = `测试第${scenarioResult.requiredTest.split('_')[0]}章`;
-          testBtn.onclick = () => {
-            navigateTo('/pages/test_page.html', scenarioResult.requiredTest, true, true);
-          };
-          break;
-
-        default:
-          // 正常学习进度
-          status.textContent = '正常学习进度，您可以开始学习该知识点';
-          learnBtn.textContent = '是';
-          testBtn.textContent = '否';
-
-          learnBtn.onclick = () => {
-            navigateTo('/pages/learning_page.html', knowledgeId);
-          };
-
-          testBtn.onclick = () => {
-            document.getElementById('knowledgeModal').style.display = 'none';
-          };
-      }
-      modal.style.display = 'block';
-    }
 
     // 单击/双击处理
     const clickState = { lastId: null, timer: null, ts: 0 };
@@ -358,17 +268,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (type === 'knowledge') {
         const label = node.data('label') || id;
 
-        // 获取当前学习知识点（从localStorage中获取跳跃学习目标）
-        let currentKnowledgeId = null;
-        try {
-          const jumpTarget = JSON.parse(localStorage.getItem('jumpLearningTarget') || '{}');
-          if (jumpTarget.knowledgeId) {
-            currentKnowledgeId = jumpTarget.knowledgeId;
-            console.log('[DEBUG] 知识图谱页面 - 当前学习知识点:', currentKnowledgeId);
-          }
-        } catch (error) {
-          console.warn('获取跳跃学习目标失败:', error);
-        }
 
         if (graphState.learnedNodes.includes(id)) {// 已学知识点
           showKnowledgeModal(id, label);
@@ -378,22 +277,15 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (jumpResult.canJump) {// 可以跳跃学习
             showKnowledgeModal(id, label);
           } else {// 不能跳跃学习，显示相应的提示
-            // 检查是否是跳跃学习场景
-            if (currentKnowledgeId && currentKnowledgeId !== id) {
-              const scenarioResult = graphState.checkJumpLearningScenario(currentKnowledgeId, id);
-              handleJumpLearningScenario(scenarioResult, id, label);
+            if (jumpResult.reason === 'chapter_locked') {
+              // 章节未解锁
+              showKnowledgeModal_2(id, jumpResult.requiredChapter, jumpResult.requiredChapterName, label);
+            } else if (jumpResult.reason === 'previous_knowledge_required' || jumpResult.reason === 'previous_chapter_test_required') {
+              // 需要完成前置知识点测试或章节测试
+              showKnowledgeModal_3(id, jumpResult.requiredKnowledgeId, jumpResult.requiredKnowledgeName, label);
             } else {
-              // 使用原有的解锁逻辑
-              if (jumpResult.reason === 'chapter_locked') {
-                // 章节未解锁
-                showKnowledgeModal_2(id, jumpResult.requiredChapter, jumpResult.requiredChapterName, label);
-              } else if (jumpResult.reason === 'previous_knowledge_required' || jumpResult.reason === 'previous_chapter_test_required') {
-                // 需要完成前置知识点测试或章节测试
-                showKnowledgeModal_3(id, jumpResult.requiredKnowledgeId, jumpResult.requiredKnowledgeName, label);
-              } else {
-                // 其他情况，使用原有逻辑
-                showKnowledgeModal(id, label);
-              }
+              // 其他情况，使用原有逻辑
+              showKnowledgeModal(id, label);
             }
           }
         }

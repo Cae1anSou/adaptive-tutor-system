@@ -1985,7 +1985,7 @@ function checkChapterPrerequisite(knowledgeId) {
 
         // 检查章节间的前置条件
         const completedChapters = JSON.parse(localStorage.getItem('completedChapters') || '[]');
-        
+
         // 查找最早的未完成章节
         for (let i = 1; i < chapter; i++) {
             const checkChapterId = `chapter${i}`;
