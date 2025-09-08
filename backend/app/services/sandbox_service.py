@@ -278,6 +278,7 @@ class SandboxService:
                 
                 try:
                     actual_text = locator.text_content(timeout=5000)
+                    actual_text = actual_text.replace('\n', ' ').replace('\r', ' ').strip()
                 except Exception:
                     return False, f"找不到或无法获取选择器 '{selector}' 的文本内容"
                 

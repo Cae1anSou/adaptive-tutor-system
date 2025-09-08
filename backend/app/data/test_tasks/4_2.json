@@ -1,7 +1,7 @@
 {
   "topic_id": "4_2",
-  "title": "掌握盒模型的核心组成与应用",
-  "description_md": "请为一个用户信息卡片添加盒模型相关样式，以增强其视觉表现。\n\n具体要求：\n- 为 `.user-card` 元素设置圆角 `border-radius: 12px`\n- 添加阴影效果 `box-shadow: 0 2px 6px rgba(0,0,0,0.15)`\n- 为 `.user-info` 设置内边距 `padding: 16px`",
+  "title": "4_2 掌握盒模型的核心组成与应用",
+  "description_md": "# 任务描述：\n请为用户信息卡片添加盒模型相关样式，增强视觉效果。\n\n## 要求：\n1. 为 `.user-card` 元素设置圆角：`border-radius: 12px`。\n2. 添加阴影效果：`box-shadow: 0 2px 6px rgba(0,0,0,0.15)`。\n3. 为 `.user-info` 元素设置内边距：`padding: 16px`。",
   "start_code": {
     "html": "<div class=\"user-card\">\n  <img src=\"\" alt=\"用户头像\">\n  <div class=\"user-info\">\n    <h3>张三</h3>\n    <p>角色：学生</p>\n    <p>积分：8765</p>\n  </div>\n</div>",
     "css": "",
