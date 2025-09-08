@@ -60,15 +60,17 @@
     },
     {
       "name": "段落元素内容检查",
-      "type": "custom_script",
-      "script": "const paragraph = document.querySelector('p'); if (!paragraph) return false; const textContent = paragraph.textContent || paragraph.innerText; return textContent === 'Join us for a purr-fect celebration of feline beauty and grace. Discover various cat breeds and experience the excitement of the event!';",
+      "type": "assert_text_content",
+      "selector": "p",
+      "assertion_type": "equals",
+      "value": "Join us for a purr-fect celebration of feline beauty and grace. Discover various cat breeds and experience the excitement of the event!",
       "feedback": "请给p元素中添加正确的段落内容"
     },
     {
       "name": "加粗文本样式检查",
       "type": "custom_script",
       "script": "const boldElement = document.querySelector('p span.bold-text'); if (!boldElement) return false; const computedStyle = window.getComputedStyle(boldElement); return computedStyle.fontWeight === 'bold' || computedStyle.fontWeight === '700';",
-      "feedback": "请使用CSS的font-weight属性为'purr-fect'添加加粗样式"
+      "feedback": "请使用CSS的font-weight属性为'bold'添加加粗样式"
     },
     {
       "name": "斜体文本样式检查",
@@ -77,7 +79,7 @@
       "css_property": "font-style",
       "assertion_type": "equals",
       "value": "italic",
-      "feedback": "请使用CSS的font-style属性为'grace'添加斜体样式"
+      "feedback": "请使用CSS的font-style属性为'italic'添加斜体样式"
     }
   ],
   "answer": {
