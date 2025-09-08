@@ -597,6 +597,17 @@ export class MiniKnowledgeGraph {
     learnBtn.textContent = '学习';
     testBtn.className = 'test-btn';
 
+    // 获取当前学习的知识点ID（用于判断跳跃学习场景）
+    let currentKnowledgeId = null;
+    try {
+      const topicData = getUrlParam('topic');
+      if (topicData && topicData.id) {
+        currentKnowledgeId = topicData.id;
+      }
+    } catch (error) {
+      console.warn('获取当前学习知识点失败:', error);
+    }
+
     if (this.graphState.learnedNodes.includes(knowledgeId)) {
       status.textContent = '您已学过该知识点，是否再次复习或重新测试？';
       learnBtn.textContent = '复习';
@@ -620,28 +631,25 @@ export class MiniKnowledgeGraph {
         this.navigateTo('/pages/test_page.html', knowledgeId, true, true);
       };
     } else {
-      // 获取前置知识点信息
-      const prerequisiteInfo = this.getPrerequisiteInfo(knowledgeId);
-      if (prerequisiteInfo) {
-        status.textContent = `该知识点尚未解锁，需要先完成"${prerequisiteInfo.label}"的测试`;
-        learnBtn.disabled = true;
-        learnBtn.className += ' disabled';
-
-        learnBtn.onclick = () => { };
-        testBtn.onclick = () => {
-          if (confirm(`您还未学习前置知识点"${prerequisiteInfo.label}"，需要先完成该知识点的测试才能学习"${nodeLabel}"。是否现在开始测试前置知识点？`)) {
-            this.navigateTo('/pages/test_page.html', prerequisiteInfo.id, true, true);
-          }
+      // 使用新的跳跃学习检查逻辑
+      const jumpResult = this.graphState.canJumpToKnowledge(knowledgeId);
+      if (jumpResult.canJump) {
+        status.textContent = '您可以开始学习该知识点或直接进行测试';
+        learnBtn.onclick = () => {
+          this.navigateTo('/pages/learning_page.html', knowledgeId);
         };
-      } else {
-        status.textContent = '该知识点尚未解锁，您是否要直接开始测试？';
-        learnBtn.disabled = true;
-        learnBtn.className += ' disabled';
-
-        learnBtn.onclick = () => { };
         testBtn.onclick = () => {
           this.navigateTo('/pages/test_page.html', knowledgeId, true, true);
         };
+      } else {
+        // 检查是否是跳跃学习场景
+        if (currentKnowledgeId && currentKnowledgeId !== knowledgeId) {
+          const scenarioResult = this.graphState.checkJumpLearningScenario(currentKnowledgeId, knowledgeId);
+          this.handleJumpLearningScenario(scenarioResult, knowledgeId, nodeLabel, learnBtn, testBtn, status);
+        } else {
+          // 使用原有的解锁逻辑
+          this.handleNormalUnlockScenario(jumpResult, knowledgeId, nodeLabel, learnBtn, testBtn, status);
+        }
       }
     }
     modal.style.display = 'block';
@@ -653,6 +661,152 @@ export class MiniKnowledgeGraph {
       }
     };
     modal.onclick = closeModal;
+  }
+
+  // 处理跳跃学习场景（新增方法）
+  handleJumpLearningScenario(scenarioResult, knowledgeId, nodeLabel, learnBtn, testBtn, status) {
+    switch (scenarioResult.scenario) {
+      case 'direct_access':
+        // 情况一：完成了所有前置条件，可以直接进入目标知识点
+        status.textContent = '您已完成所有前置条件，可以直接进入该知识点学习';
+        learnBtn.onclick = () => {
+          this.navigateTo('/pages/learning_page.html', knowledgeId);
+        };
+        testBtn.onclick = () => {
+          this.navigateTo('/pages/test_page.html', knowledgeId, true, true);
+        };
+        break;
+
+      case 'knowledge_required':
+        // 情况二：需要先完成前置知识点测试
+        if (scenarioResult.intermediateKnowledge) {
+          // 需要先进入中间知识点
+          status.textContent = `需要先完成"${this.graphState.getKnowledgeLabel(scenarioResult.requiredTest)}"的测试。您可以选择进入"${this.graphState.getKnowledgeLabel(scenarioResult.intermediateKnowledge)}"学习，或直接测试前置知识点。`;
+
+          learnBtn.textContent = `进入${this.graphState.getKnowledgeLabel(scenarioResult.intermediateKnowledge)}`;
+          learnBtn.onclick = () => {
+            this.navigateTo('/pages/learning_page.html', scenarioResult.intermediateKnowledge);
+          };
+
+          testBtn.textContent = `测试${this.graphState.getKnowledgeLabel(scenarioResult.requiredTest)}`;
+          testBtn.onclick = () => {
+            this.navigateTo('/pages/test_page.html', scenarioResult.requiredTest, true, true);
+          };
+        } else {
+          // 直接需要前置知识点测试
+          status.textContent = `需要先完成"${this.graphState.getKnowledgeLabel(scenarioResult.requiredTest)}"的测试`;
+          learnBtn.disabled = true;
+          learnBtn.className += ' disabled';
+          learnBtn.onclick = () => { };
+
+          testBtn.textContent = `测试${this.graphState.getKnowledgeLabel(scenarioResult.requiredTest)}`;
+          testBtn.onclick = () => {
+            this.navigateTo('/pages/test_page.html', scenarioResult.requiredTest, true, true);
+          };
+        }
+        break;
+
+      case 'chapter_locked':
+        // 情况三：章节未解锁
+        status.textContent = scenarioResult.message;
+        learnBtn.disabled = true;
+        learnBtn.className += ' disabled';
+        learnBtn.onclick = () => { };
+
+        testBtn.textContent = `测试第${scenarioResult.requiredTest.split('_')[0]}章`;
+        testBtn.onclick = () => {
+          this.navigateTo('/pages/test_page.html', scenarioResult.requiredTest, true, true);
+        };
+        break;
+
+      default:
+        // 正常学习进度
+        status.textContent = '正常学习进度，您可以开始学习该知识点';
+        learnBtn.onclick = () => {
+          this.navigateTo('/pages/learning_page.html', knowledgeId);
+        };
+        testBtn.onclick = () => {
+          this.navigateTo('/pages/test_page.html', knowledgeId, true, true);
+        };
+    }
+  }
+
+  // 处理正常解锁场景（新增方法）
+  handleNormalUnlockScenario(jumpResult, knowledgeId, nodeLabel, learnBtn, testBtn, status) {
+    if (jumpResult.reason === 'chapter_locked') {
+      // 章节未解锁 - 使用"是"和"否"按钮
+      status.textContent = `您还未完成前置章节"${jumpResult.requiredChapterName}"的测试，需要先完成该章节的测试才能学习本知识点。是否现在开始测试前置章节？`;
+      learnBtn.textContent = '是';
+      learnBtn.className = 'learn-btn';
+      learnBtn.disabled = false;
+      testBtn.textContent = '否';
+      testBtn.className = 'test-btn';
+
+      learnBtn.onclick = () => {
+        // 跳转到前一章节的章节测试
+        console.log('[DEBUG] jumpResult.requiredChapter:', jumpResult.requiredChapter);
+        const previousChapterNum = parseInt(jumpResult.requiredChapter.replace('chapter', ''));
+        const chapterTestId = `${previousChapterNum}_end`;
+        console.log('[DEBUG] previousChapterNum:', previousChapterNum);
+        console.log('[DEBUG] chapterTestId:', chapterTestId);
+        console.log('[DEBUG] 准备跳转到:', `/pages/test_page.html?topic=${chapterTestId}`);
+
+        // 存储跳跃学习目标知识点
+        const jumpTarget = {
+          knowledgeId: knowledgeId,
+          label: nodeLabel,
+          timestamp: Date.now()
+        };
+        localStorage.setItem('jumpLearningTarget', JSON.stringify(jumpTarget));
+        console.log('[DEBUG] 存储跳跃学习目标:', jumpTarget);
+
+        this.navigateTo('/pages/test_page.html', chapterTestId, true, true);
+      };
+
+      testBtn.onclick = () => {
+        document.getElementById('knowledgeModal').style.display = 'none';
+      };
+    } else if (jumpResult.reason === 'previous_knowledge_required' || jumpResult.reason === 'previous_chapter_test_required') {
+      // 需要完成前置知识点测试或章节测试 - 使用"是"和"否"按钮
+      const isChapterTest = jumpResult.reason === 'previous_chapter_test_required';
+      const testType = isChapterTest ? '章节测试' : '知识点测试';
+      status.textContent = `您还未学习前置知识点"${jumpResult.requiredKnowledgeName}"，需要先完成该知识点的测试才能学习本知识点。是否现在开始测试前置知识点？`;
+      learnBtn.textContent = '是';
+      learnBtn.className = 'learn-btn';
+      learnBtn.disabled = false;
+      testBtn.textContent = '否';
+      testBtn.className = 'test-btn';
+
+      learnBtn.onclick = () => {
+        console.log('[DEBUG] jumpResult.reason:', jumpResult.reason);
+        console.log('[DEBUG] jumpResult.requiredKnowledgeId:', jumpResult.requiredKnowledgeId);
+        console.log('[DEBUG] 准备跳转到:', `/pages/test_page.html?topic=${jumpResult.requiredKnowledgeId}`);
+
+        // 存储跳跃学习目标知识点
+        const jumpTarget = {
+          knowledgeId: knowledgeId,
+          label: nodeLabel,
+          timestamp: Date.now()
+        };
+        localStorage.setItem('jumpLearningTarget', JSON.stringify(jumpTarget));
+        console.log('[DEBUG] 存储跳跃学习目标:', jumpTarget);
+
+        this.navigateTo('/pages/test_page.html', jumpResult.requiredKnowledgeId, true, true);
+      };
+
+      testBtn.onclick = () => {
+        document.getElementById('knowledgeModal').style.display = 'none';
+      };
+    } else {
+      // 其他情况，使用原有逻辑
+      status.textContent = '该知识点尚未解锁，您是否要直接开始测试？';
+      learnBtn.disabled = true;
+      learnBtn.className += ' disabled';
+      learnBtn.onclick = () => { };
+      testBtn.onclick = () => {
+        this.navigateTo('/pages/test_page.html', knowledgeId, true, true);
+      };
+    }
   }
 
   // 导航到指定页面

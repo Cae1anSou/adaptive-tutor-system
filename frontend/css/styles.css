@@ -19,7 +19,7 @@
         --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
         --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.1);
         --header-height: 64px;
-        --header-font-size: 20px;
+        --header-font-size: 18px;
         --title-font-size: 18px;
         --ai-messages: #a4fc95;
         --user-messages: #ababab;
@@ -37,7 +37,7 @@
         --font-size-xs: 12px;
         --font-size-sm: 14px;
         --font-size-base: 16px;
-        --font-size-lg: 18px;
+        --font-size-lg: 17px;
         --font-size-xl: 20px;
         --font-size-2xl: 24px;
         --font-size-3xl: 30px;
@@ -132,7 +132,7 @@
         left: 20px;
         /* 设置左侧固定位置 */
     }
-    
+
     /* 标题链接样式 */
     .header-title {
         cursor: pointer;
@@ -143,6 +143,7 @@
         opacity: 0.8;
         transform: scale(1.02);
     }
+
     .user-profile {
         display: flex;
         align-items: center;
@@ -423,11 +424,11 @@
     /* 栏目容器布局 */
     /* index页面布局样式 */
     .index-container {
-        width: 80%;
+        width: 90%;
         margin: 1% auto;
         overflow: hidden;
         flex: 1;
-        max-width: 1200px;
+        max-width: 1400px;
     }
 
     .index-form {
@@ -916,6 +917,7 @@
         display: flex;
         gap: var(--spacing-md);
         justify-content: center;
+        align-items: center;
     }
 
     .modal-actions button {
@@ -924,6 +926,9 @@
         font-weight: 600;
         cursor: pointer;
         transition: all 0.2s ease;
+        min-width: 80px;
+        flex: 1;
+        max-width: 120px;
         font-size: var(--font-size-sm);
         border: none;
     }
@@ -965,10 +970,10 @@
         top: 50%;
         left: 53%;
         transform: translate(-50%, -50%);
-        width: 85%;
-        /* 增加5% (80% * 1.05 = 84%) */
-        height: 85%;
-        /* 增加5% (80% * 1.05 = 84%) */
+        width: 92%;
+        /* 进一步增大知识图谱区域 */
+        height: 90%;
+        /* 进一步增大知识图谱区域 */
         z-index: 1000;
         display: none;
     }
