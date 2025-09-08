@@ -15,6 +15,9 @@ let submissionCount = 0;
 let failedSubmissionCount = 0;
 let chatResultCallbackRef = null;
 
+// 添加一个标志位，用于跟踪是否已经在本次提交后触发过AI主动询问
+let hasTriggeredAssistanceAfterSubmission = false;
+
 tracker.init({
     user_idle: true,
     page_click: true,
@@ -177,6 +180,9 @@ function extendChatModuleForSmartHints(topicId) {
             console.log(`提交失败次数: ${failedSubmissionCount}`);
         }
 
+        // 重置AI主动询问触发标志位
+        hasTriggeredAssistanceAfterSubmission = false;
+
         // 调用原始回调
         if (originalSubmissionCallback) {
             originalSubmissionCallback(msg);
@@ -231,18 +237,23 @@ function extendChatModuleForAIResponse(topicId, getCounters) {
 
 // 添加一个新的辅助函数来统一检查触发条件
 function checkAndTriggerAssistanceAfterAction(topicId, aiAskCount, submissionCount, failedSubmissionCount, conversationHistory) {
-    // 只在AI询问4次以上时触发检查，并且每隔两次触发一次
-    if (aiAskCount >= 4 && aiAskCount % 2 === 0) {
-        if (aiAskCount < 10) {
-            setTimeout(() => {
-                triggerSmartHint(topicId, conversationHistory || [], aiAskCount, submissionCount, failedSubmissionCount);
-            }, 1000);
-        }
-        // 当用户询问10次及以上且提交4次未通过时，直接给出答案
-        else if (aiAskCount >= 10 && failedSubmissionCount >= 4) {
-            setTimeout(() => {
-                provideDirectAnswer(topicId);
-            }, 1000);
+    // 只在有提交行为后才触发检查，并且确保只触发一次
+    if (submissionCount > 0 && !hasTriggeredAssistanceAfterSubmission) {
+        // 检查AI询问次数条件
+        if (aiAskCount >= 4 && aiAskCount % 2 === 0) {
+            if (aiAskCount < 10) {
+                hasTriggeredAssistanceAfterSubmission = true;
+                setTimeout(() => {
+                    triggerSmartHint(topicId, conversationHistory || [], aiAskCount, submissionCount, failedSubmissionCount);
+                }, 1000);
+            }
+            // 当用户询问10次及以上且提交4次未通过时，直接给出答案
+            else if (aiAskCount >= 10 && failedSubmissionCount >= 4) {
+                hasTriggeredAssistanceAfterSubmission = true;
+                setTimeout(() => {
+                    provideDirectAnswer(topicId);
+                }, 1000);
+            }
         }
     }
 }
@@ -475,7 +486,7 @@ function showProblemHintInChat(message, editorType, editCount) {
         <iconify-icon icon="mdi:robot" width="20" height="20"></iconify-icon>
       </div>
       <div class="ai-content">
-        <div class="markdown-content">
+        <div class="message-content">
             <p>${message}</p>
           </div>
         </div>
@@ -586,7 +597,7 @@ function setupSubmitLogic() {
                                 // 没有下一个章节，显示完成信息
                                 alert("恭喜！您已完成所有章节！");
                                 setTimeout(() => {
-                                    window.location.href = '/pages/knowledge_graph.html';
+                                    window.location.href = '/pages/index.html';
                                 }, 100);
                             }
                         } else {
@@ -600,14 +611,19 @@ function setupSubmitLogic() {
                                 // 没有下一个知识点，显示完成信息
                                 alert("恭喜！您已完成所有测试！");
                                 setTimeout(() => {
-                                    window.location.href = '/pages/knowledge_graph.html';
+                                    window.location.href = '/pages/index.html';
                                 }, 100);
                             }
                         }
                     } else {
                         alert("测试完成！");
                         setTimeout(() => {
-                            window.location.href = '/pages/knowledge_graph.html';
+                            // 返回到当前topicId对应的学习页面
+                            if (topicId) {
+                                navigateTo('/pages/learning_page.html', topicId, true);
+                            } else {
+                                window.location.href = '/pages/knowledge_graph.html';
+                            }
                         }, 100);
                     }
                 } else {
@@ -721,9 +737,6 @@ ${testResult.message || '无具体信息'}
 **详细信息:**
 ${(testResult.details || []).join('\n') || '无详细信息'}
 
-**题目要求:**
-${task.description_md || '暂无描述'}
-
 您希望我详细解释哪个检查点的错误原因呢？请告诉我您的具体问题，我会针对性地为您解答！`;
 
         // 在聊天框中显示提示
@@ -746,7 +759,7 @@ ${task.description_md || '暂无描述'}
 // 主程序入口
 document.addEventListener('DOMContentLoaded', function () {
     // 设置标题和返回按钮
-    setupHeaderTitle('/pages/knowledge_graph.html');
+    setupHeaderTitle('/pages/learning_page.html');
     // 设置返回按钮
     setupBackButton();
     // 调试信息
@@ -888,10 +901,11 @@ function showTestCompletionModal(currentTopicId, nextKnowledgeInfo) {
     const returnBtn = document.getElementById('returnToGraphBtn');
     const continueBtn = document.getElementById('continueLearningBtn');
 
-    // 返回按钮 - 回到知识图谱导航页
+    // 返回按钮 - 返回到当前topicId的学习页面
     returnBtn.addEventListener('click', () => {
         modal.remove();
-        window.location.href = '/pages/knowledge_graph.html';
+        // 返回到当前topicId对应的学习页面
+        navigateTo('/pages/learning_page.html', currentTopicId, true);
     });
 
     // 确认按钮 - 跳转到下一个学习页面
@@ -904,7 +918,8 @@ function showTestCompletionModal(currentTopicId, nextKnowledgeInfo) {
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
             modal.remove();
-            window.location.href = '/pages/knowledge_graph.html';
+            // 返回到当前topicId对应的学习页面
+            navigateTo('/pages/learning_page.html', currentTopicId, true);
         }
     });
 }
@@ -1009,10 +1024,17 @@ function showChapterCompletionModal(completedChapter, nextChapterFirstKnowledge)
     const returnBtn = document.getElementById('returnToGraphBtn');
     const continueBtn = document.getElementById('continueLearningBtn');
 
-    // 返回按钮 - 回到知识图谱导航页
+    // 返回按钮 - 返回到当前topicId的学习页面
     returnBtn.addEventListener('click', () => {
         modal.remove();
-        window.location.href = '/pages/knowledge_graph.html';
+        // 获取当前topicId
+        const topicData = getUrlParam('topic');
+        const currentTopicId = topicData && topicData.id ? topicData.id : null;
+        if (currentTopicId) {
+            navigateTo('/pages/learning_page.html', currentTopicId, true);
+        } else {
+            window.location.href = '/pages/index.html';
+        }
     });
 
     // 确认按钮 - 跳转到下一个章节的第一个学习页面
@@ -1025,10 +1047,18 @@ function showChapterCompletionModal(completedChapter, nextChapterFirstKnowledge)
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
             modal.remove();
-            window.location.href = '/pages/knowledge_graph.html';
+            // 获取当前topicId
+            const topicData = getUrlParam('topic');
+            const currentTopicId = topicData && topicData.id ? topicData.id : null;
+            if (currentTopicId) {
+                navigateTo('/pages/learning_page.html', currentTopicId, true);
+            } else {
+                window.location.href = '/pages/index.html';
+            }
         }
     });
 }
+
 // 绑定解题思路按钮事件
 function bindProblemSolvingHintButton(topicId) {
     const hintButton = document.getElementById('problem-solving-hint-btn');

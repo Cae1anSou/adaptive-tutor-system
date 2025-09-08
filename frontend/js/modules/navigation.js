@@ -90,8 +90,8 @@ export function getReturnUrl() {
         return decodeURIComponent(returnUrl);
     }
     
-    // 默认返回知识图谱
-    return '/pages/knowledge_graph.html';
+    // 默认返回注册界面
+    return '/pages/index.html';
 }
 
 /**
@@ -108,7 +108,7 @@ export function goBack() {
     // 如果是学习页面，固定返回知识图谱
     else if (window.location.pathname.includes('learning_page.html')) {
         console.log('返回知识图谱');
-        window.location.href = '/pages/knowledge_graph.html';
+        window.location.href = '/pages/index.html';
     }
     // 其他情况使用浏览器历史
     else if (window.history.length > 1) {

@@ -611,6 +611,101 @@
         opacity: 0.6;
     }
 
+    /* 面板底部样式 */
+    .panel-footer {
+        padding: var(--spacing-md);
+        border-top: 1px solid var(--border-color);
+        background-color: var(--panel-background);
+        border-bottom-left-radius: var(--border-radius-md);
+        border-bottom-right-radius: var(--border-radius-md);
+    }
+
+    /* 解题思路按钮样式 */
+    #problem-solving-hint-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--spacing-sm);
+        width: 100%;
+        padding: var(--spacing-md);
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius-md);
+        font-weight: 600;
+        font-size: var(--font-size-sm);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-light);
+    }
+
+    #problem-solving-hint-btn:hover {
+        background-color: #6366f1;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-medium);
+    }
+
+    #problem-solving-hint-btn:active {
+        transform: translateY(0);
+        box-shadow: var(--shadow-light);
+    }
+
+    #problem-solving-hint-btn:focus {
+        outline: 2px solid rgba(99, 102, 241, 0.5);
+        outline-offset: 2px;
+    }
+
+    /* 询问AI按钮样式 */
+    #ask-ai-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--spacing-sm);
+        width: 100%;
+        padding: var(--spacing-md);
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius-md);
+        font-weight: 600;
+        font-size: var(--font-size-sm);
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    #ask-ai-btn:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-medium);
+    }
+
+    #ask-ai-btn:active {
+        transform: translateY(0);
+        box-shadow: var(--shadow-light);
+    }
+
+    #ask-ai-btn:focus {
+        outline: 2px solid rgba(79, 70, 229, 0.5);
+        outline-offset: 2px;
+    }
+
+    #ask-ai-btn:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-medium);
+    }
+
+    #ask-ai-btn:active {
+        transform: translateY(0);
+        box-shadow: var(--shadow-light);
+    }
+
+    #ask-ai-btn:focus {
+        outline: 2px solid rgba(79, 70, 229, 0.5);
+        outline-offset: 2px;
+    }
+
+
     /* 响应式调整 */
     @media (max-width: 640px) {
         .entry-container {
@@ -831,6 +926,19 @@
         transition: all 0.2s ease;
         font-size: var(--font-size-sm);
         border: none;
+    }
+
+    /* 修改返回按钮样式，使其更明显 */
+    .modal-actions .btn-secondary {
+        background-color: #f1f5f9;
+        color: #475569;
+        border: 1px solid #cbd5e1;
+    }
+
+    .modal-actions .btn-secondary:hover {
+        background-color: #e2e8f0;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     .learn-btn,
@@ -1058,7 +1166,7 @@
     .top-row {
         display: flex;
         gap: var(--spacing-md);
-        height: auto;
+        height: 60%;
         min-height: 200px;
         /* 减少最小高度从240px到200px */
         align-items: stretch;
@@ -1110,6 +1218,7 @@
         min-width: 300px;
         box-sizing: border-box;
         background: var(--content-background);
+        overflow: hidden; /* 确保内容不会溢出 */
     }
 
     /* 代码展示区域样式 - 适应新的exploration-content布局 */
@@ -1176,7 +1285,7 @@
     /* 知识区域 */
     /* 知识点展示（下排跨两列，宽度=左+中） */
     .knowledge-panel {
-        height: auto;
+        height: 40%;
         flex: 1 1 0;
         min-height: 200px;
         /* 确保最小高度 */
@@ -1240,7 +1349,7 @@
         top: 0;
         left: 0;
         width: 100%;
-        height: 100%;
+        height: 85%;
         border: none;
         display: block;
     }
