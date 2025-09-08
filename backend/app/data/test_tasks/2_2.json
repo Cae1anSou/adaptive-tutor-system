@@ -1,7 +1,7 @@
 {
   "topic_id": "2_2",
-  "title": "创建有序与无序列表",
-  "description_md": "# 创建有序与无序列表\n## 任务1：\n请在h3元素下方创建一个无序列表，并在其中添加三个项目：• 购买食材，• 准备厨具，• 开始烹饪\n",
+  "title": "2_2 创建有序列表",
+  "description_md": "# 任务描述：\n请在 `<h3>` 元素下方创建一个有序列表，用于展示待办步骤，目标是掌握有序列表 `<ol>` 与 `<li>` 标签的用法。\n\n## 要求：\n1. 在 `<h3>` 元素下方添加一个有序列表。\n2. 在列表中依次添加三个项目：购买食材、准备厨具、开始烹饪。",
   "start_code": {
     "html": "<h3> 烹饪准备工作 </h3>\n",
     "css": "",
@@ -9,38 +9,38 @@
   },
   "checkpoints": [
     {
-      "name": "无序列表ul元素位置检查",
+      "name": "有序列表ol元素位置检查",
       "type": "custom_script",
-      "script": "return document.querySelector('h3').getBoundingClientRect().top < document.querySelector('ul').getBoundingClientRect().top",
-      "feedback": "ul元素应该在第一个h3元素下方。"
+      "script": "const elements = Array.from(document.querySelectorAll('h3, ol')); const h3Index = elements.indexOf(document.querySelector('h3')); const olIndex = elements.indexOf(document.querySelector('ol')); return h3Index < olIndex;",
+      "feedback": "ol元素应该在h3元素下方。"
     },
     {
-      "name": "无序列表中li元素列表项数量检查",
+      "name": "有序列表中li元素列表项数量检查",
       "type": "custom_script",
-      "script": "return document.querySelector('ul').querySelectorAll('li').length == 3",
-      "feedback": "ul元素里应该包含3个li元素。"
+      "script": "return document.querySelector('ol').querySelectorAll('li').length == 3",
+      "feedback": "ol元素里应该包含3个li元素。"
     },
     {
-      "name": "无序列表中li元素第一个列表项内容检查",
+      "name": "有序列表中li元素第一个列表项内容检查",
       "type": "custom_script",
-      "script": "return document.querySelector('ul li:nth-child(1)').textContent == '购买食材'",
-      "feedback": "无序列表中第一个li元素的内容应该是'购买食材'。"
+      "script": "return document.querySelector('ol li:nth-child(1)').textContent == '购买食材'",
+      "feedback": "有序列表中第一个li元素的内容应该是'购买食材'。"
     },
     {
-      "name": "无序列表中li元素第二个列表项内容检查",
+      "name": "有序列表中li元素第二个列表项内容检查",
       "type": "custom_script",
-      "script": "return document.querySelector('ul li:nth-child(2)').textContent == '准备厨具'",
-      "feedback": "无序列表中第二个li元素的内容应该是'准备厨具'。"
+      "script": "return document.querySelector('ol li:nth-child(2)').textContent == '准备厨具'",
+      "feedback": "有序列表中第二个li元素的内容应该是'准备厨具'。"
     },
     {
-      "name": "无序列表中li元素第三个列表项内容检查",
+      "name": "有序列表中li元素第三个列表项内容检查",
       "type": "custom_script",
-      "script": "return document.querySelector('ul li:nth-child(3)').textContent == '开始烹饪'",
-      "feedback": "无序列表中第三个li元素的内容应该是'开始烹饪'。"
+      "script": "return document.querySelector('ol li:nth-child(3)').textContent == '开始烹饪'",
+      "feedback": "有序列表中第三个li元素的内容应该是'开始烹饪'。"
     }
   ],
   "answer": {
-    "html": "<h3> 烹饪准备工作 </h3>\n<ul>\n  <li>购买食材</li>\n  <li>准备厨具</li>\n  <li>开始烹饪</li>\n</ul>",
+    "html": "<h3> 烹饪准备工作 </h3>\n<ol>\n  <li>购买食材</li>\n  <li>准备厨具</li>\n  <li>开始烹饪</li>\n</ol>",
     "css": "",
     "js": ""
   }

@@ -119,8 +119,62 @@ function updateUIWithTaskData(task) {
         headerTitle.textContent = task.title || '编程测试';
     }
     if (requirementsContent) {
-        requirementsContent.innerHTML = marked(task.description_md || '');
+
+        // 对HTML标签进行智能转义处理
+        let rawHtml = smartEscapeHtmlTagsWithRegex(task.description_md);
+        // 先将Markdown转换为HTML
+        rawHtml = marked(rawHtml || '');
+        requirementsContent.innerHTML = rawHtml;
     }
+}
+
+// 智能转义HTML标签函数 - 基于正则表达式
+function smartEscapeHtmlTagsWithRegex(html) {
+    // 定义代码块的正则表达式
+    const codeBlockRegex = /(```[\s\S]*?```)/g;
+
+    // 提取所有代码块
+    const codeBlocks = [];
+    let match;
+    while ((match = codeBlockRegex.exec(html)) !== null) {
+        codeBlocks.push(match[0]);
+    }
+
+    // 将代码块替换为占位符
+    let htmlWithPlaceholders = html;
+    codeBlocks.forEach((block, index) => {
+        const placeholder = `__CODE_BLOCK_${index}__`;
+        htmlWithPlaceholders = htmlWithPlaceholders.replace(block, placeholder);
+    });
+
+    // 定义不需要转义的HTML标签的正则表达式（如Markdown标题）
+    const regexForNoEscape = /^(#{1,3})\s+/gm;
+
+    // 将HTML字符串按行分割
+    const lines = htmlWithPlaceholders.split('\n');
+
+    // 处理每一行
+    const processedLines = lines.map(line => {
+        // 检查当前行是否包含不需要转义的标签
+        if (regexForNoEscape.test(line)) {
+            // 不需要转义，直接返回原行
+            return line;
+        } else {
+            // 需要转义，处理HTML标签
+            return line.replace(/</g, '<').replace(/>/g, '>');
+        }
+    });
+
+    // 将处理后的行重新组合成HTML字符串
+    let processedHtml = processedLines.join('\n');
+
+    // 将占位符还原为原始代码块
+    codeBlocks.forEach((block, index) => {
+        const placeholder = `__CODE_BLOCK_${index}__`;
+        processedHtml = processedHtml.replace(placeholder, block);
+    });
+
+    return processedHtml;
 }
 
 // 初始化Monaco编辑器并设置实时预览
@@ -155,7 +209,7 @@ function initializeEditors(startCode) {
     }, 100);
 }
 
-// 初始化智能代码监控
+
 // 初始化智能代码监控
 function initSmartCodeTracking() {
     if (window.editorState && tracker && typeof tracker.initSmartCodeTracking === 'function') {
