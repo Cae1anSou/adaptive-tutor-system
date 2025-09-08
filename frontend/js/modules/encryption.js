@@ -7,13 +7,13 @@ export function encrypt(str) {
     try {
         // 先转换为UTF-8编码
         const utf8Bytes = new TextEncoder().encode(str);
-        
+
         // 将UTF-8字节数组转换为二进制字符串
         let binaryString = '';
         for (let i = 0; i < utf8Bytes.length; i++) {
             binaryString += String.fromCharCode(utf8Bytes[i]);
         }
-        
+
         // 使用btoa进行Base64编码
         return btoa(binaryString);
     } catch (error) {
@@ -32,13 +32,13 @@ export function decrypt(str) {
     try {
         // 先解码Base64
         const binaryString = atob(str);
-        
+
         // 将二进制字符串转换为字节数组
         const bytes = new Uint8Array(binaryString.length);
         for (let i = 0; i < binaryString.length; i++) {
             bytes[i] = binaryString.charCodeAt(i);
         }
-        
+
         // 使用TextDecoder解码为UTF-8字符串
         return new TextDecoder().decode(bytes);
     } catch (error) {
@@ -74,7 +74,7 @@ export function urlSafeToBase64(urlSafeBase64) {
     let base64 = urlSafeBase64
         .replace(/-/g, '+')
         .replace(/_/g, '/');
-    
+
     // 添加填充字符=
     const pad = base64.length % 4;
     if (pad) {
@@ -83,7 +83,7 @@ export function urlSafeToBase64(urlSafeBase64) {
         }
         base64 += '='.repeat(4 - pad);
     }
-    
+
     return base64;
 }
 
@@ -109,11 +109,11 @@ export function decryptWithTimestamp(encryptedData) {
         // 将URL安全的Base64转换回标准Base64
         const standardBase64 = urlSafeToBase64(encryptedData);
         const decrypted = decrypt(standardBase64);
-        
+
         if (!decrypted) {
             return { id: null, timestamp: null, isValid: false };
         }
-        
+
         const [id, timestamp] = decrypted.split('|');
         return {
             id: id,
@@ -138,7 +138,7 @@ export function simpleParamDecode(param) {
         if (result.isValid) {
             return result;
         }
-        
+
         // 如果解密失败，尝试直接解析（兼容未加密的情况）
         const [id, timestamp] = atob(param).split('|');
         return {
