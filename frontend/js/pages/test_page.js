@@ -360,6 +360,7 @@ function checkAndTriggerAssistanceAfterAction(topicId, aiAskCount, submissionCou
                     // 跳跃学习场景：不给出答案，直接返回
                     console.log('[DEBUG] 跳跃学习场景，AI询问10次后不给出答案，直接返回');
                     showJumpLearningFailureModal(topicId, returnUrl);
+                }
             }
         }
     }
@@ -695,7 +696,7 @@ function setupSubmitLogic() {
                         // 检查是否是章节的最后一个测试
                         const isLastTestInChapter = isLastTestInCurrentChapter(currentTopicId);
                       
-# TODO: 冲突，以下为enqi
+// # TODO: 冲突，以下为enqi
                         // 测试通过后的跳转逻辑
                         handleTestSuccess(currentTopicId);
                     } else {
@@ -712,51 +713,51 @@ function setupSubmitLogic() {
                                 window.location.href = '/pages/knowledge_graph.html';
                             }, 100);
                         }
-#以下为jiadi
-                        if (isLastTestInChapter) {
-                            // 完成章节测试，标记章节为已完成
-                            const currentChapter = getChapterFromTopicId(currentTopicId);
-                            markChapterAsCompleted(currentChapter);
+// #以下为jiadi
+                    //     if (isLastTestInChapter) {
+                    //         // 完成章节测试，标记章节为已完成
+                    //         const currentChapter = getChapterFromTopicId(currentTopicId);
+                    //         markChapterAsCompleted(currentChapter);
 
-                            // 获取下一个章节的第一个知识点
-                            const nextChapterFirstKnowledge = getNextChapterFirstKnowledge(currentChapter);
+                    //         // 获取下一个章节的第一个知识点
+                    //         const nextChapterFirstKnowledge = getNextChapterFirstKnowledge(currentChapter);
 
-                            if (nextChapterFirstKnowledge) {
-                                // 显示章节完成弹窗
-                                showChapterCompletionModal(currentChapter, nextChapterFirstKnowledge);
-                            } else {
-                                // 没有下一个章节，显示完成信息
-                                alert("恭喜！您已完成所有章节！");
-                                setTimeout(() => {
-                                    window.location.href = '/pages/index.html';
-                                }, 100);
-                            }
-                        } else {
-                            // 获取下一个知识点信息
-                            const nextKnowledgeInfo = getNextKnowledgeInfo(currentTopicId);
+                    //         if (nextChapterFirstKnowledge) {
+                    //             // 显示章节完成弹窗
+                    //             showChapterCompletionModal(currentChapter, nextChapterFirstKnowledge);
+                    //         } else {
+                    //             // 没有下一个章节，显示完成信息
+                    //             alert("恭喜！您已完成所有章节！");
+                    //             setTimeout(() => {
+                    //                 window.location.href = '/pages/index.html';
+                    //             }, 100);
+                    //         }
+                    //     } else {
+                    //         // 获取下一个知识点信息
+                    //         const nextKnowledgeInfo = getNextKnowledgeInfo(currentTopicId);
 
-                            if (nextKnowledgeInfo) {
-                                // 显示完成测试的弹窗
-                                showTestCompletionModal(currentTopicId, nextKnowledgeInfo);
-                            } else {
-                                // 没有下一个知识点，显示完成信息
-                                alert("恭喜！您已完成所有测试！");
-                                setTimeout(() => {
-                                    window.location.href = '/pages/index.html';
-                                }, 100);
-                            }
-                        }
-                    } else {
-                        alert("测试完成！");
-                        setTimeout(() => {
-                            // 返回到当前topicId对应的学习页面
-                            if (topicId) {
-                                navigateTo('/pages/learning_page.html', topicId, true);
-                            } else {
-                                window.location.href = '/pages/knowledge_graph.html';
-                            }
-                        }, 100);
-# 冲突结束
+                    //         if (nextKnowledgeInfo) {
+                    //             // 显示完成测试的弹窗
+                    //             showTestCompletionModal(currentTopicId, nextKnowledgeInfo);
+                    //         } else {
+                    //             // 没有下一个知识点，显示完成信息
+                    //             alert("恭喜！您已完成所有测试！");
+                    //             setTimeout(() => {
+                    //                 window.location.href = '/pages/index.html';
+                    //             }, 100);
+                    //         }
+                    //     }
+                    // } else {
+                    //     alert("测试完成！");
+                    //     setTimeout(() => {
+                    //         // 返回到当前topicId对应的学习页面
+                    //         if (topicId) {
+                    //             navigateTo('/pages/learning_page.html', topicId, true);
+                    //         } else {
+                    //             window.location.href = '/pages/knowledge_graph.html';
+                    //         }
+                    //     }, 100);
+// # 冲突结束
                     }
                 } else {
                     tracker.logEvent('test_failed', {
@@ -1768,4 +1769,3 @@ async function showJumpLearningFailureModal(currentTopicId, returnUrl) {
         navigateTo('/pages/learning_page.html', nearestLearnableNode, true, false);
     });
 }
-
