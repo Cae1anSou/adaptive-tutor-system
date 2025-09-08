@@ -254,21 +254,25 @@ function isJumpLearningScenario(returnUrl) {
     let topicData = null;
 
     try {
-        const url = new URL(returnUrl, window.location.origin);
-        const topicParam = url.searchParams.get('topic');
-
-        if (topicParam) {
-            // 从URL参数解密topic
-            topicData = decryptWithTimestamp(decodeURIComponent(topicParam));
+        // 优先从localStorage获取跳跃学习目标
+        const jumpTarget = JSON.parse(localStorage.getItem('jumpLearningTarget') || '{}');
+        if (jumpTarget.knowledgeId) {
+            topicData = { id: jumpTarget.knowledgeId };
+            console.log('[DEBUG] 从localStorage获取跳跃学习目标:', jumpTarget.knowledgeId);
         } else {
-            // 从localStorage获取跳跃学习目标
-            const jumpTarget = JSON.parse(localStorage.getItem('jumpLearningTarget') || '{}');
-            if (jumpTarget.knowledgeId) {
-                topicData = { id: jumpTarget.knowledgeId };
+            // 如果没有localStorage目标，尝试从URL参数解析
+            const url = new URL(returnUrl, window.location.origin);
+            const topicParam = url.searchParams.get('topic');
+
+            if (topicParam) {
+                // 从URL参数解密topic
+                topicData = decryptWithTimestamp(decodeURIComponent(topicParam));
+                console.log('[DEBUG] 从URL参数解析目标:', topicData);
             }
         }
 
         if (!topicData || !topicData.id) {
+            console.log('[DEBUG] 没有找到有效的目标知识点');
             return false;
         }
 
@@ -322,7 +326,8 @@ function isJumpLearningScenario(returnUrl) {
             isJumpChapter,
             isJumpSection,
             isChapterTestToSameChapter,
-            isJumpLearning: (isJumpChapter || isJumpSection) && !isChapterTestToSameChapter
+            isJumpLearning: (isJumpChapter || isJumpSection) && !isChapterTestToSameChapter,
+            jumpLearningTarget: localStorage.getItem('jumpLearningTarget')
         });
 
         return (isJumpChapter || isJumpSection) && !isChapterTestToSameChapter;
@@ -360,6 +365,7 @@ function checkAndTriggerAssistanceAfterAction(topicId, aiAskCount, submissionCou
                     // 跳跃学习场景：不给出答案，直接返回
                     console.log('[DEBUG] 跳跃学习场景，AI询问10次后不给出答案，直接返回');
                     showJumpLearningFailureModal(topicId, returnUrl);
+                }
             }
         }
     }
@@ -694,14 +700,13 @@ function setupSubmitLogic() {
 
                         // 检查是否是章节的最后一个测试
                         const isLastTestInChapter = isLastTestInCurrentChapter(currentTopicId);
-                      
-# TODO: 冲突，以下为enqi
+
                         // 测试通过后的跳转逻辑
                         handleTestSuccess(currentTopicId);
                     } else {
                         // 检查是否是跳跃学习失败的情况
                         if (window.isJumpLearningFailure) {
-                            console.log('[DEBUG] 跳跃学习失败');
+                            console.log('[DEBUG] 跳跃学习失败，给出答案后显示返回弹窗');
                             showJumpLearningFailureModal(currentTopicId, window.jumpLearningReturnUrl);
                             // 清除标记
                             window.isJumpLearningFailure = false;
@@ -712,51 +717,6 @@ function setupSubmitLogic() {
                                 window.location.href = '/pages/knowledge_graph.html';
                             }, 100);
                         }
-#以下为jiadi
-                        if (isLastTestInChapter) {
-                            // 完成章节测试，标记章节为已完成
-                            const currentChapter = getChapterFromTopicId(currentTopicId);
-                            markChapterAsCompleted(currentChapter);
-
-                            // 获取下一个章节的第一个知识点
-                            const nextChapterFirstKnowledge = getNextChapterFirstKnowledge(currentChapter);
-
-                            if (nextChapterFirstKnowledge) {
-                                // 显示章节完成弹窗
-                                showChapterCompletionModal(currentChapter, nextChapterFirstKnowledge);
-                            } else {
-                                // 没有下一个章节，显示完成信息
-                                alert("恭喜！您已完成所有章节！");
-                                setTimeout(() => {
-                                    window.location.href = '/pages/index.html';
-                                }, 100);
-                            }
-                        } else {
-                            // 获取下一个知识点信息
-                            const nextKnowledgeInfo = getNextKnowledgeInfo(currentTopicId);
-
-                            if (nextKnowledgeInfo) {
-                                // 显示完成测试的弹窗
-                                showTestCompletionModal(currentTopicId, nextKnowledgeInfo);
-                            } else {
-                                // 没有下一个知识点，显示完成信息
-                                alert("恭喜！您已完成所有测试！");
-                                setTimeout(() => {
-                                    window.location.href = '/pages/index.html';
-                                }, 100);
-                            }
-                        }
-                    } else {
-                        alert("测试完成！");
-                        setTimeout(() => {
-                            // 返回到当前topicId对应的学习页面
-                            if (topicId) {
-                                navigateTo('/pages/learning_page.html', topicId, true);
-                            } else {
-                                window.location.href = '/pages/knowledge_graph.html';
-                            }
-                        }, 100);
-# 冲突结束
                     }
                 } else {
                     tracker.logEvent('test_failed', {
@@ -1767,5 +1727,6 @@ async function showJumpLearningFailureModal(currentTopicId, returnUrl) {
         // 返回到最近一个能学习的节点
         navigateTo('/pages/learning_page.html', nearestLearnableNode, true, false);
     });
+
 }
 
