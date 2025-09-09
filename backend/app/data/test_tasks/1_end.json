@@ -1,10 +1,10 @@
 {
   "topic_id": "1_end",
   "title": "1_end 第1章文本与页面结构基础综合测试",
-  "description_md": "# 任务描述：\n请综合运用本章所学知识点，构建一个关于 “WCF Best Cat Exhibition”（WCF最佳猫咪展览） 的介绍页面。\n\n## 要求：\n1. 创建页面基本结构：\n   - 添加 HTML5 文档类型声明。\n   - 设置页面语言为英文。\n   - 添加页面标题为 “WCF Best Cat Exhibition”。\n   - 设置字符编码为 UTF-8。\n   - 添加 viewport meta 标签，确保响应式布局。\n2. 添加页面内容结构：\n   - 添加主标题 `<h1>`：“WCF Best Cat Exhibition”。\n   - 添加二级标题 `<h2>`：“Welcome to the Cat Exhibition”。\n   - 添加三级标题 `<h3>`：“Event Highlights”。\n   - 添加另一个三级标题 `<h3>`：“Daily Schedule”。\n   - 在适当位置添加段落 `<p>`，内容为：Join us for a purr-fect celebration of feline beauty and grace. Discover various cat breeds and experience the excitement of the event!\n3. 应用文本格式化：\n   - 使用 `<span>` 包裹 “purr-fect”，并通过 CSS 的 `font-weight` 属性加粗。\n   - 使用 `<span>` 包裹 “grace”，并通过 CSS 的 `font-style` 属性设置为斜体。",
+  "description_md": "# 任务描述：\n请综合运用本章所学知识点，构建一个关于 “WCF Best Cat Exhibition”（WCF最佳猫咪展览） 的介绍页面。\n\n## 要求：\n1. 创建页面基本结构：\n   - 添加 HTML5 文档类型声明。\n   - 设置页面语言为英文。\n   - 添加页面标题为 “WCF Best Cat Exhibition”。\n   - 设置字符编码为 UTF-8。\n   - 添加 viewport meta 标签，确保响应式布局。\n2. 添加页面内容结构：\n   - 添加主标题 `<h1>`：“WCF Best Cat Exhibition”。\n   - 添加二级标题 `<h2>`：“Welcome to the Cat Exhibition”。\n   - 添加三级标题 `<h3>`：“Event Highlights”。\n   - 添加另一个三级标题 `<h3>`：“Daily Schedule”。\n   - 在适当位置添加段落 `<p>`，内容为：Join us for a purr-fect celebration of feline beauty and grace. Discover various cat breeds and experience the excitement of the event!\n3. 应用文本格式化：\n   - 使用 `<span>` 包裹 “purr-fect”且设置class为bold-text，并通过 CSS 的 `font-weight` 属性加粗。\n   - 使用 `<span>` 包裹 “grace”且设置class为italic-text，并通过 CSS 的 `font-style` 属性设置为斜体。",
   "start_code": {
-    "html": "",
-    "css": "",
+    "html": "# 请在此处完成HTML代码！",
+    "css": "# 请在此处完成CSS代码样式！",
     "js": ""
   },
   "checkpoints": [

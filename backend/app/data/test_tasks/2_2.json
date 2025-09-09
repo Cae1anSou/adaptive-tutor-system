@@ -3,7 +3,7 @@
   "title": "2_2 创建有序列表",
   "description_md": "# 任务描述：\n请在 `<h3>` 元素下方创建一个有序列表，用于展示待办步骤，目标是掌握有序列表 `<ol>` 与 `<li>` 标签的用法。\n\n## 要求：\n1. 在 `<h3>` 元素下方添加一个有序列表。\n2. 在列表中依次添加三个项目：购买食材、准备厨具、开始烹饪。",
   "start_code": {
-    "html": "<h3> 烹饪准备工作 </h3>\n",
+    "html": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <h3> 烹饪准备工作 </h3>\n# 请在此处添加你的代码！\n</body>\n</html>",
     "css": "",
     "js": ""
   },

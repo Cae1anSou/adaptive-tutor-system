@@ -3,7 +3,7 @@
   "title": "2_3 创建无序列表",
   "description_md": "# 任务描述：\n请在 `<h3>` 元素下方添加一个无序列表，用于展示学习计划，目标是掌握无序列表 `<ul>` 与 `<li>` 标签的基本用法。\n\n## 要求：\n1. 在 `<h3>` 元素下方创建一个无序列表。\n2. 在列表中依次添加三个项目：学习HTML基础、练习CSS样式、构建简单网页。",
   "start_code": {
-    "html": "<h3>前端学习计划</h3>\n",
+    "html": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <h3>前端学习计划</h3>\n# 请在此处添加你的代码！\n</body>\n</html>",
     "css": "",
     "js": ""
   },
