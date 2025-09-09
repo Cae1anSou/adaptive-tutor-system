@@ -244,7 +244,7 @@ class SandboxService:
                     pass
         
         message = "恭喜！所有测试点都通过了！" if passed_all else "很遗憾，部分测试点未通过。"
-        return {"passed": passed_all, "message": "恭喜！所有测试点都通过了！", "details": results}
+        return {"passed": passed_all, "message": message, "details": results}
 
     def _evaluate_checkpoint(self, page: Page, checkpoint) -> Tuple[bool, str]:
         """
