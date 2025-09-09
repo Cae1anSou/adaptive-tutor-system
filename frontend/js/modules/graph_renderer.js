@@ -24,7 +24,7 @@ export class GraphRenderer {
             'text-valign': 'center',
             'text-halign': 'center',
             'color': '#1e293b',
-            'background-color': '#f1f5f9',
+            'background-color': '#f8fafc',
             'width': 120,
             'height': 120,
             'font-size': '14px',
@@ -35,7 +35,7 @@ export class GraphRenderer {
             'border-width': 2,
             'border-color': '#e2e8f0',
             'overlay-opacity': 0,
-            'overlay-color': '#4f46e5',
+            'overlay-color': '#7aaef8',
             'overlay-padding': '10px',
             'transition-property': 'background-color, border-color, width, height',
             'transition-duration': '0.3s',
@@ -49,7 +49,7 @@ export class GraphRenderer {
             'font-weight': 'bold',
             'width': 200,
             'height': 80,
-            'background-color': '#4f46e5',
+            'background-color': '#7aaef8',
             'color': '#1e293b',
             'border-width': 3,
             'border-color': '#3730a3',
@@ -59,28 +59,28 @@ export class GraphRenderer {
         {
           selector: 'node.learned',
           style: {
-            'background-color': '#10b981',
+            'background-color': '#86efac',
             'border-color': '#059669'
           }
         },
         {
           selector: 'node.unlocked',
           style: {
-            'background-color': '#3b82f6',
+            'background-color': '#a5d3ff',
             'border-color': '#2563eb'
           }
         },
         {
           selector: 'node.locked',
           style: {
-            'background-color': '#9ca3af',
+            'background-color': '#e2e8f0',
             'border-color': '#6b7280'
           }
         },
         {
           selector: 'node.current',
           style: {
-            'background-color': '#f59e0b',
+            'background-color': '#fcd34d',
             'border-color': '#d97706'
           }
         },
@@ -243,7 +243,7 @@ export class GraphRenderer {
         backgroundColor = '#d97706';
         borderColor = '#b45309';
       } else if (node.data('type') === 'chapter') {
-        backgroundColor = '#3730a3';
+        backgroundColor = '#4f8af9';
         borderColor = '#4f46e5';
       } else {
         backgroundColor = '#c7d2fe';
@@ -255,6 +255,8 @@ export class GraphRenderer {
         style: {
           'background-color': backgroundColor,
           'border-color': borderColor,
+          'color': node.data('type') === 'chapter' ? '#f1f5f9': '#1e293b',
+          'font-size': node.data('type') === 'chapter' ? '18px' : '16px',
           'width': originalSize.width * scaleFactor,
           'height': originalSize.height * scaleFactor
         }
@@ -268,7 +270,8 @@ export class GraphRenderer {
       // 使用动画恢复原始样式
       node.stop().animate({
         style: {
-          'color': '#1e293b'
+          'color': '#1e293b',
+          'font-size': node.data('type') === 'chapter' ? '16px' : '14px',
         }
       }, {
         duration: 150,
@@ -328,7 +331,7 @@ export class GraphRenderer {
     if (id === currentLearningNodeId) {
       // 当前学习节点始终为橙色，无论其他状态如何
       node.style({
-        'background-color': '#f59e0b',
+        'background-color': '#fcd34d',
         'border-color': '#d97706'
       });
       return; // 直接返回，不再应用其他样式
@@ -340,39 +343,39 @@ export class GraphRenderer {
       if (this.graphState.currentLearningChapter === id) {
         // 当前学习章节使用橙色
         node.style({
-          'background-color': '#f59e0b',
+          'background-color': '#fcd34d',
           'border-color': '#d97706'
         });
       } else if (this.graphState.isChapterCompleted(id)) {
         node.style({
-          'background-color': '#10b981',
+          'background-color': '#86efac',
           'border-color': '#059669'
         });
       } else if (this.graphState.canLearnChapter(id)) {
         node.style({
-          'background-color': '#3b82f6',
+          'background-color': '#a5d3ff',
           'border-color': '#2563eb'
         });
       } else {
         node.style({
-          'background-color': '#9ca3af',
+          'background-color': '#e2e8f0',
           'border-color': '#6b7280'
         });
       }
     } else {
       if (this.graphState.learnedNodes.includes(id)) {
         node.style({
-          'background-color': '#10b981',
+          'background-color': '#86efac',
           'border-color': '#059669'
         });
       } else if (this.graphState.isKnowledgeUnlocked(id)) {
         node.style({
-          'background-color': '#3b82f6',
-          'border-color': '#2563eb'
+          'background-color': '#a5d3ff',
+          'border-color': '#7aaef8'
         });
       } else {
         node.style({
-          'background-color': '#9ca3af',
+          'background-color': '#e2e8f0',
           'border-color': '#6b7280'
         });
       }

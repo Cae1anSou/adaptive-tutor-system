@@ -213,7 +213,90 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       modal.style.display = 'block';
     }
+function showChapterModal(Id) {
+    const modal = document.getElementById('knowledgeModal');
+    const title = document.getElementById('modalTitle');
+    const status = document.getElementById('modalStatus');
+    const learnBtn = document.getElementById('learnBtn');
+    const testBtn = document.getElementById('testBtn');
 
+    // 只显示章节号，去掉"_end"后缀
+    const chapterNumber = Id.split('_')[0];
+    title.textContent = `第${chapterNumber}章`
+    learnBtn.className = 'learn-btn';
+    learnBtn.disabled = false;
+    learnBtn.textContent = '是';
+    testBtn.textContent = '否';
+    testBtn.className = 'test-btn';
+
+    status.textContent = `您已学过本章节，是否再次进行测试？`;
+
+    learnBtn.onclick = () => {
+        navigateTo('/pages/test_page.html', Id, true, true);
+    };
+
+    testBtn.onclick = () => {
+        document.getElementById('knowledgeModal').style.display = 'none';
+    };
+
+    modal.style.display = 'block';
+}
+function showChapterModal_2(Id) {
+    const modal = document.getElementById('knowledgeModal');
+    const title = document.getElementById('modalTitle');
+    const status = document.getElementById('modalStatus');
+    const learnBtn = document.getElementById('learnBtn');
+    const testBtn = document.getElementById('testBtn');
+
+    // 只显示章节号，去掉"_end"后缀
+    const chapterNumber = Id.split('_')[0];
+    title.textContent = `第${chapterNumber}章`;
+    learnBtn.className = 'learn-btn';
+    learnBtn.disabled = false;
+    learnBtn.textContent = '是';
+    testBtn.textContent = '否';
+    testBtn.className = 'test-btn';
+
+    status.textContent = `您还未学完当前章节内容，是否直接开始测试？`;
+
+    learnBtn.onclick = () => {
+        navigateTo('/pages/test_page.html', Id, true, true);
+    };
+
+    testBtn.onclick = () => {
+        document.getElementById('knowledgeModal').style.display = 'none';
+    };
+
+    modal.style.display = 'block';
+}
+function showChapterModal_3(Id) {
+    const modal = document.getElementById('knowledgeModal');
+    const title = document.getElementById('modalTitle');
+    const status = document.getElementById('modalStatus');
+    const learnBtn = document.getElementById('learnBtn');
+    const testBtn = document.getElementById('testBtn');
+
+    // 只显示章节号，去掉"_end"后缀
+    const chapterNumber = Id.split('_')[0];
+    title.textContent = `第${chapterNumber}章`;
+    learnBtn.className = 'learn-btn';
+    learnBtn.disabled = false;
+    learnBtn.textContent = '是';
+    testBtn.textContent = '否';
+    testBtn.className = 'test-btn';
+
+    status.textContent = `您还未解锁前置章节，是否直接开始测试？`;
+
+    learnBtn.onclick = () => {
+        navigateTo('/pages/test_page.html', Id, true, true);
+    };
+
+    testBtn.onclick = () => {
+        document.getElementById('knowledgeModal').style.display = 'none';
+    };
+
+    modal.style.display = 'block';
+}
     // 处理跳跃学习场景
 
     // 单击/双击处理
@@ -299,17 +382,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (type === 'chapter') {
         if (graphState.isChapterCompleted(id)) {
-          if (confirm("您已学过本章节，是否再次进行测试？")) {
-            navigateTo('/pages/test_page.html', id, true, true);
-          }
+            showChapterModal(id);//已学过本章节
         } else if (graphState.currentLearningChapter === id) {
-          if (confirm("您还未学完当前章节内容，是否直接开始测试？")) {
-            navigateTo('/pages/test_page.html', id, true, true);
-          }
+            showChapterModal_2(id);//未学完章节
         } else {
-          if (confirm("您还未解锁前置章节，是否直接开始测试？")) {
-            navigateTo('/pages/test_page.html', id, true, true);
-          }
+            showChapterModal_3(id);//未解锁章节
         }
 
         graphState.passChapterTest(id);

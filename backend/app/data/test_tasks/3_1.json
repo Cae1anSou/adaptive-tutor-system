@@ -3,7 +3,7 @@
   "title": "3_1 创建登录表单的文本框与按钮",
   "description_md": "# 任务描述：\n请创建一个简单的登录表单，包含用户名输入框和登录按钮。\n\n## 要求：\n1. 创建一个文本框，提示文本为“请输入用户名”。\n2. 在文本框下方创建一个按钮，按钮文本为“登录”。",
   "start_code": {
-    "html": "",
+    "html": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    # 请在此处添加你的代码！\n</body>\n</html>",
     "css": "",
     "js": ""
   },

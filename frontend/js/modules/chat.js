@@ -50,8 +50,10 @@ class ChatModule {
    * 初始化聊天模块
    * @param {string} mode - 模式 ('learning' 或 'test')
    * @param {string} contentId - 内容ID (学习内容ID或测试任务ID)
+   * @param {Object} options - 配置选项
+   * @param {boolean} options.enableEnterToSend - 是否启用Enter键发送消息，默认为true
    */
-  init(mode, contentId) {
+  init(mode, contentId, options = {}) {
     // 记录当前上下文，便于持久化
     this.currentMode = mode;
     this.currentContentId = contentId;
@@ -67,7 +69,7 @@ class ChatModule {
     }
 
     // 绑定事件监听器
-    this.bindEvents(mode, contentId);
+    this.bindEvents(mode, contentId, options);
 
     // 从本地存储回放历史（若存在）
     try {
@@ -92,20 +94,27 @@ class ChatModule {
    * 绑定事件监听器
    * @param {string} mode - 模式 ('learning' 或 'test')
    * @param {string} contentId - 内容ID
+   * @param {Object} options - 配置选项
+   * @param {boolean} options.enableEnterToSend - 是否启用Enter键发送消息，默认为true
    */
-  bindEvents(mode, contentId) {
+  bindEvents(mode, contentId, options = {}) {
+    // 设置默认选项
+    const { enableEnterToSend = true } = options;
+    
     // 发送按钮点击事件
     this.sendButton.addEventListener('click', () => {
       this.sendMessage(mode, contentId);
     });
 
     // 回车键发送消息（Shift+Enter换行）
-    this.inputElement.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        this.sendMessage(mode, contentId);
-      }
-    });
+    if (enableEnterToSend) {
+      this.inputElement.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          this.sendMessage(mode, contentId);
+        }
+      });
+    }
   }
 
   /**
