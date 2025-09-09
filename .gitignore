@@ -90,3 +90,4 @@ backend/models/sentiment_bert/special_tokens_map.json
 backend/models/sentiment_bert/tokenizer_config.json
 backend/models/sentiment_bert/tokenizer.json
 backend/models/sentiment_bert/vocab.txt
+/backend/scripts/ai_exp_database_export.json
