@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     # TODO: 到时候可能需要约束，不能放所有都进来
     BACKEND_CORS_ORIGINS: List[str] = ["*"]
 
-    DATABASE_URL: str = "sqlite:///./app/db/database.db"
+    DATABASE_URL: str = "mysql+pymysql://root:Silvis0852.@localhost:3306/ai_exp"
 
     # File paths
     DATA_DIR: str = "./app/data"
