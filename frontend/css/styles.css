@@ -1620,16 +1620,8 @@ body {
     font-size: var(--font-size-base);
 }
 
-/* 标题链接样式 */
-.header-title {
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
 
-.header-title:hover {
-    opacity: 0.8;
-    transform: scale(1.02);
-}
+
 .info-tab {
     padding: var(--spacing-sm) var(--spacing-lg);
     font-size: var(--font-size-base);

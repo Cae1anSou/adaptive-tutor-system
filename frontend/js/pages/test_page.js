@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 设置标题和返回按钮
-    setupHeaderTitle('/pages/knowledge_graph.html');
+    /* setupHeaderTitle('/pages/knowledge_graph.html'); */
     // 设置返回按钮
     setupBackButton();
     // 调试信息
