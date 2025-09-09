@@ -3,8 +3,8 @@
   "title": "1_2 应用文本格式（加粗、斜体）",
   "description_md": "# 任务描述：\n请在 CSS 中为页面中的 `<h2>` 元素添加样式，使其同时呈现粗体和斜体，目标是学会使用 `font-weight` 与 `font-style` 属性。\n\n## 要求：\n1. 使用 `font-weight` 属性将 `<h2>` 元素设置为粗体。\n2. 使用 `font-style` 属性将 `<h2>` 元素设置为斜体。\n3. 不要修改 HTML 结构，仅在 CSS 中添加或修改样式。",
   "start_code": {
-    "html": "<h2>Web开发基础教程</h2>",
-    "css": "",
+    "html": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <h2>Web开发基础教程</h2>\n</body>\n</html>",
+    "css": "# 请在此处添加你的CSS样式代码！",
     "js": ""
   },
   "checkpoints": [

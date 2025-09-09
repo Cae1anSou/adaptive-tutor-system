@@ -3,7 +3,7 @@
   "title": "3_2 复选框与单选框练习",
   "description_md": "# 任务描述：\n请在页面中添加复选框与单选框，模拟技能与级别选择功能。\n\n## 要求：\n1. 创建两个复选框，`name` 值为 `skills`。\n   - 第一个复选框 `value` 为 `HTML`，内容为“掌握HTML”。\n   - 第二个复选框 `value` 为 `CSS`，内容为“掌握CSS”。\n2. 在复选框下方创建两个单选框，`name` 值为 `level`。\n   - 第一个单选框 `value` 为“初级”，内容为“初级程序员”。\n   - 第二个单选框 `value` 为“高级”，内容为“高级程序员”。",
   "start_code": {
-    "html": "",
+    "html": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    # 请在此处添加你的代码！\n</body>\n</html>",
     "css": "",
     "js": ""
   },
