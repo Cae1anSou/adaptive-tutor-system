@@ -3,8 +3,8 @@
   "title": "5_1 插入并管理网页中的图片元素",
   "description_md": "# 任务描述：\n请在商品卡片中插入图片，并设置合适的展示样式。\n\n## 要求：\n1. 在 `.card` 元素的顶部添加 `<img>` 标签。\n2. 每个图片需包含 `src` 和 `alt` 属性。\n3. 设置图片宽度为 `100%`，并使用 `object-fit: cover` 保持比例裁剪。",
   "start_code": {
-    "html": "<div class=\"card\">\n  <!-- 在这里插入图片 -->\n  <div class=\"card-content\">\n    <h3>智能手表</h3>\n    <p>分类：数码</p>\n    <p>价格：￥1299</p>\n  </div>\n</div>\n<div class=\"card\">\n  <!-- 在这里插入图片 -->\n  <div class=\"card-content\">\n    <h3>保温杯</h3>\n    <p>分类：家居</p>\n    <p>价格：￥89</p>\n  </div>\n</div>",
-    "css": "",
+    "html": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <div class=\"card\">\n  # 请在这里插入图片！\n  <div class=\"card-content\">\n    <h3>智能手表</h3>\n    <p>分类：数码</p>\n    <p>价格：￥1299</p>\n  </div>\n</div>\n<div class=\"card\">\n  # 请在这里插入图片！\n  <div class=\"card-content\">\n    <h3>保温杯</h3>\n    <p>分类：家居</p>\n    <p>价格：￥89</p>\n  </div>\n</div>\n</body>\n</html>",
+    "css": "# 请在此处添加CSS样式代码！",
     "js": ""
   },
   "checkpoints": [

@@ -3,7 +3,7 @@
   "title": "1_1 使用h元素和p元素体验标题与段落",
   "description_md": "# 任务描述：\n请使用 HTML 标签构建一个简单的页面结构，包括主标题、副标题和正文段落。目标是熟悉常用的结构性标签 `<h2>`、`<h4>` 和 `<p>` 的用法。\n\n## 要求：\n1. 使用 `<h2>` 元素创建一个主标题，内容为“前端开发入门指南”。\n2. 在主标题下方使用 `<h4>` 元素创建一个副标题，内容为“HTML基础结构”。\n3. 在副标题下方使用 `<p>` 元素创建一个段落，内容为“本文将介绍如何使用HTML构建网页的基本结构。”\n4. 保持标签层次清晰，不要额外添加无关内容。",
   "start_code": {
-    "html": "",
+    "html": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    # 请在此处添加你的代码！\n</body>\n</html>",
     "css": "",
     "js": ""
   },

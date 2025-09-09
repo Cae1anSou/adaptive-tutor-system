@@ -3,9 +3,9 @@
   "title": "3_3 表单提交机制",
   "description_md": "# 任务描述：\n请为用户注册表单添加提交功能，通过 JavaScript 处理提交逻辑。\n\n## 要求：\n1. 使用 `<form>` 元素包裹所有表单控件。\n2. 在 `<form>` 标签中通过 `onsubmit` 属性绑定 `handleRegister` 函数。\n3. 在 `handleRegister` 函数中阻止表单默认提交行为。\n4. 在控制台输出“注册信息已处理”。",
   "start_code": {
-    "html": "<label>用户名：<input type=\"text\" name=\"username\"></label>\n<label>邮箱：<input type=\"email\" name=\"email\"></label>\n<button type=\"submit\">注册</button>",
+    "html": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <label>用户名：<input type=\"text\" name=\"username\"></label>\n<label>邮箱：<input type=\"email\" name=\"email\"></label>\n<button type=\"submit\">注册</button>\n</body>\n</html>",
     "css": "",
-    "js": ""
+    "js": "# 请在此处添加你的JavaScript代码！"
   },
   "checkpoints": [
     {

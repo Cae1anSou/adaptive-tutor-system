@@ -137,25 +137,70 @@ class SandboxService:
                     page.set_content(full_html_with_script, wait_until="load")  # 等待页面加载完成
                 else:
                     # 标准沙箱模式：将用户代码嵌入到标准模板中
-                    full_html = f"""
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <meta charset="UTF-8">
-                        <style>{user_code.get('css', '')}</style>
-                    </head>
-                    <body>
-                        {user_code.get('html', '')}
-                        <script>
-                        window.__alertMessages = [];
-                        window.alert = function (msg) {{
-                            window.__alertMessages.push(msg);
-                        }};
-                        </script>
-                        <script>{user_code.get('js', '')}</script>
-                    </body>
-                    </html>
-                    """
+                    # 检查用户代码是否已经包含完整的HTML结构
+                    user_html = user_code.get('html', '')
+                    if (user_html.strip().startswith('<!DOCTYPE html>') or 
+                        user_html.strip().startswith('<html') or
+                        '<html' in user_html.lower()):
+                        # 用户代码已经包含HTML结构，直接使用
+                        full_html = user_html
+                        
+                        # 注入CSS和JS到现有HTML中
+                        css_content = user_code.get('css', '')
+                        js_content = user_code.get('js', '')
+                        
+                        # 如果有CSS内容，尝试添加到<head>中
+                        if css_content:
+                            if '<head>' in full_html:
+                                # 确保只替换第一个<head>标签
+                                head_pos = full_html.find('<head>')
+                                head_end_pos = full_html.find('>', head_pos) + 1
+                                full_html = full_html[:head_end_pos] + f'<style>{css_content}</style>' + full_html[head_end_pos:]
+                            else:
+                                # 如果没有<head>，尝试添加到<html>后
+                                html_pos = full_html.find('<html')
+                                html_end_pos = full_html.find('>', html_pos) + 1
+                                full_html = full_html[:html_end_pos] + f'<head><style>{css_content}</style></head>' + full_html[html_end_pos:]
+                        
+                        # 如果有JS内容，尝试添加到</body>前或</html>前
+                        if js_content or True:  # 总是添加alert拦截脚本
+                            # 添加alert拦截脚本
+                            alert_script = """\n<script>\nwindow.__alertMessages = [];\nwindow.alert = function (msg) {\n    window.__alertMessages.push(msg);\n};\n</script>"""
+                            
+                            js_to_inject = alert_script
+                            if js_content:
+                                js_to_inject += f'\n<script>{js_content}</script>'
+                            
+                            if '</body>' in full_html:
+                                # 在</body>标签前插入JS
+                                body_end_pos = full_html.rfind('</body>')
+                                full_html = full_html[:body_end_pos] + js_to_inject + full_html[body_end_pos:]
+                            elif '</html>' in full_html:
+                                # 在</html>标签前插入JS
+                                html_end_pos = full_html.rfind('</html>')
+                                full_html = full_html[:html_end_pos] + js_to_inject + full_html[html_end_pos:]
+                            else:
+                                # 如果都没有，直接追加
+                                full_html = full_html + js_to_inject
+                    else:
+                        # 用户代码不包含HTML结构，使用标准模板
+                        full_html = f"""<!DOCTYPE html>
+                                        <html>
+                                        <head>
+                                            <meta charset="UTF-8">
+                                            <style>{user_code.get('css', '')}</style>
+                                        </head>
+                                        <body>
+                                            {user_code.get('html', '')}
+                                            <script>
+                                            window.__alertMessages = [];
+                                            window.alert = function (msg) {{
+                                                window.__alertMessages.push(msg);
+                                            }};
+                                            </script>
+                                            <script>{user_code.get('js', '')}</script>
+                                        </body>
+                                        </html>"""
                     page.set_content(full_html, wait_until="load")  # 等待页面加载完成
 
                 for i, cp in enumerate(checkpoints):
@@ -291,7 +336,7 @@ class SandboxService:
                         return False, f"元素 '{selector}' 的文本 '{actual_text}' 不匹配正则表达式 '{expected_value}'"
                 elif assertion_op == 'equals':
                     # 比较时去除前后空格，增强健壮性
-                    if actual_text.strip() != expected_value.strip():
+                    if actual_text.strip().replace(' ', '') != expected_value.strip().replace(' ', ''):
                         return False, f"元素 '{selector}' 的文本为 '{actual_text}'，不等于期望的 '{expected_value}'"
                 else:
                     return False, f"不支持的文本断言类型: '{assertion_op}'"
