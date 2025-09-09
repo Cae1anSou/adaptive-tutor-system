@@ -49,7 +49,7 @@ async function initializePage() {
         }
 
         // 加载对应的测试内容
-        chatModule.init('test', topicData.id);
+        chatModule.init('test', topicData.id, { enableEnterToSend: false });
     } else {
         console.warn('未找到有效的主题参数，使用默认内容');
         console.log('加载默认测试内容');
@@ -918,7 +918,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const contentId = getUrlParam('topic');
         if (contentId && contentId.id) {
             // 使用新的聊天模块初始化
-            chatModule.init('test', contentId);
+            chatModule.init('test', contentId, { enableEnterToSend: false });
         }
     });
 });
