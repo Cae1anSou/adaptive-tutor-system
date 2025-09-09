@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import sys
 from playwright.sync_api import sync_playwright, Page, Error
 from typing import Dict, Any, List, Protocol, Tuple
@@ -61,20 +62,20 @@ class SandboxService:
         Returns:
             评测结果字典
         """
+        # 指定可以直接通过的任务列表
+
+        # 如果是指定的直接通过任务，立即返回成功结果
+        BYPASS_EVALUATION_TASKS = ["3_1", "3_3", "3_end"]
+
+        if topic_id in BYPASS_EVALUATION_TASKS:
+            return {"passed": True, "message": "通过", "details": []}
+
         # 根据 topic_id 判断是否使用 raw HTML 模式
         # 指定需要使用 raw HTML 模式的任务列表
         RAW_HTML_TASKS = ["1_3","1_end","2_end","3_end","4_end","5_end","6_end"]  # 可以在这里添加更多需要 raw 模式的任务
         raw_html_mode = (topic_id in RAW_HTML_TASKS)
         
-        # 指定可以直接通过的任务列表
-        BYPASS_EVALUATION_TASKS = ["3_1","3_3","3_end"] 
-        
         results = []
-        passed_all = True
-
-        # 如果是指定的直接通过任务，立即返回成功结果
-        if topic_id in BYPASS_EVALUATION_TASKS:
-            return {"passed": True, "message": "通过", "details": []}
 
         browser = None
         page = None
