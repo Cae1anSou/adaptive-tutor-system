@@ -266,7 +266,7 @@ async function initializeModules(topicId) {
 
     // 初始化聊天模块
     try {
-        chatModule.init('learning', topicId);
+        chatModule.init('learning', topicId, { enableEnterToSend: false });
         console.log('[MainApp] 聊天模块初始化完成');
 
         // 统一处理AI头像显示（立即执行）

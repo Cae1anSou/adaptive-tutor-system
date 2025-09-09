@@ -12,6 +12,7 @@ import { getParticipantId } from './session.js';
 import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
 import websocket from './websocket_client.js';
 import api_client from '../api_client.js'
+import chatStorage from './chat_storage.js';
 class ChatModule {
   constructor() {
     this.chatContainer = null;
@@ -63,7 +64,7 @@ class ChatModule {
    * @param {string} mode - 模式 ('learning' 或 'test')
    * @param {string} contentId - 内容ID (学习内容ID或测试任务ID)
    */
-  init(mode, contentId) {
+  init(mode, contentId, options = {}) {
     // 获取聊天界面元素
     this.chatContainer = document.querySelector('.ai-chat-messages');
     this.messagesContainer = document.getElementById('ai-chat-messages');
@@ -81,7 +82,23 @@ class ChatModule {
     }
 
     // 绑定事件监听器
-    this.bindEvents(mode, contentId);
+    this.bindEvents(mode, contentId, options);
+
+    // 从本地存储回放历史（若存在）
+    try {
+      const participantId = getParticipantId();
+      const history = participantId ? chatStorage.load(participantId) : [];
+      if (history && history.length > 0) {
+        // 有历史：清空默认示例消息，回放
+        this.messagesContainer.innerHTML = '';
+        for (const msg of history) {
+          const sender = msg.role === 'user' ? 'user' : 'ai';
+          this.addMessageToUI(sender, msg.content, { persist: false });
+        }
+      }
+    } catch (e) {
+      console.warn('[ChatModule] 回放历史失败:', e);
+    }
 
     console.log('[ChatModule] 聊天模块初始化完成');
   }
@@ -90,20 +107,26 @@ class ChatModule {
    * 绑定事件监听器
    * @param {string} mode - 模式 ('learning' 或 'test')
    * @param {string} contentId - 内容ID
+   * @param {Object} options - 配置选项
+   * @param {boolean} options.enableEnterToSend - 是否启用Enter键发送消息，默认为true
    */
-  bindEvents(mode, contentId) {
+  bindEvents(mode, contentId, options = {}) {
+    const { enableEnterToSend = true } = options;
+    
     // 发送按钮点击事件
     this.sendButton.addEventListener('click', () => {
       this.sendMessage(mode, contentId);
     });
 
     // 回车键发送消息（Shift+Enter换行）
-    this.inputElement.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        this.sendMessage(mode, contentId);
-      }
-    });
+    if (enableEnterToSend) {
+      this.inputElement.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          this.sendMessage(mode, contentId);
+        }
+      });
+    }
   }
 
   /**
@@ -118,8 +141,8 @@ class ChatModule {
     // 清空输入框
     this.inputElement.value = '';
 
-    // 添加用户消息到UI
-    this.addMessageToUI('user', message);
+    // 添加用户消息到UI（并持久化上下文）
+    this.addMessageToUI('user', message, { mode, contentId });
 
     // 设置加载状态并标记等待WebSocket结果
     this.setLoadingState(true);
@@ -297,8 +320,13 @@ class ChatModule {
    * 添加消息到UI
    * @param {string} sender - 发送者 ('user' 或 'ai')
    * @param {string} content - 消息内容
+   * @param {Object} options - 选项对象
+   * @param {boolean} options.persist - 是否持久化到本地存储
+   * @param {string} options.mode - 模式
+   * @param {string} options.contentId - 内容ID
    */
-  addMessageToUI(sender, content) {
+  addMessageToUI(sender, content, options = {}) {
+    const { persist = true, mode = null, contentId = null } = options;
     if (!this.messagesContainer) return;
 
     const messageElement = document.createElement('div');
@@ -328,6 +356,25 @@ class ChatModule {
 
     // 滚动到底部
     this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+    
+    // 持久化消息
+    try {
+      if (persist) {
+        const participantId = getParticipantId();
+        if (participantId) {
+          chatStorage.append(participantId, {
+            role: sender === 'user' ? 'user' : 'assistant',
+            content,
+            mode,
+            contentId,
+            ts: Date.now(),
+          });
+        }
+      }
+    } catch (e) {
+      console.warn('[ChatModule] 持久化消息失败:', e);
+    }
+    
     if (sender === 'ai') {
       return aiContent;
     }
