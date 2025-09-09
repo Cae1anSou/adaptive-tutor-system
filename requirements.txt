@@ -124,3 +124,4 @@ yarg==0.1.9
 zope.event==5.1.1
 zope.interface==7.2
 zstandard==0.23.0
+cryptography

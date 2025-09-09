@@ -14,7 +14,7 @@ class Settings(BaseSettings):
 
     # OpenAI (for chat completions)
     TUTOR_OPENAI_API_KEY: str = "ms-6dd28633-156b-41d3-9b05-95ae310dfd60"
-    TUTOR_OPENAI_MODEL: str = "Qwen/Qwen3-Coder-480B-A35B-Instruct"
+    TUTOR_OPENAI_MODEL: str = "deepseek-ai/DeepSeek-V3.1"
     TUTOR_OPENAI_API_BASE: str = "https://api-inference.modelscope.cn/v1"
 
 

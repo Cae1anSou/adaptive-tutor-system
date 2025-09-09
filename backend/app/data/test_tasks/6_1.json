@@ -3,9 +3,9 @@
   "title": "6_1 为登录按钮添加点击事件",
   "description_md": "# 任务描述：\n请为“登录”按钮添加点击事件，实现输入与交互功能。\n\n## 要求：\n1. 给按钮添加 `onclick` 属性或使用 JavaScript 添加事件监听器。\n2. 点击按钮时获取用户名输入框的内容。\n3. 弹出提示框显示欢迎信息，例如“欢迎, 张三!”。",
   "start_code": {
-    "html": "<div class=\"login-bar\">\n  <input type=\"text\" placeholder=\"请输入用户名\" id=\"usernameInput\">\n  <button id=\"loginBtn\">登录</button>\n</div>",
+    "html": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <div class=\"login-bar\">\n  <input type=\"text\" placeholder=\"请输入用户名\" id=\"usernameInput\">\n  <button id=\"loginBtn\">登录</button>\n</div>\n</body>\n</html>",
     "css": "",
-    "js": ""
+    "js": "# 请在此处添加你的JavaScript代码！"
   },
   "checkpoints": [
     {

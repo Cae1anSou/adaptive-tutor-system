@@ -3,7 +3,7 @@
   "title": "5_3 在网页中嵌入教学视频",
   "description_md": "# 任务描述：\n请在网页中嵌入一段编程教学视频。\n\n## 要求：\n1. 使用 `<video>` 标签并启用 `controls` 属性。\n2. 添加 `<source>` 元素，类型为 `video/mp4`。\n3. 设置视频宽度为 `100%`。\n4. 提供后备文本，提示浏览器不支持视频播放。",
   "start_code": {
-    "html": "<section class=\"list-demo\">\n  <h3>课程教学视频</h3>\n  <!-- 在这里添加 video 标签 -->\n</section>",
+    "html": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <section class=\"list-demo\">\n  <h3>课程教学视频</h3>\n  #请在此处添加video标签 -->\n</section>\n</body>\n</html>",
     "css": "",
     "js": ""
   },

@@ -266,7 +266,7 @@ async function initializeModules(topicId) {
 
     // 初始化聊天模块
     try {
-        chatModule.init('learning', topicId);
+        chatModule.init('learning', topicId, { enableEnterToSend: false });
         console.log('[MainApp] 聊天模块初始化完成');
 
         // 统一处理AI头像显示（立即执行）
@@ -1206,6 +1206,8 @@ function askAIAboutElement() {
 // 页面加载完成后自动初始化主应用
 document.addEventListener('DOMContentLoaded', async () => {
 
+    // 设置标题和返回按钮
+    setupHeaderTitle('/index.html');
     const sidebarSection = document.getElementById('sidebarSection');
     const sidebarToggle = document.getElementById('sidebarToggle');
     const navMenu = document.getElementById('navMenu');
