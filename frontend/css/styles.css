@@ -147,6 +147,8 @@ body.login-page .main-container>* {
     /* 确保标题在最上层 */
     flex-shrink: 0;
     /* 防止标题被压缩 */
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .user-profile {

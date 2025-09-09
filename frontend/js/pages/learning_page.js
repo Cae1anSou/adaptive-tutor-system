@@ -1206,6 +1206,8 @@ function askAIAboutElement() {
 // 页面加载完成后自动初始化主应用
 document.addEventListener('DOMContentLoaded', async () => {
 
+    // 设置标题和返回按钮
+    setupHeaderTitle('/index.html');
     const sidebarSection = document.getElementById('sidebarSection');
     const sidebarToggle = document.getElementById('sidebarToggle');
     const navMenu = document.getElementById('navMenu');
