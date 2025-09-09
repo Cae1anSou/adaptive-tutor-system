@@ -255,6 +255,8 @@ export class GraphRenderer {
         style: {
           'background-color': backgroundColor,
           'border-color': borderColor,
+          'color': node.data('type') === 'chapter' ? '#f1f5f9': '#1e293b',
+          'font-size': node.data('type') === 'chapter' ? '18px' : '16px',
           'width': originalSize.width * scaleFactor,
           'height': originalSize.height * scaleFactor
         }
@@ -268,7 +270,8 @@ export class GraphRenderer {
       // 使用动画恢复原始样式
       node.stop().animate({
         style: {
-          'color': '#1e293b'
+          'color': '#1e293b',
+          'font-size': node.data('type') === 'chapter' ? '16px' : '14px',
         }
       }, {
         duration: 150,
