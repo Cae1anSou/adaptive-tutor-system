@@ -147,6 +147,8 @@ body.login-page .main-container>* {
     /* 确保标题在最上层 */
     flex-shrink: 0;
     /* 防止标题被压缩 */
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .user-profile {
@@ -864,6 +866,7 @@ body.login-page .main-container>* {
     min-height: 200px;
     /* 减少最小高度从240px到200px */
     align-items: stretch;
+    transition: min-height 0.3s ease; /* 添加过渡效果 */
 }
 
 /* 合并的预览和代码展示面板样式 */
@@ -926,6 +929,60 @@ body.login-page .main-container>* {
     flex-direction: column;
 }
 
+    /* 合并的预览和代码展示面板样式 */
+    .preview-code-panel {
+        flex: 1 1 0;
+        display: flex;
+        border-radius: var(--border-radius-lg);
+        overflow: hidden;
+        min-height: 240px;
+    }
+    
+    /* 新的示例页面探索面板样式 */
+    .example-exploration-panel {
+        flex: 1 1 0;
+        min-height: 200px; /* 减少最小高度从240px到200px */
+        border-radius: var(--border-radius-lg); /* 确保整个面板有圆角 */
+        overflow: hidden; /* 确保内容不会超出圆角边界 */
+    }
+    
+    /* 探索内容区域 - 水平布局：左侧预览 + 右侧代码 */
+    .exploration-content {
+        display: flex;
+        height: calc(100% - 60px); /* 减去标题栏高度 */
+        border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+        overflow: hidden;
+    }
+    
+    /* 修复代码区域内的info-content样式 */
+    .code-section .info-content {
+        flex: 1;
+        padding: var(--spacing-lg) var(--spacing-xl);
+        overflow-y: auto;
+        min-height: 0; /* 允许flex子元素收缩 */
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* 预览区域样式 - 适应新的exploration-content布局 */
+    .preview-section {
+        flex: 2 1 0;
+        min-width: 300px;
+        box-sizing: border-box;
+        background: var(--content-background);
+    }
+    
+    /* 代码展示区域样式 - 适应新的exploration-content布局 */
+    .code-section {
+        flex: 1 1 0;
+        overflow: hidden;
+        min-width: 250px;
+        background: var(--content-background);
+        border-left: 1px solid var(--border-color); /* 添加分隔线 */
+        display: flex;
+        flex-direction: column;
+    }
+
 /* 代码展示面板底部区域 */
 .code-panel-footer {
     margin-top: auto;
@@ -978,6 +1035,31 @@ body.login-page .main-container>* {
     position: relative;
     z-index: 10;
 }
+    /* 聊天面板样式 */
+    .chat-panel {
+        width: 30%;
+        overflow: hidden;
+        /* 确保聊天面板不会覆盖知识点面板 */
+        position: relative;
+        z-index: 5;
+    }
+.knowledge-panel {
+    height: auto; /* 改为auto实现自适应高度 */
+    flex: 1 1 0;
+    box-sizing: border-box;
+    overflow: visible; /* 允许内容溢出，以便卡片扩展 */
+    align-self: stretch;
+    position: relative;
+    opacity: 1 !important;
+    visibility: visible !important;
+    min-height: 200px;
+    background: var(--content-background) !important;
+    transition: min-height 0.3s ease; /* 添加过渡效果 */
+}
+
+.knowledge-panel:hover {
+    min-height: 320px; /* hover时增加高度 */
+}
 
 /* 确保默认状态下所有等级卡片都可见 */
 .knowledge-panel:not(.expanded) .level-card {
@@ -994,11 +1076,6 @@ body.login-page .main-container>* {
 
 /* 确保知识点面板在默认状态下可见 */
 .knowledge-panel {
-    display: flex !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    min-height: 200px !important;
-    background: var(--content-background) !important;
 }
 
 /* 确保知识点面板内容在默认状态下可见 */
@@ -1454,7 +1531,6 @@ body.login-page .main-container>* {
 .markdown-content {
     font-family: var(--font-family);
     line-height: 1.6;
-    color: var(--text-color);
     overflow-wrap: break-word;
     font-size: var(--font-size-sm);
 }
@@ -2052,16 +2128,12 @@ body.login-page .main-container>* {
     transform: translateX(-2px);
 }
 
-/* 标题链接样式 */
-.header-title {
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
 
 .header-title:hover {
     opacity: 0.8;
     transform: scale(1.02);
 }
+
 
 .info-tab {
     padding: var(--spacing-sm) var(--spacing-lg);
