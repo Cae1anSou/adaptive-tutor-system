@@ -6,6 +6,10 @@ import tracker from '../modules/behavior_tracker.js';
 import chatModule from '../modules/chat.js';
 import websocket from '../modules/websocket_client.js';
 
+
+// 用于存储WebSocket订阅回调的引用，避免重复订阅
+let submissionCallbackRef = null;
+
 tracker.init({
     user_idle: true,
     page_click: true,
@@ -306,8 +310,8 @@ function setupSubmitLogic() {
             // 提交测试并等待响应
             const result = await window.apiClient.post('/submission/submit-test2', submissionData);
 
-            // 设置WebSocket回调来处理结果
-            websocket.subscribe("submission_result", (msg) => {
+            // 保存订阅回调的引用，以便后续取消订阅
+            let submissionCallback = (msg) => {
                 console.log("[SubmitModule] 收到最终结果:", msg);
                 // 恢复按钮状态
                 restoreButton();
@@ -337,7 +341,17 @@ function setupSubmitLogic() {
                     // 测试未通过，给用户一些鼓励和建议
                     alert("测试未通过，请查看详细结果并继续改进代码。");
                 }
-            });
+                // 取消订阅，避免重复触发
+                websocket.unsubscribe("submission_result", submissionCallback);
+            };
+            
+            // 先取消之前的订阅（如果有的话），然后再订阅新的回调
+            if (submissionCallbackRef) {
+                websocket.unsubscribe("submission_result", submissionCallbackRef);
+            }
+            websocket.subscribe("submission_result", submissionCallback);
+            // 保存回调引用以便下次取消订阅
+            submissionCallbackRef = submissionCallback;
 
         } catch (error) {
             console.error('提交测试时出错:', error);

@@ -5,7 +5,7 @@
   "start_code": {
     "html": "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <label>用户名：<input type=\"text\" name=\"username\"></label>\n<label>邮箱：<input type=\"email\" name=\"email\"></label>\n<button type=\"submit\">注册</button>\n</body>\n</html>",
     "css": "",
-    "js": "# 请在此处添加你的JavaScript代码！"
+    "js": "// 请在此处添加你的JavaScript代码！"
   },
   "checkpoints": [
     {
