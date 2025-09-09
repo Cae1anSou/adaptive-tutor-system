@@ -95,3 +95,4 @@ backend/scripts/ai_exp_database_export.json
 backend/celerybeat-schedule
 backend/celerybeat-schedule
 
+/backend/scripts/cleaned_grouped_data.json
