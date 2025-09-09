@@ -535,7 +535,9 @@ body {
     height: auto;
     min-height: 200px; /* 减少最小高度从240px到200px */
     align-items: stretch;
+    transition: min-height 0.3s ease; /* 添加过渡效果 */
 }
+
     /* 合并的预览和代码展示面板样式 */
     .preview-code-panel {
         flex: 1 1 0;
@@ -624,16 +626,23 @@ body {
         position: relative;
         z-index: 5;
     }
-        .knowledge-panel {
-        height: auto; /* 改为auto实现自适应高度 */
-        flex: 1 1 0;
-        min-height: 200px;
-        box-sizing: border-box;
-        overflow: visible; /* 允许内容溢出，以便卡片扩展 */
-        align-self: stretch;
-        position: relative;
-        z-index: 10;
-    }
+.knowledge-panel {
+    height: auto; /* 改为auto实现自适应高度 */
+    flex: 1 1 0;
+    box-sizing: border-box;
+    overflow: visible; /* 允许内容溢出，以便卡片扩展 */
+    align-self: stretch;
+    position: relative;
+    opacity: 1 !important;
+    visibility: visible !important;
+    min-height: 200px;
+    background: var(--content-background) !important;
+    transition: min-height 0.3s ease; /* 添加过渡效果 */
+}
+
+.knowledge-panel:hover {
+    min-height: 320px; /* hover时增加高度 */
+}
 
 /* 确保默认状态下所有等级卡片都可见 */
 .knowledge-panel:not(.expanded) .level-card {
@@ -650,11 +659,6 @@ body {
 
 /* 确保知识点面板在默认状态下可见 */
 .knowledge-panel {
-    display: flex !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    min-height: 200px !important;
-    background: var(--content-background) !important;
 }
 
 /* 确保知识点面板内容在默认状态下可见 */
