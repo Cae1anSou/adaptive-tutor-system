@@ -20,8 +20,8 @@ class Submission(Base):
     __tablename__ = "submissions"
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    participant_id = Column(String, index=True, nullable=False)
-    topic_id = Column(String, index=True, nullable=False)
+    participant_id = Column(String(255), index=True, nullable=False)
+    topic_id = Column(String(255), index=True, nullable=False)
     html_code = Column(Text, nullable=True)
     css_code = Column(Text, nullable=True)
     js_code = Column(Text, nullable=True)

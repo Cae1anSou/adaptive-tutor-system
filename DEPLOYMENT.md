@@ -32,16 +32,16 @@ cd adaptive-tutor-system
 docker-compose up -d
 ```
 
-该命令将启动以下服务：
-- Redis数据库 (端口6380)
-- 后端API服务 (端口8000)
-- 5个Celery Worker服务
-- 前端Web服务 (端口80)
+该命令将启动以下服务（本分支默认端口）：
+- Redis数据库 (端口6382)
+- 后端API服务 (端口8001)
+- 4个Celery Worker服务
+- 前端Web服务 (端口8326)
 
 ### 3. 访问应用
 
-- 前端界面：http://localhost
-- 后端API文档：http://localhost:8000/docs
+- 前端界面：http://localhost:8326
+- 后端API文档：http://localhost:8001/docs
 
 ### 4. 查看服务状态
 
@@ -66,12 +66,12 @@ docker-compose logs -f frontend
 - 基于FastAPI框架
 - 提供RESTful API接口
 - 处理WebSocket连接
-- 端口映射：8000
+- 端口映射：8001:8000
 
 ### Redis服务 (redis)
 - 使用Redis Stack镜像
 - 提供Redis数据库和JSON支持
-- 端口映射：6380
+- 端口映射：6382:6379
 
 ### Celery Workers
 1. **Chat Worker** (celery-chat-worker)：处理聊天请求
@@ -84,7 +84,34 @@ docker-compose logs -f frontend
 - 基于Nginx的静态文件服务器
 - 代理API请求到后端服务
 - 处理WebSocket连接升级
-- 端口映射：80
+- 端口映射：8326:80
+
+## 与主分支并行部署
+
+为了在同一台服务器上同时运行主分支与本对照组分支，请注意以下事项：
+
+- 端口避让：本分支已将端口错开（Redis 6382、Backend 8001、Frontend 8326），避免与主分支常用的 6381/8000/80 或 8325 冲突。
+- 容器命名：已移除固定的 container_name，使用 Compose 项目前缀避免同名冲突。
+- 项目前缀：在项目根目录创建 `.env` 文件，设置不同的 `COMPOSE_PROJECT_NAME`，确保网络与卷名称隔离：
+
+```bash
+echo COMPOSE_PROJECT_NAME=ats-control > .env
+docker compose up -d
+```
+
+主分支建议使用另一个项目名（例如 `ats-main`）：
+
+```bash
+# 在主分支的项目目录
+echo COMPOSE_PROJECT_NAME=ats-main > .env
+docker compose up -d
+```
+
+也可以在命令行通过 `-p` 指定项目名运行：
+
+```bash
+docker compose -p ats-control up -d
+```
 
 ## 配置说明
 

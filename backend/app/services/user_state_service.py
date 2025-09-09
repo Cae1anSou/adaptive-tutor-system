@@ -381,6 +381,16 @@ class UserStateService:
 
         if profile_data:
             # 缓存命中
+            # 保障性写入：如果提供了数据库会话，确保 participants 表中存在该用户记录
+            if db:
+                try:
+                    from ..crud.crud_participant import participant as participant_crud
+                    from ..schemas.participant import ParticipantCreate
+                    if participant_crud.get(db, obj_id=participant_id) is None:
+                        participant_crud.create(db, obj_in=ParticipantCreate(id=participant_id, group=group))
+                except Exception as e:
+                    # 不要影响正常返回，但记录日志便于排查
+                    logger.warning(f"UserStateService: ensure participant on cache-hit failed: {e}")
             return StudentProfile.from_dict(participant_id, profile_data), False
 
         # 缓存未命中
