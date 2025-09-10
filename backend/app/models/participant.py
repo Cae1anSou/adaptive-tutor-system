@@ -15,6 +15,6 @@ class Participant(Base):
     """
     __tablename__ = "participants"
     
-    id = Column(String, primary_key=True)
-    group = Column(String, nullable=False)
+    id = Column(String(255), primary_key=True)
+    group = Column(String(50), nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(pytz.timezone('Asia/Shanghai')))

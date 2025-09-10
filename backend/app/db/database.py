@@ -4,10 +4,12 @@ from app.core.config import settings
 from typing import Generator
 
 # 创建数据库引擎
-# connect_args 是SQLite特有的，用于允许多线程访问
 engine = create_engine(
-    settings.DATABASE_URL, 
-    connect_args={"check_same_thread": False}
+    settings.DATABASE_URL,
+    pool_pre_ping=True,
+    pool_recycle=300,
+    pool_size=10,
+    max_overflow=20
 )
 
 # 创建一个Session工厂
