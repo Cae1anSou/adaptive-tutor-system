@@ -77,6 +77,11 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
             test_results=test_results,
         )
 
+        # 添加情感分析结果作为独立消息
+        emotion_message = self._build_emotion_message(user_state.emotion_state)
+        if emotion_message:
+            context_messages.append(emotion_message)
+
         # 构建对话消息（历史 + 当前用户消息与代码）
         conversation_messages = self._build_message_history(
             conversation_history=conversation_history,
@@ -638,6 +643,32 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
             return "Here is my current code:\n\n" + "\n\n".join(parts)
         else:
             return ""
+
+    def _build_emotion_message(self, emotion_state: Dict[str, Any]) -> Dict[str, str]:
+        """构建情感分析消息"""
+        if not emotion_state:
+            return None
+            
+        emotion_label = emotion_state.get('current_sentiment', 'NEUTRAL')
+        emotion_confidence = emotion_state.get('confidence', 0.0)
+        
+        # 构建情感信息内容
+        emotion_content = {
+            "emotion": emotion_label,
+            "confidence": emotion_confidence
+        }
+        
+        # 添加详细信息（如果存在）
+        if 'details' in emotion_state and emotion_state['details']:
+            emotion_content["details"] = emotion_state['details']
+        
+        # 创建消息
+        message = {
+            "role": "assistant",
+            "content": f"USER EMOTION ANALYSIS:\n{json.dumps(emotion_content, indent=2, ensure_ascii=False)}"
+        }
+        
+        return message
 
 
 # 创建单例实例
