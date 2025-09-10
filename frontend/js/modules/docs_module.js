@@ -5,7 +5,7 @@ const ModuleState = {
     isInitialized: false,    // 防重复初始化标志
     initPromise: null        // 初始化Promise，防止重复调用
 };
-
+import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
 // 渲染主题内容
 function renderTopicContent() {
     console.log('[DocsModule] 开始渲染主题内容');
@@ -40,9 +40,12 @@ function renderTopicContent() {
         
         const card = knowledgeContent.querySelector(`.level-card[data-level="${level.level}"]`);
         if (card) {
-            const contentText = card.querySelector('.content-text');
+            const contentText = card.querySelector('.level-content');
             if (contentText) {
-                contentText.textContent = level.description || '暂无内容';
+                contentText.innerHTML = 
+                `
+          <div class="markdown-content">${marked(level.description || '暂无内容')}</div>
+              `;
                 console.log(`[DocsModule] 等级 ${level.level} 内容更新成功`);
             } else {
                 console.warn(`[DocsModule] 等级 ${level.level} 的 content-text 元素未找到`);
