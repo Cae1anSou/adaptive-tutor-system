@@ -23,7 +23,7 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - DATABASE_URL=mysql+pymysql://caelan:Silvis0852.@172.25.22.172:3306/ai_exp
+      - DATABASE_URL=sqlite:///./app/db/database.db
 
     volumes:
       - ./backend:/app/backend
@@ -43,7 +43,7 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - DATABASE_URL=mysql+pymysql://caelan:Silvis0852.@172.25.22.172:3306/ai_exp
+      - DATABASE_URL=sqlite:///./app/db/database.db
 
     volumes:
       - ./backend:/app/backend
@@ -63,7 +63,7 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - DATABASE_URL=mysql+pymysql://caelan:Silvis0852.@172.25.22.172:3306/ai_exp
+      - DATABASE_URL=sqlite:///./app/db/database.db
 
     volumes:
       - ./backend:/app/backend
@@ -83,7 +83,7 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - DATABASE_URL=mysql+pymysql://caelan:Silvis0852.@172.25.22.172:3306/ai_exp
+      - DATABASE_URL=sqlite:///./app/db/database.db
 
     volumes:
       - ./backend:/app/backend
@@ -103,7 +103,7 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - DATABASE_URL=mysql+pymysql://caelan:Silvis0852.@172.25.22.172:3306/ai_exp
+      - DATABASE_URL=sqlite:///./app/db/database.db
 
     volumes:
       - ./backend:/app/backend
@@ -123,7 +123,7 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - DATABASE_URL=mysql+pymysql://caelan:Silvis0852.@172.25.22.172:3306/ai_exp
+      - DATABASE_URL=sqlite:///./app/db/database.db
 
     volumes:
       - ./backend:/app/backend
