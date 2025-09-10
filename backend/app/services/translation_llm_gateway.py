@@ -15,8 +15,8 @@ class TranslationLLMGateway:
         self.api_base = "https://api-inference.modelscope.cn/v1/"
         self.model = "Qwen/Qwen2.5-7B-Instruct"
 
-        self.max_tokens = int(os.getenv('LLM_MAX_TOKENS', settings.LLM_MAX_TOKENS))
-        self.temperature = float(os.getenv('LLM_TEMPERATURE', settings.LLM_TEMPERATURE))
+        self.max_tokens = 8192
+        self.temperature = 0.7
         
         # 初始化OpenAI客户端（兼容魔搭API）
         self.client = OpenAI(

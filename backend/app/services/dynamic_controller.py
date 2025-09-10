@@ -478,11 +478,12 @@ class DynamicController:
                 if should_cluster:
                     try:
                         for msg in request.conversation_history:
-                            trans_history.append({
-                                'role': msg.role,
-                                'content': translate(msg.content)
-                            })
-                            logger.info(f"翻译历史：{trans_history}")
+                            if msg.role == 'user':
+                                trans_history.append({
+                                    'role': msg.role,
+                                    'content': translate(msg.content)
+                                })
+                                logger.info(f"翻译历史：{trans_history}")
                         # 触发聚类分析：使用注入的聚类服务
                         clustering_result = self.user_state_service.update_progress_clustering(
                             request.participant_id, 
