@@ -9,7 +9,7 @@ from app.services.user_state_service import UserStateService
 from app.services.rag_service import RAGService
 from app.services.prompt_generator import PromptGenerator
 from app.services.llm_gateway import LLMGateway
-from app.services.translation_llm_gateway import translation_llm_gateway
+from app.services.translation_llm_gateway import translate
 from app.services.content_loader import load_json_content  # 导入content_loader
 from app.crud.crud_event import event as crud_event
 from app.crud.crud_chat_history import chat_history as crud_chat_history
@@ -77,26 +77,13 @@ class DynamicController:
         """
         logger.info(f"开始进行翻译...{request.user_message}")
         try:
-            # 尝试翻译用户消息为英文
-            try:
-               
-                print(f"原始消息：{request.user_message}")
-                messages = [{"role": "user", "content": request.user_message}]
-                translated_message = await translation_llm_gateway.get_completion(
-                    system_prompt="将以下内容翻译成英文",
-                    messages=messages
-                )
-                
-                print(f"翻译后消息：{request.user_message}")
-            except Exception as e:
-                print(f"⚠️ 翻译失败: {e}")
-                translated_message = request.user_message
+          
             # 步骤1: 获取或创建用户档案（使用UserStateService）
             profile, _ = self.user_state_service.get_or_create_profile(request.participant_id, db)
             # 步骤2: 情感分析
             if self.sentiment_service:
                 sentiment_result = self.sentiment_service.analyze_sentiment(
-                    translated_message
+                    request.user_message
                 )
             else:
                 # 如果情感分析服务未启用，创建一个默认的情感分析结果
@@ -412,22 +399,11 @@ class DynamicController:
         Returns:
             ChatResponse: AI回复
         """
-        logger.info(f"开始进行翻译...{request.user_message}")
+        
         try:
-            # 尝试翻译用户消息为英文
-            try:
-               
-                logger.info(f"原始消息：{request.user_message}")
-                messages = [{"role": "user", "content": request.user_message}]
-                translated_message = translation_llm_gateway.get_completion_sync(
-                    system_prompt="Translate into English without adding other components, while keeping the emotions of the original text and the translation consistent.",
-                    messages=messages
-                )
-                
-                logger.info(f"翻译后消息：{translated_message}")
-            except Exception as e:
-                logger.info(f"⚠️ 翻译失败: {e}")
-                translated_message = request.user_message
+            logger.info(f"翻译前：{request.user_message}")
+            translated_message = translate(request.user_message)
+            logger.info(f"翻译后：{translated_message}")
             # 步骤1: 获取或创建用户档案（使用UserStateService）
             profile, _ = self.user_state_service.get_or_create_profile(request.participant_id, db)
             # 步骤2: 情感分析
@@ -523,12 +499,18 @@ class DynamicController:
             # 步骤5: 生成提示词
             # 将ConversationMessage转换为字典格式
             conversation_history_dicts = []
+            trans_history = []
             if request.conversation_history:
                 for msg in request.conversation_history:
                     conversation_history_dicts.append({
                         'role': msg.role,
                         'content': msg.content
                     })
+                    trans_history.append({
+                        'role': msg.role,
+                        'content': translate(msg.content)
+                    })
+                logger.info(f"翻译历史：{trans_history}")
             elif request.conversation_history is None:
                 # 确保即使conversation_history为None也传递空列表
                 conversation_history_dicts = []

@@ -217,6 +217,23 @@ class TranslationLLMGateway:
        
     
 
-
 # 创建单例实例
 translation_llm_gateway = TranslationLLMGateway()
+def translate(text: str) -> str:
+            import logging
+            logger = logging.getLogger(__name__)
+            # 尝试翻译用户消息为英文
+            try:
+               
+               
+                messages = [{"role": "user", "content": text}]
+                translated_message = translation_llm_gateway.get_completion_sync(
+                    system_prompt="Translate into English without adding other components, while keeping the emotions of the original text and the translation consistent.",
+                    messages=messages
+                )
+                
+                
+            except Exception as e:
+                logger.info(f"⚠️ 翻译失败: {e}")
+                translated_message = text
+            return translated_message
