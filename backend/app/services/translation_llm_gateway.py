@@ -58,8 +58,7 @@ class TranslationLLMGateway:
                 model=self.model,
                 messages=full_messages,
                 max_tokens=max_tokens,
-                temperature=temperature,
-               
+                temperature=temperature
             )
             
             # 提取回复内容
@@ -123,8 +122,8 @@ class TranslationLLMGateway:
                 model=self.model,
                 messages=full_messages,
                 max_tokens=max_tokens,
-                temperature=temperature,
-                stream=False
+                temperature=temperature
+                
             )
             
           

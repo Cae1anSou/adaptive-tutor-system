@@ -21,6 +21,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 class DynamicController:
     """动态控制器 - 编排各个服务的核心逻辑"""
 
@@ -83,7 +84,7 @@ class DynamicController:
             # 步骤2: 情感分析
             if self.sentiment_service:
                 sentiment_result = self.sentiment_service.analyze_sentiment(
-                    request.user_message
+                    translated_message
                 )
             else:
                 # 如果情感分析服务未启用，创建一个默认的情感分析结果
