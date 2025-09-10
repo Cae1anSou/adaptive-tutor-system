@@ -10,6 +10,16 @@ logger = logging.getLogger(__name__)
 
 class PromptGenerator:
     """提示词生成器"""
+    
+    # 聚类名称映射（公共常量）
+    CLUSTER_NAME_MAPPING = {
+        '低进度': 'Struggling',
+        '正常': 'Normal', 
+        '超进度': 'Advanced',
+        'Struggling': 'Struggling',
+        'Normal': 'Normal',
+        'Advanced': 'Advanced'
+    }
 
     def __init__(self):
         self.base_system_prompt = """
@@ -316,29 +326,49 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
                 progress_score = progress_clustering.get('progress_score', 0.0)
                 last_analysis = progress_clustering.get('last_analysis_timestamp')
                 conversation_count = progress_clustering.get('conversation_count_analyzed', 0)
+                analysis_type = progress_clustering.get('analysis_type', 'unknown')
+                model_type = progress_clustering.get('model_type', 'unknown')
                 cluster_distances = progress_clustering.get('cluster_distances', [])  # 保留原数组以向后兼容
                 cluster_distances_dict = progress_clustering.get('cluster_distances_dict', {})  # 新的字典格式
                 window_features = progress_clustering.get('window_features', {})
                 
-                if cluster_name and cluster_confidence > 0.1:  # 只有在有一定置信度时才显示
-                    # 聚类名称现已统一为英文标准格式，无需翻译
-                    cluster_name_en = cluster_name  # 直接使用，已经是英文格式
+                if cluster_name and cluster_confidence >= 0.1:  # 只有在有一定置信度时才显示
+                    # 聚类名称映射：中文到英文
+                    cluster_name_en = PromptGenerator.CLUSTER_NAME_MAPPING.get(cluster_name, cluster_name)
                     
+                    # 生成教学友好的聚类分析
                     progress_parts = [
                         f"LEARNING PROGRESS ANALYSIS:",
-                        f"- Current progress cluster: {cluster_name_en}",
-                        f"- Cluster confidence: {cluster_confidence:.3f}"
+                        f"- Current learning stage: {cluster_name_en}",
+                        f"- Analysis confidence: {cluster_confidence:.3f}",
+                        f"- Learning pace: {progress_score:.3f} (higher = faster progress)"
                     ]
                     
-                    # 置信度评级和建议
-                    confidence_level = "High" if cluster_confidence > 0.8 else "Medium" if cluster_confidence > 0.6 else "Low"
-                    confidence_advice = "Reliable classification" if cluster_confidence > 0.7 else "Use with caution - potential misclassification"
-                    progress_parts.extend([
-                        f"  * Confidence level: {confidence_level}",
-                        f"  * Reliability: {confidence_advice}"
-                    ])
+                    # 添加分析基础信息（简化版）
+                    if conversation_count > 0:
+                        progress_parts.append(f"- Based on {conversation_count} recent conversations")
                     
-                    progress_parts.append(f"- Progress score: {progress_score:.3f} (higher = faster progress)")
+                    # 添加分析时间
+                    if last_analysis:
+                        try:
+                            from datetime import datetime
+                            analysis_time = datetime.fromisoformat(last_analysis.replace('Z', '+00:00'))
+                            progress_parts.append(f"- Last analysis: {analysis_time.strftime('%Y-%m-%d %H:%M:%S')}")
+                        except (ValueError, AttributeError):
+                            progress_parts.append(f"- Last analysis: {last_analysis}")
+                    
+                    # 置信度评级和教学建议
+                    confidence_level = "High" if cluster_confidence > 0.8 else "Medium" if cluster_confidence > 0.6 else "Low"
+                    if cluster_confidence > 0.7:
+                        confidence_advice = "Reliable - can confidently adapt teaching approach"
+                    elif cluster_confidence > 0.4:
+                        confidence_advice = "Moderate - use as guidance but monitor for changes"
+                    else:
+                        confidence_advice = "Low - use with caution, may need more data"
+                    
+                    progress_parts.extend([
+                        f"- Reliability: {confidence_level} ({confidence_advice})"
+                    ])
                     
                     # 聚类距离分析（优先使用字典格式避免顺序混乱）
                     distance_data = cluster_distances_dict if cluster_distances_dict else {}
@@ -352,69 +382,67 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
                             'Struggling': cluster_distances[2]
                         }
                     
+                    # 距离分析（教学友好版本）
                     if distance_data:
                         min_distance = min(distance_data.values())
                         closest_cluster_name = [name for name, dist in distance_data.items() if dist == min_distance][0]
                         
-                        progress_parts.append("- Distance analysis:")
-                        progress_parts.append(f"  * Closest to [{closest_cluster_name}] cluster (distance: {min_distance:.2f})")
-                        
-                        # 显示其他相关距离
-                        for name, dist in distance_data.items():
-                            if name != closest_cluster_name and dist < 0.5:  # 只显示相对接近的距离
-                                progress_parts.append(f"  * Distance to [{name}]: {dist:.2f}")
+                        # 检查是否接近边界
+                        sorted_distances = sorted(distance_data.values())
+                        if len(sorted_distances) >= 2:
+                            second_min = sorted_distances[1]
+                            if second_min - min_distance < 0.2:  # 如果距离很接近
+                                progress_parts.append(f"- Note: Student is close to {closest_cluster_name} stage but may shift to other stages")
+                            else:
+                                progress_parts.append(f"- Classification: Clearly in {closest_cluster_name} learning stage")
                     
-                    # 特征分析（如果有窗口特征数据）
+                    # 学习行为特征分析（教学友好版本）
+                    learning_insights = []
+                    
                     if window_features:
-                        progress_parts.append("- Classification factors:")
-                        
                         # 重复率分析
                         repeat_eq = window_features.get('repeat_eq', 0)
                         if repeat_eq > 0.3:
-                            progress_parts.append(f"  * High repetition rate ({repeat_eq:.2f}) - indicates learning difficulty")
+                            learning_insights.append("shows signs of struggling with concepts")
                         elif repeat_eq > 0.1:
-                            progress_parts.append(f"  * Moderate repetition rate ({repeat_eq:.2f}) - normal learning pace")
+                            learning_insights.append("demonstrates normal learning patterns")
                         
                         # 代码变化分析
                         code_change = window_features.get('code_change', 0)
                         if code_change > 0.5:
-                            progress_parts.append(f"  * Active code practice ({code_change:.2f}) - good engagement")
+                            learning_insights.append("actively engages with coding practice")
                         elif code_change < 0.2:
-                            progress_parts.append(f"  * Limited code practice ({code_change:.2f}) - may need encouragement")
+                            learning_insights.append("may need more hands-on coding encouragement")
                         
                         # 困难信号
                         stuck_hits = window_features.get('stuck_hits', 0)
                         if stuck_hits > 2:
-                            progress_parts.append(f"  * Multiple difficulty signals ({stuck_hits}) - needs additional support")
+                            learning_insights.append("frequently encounters difficulties")
                         elif stuck_hits > 0:
-                            progress_parts.append(f"  * Some difficulty signals ({stuck_hits}) - within normal range")
+                            learning_insights.append("occasionally faces challenges")
                     
-                    progress_parts.append(f"- Analyzed {conversation_count} conversations")
+                    # 如果没有具体特征数据，提供基于聚类的基本描述
+                    if not learning_insights:
+                        if cluster_name_en == 'Struggling':
+                            learning_insights.append("may need additional support and encouragement")
+                        elif cluster_name_en == 'Advanced':
+                            learning_insights.append("shows strong learning engagement")
+                        else:  # Normal
+                            learning_insights.append("demonstrates steady learning progress")
                     
-                    if last_analysis:
-                        try:
-                            from datetime import datetime
-                            analysis_time = datetime.fromisoformat(last_analysis)
-                            progress_parts.append(f"- Last analysis: {analysis_time.strftime('%Y-%m-%d %H:%M:%S')}")
-                        except ValueError:
-                            pass
+                    if learning_insights:
+                        progress_parts.append(f"- Learning patterns: Student {', '.join(learning_insights)}")
                     
-                    # 增强的聚类历史趋势分析
+                    
+                    # 学习趋势分析（教学友好版本）
                     clustering_history = progress_clustering.get('clustering_history', [])
+                    
+                    # 使用统一的映射函数
+                    def translate_cluster_name(name):
+                        return PromptGenerator.CLUSTER_NAME_MAPPING.get(name, name)
+                    
                     if len(clustering_history) > 1:
-                        # 中英文映射
-                        def translate_cluster_name(name):
-                            mapping = {
-                                '低进度': 'Struggling', '正常': 'Normal', '超进度': 'Advanced',
-                                'Struggling': 'Struggling', 'Normal': 'Normal', 'Advanced': 'Advanced'
-                            }
-                            return mapping.get(name, name)
-                        
-                        recent_clusters = [translate_cluster_name(h.get('cluster_name')) for h in clustering_history[-3:]]
-                        trend = ' → '.join(recent_clusters)
-                        
-                        # 趋势分析
-                        trend_analysis = ""
+                        # 分析最近的变化趋势
                         if len(clustering_history) >= 2:
                             prev_cluster = translate_cluster_name(clustering_history[-2].get('cluster_name'))
                             curr_cluster = translate_cluster_name(clustering_history[-1].get('cluster_name'))
@@ -422,16 +450,22 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
                             if prev_cluster != curr_cluster:
                                 if (prev_cluster == 'Struggling' and curr_cluster == 'Normal') or \
                                    (prev_cluster == 'Normal' and curr_cluster == 'Advanced'):
-                                    trend_analysis = " (positive improvement - continue current approach)"
+                                    progress_parts.append("- Learning trend: Showing positive improvement - continue current teaching approach")
                                 elif (prev_cluster == 'Normal' and curr_cluster == 'Struggling') or \
                                      (prev_cluster == 'Advanced' and curr_cluster == 'Normal'):
-                                    trend_analysis = " (declining - may need additional support and encouragement)"
+                                    progress_parts.append("- Learning trend: May need additional support and encouragement")
                                 else:
-                                    trend_analysis = " (fluctuating performance - monitor closely)"
+                                    progress_parts.append("- Learning trend: Performance is fluctuating - monitor closely")
                             else:
-                                trend_analysis = " (stable performance - consistent learning pace)"
-                        
-                        progress_parts.append(f"- Learning trend: {trend}{trend_analysis}")
+                                progress_parts.append("- Learning trend: Stable performance - consistent learning pace")
+                    else:
+                        # 如果没有历史数据，提供基于当前聚类的基本趋势描述
+                        if cluster_name_en == 'Struggling':
+                            progress_parts.append("- Learning trend: Initial assessment indicates need for foundational support")
+                        elif cluster_name_en == 'Advanced':
+                            progress_parts.append("- Learning trend: Initial assessment shows strong learning capability")
+                        else:  # Normal
+                            progress_parts.append("- Learning trend: Initial assessment indicates steady learning progress")
                     
                     student_parts.append("\n".join(progress_parts))
        
@@ -534,11 +568,12 @@ Above all: DO NOT DO THE USER'S WORK FOR THEM. Don't answer homework questions -
             cluster_distances_dict = progress_clustering.get('cluster_distances_dict', {})  # 新的字典格式
             
             # 如果没有聚类信息或置信度过低，返回空字符串
-            if not cluster_name or cluster_confidence < 0.3:
+            # 降低阈值以适应距离计算的置信度范围
+            if not cluster_name or cluster_confidence < 0.1:
                 return ""
             
-            # 聚类名称现已统一为英文标准格式，无需翻译
-            cluster_name_en = cluster_name  # 直接使用英文格式
+            # 聚类名称映射：中文到英文
+            cluster_name_en = PromptGenerator.CLUSTER_NAME_MAPPING.get(cluster_name, cluster_name)
             
             # 增强的策略描述
             base_strategies = {
