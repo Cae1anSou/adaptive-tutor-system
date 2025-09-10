@@ -5,7 +5,7 @@ services:
     image: redis/redis-stack:latest
     container_name: redis-stack-integration
     ports:
-      - "6381:6379"
+      - "6380:6379"
     volumes:
       - redis_data:/data
     restart: unless-stopped
@@ -24,6 +24,7 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - DATABASE_URL=sqlite:///./app/db/database.db
+
     volumes:
       - ./backend:/app/backend
       - backend_data:/app/backend/app/db
@@ -42,6 +43,8 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - DATABASE_URL=sqlite:///./app/db/database.db
+
     volumes:
       - ./backend:/app/backend
     depends_on:
@@ -60,6 +63,8 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - DATABASE_URL=sqlite:///./app/db/database.db
+
     volumes:
       - ./backend:/app/backend
     depends_on:
@@ -78,6 +83,8 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - DATABASE_URL=sqlite:///./app/db/database.db
+
     volumes:
       - ./backend:/app/backend
     depends_on:
@@ -96,6 +103,8 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - DATABASE_URL=sqlite:///./app/db/database.db
+
     volumes:
       - ./backend:/app/backend
     depends_on:
@@ -114,6 +123,8 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - DATABASE_URL=sqlite:///./app/db/database.db
+
     volumes:
       - ./backend:/app/backend
     depends_on:

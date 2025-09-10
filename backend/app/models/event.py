@@ -18,7 +18,7 @@ class EventLog(Base):
     __tablename__ = "event_logs"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    participant_id = Column(String, index=True, nullable=False)
+    participant_id = Column(String(255), index=True, nullable=False)
     timestamp = Column(DateTime, default=lambda: datetime.now(pytz.timezone('Asia/Shanghai')), nullable=False)
-    event_type = Column(String, nullable=False)
+    event_type = Column(String(100), nullable=False)
     event_data = Column(JSON)

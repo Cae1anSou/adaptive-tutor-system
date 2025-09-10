@@ -32,12 +32,11 @@ export async function initializeConfig() {
   } catch (error) {
     console.error("Could not initialize frontend configuration:", error);
     // Fallback to default port if config load fails in development
-    // 确保即使配置加载失败，也有默认值，并直接走后端端口，绕过反向代理
+    // 确保即使配置加载失败，也有默认值，使用相对路径避免CORS问题
     const defaultPort = 8000;
     AppConfig.backend_port = AppConfig.backend_port || defaultPort;
-    const host = window.location.hostname || 'localhost';
-    const backendHost = (host === 'localhost' || host === '127.0.0.1') ? 'localhost' : host;
-    AppConfig.api_base_url = `http://${backendHost}:${AppConfig.backend_port}/api/v1`;
+    // 使用相对路径而不是绝对URL来避免CORS问题
+    AppConfig.api_base_url = "/api/v1";
     console.log('[Config] Using fallback API base:', AppConfig.api_base_url);
   }
 }
