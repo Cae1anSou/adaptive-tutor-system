@@ -11,9 +11,9 @@ def filter_essential_data(input_file, output_file):
         "debug_dur_avg":0,
         "topic_pass": [],
         "topic_try_num":{"1_1":3, "1_3":5},
-        "topic_debug_dur":{"1_1":20000, "1_3":30000},
+        "topic_debug_dur":{"1_1":[1, 20000], "1_3":[0, 30000]},
         "emotion": [
-          ["12334534", "1.1234", "1.345345", "hello"]
+          ["12334534", "1.1234", "1", "hello"]
         ]
       }
     }
@@ -103,8 +103,10 @@ def filter_essential_data(input_file, output_file):
             if not is_passed and topic_id == latest_start_topic:
                 continue
             
-            duration = (last_submission - first_submission) * 1000  # 转换为毫秒
-            topic_debug_dur[topic_id] = duration
+            duration = (last_submission - first_submission)
+            # 构建嵌套列表：[通过状态, 调试时间]
+            pass_status = 1 if is_passed else 0
+            topic_debug_dur[topic_id] = [pass_status, duration]
         
         user_data['topic_debug_dur'] = topic_debug_dur
         
@@ -113,14 +115,16 @@ def filter_essential_data(input_file, output_file):
         passed_topics = len(topic_pass)  # 通过的topic数量
         
         if total_attempts > 0:
-            pass_rate_avg = passed_topics / total_attempts
+            pass_rate_avg = round(passed_topics / total_attempts, 5)
         else:
             pass_rate_avg = 0.0
         user_data['pass_rate_avg'] = pass_rate_avg
         
         # 6. debug_dur_avg：计算topic_debug_duration的平均值
         if topic_debug_dur:
-            debug_dur_avg = sum(topic_debug_dur.values()) / len(topic_debug_dur)
+            # 提取所有调试时间（嵌套列表的第二个元素）
+            debug_durations = [duration_info[1] for duration_info in topic_debug_dur.values()]
+            debug_dur_avg = round(sum(debug_durations) / len(debug_durations), 5)
         else:
             debug_dur_avg = 0.0
         user_data['debug_dur_avg'] = debug_dur_avg
@@ -128,15 +132,7 @@ def filter_essential_data(input_file, output_file):
         # 7. emotion：从chat_history中提取情感数据
         emotion_data = extract_emotion_data(chat_history)
         user_data['emotion'] = emotion_data
-        
-        # 保留bert、k_means等字段（如果存在）
-        if records:
-            # 从第一条记录中获取可能的额外字段
-            sample_record = records[0]
-            if 'bert' in sample_record:
-                user_data['bert'] = [r.get('bert') for r in records if r.get('bert')]
-            if 'k_means' in sample_record:
-                user_data['k_means'] = [r.get('k_means') for r in records if r.get('k_means')]
+
         
         filtered_data[participant_id] = user_data
         kept_users += 1
@@ -259,7 +255,7 @@ def print_sample_data(filtered_data, sample_user=None):
 
 if __name__ == "__main__":
     input_file = 'for老师.json'
-    output_file = 'for老师_final.json'
+    output_file = 'final.json'
     
     # 执行数据过滤
     filtered_data = filter_essential_data(input_file, output_file)
