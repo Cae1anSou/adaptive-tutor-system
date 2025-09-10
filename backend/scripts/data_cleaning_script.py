@@ -30,6 +30,8 @@ def clean_and_group_data(input_file, output_file):
     按participant_id分组清洗数据集
     键是用户的participant_id,值是该用户在所有数据表中的数据
     时间字段转换为时间戳格式
+    只保留participant_id为baseline0或exp0开头的用户数据
+    忽略在忽略列表中的participant_id
     """
     # 读取JSON数据
     with open(input_file, 'r', encoding='utf-8') as f:
@@ -37,6 +39,13 @@ def clean_and_group_data(input_file, output_file):
     
     # 创建一个字典来存储按participant_id分组的数据
     grouped_data = defaultdict(list)
+    
+    # 定义需要忽略的participant_id列表
+    ignored_participant_ids = set([
+        # 在这里添加需要忽略的participant_id
+        # 例如: 'test_user', 'dev_user', 等等
+        'exp001'
+    ])
     
     # 需要转换为时间戳的字段名
     timestamp_fields = ['timestamp', 'created_at', 'completed_at', 'submitted_at']
@@ -59,8 +68,10 @@ def clean_and_group_data(input_file, output_file):
                     participant_id_index = columns.index('participant_id')
                     participant_id = row[participant_id_index] if participant_id_index < len(row) else None
                 
-                # 只处理有有效participant_id的记录
-                if participant_id is not None:
+                # 只处理以baseline0或exp0开头的用户数据，并且不在忽略列表中
+                if (participant_id is not None and 
+                    (participant_id.startswith('baseline0') or participant_id.startswith('exp0')) and
+                    participant_id not in ignored_participant_ids):
                     # 在每条记录中添加表名信息
                     if isinstance(row, dict):
                         row_with_table = row.copy()
@@ -104,7 +115,7 @@ def print_summary(grouped_data):
 
 if __name__ == "__main__":
     input_file = 'ai_exp_database_export.json'
-    output_file = 'cleaned_grouped_data.json'
+    output_file = '按id分.json'
     
     # 执行数据清洗和分组
     grouped_data = clean_and_group_data(input_file, output_file)
