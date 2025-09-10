@@ -224,6 +224,7 @@ class SandboxService:
                     
                     page.set_content(full_html, wait_until="load")  # 等待页面加载完成
 
+                passed_all = True
                 for i, cp in enumerate(checkpoints):
                     passed, detail = self._evaluate_checkpoint(page, cp)
                     if not passed:
