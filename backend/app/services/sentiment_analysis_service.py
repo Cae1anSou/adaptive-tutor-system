@@ -125,6 +125,7 @@ class SentimentAnalysisService:
             score, pred = torch.max(probs, dim=1)
             
         # 返回结果
+        logger.info(f"Sentiment analysis result: {self.label_map.get(pred.item(), 'NEUTRAL')} ({score.item()})")
         return SentimentAnalysisResult(
             label=self.label_map.get(pred.item(), 'NEUTRAL'),
             confidence=score.item()
