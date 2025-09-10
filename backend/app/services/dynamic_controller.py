@@ -403,8 +403,17 @@ class DynamicController:
         """
         
         try:
+            # 创建翻译缓存避免重复翻译
+            translation_cache = {}
+            
+            def get_translation(text):
+                """获取翻译结果，使用缓存避免重复翻译"""
+                if text not in translation_cache:
+                    translation_cache[text] = translate(text)
+                return translation_cache[text]
+            
             logger.info(f"翻译前：{request.user_message}")
-            translated_message = translate(request.user_message)
+            translated_message = get_translation(request.user_message)
             logger.info(f"翻译后：{translated_message}")
             # 步骤1: 获取或创建用户档案（使用UserStateService）
             profile, _ = self.user_state_service.get_or_create_profile(request.participant_id, db)
@@ -481,7 +490,7 @@ class DynamicController:
                             if msg.role == 'user':
                                 trans_history.append({
                                     'role': msg.role,
-                                    'content': translate(msg.content)
+                                    'content': get_translation(msg.content)
                                 })
                                 logger.info(f"翻译历史：{trans_history}")
                         # 触发聚类分析：使用注入的聚类服务
