@@ -21,39 +21,97 @@
     },
     "pass_rate_avg": 0.1875,
     "debug_dur_avg": 176250.0,
-    "timestamp": [
-      1757340648,
-      1757340648,
-      1757340959,
-      1757340959,
-      1757341003,
-      1757341003,
-      1757341250,
-      1757341250,
-      1757341429,
-      1757341429,
-      1757341455,
-      1757341455,
-      1757341469,
-      1757341470,
-      1757341890,
-      1757341890,
-      1757341949,
-      1757341949,
-      1757342335,
-      1757342335,
-      1757342367,
-      1757342367,
-      1757342512,
-      1757342512,
-      1757342864,
-      1757342864,
-      1757343134,
-      1757343134,
-      1757343170,
-      1757343170,
-      1757343421,
-      1757343421
+    "emotion": [
+      [
+        "1757340648",
+        null,
+        null,
+        "<p id=\"text_format_paragraph\">Join us for a <strong>purr-fect</strong> celebration of feline beauty and <em>grace</em>. Discover various cat breeds and experience the excitement of the event!</p>这一段是什么东西，怎么乱七八糟的"
+      ],
+      [
+        "1757340959",
+        null,
+        null,
+        "这个题目怎么做啊"
+      ],
+      [
+        "1757341003",
+        null,
+        null,
+        "任务描述：\n请使用 HTML 标签构建一个简单的页面结构，包括主标题、副标题和正文段落。目标是熟悉常用的结构性标签 <h2>、<h4> 和 <p> 的用法。\n\n要求：\n使用 <h2> 元素创建一个主标题，内容为“前端开发入门指南”。\n在主标题下方使用 <h4> 元素创建一个副标题，内容为“HTML基础结构”。\n在副标题下方使用 <p> 元素创建一个段落，内容为“本文将介绍如何使用HTML构建网页的基本结构。”\n保持标签层次清晰，不要额外添加无关内容。"
+      ],
+      [
+        "1757341250",
+        null,
+        null,
+        "示例代码\n字体粗细设置 (font-weight)\np {\n    font-weight: bold;\n}\n字体样式设置 (font-style)\np {\n    font-style: italic;\n}这是什么意思啊，给这两个示例代码啥意思"
+      ],
+      [
+        "1757341429",
+        null,
+        null,
+        "测试要求\n任务描述：\n请在 CSS 中为页面中的 <h2> 元素添加样式，使其同时呈现粗体和斜体，目标是学会使用 font-weight 与 font-style 属性。\n\n要求：\n使用 font-weight 属性将 <h2> 元素设置为粗体。\n使用 font-style 属性将 <h2> 元素设置为斜体。\n不要修改 HTML 结构，仅在 CSS 中添加或修改样式。这题怎么写？"
+      ],
+      [
+        "1757341455",
+        null,
+        null,
+        "bold吗"
+      ],
+      [
+        "1757341890",
+        null,
+        null,
+        "将 <html> 标签的语言属性设置为中文（lang=\"zh\"）。这个怎么设置？"
+      ],
+      [
+        "1757341949",
+        null,
+        null,
+        "在 <head> 标签内添加 <meta charset=\"UTF-8\">，定义字符编码为 UTF-8。这个呢"
+      ],
+      [
+        "1757342335",
+        null,
+        null,
+        "任务描述：\n请编写一个完整的 HTML 文档结构，包含必要的声明、基础标签以及页面的标题和底部信息，目标是掌握 HTML 文档的基本组成部分。\n\n要求：\n在文档开头添加 <!DOCTYPE html> 声明，并使用 <html> 标签包裹所有内容。\n将 <html> 标签的语言属性设置为中文（lang=\"zh\"）。\n在 <head> 标签内添加 <meta charset=\"UTF-8\">，定义字符编码为 UTF-8。\n在 <head> 标签内添加 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">，以支持响应式布局。\n在 <head> 标签内添加 <title> 标签，内容为“编程学习教程”。\n在 <body> 标签中添加 <footer> 元素，用于显示页面底部信息。\n保持 HTML 标签层次完整、结构规范。\n示例代码：\n<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <footer>© 2025 编程学习教程</footer>\n</body>我这样写：<!DOCTYPE html>\n<html lang=\"zh\">\n\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n\n<body>\n    <footer>© 2025 编程学习教程</footer>\n</body>\n\n</html>为什么通不过？"
+      ],
+      [
+        "1757342367",
+        null,
+        null,
+        "❌ 未通过测试\n很遗憾，部分测试点未通过。\n\n详细信息:\n检查点 1 失败: 请在代码最顶端添加声明。\n检查点 2 失败: 请添加完整的标签对。\n检查点 3 失败: 请为标签设置lang属性为'zh'。\n检查点 4 失败: 请在标签内添加标签对。\n检查点 9 失败: 请添加标签对。"
+      ],
+      [
+        "1757342512",
+        null,
+        null,
+        "<!DOCTYPE html>\n<html lang=\"zh\">\n\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n\n<body>\n    <h1>欢迎来到编程学习教程</h1>\n    <footer>© 2025 编程学习教程</footer>\n</body>\n\n</html>这样还是不行"
+      ],
+      [
+        "1757342864",
+        null,
+        null,
+        "任务描述：\n请使用 div 标签将以下内容包裹起来，并为该 div 元素设置 id 属性值为 main-content，用于划分页面的主要内容区域。<div>\n<h3>学习HTML的重要性</h3>\n<p>掌握HTML是网页开发的基础，它帮助我们构建结构清晰的网页内容。</p>\n<h3>常见的HTML标签</h3>\n<p>常用的标签包括标题标签、段落标签和列表标签等。</p>\n</div>为什么我过不了？"
+      ],
+      [
+        "1757343134",
+        null,
+        null,
+        "怎么给按钮加事件监听器？"
+      ],
+      [
+        "1757343170",
+        null,
+        null,
+        "我不知道，你说的那个get是干嘛的啊"
+      ],
+      [
+        "1757343421",
+        null,
+        null,
+        "任务描述：\n请为“登录”按钮添加点击事件，实现输入与交互功能。\n\n要求：\n给按钮添加 onclick 属性或使用 JavaScript 添加事件监听器。\n点击按钮时获取用户名输入框的内容。\n弹出提示框显示欢迎信息，例如“欢迎, 张三!”。这个怎么做？"
+      ]
     ]
   },
   "baseline006": {
@@ -94,47 +152,127 @@
     },
     "pass_rate_avg": 0.3888888888888889,
     "debug_dur_avg": 47300.0,
-    "timestamp": [
-      1757428940,
-      1757428940,
-      1757428983,
-      1757428983,
-      1757429146,
-      1757429146,
-      1757429280,
-      1757429280,
-      1757429490,
-      1757429490,
-      1757429606,
-      1757429606,
-      1757429670,
-      1757429670,
-      1757429700,
-      1757429700,
-      1757429769,
-      1757429769,
-      1757429814,
-      1757429814,
-      1757429977,
-      1757429977,
-      1757430141,
-      1757430141,
-      1757430303,
-      1757430303,
-      1757430392,
-      1757430392,
-      1757430505,
-      1757430505,
-      1757430785,
-      1757430785,
-      1757430825,
-      1757430825,
-      1757430994,
-      1757430994,
-      1757431046,
-      1757431046,
-      1757431627,
-      1757431627
+    "emotion": [
+      [
+        "1757428940",
+        null,
+        null,
+        "请使用 HTML 标签构建一个简单的页面结构，包括主标题、副标题和正文段落。目标是熟悉常用的结构性标签 <h2>、<h4> 和 <p> 的用法。\n\n要求：\n使用 <h2> 元素创建一个主标题，内容为“前端开发入门指南”。\n在主标题下方使用 <h4> 元素创建一个副标题，内容为“HTML基础结构”。\n在副标题下方使用 <p> 元素创建一个段落，内容为“本文将介绍如何使用HTML构建网页的基本结构。”\n保持标签层次清晰，不要额外添加无关内容。"
+      ],
+      [
+        "1757428983",
+        null,
+        null,
+        "给我一个样式"
+      ],
+      [
+        "1757429146",
+        null,
+        null,
+        "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <h2>Web开发基础教程</h2>\n</body>\n</html>\n改成CSS样式"
+      ],
+      [
+        "1757429280",
+        null,
+        null,
+        "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <h2>Web开发基础教程</h2>\n</body>\n</html>\n请在 CSS 中为页面中的 <h2> 元素添加样式，使其同时呈现粗体和斜体，目标是学会使用 font-weight 与 font-style 属性。\n\n要求：\n使用 font-weight 属性将 <h2> 元素设置为粗体。\n使用 font-style 属性将 <h2> 元素设置为斜体。\n不要修改 HTML 结构，仅在 CSS 中添加或修改样式。"
+      ],
+      [
+        "1757429490",
+        null,
+        null,
+        "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n    <style>\n        h2 {\n            font-weight: bold;      \n            font-style: italic;    \n        }\n    </style>\n</head>\n<body>\n    <h2>Web开发基础教程</h2>\n</body>\n</html>改正"
+      ],
+      [
+        "1757429606",
+        null,
+        null,
+        "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <h3>学习HTML的重要性</h3>\n<p>掌握HTML是网页开发的基础，它帮助我们构建结构清晰的网页内容。</p>\n<h3>常见的HTML标签</h3>\n<p>常用的标签包括标题标签、段落标签和列表标签等。</p>\n</body>\n</html>\n请使用 div 标签将<body>中的内容包裹起来，并为该 div 元素设置 id 属性值为 main-content，用于划分页面的主要内容区域。"
+      ],
+      [
+        "1757429670",
+        null,
+        null,
+        "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <h3> 烹饪准备工作 </h3>\n# 请在此处添加你的代码！\n</body>\n</html>\n请在 <h3> 元素下方创建一个有序列表，用于展示待办步骤，目标是掌握有序列表 <ol> 与 <li> 标签的用法。\n\n要求：\n在 <h3> 元素下方添加一个有序列表。\n在列表中依次添加三个项目：购买食材、准备厨具、开始烹饪。"
+      ],
+      [
+        "1757429700",
+        null,
+        null,
+        "给我一样样式"
+      ],
+      [
+        "1757429769",
+        null,
+        null,
+        "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <h3>前端学习计划</h3>\n# 请在此处添加你的代码！\n</body>\n</html>\n请在 <h3> 元素下方添加一个无序列表，用于展示学习计划，目标是掌握无序列表 <ul> 与 <li> 标签的基本用法。\n\n要求：\n在 <h3> 元素下方创建一个无序列表。\n在列表中依次添加三个项目：学习HTML基础、练习CSS样式、构建简单网页。"
+      ],
+      [
+        "1757429814",
+        null,
+        null,
+        "给我一个样式"
+      ],
+      [
+        "1757429977",
+        null,
+        null,
+        "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    # 请在此处添加你的代码！\n</body>\n</html>\n请创建一个简单的登录表单，包含用户名输入框和登录按钮。\n\n要求：\n创建一个文本框，提示文本为“请输入用户名”。\n在文本框下方创建一个按钮，按钮文本为“登录”。"
+      ],
+      [
+        "1757430141",
+        null,
+        null,
+        "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    # 请在此处添加你的代码！\n</body>\n</html>\n请在页面中添加复选框与单选框，模拟技能与级别选择功能。\n\n要求：\n创建两个复选框，name 值为 skills。\n第一个复选框 value 为 HTML，内容为“掌握HTML”。\n第二个复选框 value 为 CSS，内容为“掌握CSS”。\n在复选框下方创建两个单选框，name 值为 level。\n第一个单选框 value 为“初级”，内容为“初级程序员”。\n第二个单选框 value 为“高级”，内容为“高级程序员”。"
+      ],
+      [
+        "1757430303",
+        null,
+        null,
+        "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <label>用户名：<input type=\"text\" name=\"username\"></label>\n<label>邮箱：<input type=\"email\" name=\"email\"></label>\n<button type=\"submit\">注册</button>\n</body>\n</html>\n请为用户注册表单添加提交功能，通过 JavaScript 处理提交逻辑。\n\n要求：\n使用 <form> 元素包裹所有表单控件。\n在 <form> 标签中通过 onsubmit 属性绑定 handleRegister 函数。\n在 handleRegister 函数中阻止表单默认提交行为。\n在控制台输出“注册信息已处理”。"
+      ],
+      [
+        "1757430392",
+        null,
+        null,
+        "用js形式输出"
+      ],
+      [
+        "1757430505",
+        null,
+        null,
+        "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n  <h1>编程学习教程 2025</h1>\n  <p>欢迎来到编程学习教程网站</p>\n</body>\n</html>\n请为整个网页设置统一的字体和背景样式，使页面更加美观一致。\n\n要求：\n为 body 元素设置字体为 Helvetica, sans-serif。\n设置字体颜色为深蓝色（#003366）。\n设置背景为从浅蓝到白色的渐变色：linear-gradient(to bottom, #cce6ff, #ffffff)。"
+      ],
+      [
+        "1757430785",
+        null,
+        null,
+        "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <div class=\"user-card\">\n  <img src=\"\" alt=\"用户头像\">\n  <div class=\"user-info\">\n    <h3>张三</h3>\n    <p>角色：学生</p>\n    <p>积分：8765</p>\n  </div>\n</div>\n</body>\n</html>\n请为用户信息卡片添加盒模型相关样式，增强视觉效果。\n\n要求：\n为 .user-card 元素设置圆角：border-radius: 12px。\n添加阴影效果：box-shadow: 0 2px 6px rgba(0,0,0,0.15)。\n为 .user-info 元素设置内边距：padding: 16px。"
+      ],
+      [
+        "1757430825",
+        null,
+        null,
+        "简单点"
+      ],
+      [
+        "1757430994",
+        null,
+        null,
+        "<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <header>\n  <h2>编程学习教程</h2>\n  <nav class=\"nav-links\">\n    <a href=\"#\" class=\"nav-link\">首页</a>\n    <a href=\"#\" class=\"nav-link\">课程</a>\n    <a href=\"#\" class=\"nav-link\">资源</a>\n    <a href=\"#\" class=\"nav-link\">联系</a>\n  </nav>\n</header>\n</body>\n</html>\n请使用 Flexbox 创建一个响应式导航栏，使标题和导航链接布局合理。\n\n要求：\n为 header 元素设置 display: flex。\n使用 justify-content: space-between 让标题与导航链接分列左右。\n为 .nav-links 添加 Flex 布局，使其中的链接横向排列、居中显示、支持自动换行，并设置 gap: 1.5rem。"
+      ],
+      [
+        "1757431046",
+        null,
+        null,
+        "HTML怎么改CSS"
+      ],
+      [
+        "1757431627",
+        null,
+        null,
+        "改css如何插入图片"
+      ]
     ]
   },
   "baseline0011": {
@@ -185,75 +323,211 @@
     },
     "pass_rate_avg": 0.65,
     "debug_dur_avg": 17666.666666666668,
-    "timestamp": [
-      1757429440,
-      1757429440,
-      1757429584,
-      1757429584,
-      1757429816,
-      1757429816,
-      1757429913,
-      1757429913,
-      1757429979,
-      1757429979,
-      1757430058,
-      1757430058,
-      1757430109,
-      1757430109,
-      1757430187,
-      1757430187,
-      1757430263,
-      1757430263,
-      1757430316,
-      1757430316,
-      1757430431,
-      1757430431,
-      1757430484,
-      1757430484,
-      1757430592,
-      1757430592,
-      1757430651,
-      1757430651,
-      1757430708,
-      1757430708,
-      1757430750,
-      1757430750,
-      1757430806,
-      1757430806,
-      1757430854,
-      1757430854,
-      1757430899,
-      1757430899,
-      1757430948,
-      1757430948,
-      1757431014,
-      1757431014,
-      1757431040,
-      1757431040,
-      1757431098,
-      1757431098,
-      1757431373,
-      1757431373,
-      1757431392,
-      1757431392,
-      1757431437,
-      1757431437,
-      1757431468,
-      1757431468,
-      1757431511,
-      1757431511,
-      1757431533,
-      1757431533,
-      1757431625,
-      1757431625,
-      1757431759,
-      1757431759,
-      1757431784,
-      1757431784,
-      1757431824,
-      1757431824,
-      1757431878,
-      1757431878
+    "emotion": [
+      [
+        "1757429440",
+        null,
+        null,
+        "基本框架"
+      ],
+      [
+        "1757429584",
+        null,
+        null,
+        "使用 <h2> 元素创建一个主标题，内容为“前端开发入门指南”。\n在主标题下方使用 <h4> 元素创建一个副标题，内容为“HTML基础结构”。\n在副标题下方使用 <p> 元素创建一个段落，内容为“本文将介绍如何使用HTML构建网页的基本结构。"
+      ],
+      [
+        "1757429816",
+        null,
+        null,
+        "<h2>前端开发入门指南<h4>HTML基础结构<h4><p>本文将介绍如何使用HTML构建网页的基本结构</p>修改"
+      ],
+      [
+        "1757429913",
+        null,
+        null,
+        "<h2>前端开发入门指南<h4>HTML基础结构</h4><p>'本文将介绍如何使用HTML构建网页的基本结构。'</p>\n p元素的内容应该为'本文将介绍如何使用HTML构建网页的基本结构。'修改"
+      ],
+      [
+        "1757429979",
+        null,
+        null,
+        "如何\n在 CSS 中添加或修改样式"
+      ],
+      [
+        "1757430058",
+        null,
+        null,
+        "使用 font-weight 属性将 <h2> 元素设置为粗体。"
+      ],
+      [
+        "1757430109",
+        null,
+        null,
+        "使用 font-style 属性将 <h2> 元素设置为斜体。"
+      ],
+      [
+        "1757430187",
+        null,
+        null,
+        "在文档开头添加 <!DOCTYPE html> 声明，并使用 <html> 标签包裹所有内容。\n将 <html> 标签的语言属性设置为中文（lang=\"zh\"）。\n在 <head> 标签内添加 <meta charset=\"UTF-8\">，定义字符编码为 UTF-8。\n在 <head> 标签内添加 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">，以支持响应式布局。\n在 <head> 标签内添加 <title> 标签，内容为“编程学习教程”。\n在 <body> 标签中添加 <footer> 元素，用于显示页面底部信息\n示例代码：\n<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <footer>© 2025 编程学习教程</footer>\n</body>\n</html>"
+      ],
+      [
+        "1757430263",
+        null,
+        null,
+        "请使用 div 标签将<body>中的内容包裹起来，并为该 div 元素设置 id 属性值为 main-content，用于划分页面的主要内容区域。\n<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <h3>学习HTML的重要性</h3>\n<p>掌握HTML是网页开发的基础，它帮助我们构建结构清晰的网页内容。</p>\n<h3>常见的HTML标签</h3>\n<p>常用的标签包括标题标签、段落标签和列表标签等。</p>\n</body>\n</html>"
+      ],
+      [
+        "1757430316",
+        null,
+        null,
+        "在 <h3> 元素下方添加一个有序列表。\n在列表中依次添加三个项目：购买食材、准备厨具、开始烹饪。\n<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <h3> 烹饪准备工作 </h3>\n# 请在此处添加你的代码！\n</body>\n</html>"
+      ],
+      [
+        "1757430431",
+        null,
+        null,
+        "无序列表是什么\n标签"
+      ],
+      [
+        "1757430484",
+        null,
+        null,
+        "创建一个文本框，提示文本为“请输入用户名”。\n在文本框下方创建一个按钮，按钮文本为“登录”。"
+      ],
+      [
+        "1757430592",
+        null,
+        null,
+        "创建两个复选框，name 值为 skills。\n第一个复选框 value 为 HTML，内容为“掌握HTML”。\n第二个复选框 value 为 CSS，内容为“掌握CSS”。\n在复选框下方创建两个单选框，name 值为 level。\n第一个单选框 value 为“初级”，内容为“初级程序员”。\n第二个单选框 value 为“高级”，内容为“高级程序员”。"
+      ],
+      [
+        "1757430651",
+        null,
+        null,
+        "使用 <form> 元素包裹所有表单控件。\n在 <form> 标签中通过 onsubmit 属性绑定 handleRegister 函数。\n在 handleRegister 函数中阻止表单默认提交行为。\n在控制台输出“注册信息已处理”。"
+      ],
+      [
+        "1757430708",
+        null,
+        null,
+        "使用 <form> 元素包裹所有表单控件。\n在 <form> 标签中通过 onsubmit 属性绑定 handleRegister 函数。\n在 handleRegister 函数中阻止表单默认提交行为。\n在控制台输出“注册信息已处理”。\n<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <label>用户名：<input type=\"text\" name=\"username\"></label>\n<label>邮箱：<input type=\"email\" name=\"email\"></label>\n<button type=\"submit\">注册</button>\n</body>\n</html>"
+      ],
+      [
+        "1757430750",
+        null,
+        null,
+        "为 body 元素设置字体为 Helvetica, sans-serif。\n设置字体颜色为深蓝色（#003366）。\n设置背景为从浅蓝到白色的渐变色：linear-gradient(to bottom, #cce6ff, #ffffff)"
+      ],
+      [
+        "1757430806",
+        null,
+        null,
+        "为 .user-card 元素设置圆角：border-radius: 12px。\n添加阴影效果：box-shadow: 0 2px 6px rgba(0,0,0,0.15)。\n为 .user-info 元素设置内边距：padding: 16px。\n为 .user-card 元素设置圆角：border-radius: 12px。\n添加阴影效果：box-shadow: 0 2px 6px rgba(0,0,0,0.15)。\n为 .user-info 元素设置内边距：padding: 16px。"
+      ],
+      [
+        "1757430854",
+        null,
+        null,
+        "为 .user-card 元素设置圆角：border-radius: 12px。\n添加阴影效果：box-shadow: 0 2px 6px rgba(0,0,0,0.15)。\n为 .user-info 元素设置内边距：padding: 16px。\n<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <div class=\"user-card\">\n  <img src=\"\" alt=\"用户头像\">\n  <div class=\"user-info\">\n    <h3>张三</h3>\n    <p>角色：学生</p>\n    <p>积分：8765</p>\n  </div>\n</div>\n</body>\n</html>"
+      ],
+      [
+        "1757430899",
+        null,
+        null,
+        "为 .user-card 元素设置圆角：border-radius: 12px。 添加阴影效果：box-shadow: 0 2px 6px rgba(0,0,0,0.15)。 为 .user-info 元素设置内边距：padding: 16px。 <!DOCTYPE html> <html lang=\"zh\"> <head> <meta charset=\"UTF-8\"> <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"> <title>编程学习教程</title> </head> <body> <div class=\"user-card\"> <img src=\"\" alt=\"用户头像\"> <div class=\"user-info\"> <h3>张三</h3> <p>角色：学生</p> <p>积分：8765</p> </div> </div> </body> </html>"
+      ],
+      [
+        "1757430948",
+        null,
+        null,
+        "为 header 元素设置 display: flex。\n使用 justify-content: space-between 让标题与导航链接分列左右。\n为 .nav-links 添加 Flex 布局，使其中的链接横向排列、居中显示、支持自动换行，并设置 gap: 1.5rem。\n<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <header>\n  <h2>编程学习教程</h2>\n  <nav class=\"nav-links\">\n    <a href=\"#\" class=\"nav-link\">首页</a>\n    <a href=\"#\" class=\"nav-link\">课程</a>\n    <a href=\"#\" class=\"nav-link\">资源</a>\n    <a href=\"#\" class=\"nav-link\">联系</a>\n  </nav>\n</header>\n</body>\n</html>"
+      ],
+      [
+        "1757431014",
+        null,
+        null,
+        "在 .card 元素的顶部添加 <img> 标签。\n每个图片需包含 src 和 alt 属性。\n设置图片宽度为 100%，并使用 object-fit: cover 保持比例裁剪。\n<!DOCTYPE html>\n<html lang=\"zh\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <div class=\"card\">\n  # 请在这里插入图片！\n  <div class=\"card-content\">\n    <h3>智能手表</h3>\n    <p>分类：数码</p>\n    <p>价格：￥1299</p>\n  </div>\n</div>\n<div class=\"card\">\n  # 请在这里插入图片！\n  <div class=\"card-content\">\n    <h3>保温杯</h3>\n    <p>分类：家居</p>\n    <p>价格：￥89</p>\n  </div>\n</div>\n</body>\n</html>"
+      ],
+      [
+        "1757431040",
+        null,
+        null,
+        "在 .card 元素的顶部添加 <img> 标签。 每个图片需包含 src 和 alt 属性。 设置图片宽度为 100%，并使用 object-fit: cover 保持比例裁剪。 <!DOCTYPE html> <html lang=\"zh\"> <head> <meta charset=\"UTF-8\"> <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"> <title>编程学习教程</title> </head> <body> <div class=\"card\"> # 请在这里插入图片！ <div class=\"card-content\"> <h3>智能手表</h3> <p>分类：数码</p> <p>价格：￥1299</p> </div> </div> <div class=\"card\"> # 请在这里插入图片！ <div class=\"card-content\"> <h3>保温杯</h3> <p>分类：家居</p> <p>价格：￥89</p> </div> </div> </body> </html>"
+      ],
+      [
+        "1757431098",
+        null,
+        null,
+        "请将图片宽度设置为 100%。"
+      ],
+      [
+        "1757431373",
+        null,
+        null,
+        "嗨man"
+      ],
+      [
+        "1757431392",
+        null,
+        null,
+        "宽度改变"
+      ],
+      [
+        "1757431437",
+        null,
+        null,
+        "你链接了外部ai吗"
+      ],
+      [
+        "1757431468",
+        null,
+        null,
+        "js的相关知识基础的有吗"
+      ],
+      [
+        "1757431511",
+        null,
+        null,
+        "变量和数据类型怎么用？"
+      ],
+      [
+        "1757431533",
+        null,
+        null,
+        "为什么不能回车发送消息"
+      ],
+      [
+        "1757431625",
+        null,
+        null,
+        "监听 是做什么的】"
+      ],
+      [
+        "1757431759",
+        null,
+        null,
+        "哈吉米"
+      ],
+      [
+        "1757431784",
+        null,
+        null,
+        "不是哥们这都可以来"
+      ],
+      [
+        "1757431824",
+        null,
+        null,
+        "用CSS动画让猫猫表情跳起来"
+      ],
+      [
+        "1757431878",
+        null,
+        null,
+        "nice相遇"
+      ]
     ]
   },
   "baseline004": {
@@ -299,39 +573,103 @@
     },
     "pass_rate_avg": 0.39285714285714285,
     "debug_dur_avg": 55181.818181818184,
-    "timestamp": [
-      1757429810,
-      1757429810,
-      1757430291,
-      1757430291,
-      1757430388,
-      1757430388,
-      1757430654,
-      1757430654,
-      1757430673,
-      1757430673,
-      1757430910,
-      1757430910,
-      1757431243,
-      1757431243,
-      1757431471,
-      1757431471,
-      1757431891,
-      1757431891,
-      1757431957,
-      1757431957,
-      1757432061,
-      1757432061,
-      1757432260,
-      1757432260,
-      1757432315,
-      1757432315,
-      1757432625,
-      1757432625,
-      1757432639,
-      1757432639,
-      1757432646,
-      1757432646
+    "emotion": [
+      [
+        "1757429810",
+        null,
+        null,
+        "hi"
+      ],
+      [
+        "1757430291",
+        null,
+        null,
+        "p {\n    font-style: italic;\n}是什么意思"
+      ],
+      [
+        "1757430388",
+        null,
+        null,
+        "h1{font-style:italic}"
+      ],
+      [
+        "1757430654",
+        null,
+        null,
+        "怎么将h2元素设置为斜体"
+      ],
+      [
+        "1757430673",
+        null,
+        null,
+        "h2"
+      ],
+      [
+        "1757430910",
+        null,
+        null,
+        "我如何将 <html> 标签的语言属性设置为中文（lang=\"zh\"）。"
+      ],
+      [
+        "1757431243",
+        null,
+        null,
+        "<!DOCTYPE html>\n<html lang=\"zh\">\n<html>\n<head>\n    <meta charest = \"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>编程学习教程</title>\n</head>\n<body>\n    <footer>© 2025 编程学习教程</footer>\n</body>\n</html>\n哪里有问题吗"
+      ],
+      [
+        "1757431471",
+        null,
+        null,
+        "怎么在html中添加一个有序列表"
+      ],
+      [
+        "1757431891",
+        null,
+        null,
+        "复选框有什么属性"
+      ],
+      [
+        "1757431957",
+        null,
+        null,
+        "怎么创造单选框"
+      ],
+      [
+        "1757432061",
+        null,
+        null,
+        "<input type=\"checkbox\" name=\"skills\" value=\"HTML\">掌握HTML\n    <input type=\"checkbox\" name=\"skills\" value=\"CSS\">掌握CSS\n    <input type=\"radio\" name = \"level\" value=\"初级\">初级程序员\n    <input type=\"radio\" name = \"level\" value=\"高级\">高级程序员 有哪里不对吗"
+      ],
+      [
+        "1757432260",
+        null,
+        null,
+        "在 <form> 标签如何通过 onsubmit 属性绑定 handleRegister 函数"
+      ],
+      [
+        "1757432315",
+        null,
+        null,
+        "在 handleRegister 函数中阻止表单默认提交行为。\n在控制台输出“注册信息已处理”。"
+      ],
+      [
+        "1757432625",
+        null,
+        null,
+        "设置背景为从浅蓝到白色的渐变色：linear-gradient(to bottom, #cce6ff, #ffffff)。"
+      ],
+      [
+        "1757432639",
+        null,
+        null,
+        "设置背景为从浅蓝到白色的渐变色：linear-gradient(to bottom, #cce6ff, #ffffff)。"
+      ],
+      [
+        "1757432646",
+        null,
+        null,
+        "你好"
+      ]
     ]
   },
   "baseline008": {
@@ -362,19 +700,43 @@
     },
     "pass_rate_avg": 0.35294117647058826,
     "debug_dur_avg": 128333.33333333333,
-    "timestamp": [
-      1757431106,
-      1757431106,
-      1757431763,
-      1757431763,
-      1757431883,
-      1757431883,
-      1757432856,
-      1757432856,
-      1757433291,
-      1757433291,
-      1757435176,
-      1757435176
+    "emotion": [
+      [
+        "1757431106",
+        null,
+        null,
+        "使用 <h2> 元素创建一个主标题，内容为“前端开发入门指南”。\n在主标题下方使用 <h4> 元素创建一个副标题，内容为“HTML基础结构”。\n在副标题下方使用 <p> 元素创建一个段落，内容为“本文将介绍如何使用HTML构建网页的基本结构。”"
+      ],
+      [
+        "1757431763",
+        null,
+        null,
+        "使用 font-weight 属性将 <h2> 元素设置为粗体。\n使用 font-style 属性将 <h2> 元素设置为斜体。"
+      ],
+      [
+        "1757431883",
+        null,
+        null,
+        "怎样修改html的标题样式"
+      ],
+      [
+        "1757432856",
+        null,
+        null,
+        "如何设置div元素的id属性值"
+      ],
+      [
+        "1757433291",
+        null,
+        null,
+        "在 <h3> 元素下方添加一个有序列表。\n在列表中依次添加三个项目：购买食材、准备厨具、开始烹饪。"
+      ],
+      [
+        "1757435176",
+        null,
+        null,
+        "你好呀"
+      ]
     ]
   },
   "baseline007": {
@@ -413,21 +775,49 @@
     },
     "pass_rate_avg": 0.6666666666666666,
     "debug_dur_avg": 14888.888888888889,
-    "timestamp": [
-      1757431441,
-      1757431441,
-      1757431908,
-      1757431908,
-      1757431931,
-      1757431931,
-      1757432492,
-      1757432492,
-      1757432613,
-      1757432613,
-      1757432882,
-      1757432882,
-      1757434626,
-      1757434626
+    "emotion": [
+      [
+        "1757431441",
+        null,
+        null,
+        "请问在HTML中如何创建2个复选框，这2个复选框的name值相同，但是value值和文字内容不同"
+      ],
+      [
+        "1757431908",
+        null,
+        null,
+        "请帮我创建一个html复选框。创建两个复选框，name 值为 skills。\n\n    第一个复选框 value 为 HTML，内容为“掌握HTML”。\n    第二个复选框 value 为 CSS，内容为“掌握CSS”。"
+      ],
+      [
+        "1757431931",
+        null,
+        null,
+        "请帮我创建一个html复选框。创建两个复选框，name 值为 skills。 第一个复选框 value 为 HTML，内容为“掌握HTML”。 第二个复选框 value 为 CSS，内容为“掌握CSS”。"
+      ],
+      [
+        "1757432492",
+        null,
+        null,
+        "我在HTML中的form元素要绑定一个函数，请问这个函数应该写在那里，格式是什么样子"
+      ],
+      [
+        "1757432613",
+        null,
+        null,
+        "我在HTML中的form元素要绑定一个函数，请问这个函数应该写在那里，格式是什么样子。这个函数要阻止表单默认提交行为，并且在控制台输出“123”"
+      ],
+      [
+        "1757432882",
+        null,
+        null,
+        "我在HTML中的form元素要绑定一个函数，请问这个函数应该写在那里，格式是什么样子。这个函数要阻止表单默认提交行为，并且在控制台输出“123”"
+      ],
+      [
+        "1757434626",
+        null,
+        null,
+        "创建两个复选框，name 值为 skills。\n\n    第一个复选框 value 为 HTML，内容为“掌握HTML”。\n    第二个复选框 value 为 CSS，内容为“掌握CSS”。"
+      ]
     ]
   },
   "baseline009": {
@@ -449,15 +839,31 @@
     },
     "pass_rate_avg": 0.3333333333333333,
     "debug_dur_avg": 137000.0,
-    "timestamp": [
-      1757432040,
-      1757432040,
-      1757432824,
-      1757432824,
-      1757433041,
-      1757433041,
-      1757433827,
-      1757433827
+    "emotion": [
+      [
+        "1757432040",
+        null,
+        null,
+        "任务描述：\n请使用 HTML 标签构建一个简单的页面结构，包括主标题、副标题和正文段落。目标是熟悉常用的结构性标签 <h2>、<h4> 和 <p> 的用法。\n\n要求：\n使用 <h2> 元素创建一个主标题，内容为“前端开发入门指南”。\n在主标题下方使用 <h4> 元素创建一个副标题，内容为“HTML基础结构”。\n在副标题下方使用 <p> 元素创建一个段落，内容为“本文将介绍如何使用HTML构建网页的基本结构。”\n保持标签层次清晰，不要额外添加无关内容。"
+      ],
+      [
+        "1757432824",
+        null,
+        null,
+        "任务描述：\n请在 CSS 中为页面中的 <h2> 元素添加样式，使其同时呈现粗体和斜体，目标是学会使用 font-weight 与 font-style 属性。\n\n要求：\n使用 font-weight 属性将 <h2> 元素设置为粗体。\n使用 font-style 属性将 <h2> 元素设置为斜体。\n不要修改 HTML 结构，仅在 CSS 中添加或修改样式。"
+      ],
+      [
+        "1757433041",
+        null,
+        null,
+        ".h2{font-weight:bold;font-style:italic;}我代码错哪了"
+      ],
+      [
+        "1757433827",
+        null,
+        null,
+        "在 <body> 标签中添加 <footer> 元素，用于显示页面底部信息。这代码要怎么写"
+      ]
     ]
   },
   "baseline005": {
@@ -495,27 +901,67 @@
     },
     "pass_rate_avg": 0.42857142857142855,
     "debug_dur_avg": 81000.0,
-    "timestamp": [
-      1757460607,
-      1757460607,
-      1757460977,
-      1757460977,
-      1757462165,
-      1757462165,
-      1757462420,
-      1757462420,
-      1757462622,
-      1757462622,
-      1757462821,
-      1757462821,
-      1757463056,
-      1757463056,
-      1757463196,
-      1757463196,
-      1757463396,
-      1757463396,
-      1757463455,
-      1757463455
+    "emotion": [
+      [
+        "1757460607",
+        null,
+        null,
+        "请使用 HTML 标签构建一个简单的页面结构，包括主标题、副标题和正文段落。目标是熟悉常用的结构性标签 <h2>、<h4> 和 <p> 的用法。\n\n要求：\n使用 <h2> 元素创建一个主标题，内容为“前端开发入门指南”。\n在主标题下方使用 <h4> 元素创建一个副标题，内容为“HTML基础结构”。\n在副标题下方使用 <p> 元素创建一个段落，内容为“本文将介绍如何使用HTML构建网页的基本结构。”\n保持标签层次清晰，不要额外添加无关内容。"
+      ],
+      [
+        "1757460977",
+        null,
+        null,
+        "请在 CSS 中为页面中的 <h2> 元素添加样式，使其同时呈现粗体和斜体，目标是学会使用 font-weight 与 font-style 属性。\n\n要求：\n使用 font-weight 属性将 <h2> 元素设置为粗体。\n使用 font-style 属性将 <h2> 元素设置为斜体。\n不要修改 HTML 结构，仅在 CSS 中添加或修改样式。"
+      ],
+      [
+        "1757462165",
+        null,
+        null,
+        "<ul>\n            <li>学习HTML基础</li>\n            <li>联系CSS样式</li>\n            <li>构建简单网页</li>\n        </ul>怎么控制这个无序列表纵向排列"
+      ],
+      [
+        "1757462420",
+        null,
+        null,
+        "HTML中如何创建一个文本框和按钮"
+      ],
+      [
+        "1757462622",
+        null,
+        null,
+        "请创建一个简单的登录表单，包含用户名输入框和登录按钮。\n\n要求：\n创建一个文本框，提示文本为“请输入用户名”。\n在文本框下方创建一个按钮，按钮文本为“登录”。"
+      ],
+      [
+        "1757462821",
+        null,
+        null,
+        "复选框该怎么增加"
+      ],
+      [
+        "1757463056",
+        null,
+        null,
+        "那单选框呢"
+      ],
+      [
+        "1757463196",
+        null,
+        null,
+        "请在页面中添加复选框与单选框，模拟技能与级别选择功能。\n\n要求：\n创建两个复选框，name 值为 skills。\n第一个复选框 value 为 HTML，内容为“掌握HTML”。\n第二个复选框 value 为 CSS，内容为“掌握CSS”。\n在复选框下方创建两个单选框，name 值为 level。\n第一个单选框 value 为“初级”，内容为“初级程序员”。\n第二个单选框 value 为“高级”，内容为“高级程序员”。"
+      ],
+      [
+        "1757463396",
+        null,
+        null,
+        "很遗憾，部分测试点未通过。\n\n详细信息:\n检查点 5 失败: 第一个复选框内容应该为：掌握HTML\n检查点 7 失败: 第二个复选框内容应该为：掌握CSS\n检查点 12 失败: 第一个单选框的内容应该为：初级程序员\n检查点 14 失败: 第二个单选框的内容应该为：高级程序员"
+      ],
+      [
+        "1757463455",
+        null,
+        null,
+        "检查点 5 失败: 第一个复选框内容应该为：掌握HTML\n检查点 7 失败: 第二个复选框内容应该为：掌握CSS\n检查点 12 失败: 第一个单选框的内容应该为：初级程序员\n检查点 14 失败: 第二个单选框的内容应该为：高级程序员"
+      ]
     ]
   },
   "baseline003": {
@@ -580,25 +1026,55 @@
     },
     "pass_rate_avg": 0.84375,
     "debug_dur_avg": 1004916.6666666666,
-    "timestamp": [
-      1757480429,
-      1757480429,
-      1757480880,
-      1757480880,
-      1757482267,
-      1757482267,
-      1757483504,
-      1757483504,
-      1757484024,
-      1757484025,
-      1757484762,
-      1757484762,
-      1757485394,
-      1757485394,
-      1757486065,
-      1757486065,
-      1757486326,
-      1757486326
+    "emotion": [
+      [
+        "1757480429",
+        null,
+        null,
+        "请你示范一下一般是怎么使用h元素和p元素展示标题与段落的"
+      ],
+      [
+        "1757480880",
+        null,
+        null,
+        "一般有几种方法可以更改字体的粗细设置和样式设置？"
+      ],
+      [
+        "1757482267",
+        null,
+        null,
+        "文本框的提示文本是什么属性啊？"
+      ],
+      [
+        "1757483504",
+        null,
+        null,
+        "请问，文本框的提示文本怎么设置啊"
+      ],
+      [
+        "1757484762",
+        null,
+        null,
+        "我现在想写应该组织表单默认提交行为的函数handleRegister，请帮我想一下我该怎么写"
+      ],
+      [
+        "1757485394",
+        null,
+        null,
+        "字体设置是用什么属性啊？"
+      ],
+      [
+        "1757486065",
+        null,
+        null,
+        "Flex 布局怎么设置子元素横向排列、居中显示、支持自动换行啊"
+      ],
+      [
+        "1757486326",
+        null,
+        null,
+        "设置图片宽度为 100%，并使用 object-fit: cover 保持比例裁剪。我这样写不行吗？img{\n    width: 100%;\n    object-fit: cover;\n}"
+      ]
     ]
   },
   "exp006": {
@@ -625,21 +1101,49 @@
     },
     "pass_rate_avg": 0.2631578947368421,
     "debug_dur_avg": 198750.0,
-    "timestamp": [
-      1757515720,
-      1757515720,
-      1757516054,
-      1757516054,
-      1757516308,
-      1757516308,
-      1757517008,
-      1757517008,
-      1757517399,
-      1757517399,
-      1757517964,
-      1757517964,
-      1757518117,
-      1757518117
+    "emotion": [
+      [
+        "1757515720",
+        "2.0.9714728593826294",
+        "1",
+        "CSS是什么"
+      ],
+      [
+        "1757516054",
+        "2.0.971980094909668",
+        "1",
+        "代码实现要点"
+      ],
+      [
+        "1757516308",
+        "2.0.9667872786521912",
+        "1",
+        "怎么改斜体"
+      ],
+      [
+        "1757517008",
+        "2.0.9751662015914917",
+        "1",
+        "怎么设置页面语言为英文"
+      ],
+      [
+        "1757517399",
+        "2.0.9750953912734985",
+        "1",
+        "怎么使用应用文本格式化"
+      ],
+      [
+        "1757517964",
+        "2.0.971980094909668",
+        "1",
+        "代码实现要点"
+      ],
+      [
+        "1757518117",
+        "2.0.9723305702209473",
+        "1",
+        "div 是什么"
+      ]
     ]
   },
   "exp015": {
@@ -682,25 +1186,61 @@
     },
     "pass_rate_avg": 0.7142857142857143,
     "debug_dur_avg": 60100.0,
-    "timestamp": [
-      1757516517,
-      1757516517,
-      1757517303,
-      1757517303,
-      1757517642,
-      1757517642,
-      1757517743,
-      1757517743,
-      1757518345,
-      1757518345,
-      1757518709,
-      1757518709,
-      1757518773,
-      1757518773,
-      1757518826,
-      1757518826,
-      1757519229,
-      1757519229
+    "emotion": [
+      [
+        "1757516517",
+        "2.0.9048779606819153",
+        "1",
+        "你好"
+      ],
+      [
+        "1757517303",
+        "2.0.9653956890106201",
+        "1",
+        "整体解题思路分析"
+      ],
+      [
+        "1757517642",
+        "0.0.9821276068687439",
+        "1",
+        "第八个错了，为什么呀。"
+      ],
+      [
+        "1757517743",
+        "1.0.975777268409729",
+        "1",
+        "So that's it.Thank you!"
+      ],
+      [
+        "1757518345",
+        "0.0.9664644598960876",
+        "1",
+        "暂时每天问题哦，我还在学习"
+      ],
+      [
+        "1757518709",
+        "0.0.9544785022735596",
+        "1",
+        "我不是很理解复选框和单选框"
+      ],
+      [
+        "1757518773",
+        "1.0.9792591333389282",
+        "1",
+        "用复选框！太谢谢了，你讲得很有趣很仔细"
+      ],
+      [
+        "1757518826",
+        "1.0.9709380865097046",
+        "1",
+        "我还不熟悉这个流程，不过谢谢你"
+      ],
+      [
+        "1757519229",
+        "0.0.9808645844459534",
+        "1",
+        "我哪里有错？明明是正确的啊。我不理解，为什么这没通过！！！是不是你们的判断有错"
+      ]
     ]
   },
   "exp009": {
@@ -723,37 +1263,97 @@
     },
     "pass_rate_avg": 0.75,
     "debug_dur_avg": 0.0,
-    "timestamp": [
-      1757516994,
-      1757516994,
-      1757517136,
-      1757517136,
-      1757517516,
-      1757517516,
-      1757517627,
-      1757517627,
-      1757517956,
-      1757517956,
-      1757518063,
-      1757518063,
-      1757518155,
-      1757518155,
-      1757518271,
-      1757518271,
-      1757518321,
-      1757518321,
-      1757518450,
-      1757518450,
-      1757518680,
-      1757518680,
-      1757518741,
-      1757518741,
-      1757519151,
-      1757519151,
-      1757519418,
-      1757519418,
-      1757519524,
-      1757519524
+    "emotion": [
+      [
+        "1757516994",
+        "2.0.8082009553909302",
+        "2",
+        "请使用 HTML 标签构建一个简单的页面结构，包括主标题、副标题和正文段落。目标是熟悉常用的结构性标签 <h2>、<h4> 和 <p> 的用法。\n要求如下：\n1.使用 <h2> 元素创建一个主标题，内容为“前端开发入门指南”。\n2.在主标题下方使用 <h4> 元素创建一个副标题，内容为“HTML基础结构”。\n3.在副标题下方使用 <p> 元素创建一个段落，内容为“本文将介绍如何使用HTML构建网页的基本结构。”\n4.保持标签层次清晰，不要额外添加无关内容。"
+      ],
+      [
+        "1757517136",
+        "2.0.9638579487800598",
+        "2",
+        "关于我选中的 <h1> 元素：\n- ID: #structure_header_header\n- 类名: header-title\n- 文本内容: \"Best Cat Exhibition\"\n- HTML代码:\n```html\n<h1 class=\"header-title\" id=\"structure_header_header\">Best Cat Exhibition</h1>\n```\n\n用户问题: 这个元素有什么用？"
+      ],
+      [
+        "1757517516",
+        "2.0.9603084325790405",
+        "2",
+        "如何用html标签构建一个简单的页面结构"
+      ],
+      [
+        "1757517627",
+        "2.0.9312092065811157",
+        "2",
+        "修改了id，现在这段代码怎么样"
+      ],
+      [
+        "1757517956",
+        "2.0.9653956890106201",
+        "2",
+        "整体解题思路分析"
+      ],
+      [
+        "1757518063",
+        "2.0.9759582281112671",
+        "2",
+        "h2选择器怎么写"
+      ],
+      [
+        "1757518155",
+        "1.0.9775388836860657",
+        "2",
+        "提供一个例句给我"
+      ],
+      [
+        "1757518271",
+        "2.0.925509512424469",
+        "2",
+        "现在怎么样"
+      ],
+      [
+        "1757518321",
+        "0.0.9823799133300781",
+        "2",
+        "为什么你的回答里有很多的\\n"
+      ],
+      [
+        "1757518450",
+        "2.0.9504978060722351",
+        "2",
+        "现在呢"
+      ],
+      [
+        "1757518680",
+        "2.0.9709867835044861",
+        "2",
+        "在 <body> 标签中添加 <footer> 元素，用于显示页面底部信息。\n这个要求是什么意思，footer是什么"
+      ],
+      [
+        "1757518741",
+        "2.0.967801570892334",
+        "2",
+        "这段代码满足任务要求了吗"
+      ],
+      [
+        "1757519151",
+        "2.0.9744097590446472",
+        "2",
+        "span 如何使用"
+      ],
+      [
+        "1757519418",
+        "2.0.9764739274978638",
+        "2",
+        "我的代码怎么样"
+      ],
+      [
+        "1757519524",
+        "2.0.9469059109687805",
+        "2",
+        "现在呢"
+      ]
     ]
   },
   "exp007": {
@@ -789,39 +1389,103 @@
     },
     "pass_rate_avg": 0.4444444444444444,
     "debug_dur_avg": 258857.14285714287,
-    "timestamp": [
-      1757517100,
-      1757517100,
-      1757517269,
-      1757517269,
-      1757517352,
-      1757517352,
-      1757517524,
-      1757517524,
-      1757518099,
-      1757518099,
-      1757518247,
-      1757518247,
-      1757518601,
-      1757518601,
-      1757518921,
-      1757518921,
-      1757518991,
-      1757518991,
-      1757519100,
-      1757519100,
-      1757519283,
-      1757519283,
-      1757519576,
-      1757519576,
-      1757519785,
-      1757519785,
-      1757520069,
-      1757520069,
-      1757520135,
-      1757520135,
-      1757520413,
-      1757520413
+    "emotion": [
+      [
+        "1757517100",
+        "2.0.9722164273262024",
+        "0",
+        "<P>的用法"
+      ],
+      [
+        "1757517269",
+        "2.0.9748835563659668",
+        "0",
+        "如何使用CCS界面"
+      ],
+      [
+        "1757517352",
+        "2.0.9719388484954834",
+        "0",
+        "斜体的值为多少"
+      ],
+      [
+        "1757517524",
+        "2.0.9375921487808228",
+        "0",
+        "我的代码存在什么问题"
+      ],
+      [
+        "1757518099",
+        "2.0.9375921487808228",
+        "0",
+        "我的代码存在什么问题"
+      ],
+      [
+        "1757518247",
+        "2.0.9753261804580688",
+        "0",
+        "<html> 标签的语言属性怎么设置"
+      ],
+      [
+        "1757518601",
+        "0.0.9828414916992188",
+        "0",
+        "检查点 4 失败: 请在<html>标签内添加<head>标签对。"
+      ],
+      [
+        "1757518921",
+        "2.0.9665525555610657",
+        "0",
+        "<!Doctype=html>这个申明对吗"
+      ],
+      [
+        "1757518991",
+        "2.0.9748663306236267",
+        "0",
+        "添加页面标题的指令是什么"
+      ],
+      [
+        "1757519100",
+        "2.0.9718199372291565",
+        "1",
+        "设置字符编码的指令是什么"
+      ],
+      [
+        "1757519283",
+        "2.0.9716233015060425",
+        "1",
+        "<head>\n            <title>WCF Best Cat Exhibition</title>\n            <meta charset=\"UTF-8\">\n            <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n        </head>检测代码是否正确"
+      ],
+      [
+        "1757519576",
+        "2.0.9780332446098328",
+        "1",
+        "<span>代码段应该放在哪里，怎么用CSS分别编辑"
+      ],
+      [
+        "1757519785",
+        "2.0.9761970639228821",
+        "1",
+        "如何分别控制不同的span？"
+      ],
+      [
+        "1757520069",
+        "2.0.970032811164856",
+        "1",
+        "<ol> 与 <li> 标签的用法"
+      ],
+      [
+        "1757520135",
+        "2.0.9697904586791992",
+        "1",
+        "关键知识点讲解"
+      ],
+      [
+        "1757520413",
+        "2.0.959243655204773",
+        "1",
+        "\"在容器内添加左侧\"，如何添加到左侧"
+      ]
     ]
   },
   "exp0011": {
@@ -858,23 +1522,55 @@
     },
     "pass_rate_avg": 0.6666666666666666,
     "debug_dur_avg": 48125.0,
-    "timestamp": [
-      1757518481,
-      1757518481,
-      1757518731,
-      1757518731,
-      1757518865,
-      1757518865,
-      1757518977,
-      1757518977,
-      1757519514,
-      1757519514,
-      1757519602,
-      1757519602,
-      1757519891,
-      1757519891,
-      1757520101,
-      1757520101
+    "emotion": [
+      [
+        "1757518481",
+        "2.0.9579474925994873",
+        "2",
+        "<!DOctype html>是什么作用"
+      ],
+      [
+        "1757518731",
+        "2.0.9461501836776733",
+        "2",
+        "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">那这段又是什么作用"
+      ],
+      [
+        "1757518865",
+        "2.0.9721377491950989",
+        "2",
+        "设置页面语言为英文。"
+      ],
+      [
+        "1757518977",
+        "2.0.9307209849357605",
+        "2",
+        "<html lang=\"en\">\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title >\n</html>完整写法"
+      ],
+      [
+        "1757519514",
+        "2.0.9751078486442566",
+        "2",
+        "css怎么为class设置样式"
+      ],
+      [
+        "1757519602",
+        "2.0.870317816734314",
+        "2",
+        "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"UTF-8\">\n        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n        <title>WCF Best Cat Exhibition</title>\n    </head>\n    <body>\n        <h1>WCF Best Cat Exhibition</h1>\n        <h2>Welcome to the Cat Exhibition</h2>\n        <h3>Event Highlights</h3>\n        <p>Join us for a purr-fect celebration of feline beauty and grace. Discover various cat breeds and experience the\n        excitement of the event!</p>\n        <span class=\"bold-text\">purr-fect</span>\n        <span class=\"italic-text\">grace</span>\n    </body>\n\n</html>格式有误吗"
+      ],
+      [
+        "1757519891",
+        "2.0.9617431163787842",
+        "2",
+        "ol和ul有什么区别"
+      ],
+      [
+        "1757520101",
+        "2.0.9677062630653381",
+        "2",
+        "html块级元素有哪些"
+      ]
     ]
   },
   "exp0013": {
@@ -908,47 +1604,127 @@
     },
     "pass_rate_avg": 0.875,
     "debug_dur_avg": 10285.714285714286,
-    "timestamp": [
-      1757519167,
-      1757519167,
-      1757519257,
-      1757519257,
-      1757519405,
-      1757519405,
-      1757519482,
-      1757519482,
-      1757519585,
-      1757519585,
-      1757519702,
-      1757519702,
-      1757519797,
-      1757519797,
-      1757519855,
-      1757519855,
-      1757520025,
-      1757520025,
-      1757520196,
-      1757520196,
-      1757520373,
-      1757520373,
-      1757520648,
-      1757520648,
-      1757520764,
-      1757520764,
-      1757520809,
-      1757520809,
-      1757520913,
-      1757520913,
-      1757521001,
-      1757521001,
-      1757521006,
-      1757521006,
-      1757521239,
-      1757521239,
-      1757521343,
-      1757521343,
-      1757521431,
-      1757521431
+    "emotion": [
+      [
+        "1757519167",
+        "2.0.9731894731521606",
+        "1",
+        "<h2>后面该怎么写内容"
+      ],
+      [
+        "1757519257",
+        "2.0.9524698853492737",
+        "1",
+        "主标题和副标题需要缩进区分吗"
+      ],
+      [
+        "1757519405",
+        "2.0.97178053855896",
+        "1",
+        "应该如何设置粗体呢"
+      ],
+      [
+        "1757519482",
+        "2.0.9684839248657227",
+        "1",
+        "那斜体有哪些值"
+      ],
+      [
+        "1757519585",
+        "0.0.9806986451148987",
+        "1",
+        "哪里出了问题呢？我明明写了"
+      ],
+      [
+        "1757519702",
+        "2.0.9480211734771729",
+        "1",
+        "1"
+      ],
+      [
+        "1757519797",
+        "0.0.9751623868942261",
+        "1",
+        "为什么语言是zh"
+      ],
+      [
+        "1757519855",
+        "2.0.954086184501648",
+        "1",
+        "好了，我们可以开始head部分了"
+      ],
+      [
+        "1757520025",
+        "2.0.9725821018218994",
+        "1",
+        "footer是什么"
+      ],
+      [
+        "1757520196",
+        "2.0.9672462940216064",
+        "1",
+        "我现在写的head算是完成了吗"
+      ],
+      [
+        "1757520373",
+        "2.0.9722211360931396",
+        "1",
+        "我目前写的怎么样"
+      ],
+      [
+        "1757520648",
+        "0.0.9736815094947815",
+        "1",
+        "我不会做噢"
+      ],
+      [
+        "1757520764",
+        "2.0.9759011268615723",
+        "1",
+        "<div class=\"explanation\">是什么意思"
+      ],
+      [
+        "1757520809",
+        "2.0.9584224820137024",
+        "1",
+        "那我现在应该怎么做"
+      ],
+      [
+        "1757520913",
+        "1.0.6534367799758911",
+        "1",
+        "给点思路"
+      ],
+      [
+        "1757521001",
+        "2.0.9746271371841431",
+        "1",
+        "ol标签是？"
+      ],
+      [
+        "1757521006",
+        "2.0.9745107293128967",
+        "1",
+        "ol标签是？"
+      ],
+      [
+        "1757521239",
+        "2.0.9751186966896057",
+        "1",
+        "什么叫做“在容器内添加左侧”"
+      ],
+      [
+        "1757521343",
+        "2.0.9778028726577759",
+        "1",
+        "现在代码绿色区域代表什么，这个会在页面上显示吗"
+      ],
+      [
+        "1757521431",
+        "2.0.9650834798812866",
+        "1",
+        "ol后面该怎么写"
+      ]
     ]
   },
   "exp016": {
@@ -979,23 +1755,55 @@
     },
     "pass_rate_avg": 0.6666666666666666,
     "debug_dur_avg": 7666.666666666667,
-    "timestamp": [
-      1757519816,
-      1757519816,
-      1757519859,
-      1757519859,
-      1757519892,
-      1757519892,
-      1757520188,
-      1757520188,
-      1757520358,
-      1757520358,
-      1757520461,
-      1757520461,
-      1757521139,
-      1757521139,
-      1757521346,
-      1757521346
+    "emotion": [
+      [
+        "1757519816",
+        "2.0.9510332942008972",
+        "2",
+        "关于我选中的 <h1> 元素：\n- ID: #structure_header_header\n- 类名: header-title\n- 文本内容: \"Best Cat Exhibition\"\n- HTML代码:\n```html\n<h1 class=\"header-title\" id=\"structure_header_header\">Best Cat Exhibition</h1>\n```\n\n用户问题: 我想了解"
+      ],
+      [
+        "1757519859",
+        "2.0.9564792513847351",
+        "2",
+        "应该是选B吧"
+      ],
+      [
+        "1757519892",
+        "2.0.9736366271972656",
+        "2",
+        "我想知道h2和h1的关系"
+      ],
+      [
+        "1757520188",
+        "2.0.9744686484336853",
+        "2",
+        "css样式要怎么用"
+      ],
+      [
+        "1757520358",
+        "2.0.9742918610572815",
+        "2",
+        "怎么构建页面基本结构呢"
+      ],
+      [
+        "1757520461",
+        "2.0.9406043887138367",
+        "2",
+        "提供解题思路"
+      ],
+      [
+        "1757521139",
+        "1.0.8965341448783875",
+        "1",
+        "关于我选中的 <div> 元素：\n- 类名: flex-container\n- 文本内容: \"Welcome to the Cat Exhibition\n                    Join us for a purr-fect celebration of feline beau\"\n- HTML代码:\n```html\n<div class=\"flex-container\">\n            <div class=\"main\">\n                <article id=\"structure_div_main-content\">\n                    <h2 id=\"text_paragraph_title\">Welcome to the Cat Exhibition</h2>\n                    <p id=\"text_format_paragraph\">Join us for a <span class=\"bold-text\">purr-fect</span> celebration of feline beauty and <span class=\"italic-text\">grace</span>. Discover various cat breeds and experience the excitement of the event!</p>\n                    \n                    <div class=\"media-container\">\n                        <div class=\"gallery\">\n                            <div class=\"gallery-item\">\n                                <img src=\"./src/1.jpeg\" alt=\"Cat Thumbnail 1\">\n                            </div>\n                            <div class=\"gallery-item\">\n                                <img src=\"./src/2.jpg\" alt=\"Cat Thumbnail 2\">\n                            </div>\n                            <div class=\"gallery-item\">\n                                <img src=\"./src/3.jpg\" alt=\"Cat Thumbnail 3\">\n                            </div>\n                        </div>\n                    </div>\n\n                    <h3 id=\"text_list_ol_events\">Event Highlights</h3>\n                    <ol class=\"ol-custom\">\n                        <li>Opening Ceremony</li>\n                        <li>Cat Parades</li>\n                        <li>Best in Show Award</li>\n                    </ol>\n\n                    <form id=\"form_submit_form\">\n                        <input type=\"text\" id=\"form_input_name\" placeholder=\"Your Name\" required=\"\">\n                        <input type=\"email\" id=\"form_input_email\" placeholder=\"Your Email\" required=\"\">\n                        <label><input type=\"checkbox\" id=\"form_checkbox_news\" checked=\"\"> Subscribe to newsletter</label>\n                        <button class=\"btn\" type=\"submit\" data-target=\"form-submit\">Join the Cat Family</button>\n                    </form>\n                </article>\n            </div>\n            <aside class=\"sidebar\">\n                <div class=\"media-container\">\n                    <h3 id=\"text_list_ul_schedule\">Daily Schedule</h3>\n                    <ul class=\"ul-custom\">\n                        <li>10:00 AM - Doors Open</li>\n                        <li>12:00 PM - Lunch Break</li>\n                        <li>03:00 PM - Cat Parade</li>\n                    </ul>\n\n                    <audio id=\"media_audio_track\" controls=\"\">\n                        <source src=\"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3\" type=\"audio/mp3\">\n                        Your browser does not support the audio element.\n                    </audio>\n                    \n                    <video id=\"media_video_video\" controls=\"\">\n                        <source src=\"https://www.w3schools.com/html/mov_bbb.mp4\" type=\"video/mp4\">\n                        Your browser does not support the video element.\n                    </video>\n                </div>\n            </aside>\n        </div>\n```\n\n用户问题: 可以帮我解释一下吗"
+      ],
+      [
+        "1757521346",
+        "2.0.9726836681365967",
+        "1",
+        "关于我选中的 <ol> 元素：\n- 类名: ol-custom\n- 文本内容: \"Opening Ceremony\n                        Cat Parades\n                        Best in Show Award\"\n- HTML代码:\n```html\n<ol class=\"ol-custom\">\n                        <li>Opening Ceremony</li>\n                        <li>Cat Parades</li>\n                        <li>Best in Show Award</li>\n                    </ol>\n```\n\n用户问题: 我想了解一下这个元素的功能"
+      ]
     ]
   }
 }

@@ -1,4 +1,5 @@
 import json
+import re
 
 def filter_essential_data(input_file, output_file):
     """
@@ -124,12 +125,14 @@ def filter_essential_data(input_file, output_file):
             debug_dur_avg = 0.0
         user_data['debug_dur_avg'] = debug_dur_avg
         
-        # 保留timestamp、bert、k_means等字段（如果存在）
+        # 7. emotion：从chat_history中提取情感数据
+        emotion_data = extract_emotion_data(chat_history)
+        user_data['emotion'] = emotion_data
+        
+        # 保留bert、k_means等字段（如果存在）
         if records:
             # 从第一条记录中获取可能的额外字段
             sample_record = records[0]
-            if 'timestamp' in sample_record:
-                user_data['timestamp'] = [r.get('timestamp') for r in records if r.get('timestamp')]
             if 'bert' in sample_record:
                 user_data['bert'] = [r.get('bert') for r in records if r.get('bert')]
             if 'k_means' in sample_record:
@@ -148,6 +151,83 @@ def filter_essential_data(input_file, output_file):
     print(f"处理用户数: {kept_users}")
     
     return filtered_data
+
+def extract_emotion_data(chat_history):
+    """
+    从chat_history中提取情感数据，按照用户要求的格式构建emotion列表
+    格式：[timestamp, bert_value, k_means_value, user_message]
+    """
+    # 按时间戳分组聊天记录
+    timestamp_groups = {}
+    
+    for record in chat_history:
+        timestamp = record.get('timestamp')
+        if timestamp:
+            if timestamp not in timestamp_groups:
+                timestamp_groups[timestamp] = []
+            timestamp_groups[timestamp].append(record)
+    
+    emotion_list = []
+    
+    for timestamp, group in timestamp_groups.items():
+        # 查找对应的user和assistant记录
+        user_record = None
+        assistant_record = None
+        
+        for record in group:
+            if record.get('role') == 'user':
+                user_record = record
+            elif record.get('role') == 'assistant':
+                assistant_record = record
+        
+        # 只有同时有user和assistant记录才处理
+        if user_record and assistant_record:
+            # 获取用户消息
+            user_message = user_record.get('message', '')
+            
+            # 从assistant的raw_context_to_llm中提取情感和k_means数据
+            bert_value = None
+            k_means_value = None
+            
+            raw_context = assistant_record.get('raw_context_to_llm')
+            if raw_context and isinstance(raw_context, str):
+                # 提取BERT情感数据
+                bert_match = re.search(r'\{"label":\s*"([^"]+)",\s*"confidence":\s*([\d.]+)', raw_context)
+                if bert_match:
+                    label = bert_match.group(1).upper()
+                    confidence = float(bert_match.group(2))
+                    # 转换为数值：positive=2, neutral=1, negative=0
+                    if label == 'POSITIVE':
+                        emotion_value = 2
+                    elif label == 'NEUTRAL':
+                        emotion_value = 1
+                    else:  # NEGATIVE
+                        emotion_value = 0
+                    bert_value = f"{emotion_value}.{confidence}"
+                
+                # 提取k_means数据（学习阶段）
+                k_means_match = re.search(r'Current learning stage:\s*(\w+)', raw_context)
+                if k_means_match:
+                    stage = k_means_match.group(1).lower()
+                    # 转换为数值：struggling=0, normal=1, advanced=2
+                    if stage == 'struggling':
+                        k_means_value = '0'
+                    elif stage == 'normal':
+                        k_means_value = '1'
+                    elif stage == 'advanced':
+                        k_means_value = '2'
+            
+            # 构建emotion条目
+            emotion_entry = [
+                str(timestamp),  # 时间戳
+                bert_value,      # BERT情感值
+                k_means_value,   # K-means值
+                user_message     # 用户消息
+            ]
+            
+            emotion_list.append(emotion_entry)
+    
+    return emotion_list
 
 def print_sample_data(filtered_data, sample_user=None):
     """
