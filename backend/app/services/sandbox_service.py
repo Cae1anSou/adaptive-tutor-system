@@ -61,6 +61,12 @@ class SandboxService:
         Returns:
             评测结果字典
         """
+        # 指定可以直接通过的任务列表
+        # 如果是指定的直接通过任务，立即返回成功结果
+        BYPASS_EVALUATION_TASKS = ["3_1", "3_3", "3_end"]
+        if topic_id in BYPASS_EVALUATION_TASKS:
+            return {"passed": True, "message": "通过", "details": []}
+
         # 根据 topic_id 判断是否使用 raw HTML 模式
         # 指定需要使用 raw HTML 模式的任务列表
         RAW_HTML_TASKS = ["1_3","1_end","2_end","3_end","4_end","5_end","6_end"]  # 可以在这里添加更多需要 raw 模式的任务
@@ -91,48 +97,48 @@ class SandboxService:
                 if raw_html_mode:
                     # Raw HTML模式：直接使用用户的完整HTML代码，不做任何修改
                     full_html = user_code.get('html', '')
-                    
+
                     # 如果用户没有写任何内容，添加一个标记以便检查点识别
                     if not full_html.strip():
                         # 用户什么都没写，使用一个特殊的空页面
                         full_html = '<html><head></head><body data-empty="true"></body></html>'
-                    
+
                     # 在Raw模式下，需要将CSS和JS也整合到HTML中
                     css_content = user_code.get('css', '')
                     js_content = user_code.get('js', '')
-                    
+
                     # 将用户原始HTML传递给页面，供检查点使用
                     full_html_with_script = full_html + f'<script>window.userOriginalHTML = {repr(user_code.get("html", ""))}</script>'
-                    
+
                     # 注入CSS和JS
                     if css_content:
                         # 在<head>标签中添加<style>标签
                         if '<head>' in full_html_with_script:
                             full_html_with_script = full_html_with_script.replace(
-                                '<head>', 
-                                f'<head><style>{css_content}</style>', 
+                                '<head>',
+                                f'<head><style>{css_content}</style>',
                                 1
                             )
                         else:
                             # 如果没有<head>标签，添加一个
                             full_html_with_script = full_html_with_script.replace(
-                                '<html', 
-                                f'<html><head><style>{css_content}</style></head>', 
+                                '<html',
+                                f'<html><head><style>{css_content}</style></head>',
                                 1
                             )
-                    
+
                     if js_content:
                         # 在</body>标签前添加<script>标签
                         if '</body>' in full_html_with_script:
                             full_html_with_script = full_html_with_script.replace(
-                                '</body>', 
-                                f'<script>{js_content}</script></body>', 
+                                '</body>',
+                                f'<script>{js_content}</script></body>',
                                 1
                             )
                         else:
                             # 如果没有</body>标签，添加一个
                             full_html_with_script = full_html_with_script + f'<script>{js_content}</script>'
-                    
+
                     # 在Raw模式下也需要设置页面内容
                     page.set_content(full_html_with_script, wait_until="load")  # 等待页面加载完成
                 else:
