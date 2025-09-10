@@ -84,7 +84,7 @@ class DynamicController:
             # 步骤2: 情感分析
             if self.sentiment_service:
                 sentiment_result = self.sentiment_service.analyze_sentiment(
-                    translated_message
+                    request.user_message
                 )
             else:
                 # 如果情感分析服务未启用，创建一个默认的情感分析结果
@@ -464,26 +464,32 @@ class DynamicController:
             if request.conversation_history:
                 # 将ConversationMessage转换为字典格式用于聚类分析
                 conversation_for_clustering = []
+                trans_history = []
                 for msg in request.conversation_history:
                     conversation_for_clustering.append({
                         'role': msg.role,
                         'content': msg.content
                     })
+                    trans_history.append({
+                        'role': msg.role,
+                        'content': translate(msg.content)
+                    })
+                logger.info(f"翻译历史：{trans_history}")
                 
                 # 使用节流逻辑：仅在满足条件时才触发聚类分析
-                should_cluster = self.user_state_service._should_perform_clustering(profile, conversation_for_clustering)
+                should_cluster = self.user_state_service._should_perform_clustering(profile, trans_history)
                 if should_cluster:
                     try:
                         # 触发聚类分析：使用注入的聚类服务
                         clustering_result = self.user_state_service.update_progress_clustering(
                             request.participant_id, 
-                            conversation_for_clustering,
+                            trans_history,
                             clustering_service=self.clustering_service
                         )
                         
                         if clustering_result and clustering_result.get('analysis_successful'):
                             model_type = clustering_result.get('model_type', 'unknown')
-                            print(f"✅ 距离聚类分析完成 (同步-{model_type}): {clustering_result['cluster_name']} "
+                            logger.info(f"✅ 距离聚类分析完成 (同步-{model_type}): {clustering_result['cluster_name']} "
                                   f"(置信度: {clustering_result['cluster_confidence']:.3f}, 类型: {clustering_result['analysis_type']})")
                         
                         # 重新获取profile以反映聚类分析结果
@@ -500,18 +506,14 @@ class DynamicController:
             # 步骤5: 生成提示词
             # 将ConversationMessage转换为字典格式
             conversation_history_dicts = []
-            trans_history = []
+            
             if request.conversation_history:
                 for msg in request.conversation_history:
                     conversation_history_dicts.append({
                         'role': msg.role,
                         'content': msg.content
                     })
-                    trans_history.append({
-                        'role': msg.role,
-                        'content': translate(msg.content)
-                    })
-                logger.info(f"翻译历史：{trans_history}")
+                    
             elif request.conversation_history is None:
                 # 确保即使conversation_history为None也传递空列表
                 conversation_history_dicts = []
