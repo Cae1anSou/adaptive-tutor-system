@@ -15,7 +15,8 @@
       "Bash(docker compose -p exp ps)",
       "Bash(docker compose:*)",
       "Bash(curl:*)",
-      "Bash(docker inspect:*)"
+      "Bash(docker inspect:*)",
+      "Bash(python:*)"
     ],
     "deny": []
   }

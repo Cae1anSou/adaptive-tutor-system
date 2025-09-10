@@ -249,7 +249,7 @@ class DynamicController:
             response = ChatResponse(ai_response=ai_response)
 
             # 步骤8: 记录AI交互
-            self._log_ai_interaction(request, response, db, background_tasks, system_prompt, content_title, context_snapshot)
+            self._log_ai_interaction(request, response, db, sentiment_result, background_tasks, system_prompt, content_title, context_snapshot)
 
             return response
 
@@ -306,10 +306,11 @@ class DynamicController:
         request: ChatRequest,
         response: ChatResponse,
         db: Session,
+        emotion: SentimentAnalysisResult,
         background_tasks: Optional[Any] = None,
         system_prompt: Optional[str] = None,
         content_title: Optional[str] = None,
-        context_snapshot: Optional[str] = None
+        context_snapshot: Optional[str] = None,
     ):
         """
         根据TDD-I规范，异步记录AI交互。
@@ -341,7 +342,7 @@ class DynamicController:
                 role="assistant",
                 message=response.ai_response,
                 raw_prompt_to_llm=system_prompt,
-                raw_context_to_llm=context_snapshot,
+                raw_context_to_llm=context_snapshot + json.dumps(emotion.model_dump(), ensure_ascii=False) if context_snapshot else json.dumps(emotion.model_dump(), ensure_ascii=False),
                 prompt_tokens=(usage or {}).get('prompt_tokens') if usage else None,
                 completion_tokens=(usage or {}).get('completion_tokens') if usage else None,
                 total_tokens=(usage or {}).get('total_tokens') if usage else None,
@@ -539,7 +540,7 @@ class DynamicController:
             # 步骤7: 构建响应（只包含AI回复内容，符合TDD-II-10设计）
             response = ChatResponse(ai_response=ai_response)
             # 步骤8: 记录AI交互
-            self._log_ai_interaction(request, response, db, background_tasks, system_prompt, content_title, context_snapshot)
+            self._log_ai_interaction(request, response, db, sentiment_result, background_tasks, system_prompt, content_title, context_snapshot)
             return response
         except Exception as e:
             print(f"❌ CRITICAL ERROR in generate_adaptive_response_sync: {e}")

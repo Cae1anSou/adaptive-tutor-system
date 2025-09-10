@@ -15,10 +15,6 @@ def process_chat_request(self,request_data: dict):
     try:
         controller = get_dynamic_controller()
         # 将 db 会话传递给需要它的服务方法
-        profile = controller.user_state_service.get_or_create_profile(
-            participant_id=request_data['participant_id'],
-            db=db
-        )
         # 调用生成回复（使用同步函数）
         request_obj = ChatRequest(**request_data)
         response = controller.generate_adaptive_response_sync(
