@@ -164,7 +164,7 @@ class DynamicController:
                         if clustering_result and clustering_result.get('analysis_successful'):
                             model_type = clustering_result.get('model_type', 'unknown')
                             print(f"✅ 距离聚类分析完成 ({model_type}): {clustering_result['cluster_name']} "
-                                  f"(置信度: {clustering_result['cluster_confidence']:.3f}, 类型: {clustering_result['analysis_type']})")
+                                  f"(置信度: {clustering_result.get('confidence', 0):.3f}, 类型: {clustering_result.get('classification_type', 'unknown')})")
                         
                         # 重新获取profile以反映聚类分析结果
                         profile, _ = self.user_state_service.get_or_create_profile(request.participant_id, db)
@@ -503,7 +503,7 @@ class DynamicController:
                         if clustering_result and clustering_result.get('analysis_successful'):
                             model_type = clustering_result.get('model_type', 'unknown')
                             logger.info(f"✅ 距离聚类分析完成 (同步-{model_type}): {clustering_result['cluster_name']} "
-                                  f"(置信度: {clustering_result['cluster_confidence']:.3f}, 类型: {clustering_result['analysis_type']})")
+                                  f"(置信度: {clustering_result.get('confidence', 0):.3f}, 类型: {clustering_result.get('classification_type', 'unknown')})")
                         
                         # 重新获取profile以反映聚类分析结果
                         profile, _ = self.user_state_service.get_or_create_profile(request.participant_id, db)
