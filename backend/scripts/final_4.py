@@ -11,9 +11,9 @@ def filter_essential_data(input_file, output_file):
         "topic_pass": [],
         "topic_try_num":{"1_1":3, "1_3":5},
         "topic_debug_dur":{"1_1":20000, "1_3":30000},
-        "timestamp": [1757340648,1757340648,1757340648,1757340648],
-        "bert": [1.123123, 2.1234234, 3.21312],
-        "k_means": [0, 1, 2]
+        "emotion": [
+          ["12334534", "1.1234", "1.345345", "hello"]
+        ]
       }
     }
     """
@@ -75,7 +75,7 @@ def filter_essential_data(input_file, output_file):
         topic_submissions = {}
         for record in submissions:
             topic_id = record.get('topic_id')
-            timestamp = record.get('timestamp')
+            timestamp = record.get('submitted_at')  # 使用submitted_at字段
             if topic_id and timestamp:
                 if topic_id not in topic_submissions:
                     topic_submissions[topic_id] = []
@@ -102,21 +102,17 @@ def filter_essential_data(input_file, output_file):
             if not is_passed and topic_id == latest_start_topic:
                 continue
             
-            duration = last_submission - first_submission
+            duration = (last_submission - first_submission) * 1000  # 转换为毫秒
             topic_debug_dur[topic_id] = duration
         
         user_data['topic_debug_dur'] = topic_debug_dur
         
-        # 5. pass_rate_avg：计算每个topic通过率的平均值
-        pass_rates = []
-        for topic_id in topic_try_num:
-            if topic_id in topic_pass:
-                pass_rates.append(1.0)
-            else:
-                pass_rates.append(0.0)
+        # 5. pass_rate_avg：计算尝试通过率（通过的topic数 / 总提交次数）
+        total_attempts = sum(topic_try_num.values())  # 总提交次数
+        passed_topics = len(topic_pass)  # 通过的topic数量
         
-        if pass_rates:
-            pass_rate_avg = sum(pass_rates) / len(pass_rates)
+        if total_attempts > 0:
+            pass_rate_avg = passed_topics / total_attempts
         else:
             pass_rate_avg = 0.0
         user_data['pass_rate_avg'] = pass_rate_avg

@@ -44,7 +44,11 @@ def clean_and_group_data(input_file, output_file):
     ignored_participant_ids = set([
         # 在这里添加需要忽略的participant_id
         # 例如: 'test_user', 'dev_user', 等等
-        'exp001'
+        'exp001',
+        'baseline002',
+        'exp002',
+        'exp003',
+        'exp004'
     ])
     
     # 需要转换为时间戳的字段名
