@@ -48,7 +48,7 @@ def clean_and_group_data(input_file, output_file):
         'baseline002',
         'exp002',
         'exp003',
-        'exp004'
+        'exp004',
         'baseline003',
         'exp004'
     ])

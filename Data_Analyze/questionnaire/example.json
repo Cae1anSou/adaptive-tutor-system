@@ -1,7 +1,28 @@
 {
-  "baseline003": {
-    "SUS": [4,2,5,2,5,1,5,1,4,2],
-    "NASA-TLX": [5,2,6,8,3,2],
-    "CPSES": [5,5,5,5,5,5,5,5,5,5,5,5]
+  "exp": {
+    "interest-based Generation Module": {
+      "good": ["it is good", ""],
+      "bad": [],
+      "suggestion": []
+    },
+    "Open-ended Exploration Module": {
+      "good": ["it is good", ""],
+      "bad": [],
+      "suggestion": []
+    },
+
+  },
+  "baseline": {
+      "interest-based Generation Module": {
+      "good": ["it is good", ""],
+      "bad": [],
+      "suggestion": []
+    },
+    "Open-ended Exploration Module": {
+      "good": ["it is good", ""],
+      "bad": [],
+      "suggestion": []
+    },
+
   }
 }
