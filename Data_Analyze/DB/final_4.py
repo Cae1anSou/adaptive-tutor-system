@@ -199,7 +199,8 @@ def extract_emotion_data(chat_history):
                         emotion_value = 1
                     else:  # NEGATIVE
                         emotion_value = 0
-                    bert_value = f"{emotion_value}.{confidence}"
+                    ans = emotion_value + confidence
+                    bert_value = f"{ans}"
                 
                 # 提取k_means数据（学习阶段）
                 k_means_match = re.search(r'Current learning stage:\s*(\w+)', raw_context)
