@@ -140,7 +140,7 @@ def create_radar_chart(data_dict):
     ax.tick_params(axis='y', which='major', labelsize=18)
     
     # Add title and legend
-    ax.set_title('NASA Task Load Index Dimensions Comparison', size=22, pad=20)
+    ax.set_title('NASA Task Load Index Dimensions Comparison', size=22, pad=20, loc='center', x=0.65)
     ax.legend(loc='upper right', bbox_to_anchor=(1.5, 1.0), fontsize=18)
     
     # Set y-labels
