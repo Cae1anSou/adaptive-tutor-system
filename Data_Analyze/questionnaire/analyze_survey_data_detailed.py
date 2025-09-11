@@ -132,39 +132,59 @@ def compute_group_statistics(group_data):
     }
 
 def perform_statistical_tests(group_a_stats, group_b_stats):
-    """Perform t-tests between groups"""
+    """Perform t-tests and Mann-Whitney U tests between groups"""
     results = {}
     
-    # SUS t-test
+    # SUS tests
+    # t-test
     t_stat, p_val = stats.ttest_ind(group_a_stats['sus']['scores'], 
                                     group_b_stats['sus']['scores'])
+    # Mann-Whitney U test
+    u_stat, p_val_mwu = stats.mannwhitneyu(group_a_stats['sus']['scores'], 
+                                          group_b_stats['sus']['scores'], 
+                                          alternative='two-sided')
     results['sus'] = {
-        't_statistic': t_stat,
-        'p_value': p_val
+        't_test': {'statistic': t_stat, 'p_value': p_val},
+        'mann_whitney_u': {'statistic': u_stat, 'p_value': p_val_mwu}
     }
     
-    # NASA-TLX unweighted t-test
+    # NASA-TLX unweighted tests
+    # t-test
     t_stat, p_val = stats.ttest_ind(group_a_stats['nasa_unweighted']['scores'], 
                                     group_b_stats['nasa_unweighted']['scores'])
+    # Mann-Whitney U test
+    u_stat, p_val_mwu = stats.mannwhitneyu(group_a_stats['nasa_unweighted']['scores'], 
+                                          group_b_stats['nasa_unweighted']['scores'], 
+                                          alternative='two-sided')
     results['nasa_unweighted'] = {
-        't_statistic': t_stat,
-        'p_value': p_val
+        't_test': {'statistic': t_stat, 'p_value': p_val},
+        'mann_whitney_u': {'statistic': u_stat, 'p_value': p_val_mwu}
     }
     
-    # NASA-TLX weighted t-test
+    # NASA-TLX weighted tests
+    # t-test
     t_stat, p_val = stats.ttest_ind(group_a_stats['nasa_weighted']['scores'], 
                                     group_b_stats['nasa_weighted']['scores'])
+    # Mann-Whitney U test
+    u_stat, p_val_mwu = stats.mannwhitneyu(group_a_stats['nasa_weighted']['scores'], 
+                                          group_b_stats['nasa_weighted']['scores'], 
+                                          alternative='two-sided')
     results['nasa_weighted'] = {
-        't_statistic': t_stat,
-        'p_value': p_val
+        't_test': {'statistic': t_stat, 'p_value': p_val},
+        'mann_whitney_u': {'statistic': u_stat, 'p_value': p_val_mwu}
     }
     
-    # CPES t-test
+    # CPES tests
+    # t-test
     t_stat, p_val = stats.ttest_ind(group_a_stats['cpes']['scores'], 
                                     group_b_stats['cpes']['scores'])
+    # Mann-Whitney U test
+    u_stat, p_val_mwu = stats.mannwhitneyu(group_a_stats['cpes']['scores'], 
+                                          group_b_stats['cpes']['scores'], 
+                                          alternative='two-sided')
     results['cpes'] = {
-        't_statistic': t_stat,
-        'p_value': p_val
+        't_test': {'statistic': t_stat, 'p_value': p_val},
+        'mann_whitney_u': {'statistic': u_stat, 'p_value': p_val_mwu}
     }
     
     return results
@@ -248,23 +268,30 @@ def main():
     print("\nGroup A (exp) - Mean (SD):")
     print(f"SUS: {group_a_stats['sus']['mean']:.2f} ({group_a_stats['sus']['std']:.2f})")
     print(f"NASA-TLX (Unweighted): {group_a_stats['nasa_unweighted']['mean']:.2f} ({group_a_stats['nasa_unweighted']['std']:.2f})")
-    print(f"NASA-TLX (Weighted): {group_a_stats['nasa_weighted']['mean']:.2f} ({group_a_stats['nasa_weighted']['std']:.2f})")
-    print(f"CPES: {group_a_stats['cpes']['mean']:.2f} ({group_a_stats['cpes']['std']:.2f})")
+    # print(f"NASA-TLX (Weighted): {group_a_stats['nasa_weighted']['mean']:.2f} ({group_a_stats['nasa_weighted']['std']:.2f})")
+    # print(f"CPES: {group_a_stats['cpes']['mean']:.2f} ({group_a_stats['cpes']['std']:.2f})")
     
     print("\nGroup B (baseline) - Mean (SD):")
     print(f"SUS: {group_b_stats['sus']['mean']:.2f} ({group_b_stats['sus']['std']:.2f})")
     print(f"NASA-TLX (Unweighted): {group_b_stats['nasa_unweighted']['mean']:.2f} ({group_b_stats['nasa_unweighted']['std']:.2f})")
-    print(f"NASA-TLX (Weighted): {group_b_stats['nasa_weighted']['mean']:.2f} ({group_b_stats['nasa_weighted']['std']:.2f})")
-    print(f"CPES: {group_b_stats['cpes']['mean']:.2f} ({group_b_stats['cpes']['std']:.2f})")
+    # print(f"NASA-TLX (Weighted): {group_b_stats['nasa_weighted']['mean']:.2f} ({group_b_stats['nasa_weighted']['std']:.2f})")
+    # print(f"CPES: {group_b_stats['cpes']['mean']:.2f} ({group_b_stats['cpes']['std']:.2f})")
     
     # Perform statistical tests
     test_results = perform_statistical_tests(group_a_stats, group_b_stats)
     
-    print("\n=== STATISTICAL TESTS (t-tests) ===")
-    print(f"SUS - t({len(group_a_stats['sus']['scores']) + len(group_b_stats['sus']['scores']) - 2}) = {test_results['sus']['t_statistic']:.3f}, p = {test_results['sus']['p_value']:.3f}")
-    print(f"NASA-TLX (Unweighted) - t({len(group_a_stats['nasa_unweighted']['scores']) + len(group_b_stats['nasa_unweighted']['scores']) - 2}) = {test_results['nasa_unweighted']['t_statistic']:.3f}, p = {test_results['nasa_unweighted']['p_value']:.3f}")
-    print(f"NASA-TLX (Weighted) - t({len(group_a_stats['nasa_weighted']['scores']) + len(group_b_stats['nasa_weighted']['scores']) - 2}) = {test_results['nasa_weighted']['t_statistic']:.3f}, p = {test_results['nasa_weighted']['p_value']:.3f}")
-    print(f"CPES - t({len(group_a_stats['cpes']['scores']) + len(group_b_stats['cpes']['scores']) - 2}) = {test_results['cpes']['t_statistic']:.3f}, p = {test_results['cpes']['p_value']:.3f}")
+    print("\n=== STATISTICAL TESTS ===")
+    print("\n--- t-tests ---")
+    print(f"SUS - t({len(group_a_stats['sus']['scores']) + len(group_b_stats['sus']['scores']) - 2}) = {test_results['sus']['t_test']['statistic']:.3f}, p = {test_results['sus']['t_test']['p_value']:.3f}")
+    print(f"NASA-TLX (Unweighted) - t({len(group_a_stats['nasa_unweighted']['scores']) + len(group_b_stats['nasa_unweighted']['scores']) - 2}) = {test_results['nasa_unweighted']['t_test']['statistic']:.3f}, p = {test_results['nasa_unweighted']['t_test']['p_value']:.3f}")
+    # print(f"NASA-TLX (Weighted) - t({len(group_a_stats['nasa_weighted']['scores']) + len(group_b_stats['nasa_weighted']['scores']) - 2}) = {test_results['nasa_weighted']['t_test']['statistic']:.3f}, p = {test_results['nasa_weighted']['t_test']['p_value']:.3f}")
+    # print(f"CPES - t({len(group_a_stats['cpes']['scores']) + len(group_b_stats['cpes']['scores']) - 2}) = {test_results['cpes']['t_test']['statistic']:.3f}, p = {test_results['cpes']['t_test']['p_value']:.3f}")
+    
+    print("\n--- Mann-Whitney U tests ---")
+    print(f"SUS - U = {test_results['sus']['mann_whitney_u']['statistic']:.3f}, p = {test_results['sus']['mann_whitney_u']['p_value']:.3f}")
+    print(f"NASA-TLX (Unweighted) - U = {test_results['nasa_unweighted']['mann_whitney_u']['statistic']:.3f}, p = {test_results['nasa_unweighted']['mann_whitney_u']['p_value']:.3f}")
+    # print(f"NASA-TLX (Weighted) - U = {test_results['nasa_weighted']['mann_whitney_u']['statistic']:.3f}, p = {test_results['nasa_weighted']['mann_whitney_u']['p_value']:.3f}")
+    # print(f"CPES - U = {test_results['cpes']['mann_whitney_u']['statistic']:.3f}, p = {test_results['cpes']['mann_whitney_u']['p_value']:.3f}")
     
     # Effect sizes (Cohen's d)
     def cohens_d(group1, group2):
@@ -281,7 +308,7 @@ def main():
     
     print(f"SUS: d = {sus_d:.3f}")
     print(f"NASA-TLX (Unweighted): d = {nasa_unweighted_d:.3f}")
-    print(f"NASA-TLX (Weighted): d = {nasa_weighted_d:.3f}")
+    # print(f"NASA-TLX (Weighted): d = {nasa_weighted_d:.3f}")
     print(f"CPES: d = {cpes_d:.3f}")
     
     # Analyze individual NASA-TLX dimensions
