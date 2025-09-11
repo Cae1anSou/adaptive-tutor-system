@@ -17,10 +17,6 @@ NASA-TLX (Unweighted): 5.03 (1.11)
 SUS - t(22) = 0.921, p = 0.367
 NASA-TLX (Unweighted) - t(22) = -0.135, p = 0.894
 
---- Mann-Whitney U tests ---
-SUS - U = 97.000, p = 0.154
-NASA-TLX (Unweighted) - U = 72.500, p = 1.000
-
 === EFFECT SIZES (Cohen's d) ===
 SUS: d = 0.393
 NASA-TLX (Unweighted): d = -0.058
