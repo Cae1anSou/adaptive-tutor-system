@@ -205,13 +205,13 @@ def extract_emotion_data(chat_history):
                 k_means_match = re.search(r'Current learning stage:\s*(\w+)', raw_context)
                 if k_means_match:
                     stage = k_means_match.group(1).lower()
-                    # 转换为数值：struggling=0, normal=1, advanced=2
+                    # 转换为数值：struggling=1, normal=2, advanced=3
                     if stage == 'struggling':
-                        k_means_value = '0'
-                    elif stage == 'normal':
                         k_means_value = '1'
-                    elif stage == 'advanced':
+                    elif stage == 'normal':
                         k_means_value = '2'
+                    elif stage == 'advanced':
+                        k_means_value = '3'
             
             # 构建emotion条目
             emotion_entry = [
