@@ -49,6 +49,8 @@ def clean_and_group_data(input_file, output_file):
         'exp002',
         'exp003',
         'exp004'
+        'baseline003',
+        'exp004'
     ])
     
     # 需要转换为时间戳的字段名

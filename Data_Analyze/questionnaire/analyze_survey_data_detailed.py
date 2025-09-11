@@ -309,7 +309,7 @@ def main():
     print(f"SUS: d = {sus_d:.3f}")
     print(f"NASA-TLX (Unweighted): d = {nasa_unweighted_d:.3f}")
     # print(f"NASA-TLX (Weighted): d = {nasa_weighted_d:.3f}")
-    print(f"CPES: d = {cpes_d:.3f}")
+    # print(f"CPES: d = {cpes_d:.3f}")
     
     # Analyze individual NASA-TLX dimensions
     print("\n=== INDIVIDUAL NASA-TLX DIMENSIONS ANALYSIS ===")
