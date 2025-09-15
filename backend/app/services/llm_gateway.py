@@ -84,16 +84,16 @@ class LLMGateway:
         except Exception as e:
             print(f"Error calling LLM API: {e}")
             return f"I apologize, but I encountered an error: {str(e)}"
-    
-    async def get_completion(
+
+    def get_stream_completion_sync(
         self, 
         system_prompt: str, 
         messages: List[Dict[str, str]],
         max_tokens: Optional[int] = None,
         temperature: Optional[float] = None
-    ) -> str:
+    ):
         """
-        获取LLM完成结果
+        同步获取LLM流式完成结果
         
         Args:
             system_prompt: 系统提示词
@@ -101,8 +101,8 @@ class LLMGateway:
             max_tokens: 最大token数
             temperature: 温度参数
             
-        Returns:
-            str: LLM生成的回复
+        Yields:
+            str: LLM生成的回复片段
         """
         try:
             # 构建完整的消息列表
@@ -112,45 +112,26 @@ class LLMGateway:
             max_tokens = max_tokens or self.max_tokens
             temperature = temperature or self.temperature
             
-            # 调用LLM API - OpenAI客户端是同步的
-            # 使用 asyncio.to_thread 来在异步环境中运行同步代码
-
-            #TODO:修改流式参数调用，修改返回逻辑
-            response = await asyncio.to_thread(
-                self.client.chat.completions.create,
+            # 直接调用OpenAI客户端（同步）
+            response = self.client.chat.completions.create(
                 model=self.model,
                 messages=full_messages,
                 max_tokens=max_tokens,
-                temperature=temperature
-                #,stream=True,
+                temperature=temperature,
+                stream=True,
             )
             
-            #TODO:数据返回逻辑需要修改
-
-            # 记录usage（若提供）
-            try:
-                usage = getattr(response, 'usage', None)
-                if usage is not None:
-                    self.last_usage = {
-                        'prompt_tokens': getattr(usage, 'prompt_tokens', None),
-                        'completion_tokens': getattr(usage, 'completion_tokens', None),
-                        'total_tokens': getattr(usage, 'total_tokens', None),
-                    }
-                else:
-                    self.last_usage = None
-            except Exception:
-                self.last_usage = None
-
-            if response.choices and len(response.choices) > 0:
-                return response.choices[0].message.content
-            else:
-                return "I apologize, but I couldn't generate a response at this time."
-                
+            # 流式返回内容
+            for chunk in response:
+                if chunk.choices and len(chunk.choices) > 0:
+                    delta = chunk.choices[0].delta
+                    if delta.content:
+                        yield delta.content
+            
         except Exception as e:
             print(f"Error calling LLM API: {e}")
-            return f"I apologize, but I encountered an error: {str(e)}"
-    
-    
+            yield f"I apologize, but I encountered an error: {str(e)}"
+
     async def get_stream_completion(
         self, 
         system_prompt: str, 

@@ -48,7 +48,7 @@ class ChatModule {
 websocket.subscribe("stream_end", (msg) => {
       //console.log("[ChatModule] 收到AI结果:", msg);
       // 展示AI回复
-      if (currentAiMessageElement) {
+      if (this.streamElement) {
                   const el = this.streamElement;
                   if (msg.ai_response) {
                       this.appendMessageContent(el, msg.ai_response);

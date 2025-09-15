@@ -544,7 +544,7 @@ class DynamicController:
             )
             ai_response=""
             # 步骤6: 调用LLM（同步方式）
-            for chunck in self.llm_gateway.get_stream_completion(
+            for chunck in self.llm_gateway.get_stream_completion_sync(
                 system_prompt=system_prompt,
                 messages=messages
             ):
