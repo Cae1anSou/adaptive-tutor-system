@@ -247,6 +247,9 @@ websocket.subscribe("stream_end", (msg) => {
     }
   }
      appendMessageContent(messageContentElement, content) {
+    // 检查元素是否存在
+    if (!messageContentElement) return;
+    
     // 初始化缓冲
     if (!messageContentElement._renderBuffer) messageContentElement._renderBuffer = '';
     messageContentElement._renderBuffer += content;
