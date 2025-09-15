@@ -20,21 +20,54 @@ class ChatModule {
     this.inputElement = null;
     this.sendButton = null;
     this.isLoading = false;
+    this.streamElement = null;
     //websocket.userId = getParticipantId();
     //websocket.connect();
      // 订阅 WebSocket 消息
-    websocket.subscribe("chat_result", (msg) => {
-      console.log("[ChatModule] 收到AI结果:", msg);
+//stream_start
+    websocket.subscribe("stream_start", (msg) => {
+      //console.log("[ChatModule] 收到AI结果:", msg);
       // 展示AI回复
-      this.addMessageToUI('ai', msg.ai_response, { mode: this.currentMode || null, contentId: this.currentContentId || null });
+      this.streamElement=this.addMessageToUI('ai', msg.ai_response, { mode: this.currentMode || null, contentId: this.currentContentId || null });
+      // 收到结果后解除加载状态，解锁“提问”按钮
+      //this.setLoadingState(false);
+      // 双重保证：收到结果时清空输入框（即使发送时已清空）
+      
+    });
+//streaming
+     websocket.subscribe("streaming", (msg) => {
+      //console.log("[ChatModule] 收到AI结果:", msg);
+      // 展示AI回复
+       this.appendMessageContent(this.streamElement,  msg.ai_response);
+      // 收到结果后解除加载状态，解锁“提问”按钮
+      //this.setLoadingState(false);
+      // 双重保证：收到结果时清空输入框（即使发送时已清空）
+      
+    });
+//stream_end
+websocket.subscribe("stream_end", (msg) => {
+      //console.log("[ChatModule] 收到AI结果:", msg);
+      // 展示AI回复
+      if (currentAiMessageElement) {
+                  const el = this.streamElement;
+                  if (msg.ai_response) {
+                      this.appendMessageContent(el, msg.ai_response);
+                  }
+                  if (el._flushFn) {
+                      el._flushFn();
+                  } else if (el._streamBuffer && el._streamBuffer.length > 0) {
+                      el.textContent += el._streamBuffer;
+                      el._streamBuffer = '';
+                  }
+      }
       // 收到结果后解除加载状态，解锁“提问”按钮
       this.setLoadingState(false);
       // 双重保证：收到结果时清空输入框（即使发送时已清空）
       if (this.inputElement) {
         this.inputElement.value = '';
       }
+      this.streamElement=null;
     });
-
     // websocket.subscribe("submission_progress", (msg) => {
     //   console.log("[ChatModule] 收到进度:", msg);
     //   this.addMessageToUI('ai', `进度: ${msg.data.progress * 100}%`);
@@ -214,60 +247,48 @@ class ChatModule {
     }
   }
      appendMessageContent(messageContentElement, content) {
-                // 按流缓冲起来，使用 requestAnimationFrame 分片追加，避免每次小片段都触发大量重排
-                if (!messageContentElement._streamBuffer) messageContentElement._streamBuffer = '';
-                messageContentElement._streamBuffer += content;
+    // 初始化缓冲
+    if (!messageContentElement._renderBuffer) messageContentElement._renderBuffer = '';
+    messageContentElement._renderBuffer += content;
 
-                // 如果已有调度则无需重复调度
-                if (messageContentElement._rafScheduled) return;
-                messageContentElement._rafScheduled = true;
+    const messagesContainer = this.messagesContainer;
 
-                const messagesContainer = this.messagesContainer
+    // 如果已经有定时器就不重复开
+    if (!messageContentElement._renderTimer) {
+        messageContentElement._renderTimer = setInterval(() => {
+            if (!messageContentElement._renderBuffer) return;
 
-                const FLUSH_CHUNK = 2; // 每帧最多追加的字符数，调大或调小以平衡流畅度与实时性
+            // 全量渲染：拿到完整内容
+            const fullText = messageContentElement._renderBuffer;
 
-                const flush = () => {
-                    messageContentElement._rafScheduled = false;
+            // 每次都把整个内容重新解析
+            messageContentElement.innerHTML = marked.parse(fullText);
 
-                    // 每次从缓冲区取出一段字符追加
-                    const buffer = messageContentElement._streamBuffer || '';
-                    if (!buffer) return;
-
-                    const toAppend = buffer.slice(0, FLUSH_CHUNK);
-                    // 使用 textContent 追加纯文本，避免 XSS 和重解析
-                    messageContentElement.textContent += toAppend;
-
-                    // 剩余写回缓冲区
-                    messageContentElement._streamBuffer = buffer.slice(FLUSH_CHUNK);
-
-                    // 平滑滚动到底部，但仅在用户接近底部时使用 smooth，避免用户查看历史消息时被打断
-                    try {
-                        const distanceFromBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop - messagesContainer.clientHeight;
-                        const useSmooth = distanceFromBottom < 80; // 阈值可调整
-                        messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: useSmooth ? 'smooth' : 'auto' });
-                    } catch (e) {
-                        // fallback
-                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                    }
-
-                    // 如果还有缓冲则在下一帧继续刷新
-                    if (messageContentElement._streamBuffer && messageContentElement._streamBuffer.length > 0) {
-                        messageContentElement._rafScheduled = true;
-                        requestAnimationFrame(flush);
-                    }
-                };
-
-                // 将 flush 暴露到元素，以便 stream_end 调用时触发分片完成
-                messageContentElement._flushFn = () => {
-                    // 如果已经在调度中，flush 会在当前 rAF 循环中自动完成
-                    if (messageContentElement._rafScheduled) return;
-                    messageContentElement._rafScheduled = true;
-                    requestAnimationFrame(flush);
-                };
-
-                // 首次调度
-                requestAnimationFrame(flush);
+            // 滚动到底部
+            try {
+                const distanceFromBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop - messagesContainer.clientHeight;
+                const useSmooth = distanceFromBottom < 80;
+                messagesContainer.scrollTo({
+                    top: messagesContainer.scrollHeight,
+                    behavior: useSmooth ? 'smooth' : 'auto'
+                });
+            } catch (e) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }
+        }, 100); // 每隔 2 秒全量渲染一次
+    }
+
+    // 在 stream_end 时调用，确保完整内容最终渲染
+    messageContentElement._flushFn = () => {
+        if (messageContentElement._renderBuffer) {
+            messageContentElement.innerHTML = marked.parse(messageContentElement._renderBuffer);
+        }
+        if (messageContentElement._renderTimer) {
+            clearInterval(messageContentElement._renderTimer);
+            messageContentElement._renderTimer = null;
+        }
+    };
+}
   /**
    * 添加消息到UI
    * @param {string} sender - 发送者 ('user' 或 'ai')
@@ -297,7 +318,7 @@ class ChatModule {
           <div class="markdown-content">${marked(content)}</div>
         </div>
       `;
-      aiContent = messageElement.querySelector('.ai-content');
+      aiContent = messageElement.querySelector('.markdown-content');
     }
 
     this.messagesContainer.appendChild(messageElement);

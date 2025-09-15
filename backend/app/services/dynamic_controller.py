@@ -19,7 +19,7 @@ from app.schemas.behavior import BehaviorEvent
 from app.schemas.behavior import EventType, AiHelpRequestData
 from datetime import datetime
 from zoneinfo import ZoneInfo
-
+from typing import AsyncGenerator
 logger = logging.getLogger(__name__)
 logger = logging.getLogger(__name__)
 class DynamicController:
@@ -391,7 +391,7 @@ class DynamicController:
         request: ChatRequest,
         db: Session,
         background_tasks = None
-    ) -> ChatResponse:
+    ) -> AsyncGenerator[str, None]:
         """
         同步生成自适应AI回复的核心流程（供Celery任务使用）
         Args:
@@ -543,15 +543,19 @@ class DynamicController:
                 test_results=request.test_results  # 传递测试结果
             )
             # 步骤6: 调用LLM（同步方式）
-            ai_response = self.llm_gateway.get_stream_completion(
+            ai_response_iterator = self.llm_gateway.get_stream_completion(
                 system_prompt=system_prompt,
                 messages=messages
             )
+            ai_response=""
+            for chunk in ai_response_iterator:
+                ai_response += chunk
+                yield chunk
             # 步骤7: 构建响应（只包含AI回复内容，符合TDD-II-10设计）
             response = ChatResponse(ai_response=ai_response)
             # 步骤8: 记录AI交互
             self._log_ai_interaction(request, response, db, sentiment_result, background_tasks, system_prompt, content_title, context_snapshot)
-            return response
+            #return response
         except Exception as e:
             print(f"❌ CRITICAL ERROR in generate_adaptive_response_sync: {e}")
             import traceback
