@@ -543,7 +543,7 @@ class DynamicController:
                 test_results=request.test_results  # 传递测试结果
             )
             # 步骤6: 调用LLM（同步方式）
-            ai_response = self.llm_gateway.get_completion_sync(
+            ai_response = self.llm_gateway.get_stream_completion(
                 system_prompt=system_prompt,
                 messages=messages
             )
