@@ -391,7 +391,7 @@ class DynamicController:
         request: ChatRequest,
         db: Session,
         background_tasks = None
-    ) -> AsyncGenerator[str, None]:
+    ):
         """
         同步生成自适应AI回复的核心流程（供Celery任务使用）
         Args:
@@ -542,15 +542,14 @@ class DynamicController:
                 content_json=loaded_content_json,  # 传递加载的内容JSON
                 test_results=request.test_results  # 传递测试结果
             )
+            ai_response=""
             # 步骤6: 调用LLM（同步方式）
-            ai_response_iterator = self.llm_gateway.get_stream_completion(
+            for chunck in self.llm_gateway.get_stream_completion(
                 system_prompt=system_prompt,
                 messages=messages
-            )
-            ai_response=""
-            for chunk in ai_response_iterator:
-                ai_response += chunk
-                yield chunk
+            ):
+                ai_response += chunck
+                yield chunck
             # 步骤7: 构建响应（只包含AI回复内容，符合TDD-II-10设计）
             response = ChatResponse(ai_response=ai_response)
             # 步骤8: 记录AI交互

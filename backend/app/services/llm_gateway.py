@@ -189,7 +189,7 @@ class LLMGateway:
                 temperature=temperature,
                 stream=True,
             )
-            return response
+            #return response
             # 流式返回内容
             for chunk in response:
                 if chunk.choices and len(chunk.choices) > 0:
