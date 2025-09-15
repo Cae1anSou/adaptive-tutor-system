@@ -15,6 +15,7 @@ import api_client from '../api_client.js'
 import chatStorage from './chat_storage.js';
 class ChatModule {
   constructor() {
+    console.log('[DEBUG] ChatModule 脚本加载了');
     this.chatContainer = null;
     this.messagesContainer = null;
     this.inputElement = null;
@@ -29,49 +30,90 @@ class ChatModule {
       console.log("[ChatModule]stream_start");
       // 展示AI回复
       //console.log("[ChatModule] 收到AI结果:", msg);
-      this.streamElement=this.addMessageToUI('ai', "", { mode: this.currentMode || null, contentId: this.currentContentId || null });
+      this.setLoadingState(false);
       // 收到结果后解除加载状态，解锁“提问”按钮
       //this.setLoadingState(false);
       // 双重保证：收到结果时清空输入框（即使发送时已清空）
       
     });
 //streaming
-     websocket.subscribe("streaming", (msg) => {
-      console.log("[ChatModule] streaming");
-      // 展示AI回复
-      if(this.streamElement){
-        console.log("[ChatModule] 有元素");
+    websocket.subscribe("streaming", (msg) => {
+      // 流式中间数据
+      console.log('[ChatModule] streaming raw msg:', msg);
+      // 确保有一个占位元素
+      if (!this.streamElement) {
+        // 尝试寻找最后一个 AI 占位元素作为回退
+        const lastAi = this.messagesContainer && this.messagesContainer.querySelector('.ai-message:last-of-type .markdown-content');
+        if (lastAi) {
+          this.streamElement = lastAi;
+          console.log('[ChatModule] 在 streaming 时恢复 streamElement');
+        }
       }
-      
-       this.appendMessageContent(this.streamElement, msg.ai_response);
-      // 收到结果后解除加载状态，解锁“提问”按钮
-      //this.setLoadingState(false);
-      // 双重保证：收到结果时清空输入框（即使发送时已清空）
-      
+
+      // 解析消息，支持字符串或对象
+      let chunk = '';
+      try {
+        if (typeof msg === 'string') {
+          chunk = msg;
+        } else if (msg === null || msg === undefined) {
+          chunk = '';
+        } else if (typeof msg === 'object') {
+          // 常见字段优先级：data > ai_response > content > text
+          chunk = msg.data || msg.ai_response || msg.content || msg.text || '';
+          // 有时 data 是对象包含 text
+          if (typeof chunk === 'object' && chunk !== null) {
+            chunk = chunk.text || chunk.message || JSON.stringify(chunk);
+          }
+        }
+      } catch (e) {
+        console.warn('[ChatModule] 解析 stream chunk 时出错', e, msg);
+        chunk = '';
+      }
+
+      if (chunk && this.streamElement) {
+        this.appendMessageContent(this.streamElement, chunk);
+      } else if (chunk && !this.streamElement) {
+        // 如果没有占位元素，直接新增一条 ai 消息并填充
+        const el = this.addMessageToUI('ai', chunk, { persist: false });
+        this.streamElement = el;
+      }
     });
 //stream_end
 websocket.subscribe("stream_end", (msg) => {
-      console.log("[ChatModule] stream_end");
-      // 展示AI回复
+      console.log('[ChatModule] stream_end raw msg:', msg);
+      if (!this.streamElement) {
+        // 尝试恢复最后一个 AI 元素
+        const lastAi = this.messagesContainer && this.messagesContainer.querySelector('.ai-message:last-of-type .markdown-content');
+        if (lastAi) {
+          this.streamElement = lastAi;
+        }
+      }
+
       if (this.streamElement) {
-                  const el = this.streamElement;
-                  if (msg) {
-                      this.appendMessageContent(el, msg.ai_response);
-                  }
-                  if (el._flushFn) {
-                      el._flushFn();
-                  } else if (el._streamBuffer && el._streamBuffer.length > 0) {
-                      el.textContent += el._streamBuffer;
-                      el._streamBuffer = '';
-                  }
+        let finalChunk = '';
+        try {
+          if (typeof msg === 'string') {
+            finalChunk = msg;
+          } else if (msg && typeof msg === 'object') {
+            finalChunk = msg.data || msg.ai_response || msg.content || msg.text || '';
+            if (typeof finalChunk === 'object' && finalChunk !== null) {
+              finalChunk = finalChunk.text || finalChunk.message || JSON.stringify(finalChunk);
+            }
+          }
+        } catch (e) {
+          console.warn('[ChatModule] 解析 stream_end msg 失败', e, msg);
+        }
+
+       // if (finalChunk) this.appendMessageContent(this.streamElement, finalChunk);
+
+        if (this.streamElement._flushFn) {
+          this.streamElement._flushFn();
+        }
       }
-      // 收到结果后解除加载状态，解锁“提问”按钮
+
+      if (this.inputElement) this.inputElement.value = '';
       this.setLoadingState(false);
-      // 双重保证：收到结果时清空输入框（即使发送时已清空）
-      if (this.inputElement) {
-        this.inputElement.value = '';
-      }
-      this.streamElement=null;
+      this.streamElement = null;
     });
     // websocket.subscribe("submission_progress", (msg) => {
     //   console.log("[ChatModule] 收到进度:", msg);
@@ -86,7 +128,7 @@ websocket.subscribe("stream_end", (msg) => {
 
   /**
    * 初始化聊天模块
-   * @param {string} mode - 模式 ('learning' 或 'test')
+   * @param {string} mode - 模式 ('learning' 或 'sent2')
    * @param {string} contentId - 内容ID (学习内容ID或测试任务ID)
    * @param {Object} options - 配置选项
    * @param {boolean} options.enableEnterToSend - 是否启用Enter键发送消息，默认为true
@@ -130,7 +172,7 @@ websocket.subscribe("stream_end", (msg) => {
 
   /**
    * 绑定事件监听器
-   * @param {string} mode - 模式 ('learning' 或 'test')
+   * @param {string} mode - 模式 ('learning' 或 'sent2')
    * @param {string} contentId - 内容ID
    * @param {Object} options - 配置选项
    * @param {boolean} options.enableEnterToSend - 是否启用Enter键发送消息，默认为true
@@ -142,6 +184,7 @@ websocket.subscribe("stream_end", (msg) => {
     // 发送按钮点击事件
     this.sendButton.addEventListener('click', () => {
       this.sendMessage(mode, contentId);
+      console.log('点击');
     });
 
     // 回车键发送消息（Shift+Enter换行）
@@ -157,18 +200,80 @@ websocket.subscribe("stream_end", (msg) => {
 
   /**
    * 发送消息到后端
-   * @param {string} mode - 模式 ('learning' 或 'test')
+   * @param {string} mode - 模式 ('learning' 或 'sent2')
    * @param {string} contentId - 内容ID
    */
   async sendMessage(mode, contentId) {
-    const message = this.inputElement.value.trim();
-    if (!message || this.isLoading) return;
+  // alert('sendMessage 我进来了'); 
+    try { 
+          console.log('[DEBUG]点击发送');
+          const message = this.inputElement.value.trim();
+          if (!message || this.isLoading) return;
 
-    // 清空输入框
-    this.inputElement.value = '';
+          // 清空输入框
+          this.inputElement.value = '';
 
-    // 添加用户消息到UI（并持久化上下文）
-    this.addMessageToUI('user', message, { mode, contentId });
+          // 添加用户消息到UI（并持久化上下文）
+          this.addMessageToUI('user', message, { mode, contentId });
+          // 创建AI占位元素并保存到 this.streamElement
+          const aiEl = this.addMessageToUI('ai', "", { mode, contentId });
+          this.streamElement = aiEl;
+          console.log('[chat] created streamElement', this.streamElement);
+     } catch (error) {
+      console.log('[ERROR] 发送消息时出错:', error);
+    }
+    // 设置加载状态
+    this.setLoadingState(true);
+
+    try {
+      // 构建请求体 (participant_id 会由 apiClient 自动注入)
+      const requestBody = {
+        user_message: message,
+        conversation_history: this.getConversationHistory(),
+        code_context: this.getCodeContext(),
+        mode: mode,
+        content_id: contentId
+      };
+
+      // 如果是测试模式，添加测试结果
+      if (mode === 'sent2') {
+        const sent2Results = this._getsent2Results();
+        if (sent2Results) {
+          requestBody.sent2_results = sent2Results;
+        }
+      }
+      
+      // 发送请求以触发后端处理，实际回复通过 WebSocket 返回
+      // 等待请求返回（通常为确认/排队），错误时在 catch 中解锁按钮
+      await api_client.post('/chat/ai/chat2', requestBody);
+
+
+     
+    } catch (error) {
+      console.error('[ChatModule] 发送消息时出错:', error);
+      this.addMessageToUI('ai', `抱歉，我无法回答你的问题。错误信息: ${error.message}`);
+      // 请求失败（不会有 WebSocket 结果），需要解锁按钮
+      this.setLoadingState(false);
+    }
+  }
+  async send2(mode, contentId) {
+     alert('sendMessage 真的进来了'); 
+      console.log('[DEBUG]点击发送');
+      const message = this.inputElement.value.trim();
+      if (!message || this.isLoading) return;
+
+      // 清空输入框
+      this.inputElement.value = '';
+
+      // 添加用户消息到UI（并持久化上下文）
+      this.addMessageToUI('user', message, { mode, contentId });
+      alert("开始请求")
+      const element=this.addMessageToUI('ai', "", { mode, contentId });
+      console.log(element+"1")
+      this.streamElement=element;
+      console.log(this.streamElement+"2")
+      //alert("开始请求")
+      console.log("[chat]streamElement",this.streamElement);
 
     // 设置加载状态
     this.setLoadingState(true);
@@ -184,66 +289,18 @@ websocket.subscribe("stream_end", (msg) => {
       };
 
       // 如果是测试模式，添加测试结果
-      if (mode === 'test') {
-        const testResults = this._getTestResults();
-        if (testResults) {
-          requestBody.test_results = testResults;
+      if (mode === 'sent2') {
+        const sent2Results = this._getsent2Results();
+        if (sent2Results) {
+          requestBody.sent2_results = sent2Results;
         }
       }
+      
       // 发送请求以触发后端处理，实际回复通过 WebSocket 返回
       // 等待请求返回（通常为确认/排队），错误时在 catch 中解锁按钮
       await api_client.post('/chat/ai/chat2', requestBody);
 
 
-      // let block=this.addMessageToUI('ai', "");
-      // let currentAiMessageElement=block;
-      // const messageData = {
-      //                   type: "ai_message",
-      //                   userId: getParticipantId(),
-      //                   message: message
-      //               };
-      // websocket.socket.send(JSON.stringify(messageData))
-      // websocket.onMessage((data, rawEvent) => {
-      //               //console.log("外部捕获消息:", data);
-      //               if (data.type === "stream_start") {
-      //                   // 开始流式传输
-      //                   //this.showTypingIndicator(false);
-      //                   //currentAiMessageElement = addMessage('', 'ai', 'AI');
-      //               } else if (data.type === "stream") {
-      //                   // 流式传输中
-      //                   if (currentAiMessageElement) {
-      //                       this.appendMessageContent(currentAiMessageElement, data.message);
-      //                   }
-      //               } else if (data.type === "stream_end") {
-      //                           // 流式传输结束：如果 stream_end 携带最后一段文本，先通过 appendMessageContent 入缓冲，
-      //                           // 然后调用元素的分片 flush 函数完成剩余内容，避免一次性大块追加
-      //                           if (currentAiMessageElement) {
-      //                               const el = currentAiMessageElement;
-      //                               if (data.message) {
-      //                                   this.appendMessageContent(el, data.message);
-      //                               }
-      //                               if (el._flushFn) {
-      //                                   el._flushFn();
-      //                               } else if (el._streamBuffer && el._streamBuffer.length > 0) {
-      //                                   el.textContent += el._streamBuffer;
-      //                                   el._streamBuffer = '';
-      //                               }
-      //                           }
-      //                           currentAiMessageElement = null;
-      //               } 
-                    
-      //       }
-         // );
-
-
-
-      // if (data.code === 200 && data.data && typeof data.data.ai_response === 'string') {
-      //   // 添加AI回复到UI
-      //   this.addMessageToUI('ai', data.data.ai_response);
-      // } else {
-      //   // 即使请求成功，但如果响应内容为空或格式不正确，也抛出错误
-      //   throw new Error(data.message || 'AI回复内容为空或格式不正确');
-      // }
     } catch (error) {
       console.error('[ChatModule] 发送消息时出错:', error);
       this.addMessageToUI('ai', `抱歉，我无法回答你的问题。错误信息: ${error.message}`);
@@ -322,14 +379,24 @@ websocket.subscribe("stream_end", (msg) => {
           ${contentDiv.outerHTML}
         </div>
       `;
+      //alert(safeContent);
     } else {
       messageElement.innerHTML = `
         <div class="ai-avatar">AI</div>
         <div class="ai-content">
-          <div class="markdown-content">${marked(safeContent)}</div>
+          <div class="markdown-content"></div>
         </div>
       `;
       aiContent = messageElement.querySelector('.markdown-content');
+      // 如果初始 content 非空，立刻进入增量渲染流程
+      if (safeContent) {
+        try {
+          this.appendMessageContent(aiContent, safeContent);
+        } catch (e) {
+          console.warn('[ChatModule] append 初始 AI 内容失败，回退为 textContent', e);
+          aiContent.textContent = safeContent;
+        }
+      }
     }
 
     this.messagesContainer.appendChild(messageElement);
@@ -355,6 +422,7 @@ websocket.subscribe("stream_end", (msg) => {
       console.warn('[ChatModule] 持久化消息失败:', e);
     }
     if (sender === 'ai') {
+      console.log('返回内容', aiContent);
       return aiContent;
     }
   }
@@ -405,14 +473,14 @@ websocket.subscribe("stream_end", (msg) => {
    * @returns {Array|null} 测试结果数组或null
    * @private
    */
-  _getTestResults() {
-    const resultsContainer = document.getElementById('test-results-content');
+  _getsent2Results() {
+    const resultsContainer = document.getElementById('sent2-results-content');
     if (!resultsContainer || !resultsContainer.innerHTML.trim()) {
       return null;
     }
 
     const results = [];
-    const overallStatus = resultsContainer.classList.contains('test-result-passed') ? 'success' : 'error';
+    const overallStatus = resultsContainer.classList.contains('sent2-result-passed') ? 'success' : 'error';
 
     // 提取主标题和副标题
     const mainHeader = resultsContainer.querySelector('h4');
