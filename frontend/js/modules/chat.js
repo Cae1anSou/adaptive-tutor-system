@@ -26,9 +26,10 @@ class ChatModule {
      // 订阅 WebSocket 消息
 //stream_start
     websocket.subscribe("stream_start", (msg) => {
-      //console.log("[ChatModule] 收到AI结果:", msg);
+      console.log("[ChatModule]stream_start");
       // 展示AI回复
-      this.streamElement=this.addMessageToUI('ai', msg.ai_response, { mode: this.currentMode || null, contentId: this.currentContentId || null });
+      //console.log("[ChatModule] 收到AI结果:", msg);
+      this.streamElement=this.addMessageToUI('ai', "", { mode: this.currentMode || null, contentId: this.currentContentId || null });
       // 收到结果后解除加载状态，解锁“提问”按钮
       //this.setLoadingState(false);
       // 双重保证：收到结果时清空输入框（即使发送时已清空）
@@ -36,9 +37,13 @@ class ChatModule {
     });
 //streaming
      websocket.subscribe("streaming", (msg) => {
-      //console.log("[ChatModule] 收到AI结果:", msg);
+      console.log("[ChatModule] streaming");
       // 展示AI回复
-       this.appendMessageContent(this.streamElement,  msg.ai_response);
+      if(this.streamElement){
+        console.log("[ChatModule] 有元素");
+      }
+      
+       this.appendMessageContent(this.streamElement, msg.ai_response);
       // 收到结果后解除加载状态，解锁“提问”按钮
       //this.setLoadingState(false);
       // 双重保证：收到结果时清空输入框（即使发送时已清空）
@@ -46,11 +51,11 @@ class ChatModule {
     });
 //stream_end
 websocket.subscribe("stream_end", (msg) => {
-      //console.log("[ChatModule] 收到AI结果:", msg);
+      console.log("[ChatModule] stream_end");
       // 展示AI回复
       if (this.streamElement) {
                   const el = this.streamElement;
-                  if (msg.ai_response) {
+                  if (msg) {
                       this.appendMessageContent(el, msg.ai_response);
                   }
                   if (el._flushFn) {
@@ -301,13 +306,16 @@ websocket.subscribe("stream_end", (msg) => {
     const { persist = true, mode = null, contentId = null } = options;
     if (!this.messagesContainer) return;
 
+    // 确保content不是undefined或null
+    const safeContent = content || "";
+
     const messageElement = document.createElement('div');
     messageElement.classList.add(`${sender}-message`);
     let aiContent;
     if (sender === 'user') {
       const contentDiv = document.createElement('div');
       contentDiv.className = 'markdown-content';
-      contentDiv.textContent = content;
+      contentDiv.textContent = safeContent;
       messageElement.innerHTML = `
         <div class="user-avatar">你</div>
         <div class="user-content">
@@ -318,7 +326,7 @@ websocket.subscribe("stream_end", (msg) => {
       messageElement.innerHTML = `
         <div class="ai-avatar">AI</div>
         <div class="ai-content">
-          <div class="markdown-content">${marked(content)}</div>
+          <div class="markdown-content">${marked(safeContent)}</div>
         </div>
       `;
       aiContent = messageElement.querySelector('.markdown-content');
@@ -336,7 +344,7 @@ websocket.subscribe("stream_end", (msg) => {
         if (participantId) {
           chatStorage.append(participantId, {
             role: sender === 'user' ? 'user' : 'assistant',
-            content,
+            content: safeContent,
             mode,
             contentId,
             ts: Date.now(),
