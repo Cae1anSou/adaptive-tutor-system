@@ -21,6 +21,8 @@ class ChatModule {
     this.inputElement = null;
     this.sendButton = null;
     this.isLoading = false;
+  // 当为 true 时，生成期间始终自动滚到底部；生成结束后恢复用户自由滚动
+  this.autoScrollDuringGeneration = false;
     this.streamElement = null;
     //websocket.userId = getParticipantId();
     //websocket.connect();
@@ -110,9 +112,10 @@ websocket.subscribe("stream_end", (msg) => {
           this.streamElement._flushFn();
         }
       }
-      this.setLoadingState(false);
+    // 生成结束：关闭强制滚动
+    this.autoScrollDuringGeneration = false;
+    this.setLoadingState(false);
       if (this.inputElement) this.inputElement.value = '';
-      this.setLoadingState(false);
       this.streamElement = null;
     });
     // websocket.subscribe("submission_progress", (msg) => {
@@ -218,6 +221,8 @@ websocket.subscribe("stream_end", (msg) => {
           // 创建AI占位元素并保存到 this.streamElement
           const aiEl = this.addMessageToUI('ai', "", { mode, contentId });
           this.streamElement = aiEl;
+          // 开始生成：启用强制自动滚动
+          this.autoScrollDuringGeneration = true;
           console.log('[chat] created streamElement', this.streamElement);
      } catch (error) {
       console.log('[ERROR] 发送消息时出错:', error);
@@ -326,20 +331,24 @@ websocket.subscribe("stream_end", (msg) => {
             // 全量渲染：拿到完整内容
             const fullText = messageContentElement._renderBuffer;
 
-            // 每次都把整个内容重新解析
-            messageContentElement.innerHTML = marked.parse(fullText);
+      // 每次都把整个内容重新解析
+      messageContentElement.innerHTML = marked.parse(fullText);
 
-            // 滚动到底部
-            try {
-                const distanceFromBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop - messagesContainer.clientHeight;
-                const useSmooth = distanceFromBottom < 80;
-                messagesContainer.scrollTo({
-                    top: messagesContainer.scrollHeight,
-                    behavior: useSmooth ? 'smooth' : 'auto'
-                });
-            } catch (e) {
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }
+      // 滚动到底部：如果正在生成且强制滚动开启，始终滚动；否则仅在接近底部时滚动
+      try {
+        const distanceFromBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop - messagesContainer.clientHeight;
+        if (this.autoScrollDuringGeneration) {
+          messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: 'auto' });
+        } else {
+          const threshold = 80;
+          if (distanceFromBottom <= threshold) {
+            const useSmooth = distanceFromBottom < threshold;
+            messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: useSmooth ? 'smooth' : 'auto' });
+          }
+        }
+      } catch (e) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
         }, 100); // 每隔 2 秒全量渲染一次
     }
 
@@ -401,8 +410,18 @@ websocket.subscribe("stream_end", (msg) => {
 
     this.messagesContainer.appendChild(messageElement);
 
-    // 滚动到底部
-    this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+    // 滚动到底部：如果正在生成且强制滚动开启则强制，否则仅在接近底部时滚动
+    try {
+      const distanceFromBottom = this.messagesContainer.scrollHeight - this.messagesContainer.scrollTop - this.messagesContainer.clientHeight;
+      if (this.autoScrollDuringGeneration) {
+        this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+      } else {
+        const threshold = 80;
+        if (distanceFromBottom <= threshold) this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+      }
+    } catch (e) {
+      // ignore
+    }
     
     // 持久化消息
     try {
@@ -454,7 +473,12 @@ websocket.subscribe("stream_end", (msg) => {
         </div>
       `;
       this.messagesContainer.appendChild(loadingElement);
-      this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+      if (this.autoScrollDuringGeneration) {
+        this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+      } else {
+        const wasNearBottom = this.messagesContainer ? (this.messagesContainer.scrollHeight - this.messagesContainer.scrollTop - this.messagesContainer.clientHeight) <= 80 : true;
+        if (wasNearBottom) this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+      }
     } else {
       const loadingElement = document.getElementById('ai-loading');
       if (loadingElement) {
