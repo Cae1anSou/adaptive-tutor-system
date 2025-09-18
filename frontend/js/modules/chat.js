@@ -30,7 +30,7 @@ class ChatModule {
       console.log("[ChatModule]stream_start");
       // 展示AI回复
       //console.log("[ChatModule] 收到AI结果:", msg);
-      this.setLoadingState(false);
+      //this.setLoadingState(false);
       // 收到结果后解除加载状态，解锁“提问”按钮
       //this.setLoadingState(false);
       // 双重保证：收到结果时清空输入框（即使发送时已清空）
@@ -88,7 +88,7 @@ websocket.subscribe("stream_end", (msg) => {
           this.streamElement = lastAi;
         }
       }
-
+    
       if (this.streamElement) {
         let finalChunk = '';
         try {
@@ -110,7 +110,7 @@ websocket.subscribe("stream_end", (msg) => {
           this.streamElement._flushFn();
         }
       }
-
+      this.setLoadingState(false);
       if (this.inputElement) this.inputElement.value = '';
       this.setLoadingState(false);
       this.streamElement = null;
