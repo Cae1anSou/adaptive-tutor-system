@@ -4,11 +4,11 @@
     "levels": [
             {
                 "level": 1,
-                "description": "在网页开发中，用户与页面的交互是核心功能之一。按钮点击事件就是最常见的一种交互方式。当用户用鼠标点击一个按钮时，我们希望网页能做出反应，比如显示一段信息、跳转到另一个页面或提交表单。实现这种功能的关键是JavaScript中的事件处理机制。所谓‘事件’，就是用户在页面上的某种操作，如点击、输入文字、滚动等。而‘点击事件’特指用户点击某个元素的行为。在HTML中，我们可以通过为按钮元素添加onclick属性来绑定一个JavaScript函数，当按钮被点击时，这个函数就会执行。例如，我们可以写<button onclick=\"alert('你好！')\">点击我</button>，这样每次点击按钮，浏览器就会弹出一个提示框显示‘你好！’。这是最基础的事件绑定方式，适合初学者理解事件的基本概念。需要注意的是，这里的onclick是HTML属性，而alert是一个JavaScript内置函数，用于弹出提示对话框。通过这种方式，我们把HTML的结构和JavaScript的行为结合起来，实现了动态交互效果。"
+                "description": "在网页开发中，用户与页面的交互是核心功能之一。按钮点击事件就是最常见的一种交互方式。当用户用鼠标点击一个按钮时，我们希望网页能做出反应，比如显示一段信息、跳转到另一个页面或提交表单。实现这种功能的关键是JavaScript中的事件处理机制。所谓‘事件’，就是用户在页面上的某种操作，如点击、输入文字、滚动等。而‘点击事件’特指用户点击某个元素的行为。在HTML中，我们可以通过为按钮元素添加onclick属性来绑定一个JavaScript函数，当按钮被点击时，这个函数就会执行。例如，我们可以写`<button onclick=\"alert('你好！')\">点击我</button>`,这样每次点击按钮，浏览器就会弹出一个提示框显示‘你好！’。这是最基础的事件绑定方式，适合初学者理解事件的基本概念。需要注意的是，这里的onclick是HTML属性，而alert是一个JavaScript内置函数，用于弹出提示对话框。通过这种方式，我们把HTML的结构和JavaScript的行为结合起来，实现了动态交互效果。"
             },
             {
                 "level": 2,
-                "description": "虽然使用HTML的onclick属性可以快速实现点击功能，但在实际开发中，更推荐使用JavaScript的事件监听机制来管理点击事件。这是因为将事件处理逻辑写在HTML标签内会使代码变得混乱，不利于维护和扩展。现代前端开发提倡‘行为与结构分离’的原则，即HTML负责页面结构，CSS负责样式，JavaScript负责行为。为此，JavaScript提供了addEventListener方法，可以在不修改HTML的情况下为元素绑定事件。例如，先给按钮设置一个id，如<button id=\"myBtn\">点击我</button>，然后在JavaScript中通过document.getElementById('myBtn')获取该元素，并调用其addEventListener方法，传入'click'作为事件类型和一个函数作为回调。这样当按钮被点击时，回调函数就会执行。这种方法的好处是清晰、灵活，支持同时绑定多个事件处理函数，也便于后续移除事件监听。此外，事件监听还可以应用于其他元素，如图片、链接甚至整个页面，极大提升了交互的可能性。掌握这种模式有助于编写更专业、可维护的代码。"
+                "description": "虽然使用HTML的onclick属性可以快速实现点击功能，但在实际开发中，更推荐使用JavaScript的事件监听机制来管理点击事件。这是因为将事件处理逻辑写在HTML标签内会使代码变得混乱，不利于维护和扩展。现代前端开发提倡‘行为与结构分离’的原则，即HTML负责页面结构，CSS负责样式，JavaScript负责行为。为此，JavaScript提供了addEventListener方法，可以在不修改HTML的情况下为元素绑定事件。例如，先给按钮设置一个id，如`<button id=\"myBtn\">点击我</button>`，然后在JavaScript中通过`document.getElementById('myBtn')`获取该元素，并调用其addEventListener方法，传入'click'作为事件类型和一个函数作为回调。这样当按钮被点击时，回调函数就会执行。这种方法的好处是清晰、灵活，支持同时绑定多个事件处理函数，也便于后续移除事件监听。此外，事件监听还可以应用于其他元素，如图片、链接甚至整个页面，极大提升了交互的可能性。掌握这种模式有助于编写更专业、可维护的代码。"
             },
             {
                 "level": 3,
@@ -16,7 +16,7 @@
             },
             {
                 "level": 4,
-                "description": "为了帮助你巩固对按钮点击事件的理解，下面我们来看一个综合示例。假设我们要创建一个简单的颜色切换器，页面上有一个按钮和一个方块，每次点击按钮，方块的颜色就在红色和蓝色之间切换。首先，在HTML中定义结构：<div id=\"colorBox\" style=\"width:100px; height:100px; background-color:red;\"></div><button id=\"toggleBtn\">切换颜色</button>。接着在JavaScript中编写逻辑：const box = document.getElementById('colorBox'); const btn = document.getElementById('toggleBtn'); let isRed = true; btn.addEventListener('click', function() { if (isRed) { box.style.backgroundColor = 'blue'; isRed = false; } else { box.style.backgroundColor = 'red'; isRed = true; } }); 这段代码展示了如何获取DOM元素、绑定事件以及动态修改样式。你可以尝试在此基础上扩展功能，比如增加更多颜色、使用随机色或添加过渡动画。这正是测试题中‘搜索按钮弹出输入内容’的前置技能——先学会响应点击，再读取输入框值并展示结果。"
+                "description": "为了帮助你巩固对按钮点击事件的理解，下面我们来看一个综合示例。假设我们要创建一个简单的颜色切换器，页面上有一个按钮和一个方块，每次点击按钮，方块的颜色就在红色和蓝色之间切换。首先，在HTML中定义结构：\n\n```html\n<div id=\"colorBox\" style=\"width:100px; height:100px; background-color:red;\">\n</div>\n<button id=\"toggleBtn\">切换颜色</button>\n```\n\n接着在JavaScript中编写逻辑：\n\n```javacript\nconst box = document.getElementById('colorBox'); \nconst btn = document.getElementById('toggleBtn'); \nlet isRed = true;\nbtn.addEventListener('click', function({\nif (isRed){ \n  box.style.backgroundColor = 'blue';\n  isRed = false;\n}else{\n  box.style.backgroundColor = 'red';\n  isRed = true; \n}\n});\n```\n\n 这段代码展示了如何获取DOM元素、绑定事件以及动态修改样式。你可以尝试在此基础上扩展功能，比如增加更多颜色、使用随机色或添加过渡动画。这正是测试题中‘搜索按钮弹出输入内容’的前置技能——先学会响应点击，再读取输入框值并展示结果。"
             }
         ],
     "sc_all": [
