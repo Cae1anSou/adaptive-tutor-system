@@ -15,26 +15,142 @@ import api_client from '../api_client.js'
 import chatStorage from './chat_storage.js';
 class ChatModule {
   constructor() {
+    console.log('[DEBUG] ChatModule 脚本加载了');
     this.chatContainer = null;
     this.messagesContainer = null;
     this.inputElement = null;
     this.sendButton = null;
     this.isLoading = false;
+  // 当为 true 时，生成期间始终自动滚到底部；生成结束后恢复用户自由滚动
+  this.autoScrollDuringGeneration = false;
+    this.streamElement = null;
+    // 添加缓冲区用于存储完整的AI消息
+    this.aiMessageBuffer = null;
     //websocket.userId = getParticipantId();
     //websocket.connect();
      // 订阅 WebSocket 消息
-    websocket.subscribe("chat_result", (msg) => {
-      console.log("[ChatModule] 收到AI结果:", msg);
+//stream_start
+    websocket.subscribe("stream_start", (msg) => {
+      console.log("[ChatModule]stream_start");
       // 展示AI回复
-      this.addMessageToUI('ai', msg.ai_response, { mode: this.currentMode || null, contentId: this.currentContentId || null });
+      //console.log("[ChatModule] 收到AI结果:", msg);
+      //this.setLoadingState(true);
       // 收到结果后解除加载状态，解锁“提问”按钮
-      this.setLoadingState(false);
+      //this.setLoadingState(false);
       // 双重保证：收到结果时清空输入框（即使发送时已清空）
-      if (this.inputElement) {
-        this.inputElement.value = '';
+      // 初始化AI消息缓冲区
+      this.aiMessageBuffer = "";
+    });
+//streaming
+    websocket.subscribe("streaming", (msg) => {
+      // 流式中间数据
+      console.log('[ChatModule] streaming raw msg:', msg);
+      // 确保有一个占位元素
+      if (!this.streamElement) {
+        // 尝试寻找最后一个 AI 占位元素作为回退
+        const lastAi = this.messagesContainer && this.messagesContainer.querySelector('.ai-message:last-of-type .markdown-content');
+        if (lastAi) {
+          this.streamElement = lastAi;
+          console.log('[ChatModule] 在 streaming 时恢复 streamElement');
+        }
+      }
+
+      // 解析消息，支持字符串或对象
+      let chunk = '';
+      try {
+        if (typeof msg === 'string') {
+          chunk = msg;
+        } else if (msg === null || msg === undefined) {
+          chunk = '';
+        } else if (typeof msg === 'object') {
+          // 常见字段优先级：data > ai_response > content > text
+          chunk = msg.data || msg.ai_response || msg.content || msg.text || '';
+          // 有时 data 是对象包含 text
+          if (typeof chunk === 'object' && chunk !== null) {
+            chunk = chunk.text || chunk.message || JSON.stringify(chunk);
+          }
+        }
+      } catch (e) {
+        console.warn('[ChatModule] 解析 stream chunk 时出错', e, msg);
+        chunk = '';
+      }
+
+      // 将内容添加到缓冲区
+      if (chunk) {
+        this.aiMessageBuffer += chunk;
+      }
+
+      if (chunk && this.streamElement) {
+        this.appendMessageContent(this.streamElement, chunk);
+      } else if (chunk && !this.streamElement) {
+        // 如果没有占位元素，直接新增一条 ai 消息并填充
+        const el = this.addMessageToUI('ai', chunk, { persist: false });
+        this.streamElement = el;
       }
     });
+//stream_end
+websocket.subscribe("stream_end", (msg) => {
+      console.log('[ChatModule] stream_end raw msg:', msg);
+      // if (!this.streamElement) {
+      //   // 尝试恢复最后一个 AI 元素
+      //   const lastAi = this.messagesContainer && this.messagesContainer.querySelector('.ai-message:last-of-type .markdown-content');
+      //   if (lastAi) {
+      //     this.streamElement = lastAi;
+      //   }
+      // }
+    
+      if (this.streamElement) {
+        let finalChunk = '';
+        try {
+          if (typeof msg === 'string') {
+            finalChunk = msg;
+          } else if (msg && typeof msg === 'object') {
+            finalChunk = msg.data || msg.ai_response || msg.content || msg.text || '';
+            if (typeof finalChunk === 'object' && finalChunk !== null) {
+              finalChunk = finalChunk.text || finalChunk.message || JSON.stringify(finalChunk);
+            }
+          }
+        } catch (e) {
+          console.warn('[ChatModule] 解析 stream_end msg 失败', e, msg);
+        }
 
+        // 将最终块添加到缓冲区
+        // if (finalChunk) {
+        //   this.aiMessageBuffer += finalChunk;
+        // }
+
+        // 使用完整缓冲区内容更新DOM
+        if (this.aiMessageBuffer !== null && this.streamElement) {
+          this.streamElement._renderBuffer = this.aiMessageBuffer;
+          if (this.streamElement._flushFn) {
+            this.streamElement._flushFn();
+          }
+        }
+
+        // 将完整消息保存到localStorage
+        if (this.aiMessageBuffer !== null) {
+          try {
+            const participantId = getParticipantId();
+            if (participantId) {
+              chatStorage.append(participantId, {
+                role: 'assistant',
+                content: this.aiMessageBuffer,
+                mode: this.currentMode,
+                contentId: this.currentContentId,
+                ts: Date.now(),
+              });
+            }
+          } catch (e) {
+            console.warn('[ChatModule] 持久化完整AI消息失败:', e);
+          }
+        }
+      }
+      this.setLoadingState(false);
+      if (this.inputElement) this.inputElement.value = '';
+      this.streamElement = null;
+      // 清空缓冲区
+      this.aiMessageBuffer = null;
+    });
     // websocket.subscribe("submission_progress", (msg) => {
     //   console.log("[ChatModule] 收到进度:", msg);
     //   this.addMessageToUI('ai', `进度: ${msg.data.progress * 100}%`);
@@ -48,7 +164,7 @@ class ChatModule {
 
   /**
    * 初始化聊天模块
-   * @param {string} mode - 模式 ('learning' 或 'test')
+   * @param {string} mode - 模式 ('learning' 或 'sent2')
    * @param {string} contentId - 内容ID (学习内容ID或测试任务ID)
    * @param {Object} options - 配置选项
    * @param {boolean} options.enableEnterToSend - 是否启用Enter键发送消息，默认为true
@@ -92,7 +208,7 @@ class ChatModule {
 
   /**
    * 绑定事件监听器
-   * @param {string} mode - 模式 ('learning' 或 'test')
+   * @param {string} mode - 模式 ('learning' 或 'sent2')
    * @param {string} contentId - 内容ID
    * @param {Object} options - 配置选项
    * @param {boolean} options.enableEnterToSend - 是否启用Enter键发送消息，默认为true
@@ -104,6 +220,7 @@ class ChatModule {
     // 发送按钮点击事件
     this.sendButton.addEventListener('click', () => {
       this.sendMessage(mode, contentId);
+      console.log('点击');
     });
 
     // 回车键发送消息（Shift+Enter换行）
@@ -119,19 +236,30 @@ class ChatModule {
 
   /**
    * 发送消息到后端
-   * @param {string} mode - 模式 ('learning' 或 'test')
+   * @param {string} mode - 模式 ('learning' 或 'sent2')
    * @param {string} contentId - 内容ID
    */
   async sendMessage(mode, contentId) {
-    const message = this.inputElement.value.trim();
-    if (!message || this.isLoading) return;
+  // alert('sendMessage 我进来了'); 
+    try { 
+          console.log('[DEBUG]点击发送');
+          const message = this.inputElement.value.trim();
+          if (!message || this.isLoading) return;
 
-    // 清空输入框
-    this.inputElement.value = '';
+          // 清空输入框
+          this.inputElement.value = '';
 
-    // 添加用户消息到UI（并持久化上下文）
-    this.addMessageToUI('user', message, { mode, contentId });
-
+          // 添加用户消息到UI（并持久化上下文）
+          this.addMessageToUI('user', message, { mode, contentId });
+          // 创建AI占位元素并保存到 this.streamElement
+          const aiEl = this.addMessageToUI('ai', "", { mode, contentId });
+          this.streamElement = aiEl;
+          // 开始生成：启用强制自动滚动
+          this.autoScrollDuringGeneration = true;
+          console.log('[chat] created streamElement', this.streamElement);
+     } catch (error) {
+      console.log('[ERROR] 发送消息时出错:', error);
+    }
     // 设置加载状态
     this.setLoadingState(true);
 
@@ -146,66 +274,19 @@ class ChatModule {
       };
 
       // 如果是测试模式，添加测试结果
-      if (mode === 'test') {
-        const testResults = this._getTestResults();
-        if (testResults) {
-          requestBody.test_results = testResults;
+      if (mode === 'sent2') {
+        const sent2Results = this._getsent2Results();
+        if (sent2Results) {
+          requestBody.sent2_results = sent2Results;
         }
       }
+      
       // 发送请求以触发后端处理，实际回复通过 WebSocket 返回
       // 等待请求返回（通常为确认/排队），错误时在 catch 中解锁按钮
       await api_client.post('/chat/ai/chat2', requestBody);
 
 
-      // let block=this.addMessageToUI('ai', "");
-      // let currentAiMessageElement=block;
-      // const messageData = {
-      //                   type: "ai_message",
-      //                   userId: getParticipantId(),
-      //                   message: message
-      //               };
-      // websocket.socket.send(JSON.stringify(messageData))
-      // websocket.onMessage((data, rawEvent) => {
-      //               //console.log("外部捕获消息:", data);
-      //               if (data.type === "stream_start") {
-      //                   // 开始流式传输
-      //                   //this.showTypingIndicator(false);
-      //                   //currentAiMessageElement = addMessage('', 'ai', 'AI');
-      //               } else if (data.type === "stream") {
-      //                   // 流式传输中
-      //                   if (currentAiMessageElement) {
-      //                       this.appendMessageContent(currentAiMessageElement, data.message);
-      //                   }
-      //               } else if (data.type === "stream_end") {
-      //                           // 流式传输结束：如果 stream_end 携带最后一段文本，先通过 appendMessageContent 入缓冲，
-      //                           // 然后调用元素的分片 flush 函数完成剩余内容，避免一次性大块追加
-      //                           if (currentAiMessageElement) {
-      //                               const el = currentAiMessageElement;
-      //                               if (data.message) {
-      //                                   this.appendMessageContent(el, data.message);
-      //                               }
-      //                               if (el._flushFn) {
-      //                                   el._flushFn();
-      //                               } else if (el._streamBuffer && el._streamBuffer.length > 0) {
-      //                                   el.textContent += el._streamBuffer;
-      //                                   el._streamBuffer = '';
-      //                               }
-      //                           }
-      //                           currentAiMessageElement = null;
-      //               } 
-                    
-      //       }
-         // );
-
-
-
-      // if (data.code === 200 && data.data && typeof data.data.ai_response === 'string') {
-      //   // 添加AI回复到UI
-      //   this.addMessageToUI('ai', data.data.ai_response);
-      // } else {
-      //   // 即使请求成功，但如果响应内容为空或格式不正确，也抛出错误
-      //   throw new Error(data.message || 'AI回复内容为空或格式不正确');
-      // }
+     
     } catch (error) {
       console.error('[ChatModule] 发送消息时出错:', error);
       this.addMessageToUI('ai', `抱歉，我无法回答你的问题。错误信息: ${error.message}`);
@@ -213,61 +294,57 @@ class ChatModule {
       this.setLoadingState(false);
     }
   }
+ 
      appendMessageContent(messageContentElement, content) {
-                // 按流缓冲起来，使用 requestAnimationFrame 分片追加，避免每次小片段都触发大量重排
-                if (!messageContentElement._streamBuffer) messageContentElement._streamBuffer = '';
-                messageContentElement._streamBuffer += content;
+    // 检查元素是否存在
+    if (!messageContentElement) return;
+    
+    // 初始化缓冲
+    if (!messageContentElement._renderBuffer) messageContentElement._renderBuffer = '';
+    messageContentElement._renderBuffer += content;
 
-                // 如果已有调度则无需重复调度
-                if (messageContentElement._rafScheduled) return;
-                messageContentElement._rafScheduled = true;
+    const messagesContainer = this.messagesContainer;
 
-                const messagesContainer = this.messagesContainer
+    // 如果已经有定时器就不重复开
+    if (!messageContentElement._renderTimer) {
+        messageContentElement._renderTimer = setInterval(() => {
+            if (!messageContentElement._renderBuffer) return;
 
-                const FLUSH_CHUNK = 2; // 每帧最多追加的字符数，调大或调小以平衡流畅度与实时性
+            // 全量渲染：拿到完整内容
+            const fullText = messageContentElement._renderBuffer;
 
-                const flush = () => {
-                    messageContentElement._rafScheduled = false;
+      // 每次都把整个内容重新解析
+      messageContentElement.innerHTML = marked.parse(fullText);
 
-                    // 每次从缓冲区取出一段字符追加
-                    const buffer = messageContentElement._streamBuffer || '';
-                    if (!buffer) return;
+      // 滚动到底部：如果正在生成且强制滚动开启，始终滚动；否则仅在接近底部时滚动
+      try {
+        const distanceFromBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop - messagesContainer.clientHeight;
+        if (this.autoScrollDuringGeneration) {
+          messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: 'auto' });
+        } else {
+          const threshold = 80;
+          if (distanceFromBottom <= threshold) {
+            const useSmooth = distanceFromBottom < threshold;
+            messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: useSmooth ? 'smooth' : 'auto' });
+          }
+        }
+      } catch (e) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+        }, 100); // 每隔 2 秒全量渲染一次
+    }
 
-                    const toAppend = buffer.slice(0, FLUSH_CHUNK);
-                    // 使用 textContent 追加纯文本，避免 XSS 和重解析
-                    messageContentElement.textContent += toAppend;
-
-                    // 剩余写回缓冲区
-                    messageContentElement._streamBuffer = buffer.slice(FLUSH_CHUNK);
-
-                    // 平滑滚动到底部，但仅在用户接近底部时使用 smooth，避免用户查看历史消息时被打断
-                    try {
-                        const distanceFromBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop - messagesContainer.clientHeight;
-                        const useSmooth = distanceFromBottom < 80; // 阈值可调整
-                        messagesContainer.scrollTo({ top: messagesContainer.scrollHeight, behavior: useSmooth ? 'smooth' : 'auto' });
-                    } catch (e) {
-                        // fallback
-                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                    }
-
-                    // 如果还有缓冲则在下一帧继续刷新
-                    if (messageContentElement._streamBuffer && messageContentElement._streamBuffer.length > 0) {
-                        messageContentElement._rafScheduled = true;
-                        requestAnimationFrame(flush);
-                    }
-                };
-
-                // 将 flush 暴露到元素，以便 stream_end 调用时触发分片完成
-                messageContentElement._flushFn = () => {
-                    // 如果已经在调度中，flush 会在当前 rAF 循环中自动完成
-                    if (messageContentElement._rafScheduled) return;
-                    messageContentElement._rafScheduled = true;
-                    requestAnimationFrame(flush);
-                };
-
-                // 首次调度
-                requestAnimationFrame(flush);
-            }
+    // 在 stream_end 时调用，确保完整内容最终渲染
+    messageContentElement._flushFn = () => {
+        if (messageContentElement._renderBuffer) {
+            messageContentElement.innerHTML = marked.parse(messageContentElement._renderBuffer);
+        }
+        if (messageContentElement._renderTimer) {
+            clearInterval(messageContentElement._renderTimer);
+            messageContentElement._renderTimer = null;
+        }
+    };
+}
   /**
    * 添加消息到UI
    * @param {string} sender - 发送者 ('user' 或 'ai')
@@ -277,52 +354,81 @@ class ChatModule {
     const { persist = true, mode = null, contentId = null } = options;
     if (!this.messagesContainer) return;
 
+    // 确保content不是undefined或null
+    const safeContent = content || "";
+
     const messageElement = document.createElement('div');
     messageElement.classList.add(`${sender}-message`);
     let aiContent;
     if (sender === 'user') {
       const contentDiv = document.createElement('div');
       contentDiv.className = 'markdown-content';
-      contentDiv.textContent = content;
+      contentDiv.textContent = safeContent;
       messageElement.innerHTML = `
         <div class="user-avatar">你</div>
         <div class="user-content">
           ${contentDiv.outerHTML}
         </div>
       `;
+      //alert(safeContent);
     } else {
       messageElement.innerHTML = `
         <div class="ai-avatar">AI</div>
         <div class="ai-content">
-          <div class="markdown-content">${marked(content)}</div>
+          <div class="markdown-content"></div>
         </div>
       `;
-      aiContent = messageElement.querySelector('.ai-content');
+      aiContent = messageElement.querySelector('.markdown-content');
+      // 如果初始 content 非空，立刻进入增量渲染流程
+      if (safeContent) {
+        try {
+          this.appendMessageContent(aiContent, safeContent);
+        } catch (e) {
+          console.warn('[ChatModule] append 初始 AI 内容失败，回退为 textContent', e);
+          aiContent.textContent = safeContent;
+        }
+      }
     }
 
     this.messagesContainer.appendChild(messageElement);
 
-    // 滚动到底部
-    this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+    // 滚动到底部：如果正在生成且强制滚动开启则强制，否则仅在接近底部时滚动
+    try {
+      const distanceFromBottom = this.messagesContainer.scrollHeight - this.messagesContainer.scrollTop - this.messagesContainer.clientHeight;
+      if (this.autoScrollDuringGeneration) {
+        this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+      } else {
+        const threshold = 80;
+        if (distanceFromBottom <= threshold) this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+      }
+    } catch (e) {
+      // ignore
+    }
     
-    // 持久化消息
+    // 持久化消息 (对于AI消息，仅在非流式传输时保存，流式传输的消息由stream_end处理)
     try {
       if (persist) {
         const participantId = getParticipantId();
         if (participantId) {
-          chatStorage.append(participantId, {
-            role: sender === 'user' ? 'user' : 'assistant',
-            content,
-            mode,
-            contentId,
-            ts: Date.now(),
-          });
+          // 对于AI消息且在流式传输过程中，不立即保存，等待stream_end处理
+          const isStreamingAI = sender === 'ai' && this.isLoading && this.aiMessageBuffer !== null;
+          
+          if (!isStreamingAI) {
+            chatStorage.append(participantId, {
+              role: sender === 'user' ? 'user' : 'assistant',
+              content: safeContent,
+              mode,
+              contentId,
+              ts: Date.now(),
+            });
+          }
         }
       }
     } catch (e) {
       console.warn('[ChatModule] 持久化消息失败:', e);
     }
     if (sender === 'ai') {
+      console.log('返回内容', aiContent);
       return aiContent;
     }
   }
@@ -354,7 +460,12 @@ class ChatModule {
         </div>
       `;
       this.messagesContainer.appendChild(loadingElement);
-      this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+      if (this.autoScrollDuringGeneration) {
+        this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+      } else {
+        const wasNearBottom = this.messagesContainer ? (this.messagesContainer.scrollHeight - this.messagesContainer.scrollTop - this.messagesContainer.clientHeight) <= 80 : true;
+        if (wasNearBottom) this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+      }
     } else {
       const loadingElement = document.getElementById('ai-loading');
       if (loadingElement) {
@@ -373,14 +484,14 @@ class ChatModule {
    * @returns {Array|null} 测试结果数组或null
    * @private
    */
-  _getTestResults() {
-    const resultsContainer = document.getElementById('test-results-content');
+  _getsent2Results() {
+    const resultsContainer = document.getElementById('sent2-results-content');
     if (!resultsContainer || !resultsContainer.innerHTML.trim()) {
       return null;
     }
 
     const results = [];
-    const overallStatus = resultsContainer.classList.contains('test-result-passed') ? 'success' : 'error';
+    const overallStatus = resultsContainer.classList.contains('sent2-result-passed') ? 'success' : 'error';
 
     // 提取主标题和副标题
     const mainHeader = resultsContainer.querySelector('h4');
@@ -436,11 +547,11 @@ class ChatModule {
         const markdownContent = element.querySelector('.markdown-content');
         
         if (markdownContent) {
-          // 如果是AI消息，markdownContent包含HTML，需要提取纯文本
-          // 如果是用户消息，markdownContent是纯文本节点
-          if (isAiMessage) {
-            textContent = markdownContent.textContent || markdownContent.innerText || '';
+          // 如果是AI消息且有渲染缓冲区，优先使用缓冲区内容
+          if (isAiMessage && markdownContent._renderBuffer) {
+            textContent = markdownContent._renderBuffer;
           } else {
+            // 否则使用元素的文本内容
             textContent = markdownContent.textContent || markdownContent.innerText || '';
           }
         } else {
