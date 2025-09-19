@@ -22,6 +22,8 @@ class ChatModule {
     this.sendButton = null;
     this.isLoading = false;
     this.streamElement = null;
+    // 添加缓冲区用于存储完整的AI消息
+    this.aiMessageBuffer = null;
     //websocket.userId = getParticipantId();
     //websocket.connect();
      // 订阅 WebSocket 消息
@@ -34,7 +36,8 @@ class ChatModule {
       // 收到结果后解除加载状态，解锁“提问”按钮
       //this.setLoadingState(false);
       // 双重保证：收到结果时清空输入框（即使发送时已清空）
-      
+      // 初始化AI消息缓冲区
+      this.aiMessageBuffer = "";
     });
 //streaming
     websocket.subscribe("streaming", (msg) => {
@@ -70,6 +73,11 @@ class ChatModule {
         chunk = '';
       }
 
+      // 将内容添加到缓冲区
+      if (chunk) {
+        this.aiMessageBuffer += chunk;
+      }
+
       if (chunk && this.streamElement) {
         this.appendMessageContent(this.streamElement, chunk);
       } else if (chunk && !this.streamElement) {
@@ -81,13 +89,13 @@ class ChatModule {
 //stream_end
 websocket.subscribe("stream_end", (msg) => {
       console.log('[ChatModule] stream_end raw msg:', msg);
-      if (!this.streamElement) {
-        // 尝试恢复最后一个 AI 元素
-        const lastAi = this.messagesContainer && this.messagesContainer.querySelector('.ai-message:last-of-type .markdown-content');
-        if (lastAi) {
-          this.streamElement = lastAi;
-        }
-      }
+      // if (!this.streamElement) {
+      //   // 尝试恢复最后一个 AI 元素
+      //   const lastAi = this.messagesContainer && this.messagesContainer.querySelector('.ai-message:last-of-type .markdown-content');
+      //   if (lastAi) {
+      //     this.streamElement = lastAi;
+      //   }
+      // }
     
       if (this.streamElement) {
         let finalChunk = '';
@@ -104,16 +112,43 @@ websocket.subscribe("stream_end", (msg) => {
           console.warn('[ChatModule] 解析 stream_end msg 失败', e, msg);
         }
 
-       // if (finalChunk) this.appendMessageContent(this.streamElement, finalChunk);
+        // 将最终块添加到缓冲区
+        // if (finalChunk) {
+        //   this.aiMessageBuffer += finalChunk;
+        // }
 
-        if (this.streamElement._flushFn) {
-          this.streamElement._flushFn();
+        // 使用完整缓冲区内容更新DOM
+        if (this.aiMessageBuffer !== null && this.streamElement) {
+          this.streamElement._renderBuffer = this.aiMessageBuffer;
+          if (this.streamElement._flushFn) {
+            this.streamElement._flushFn();
+          }
+        }
+
+        // 将完整消息保存到localStorage
+        if (this.aiMessageBuffer !== null) {
+          try {
+            const participantId = getParticipantId();
+            if (participantId) {
+              chatStorage.append(participantId, {
+                role: 'assistant',
+                content: this.aiMessageBuffer,
+                mode: this.currentMode,
+                contentId: this.currentContentId,
+                ts: Date.now(),
+              });
+            }
+          } catch (e) {
+            console.warn('[ChatModule] 持久化完整AI消息失败:', e);
+          }
         }
       }
       this.setLoadingState(false);
       if (this.inputElement) this.inputElement.value = '';
       this.setLoadingState(false);
       this.streamElement = null;
+      // 清空缓冲区
+      this.aiMessageBuffer = null;
     });
     // websocket.subscribe("submission_progress", (msg) => {
     //   console.log("[ChatModule] 收到进度:", msg);
@@ -256,58 +291,7 @@ websocket.subscribe("stream_end", (msg) => {
       this.setLoadingState(false);
     }
   }
-  async send2(mode, contentId) {
-     alert('sendMessage 真的进来了'); 
-      console.log('[DEBUG]点击发送');
-      const message = this.inputElement.value.trim();
-      if (!message || this.isLoading) return;
-
-      // 清空输入框
-      this.inputElement.value = '';
-
-      // 添加用户消息到UI（并持久化上下文）
-      this.addMessageToUI('user', message, { mode, contentId });
-      alert("开始请求")
-      const element=this.addMessageToUI('ai', "", { mode, contentId });
-      console.log(element+"1")
-      this.streamElement=element;
-      console.log(this.streamElement+"2")
-      //alert("开始请求")
-      console.log("[chat]streamElement",this.streamElement);
-
-    // 设置加载状态
-    this.setLoadingState(true);
-
-    try {
-      // 构建请求体 (participant_id 会由 apiClient 自动注入)
-      const requestBody = {
-        user_message: message,
-        conversation_history: this.getConversationHistory(),
-        code_context: this.getCodeContext(),
-        mode: mode,
-        content_id: contentId
-      };
-
-      // 如果是测试模式，添加测试结果
-      if (mode === 'sent2') {
-        const sent2Results = this._getsent2Results();
-        if (sent2Results) {
-          requestBody.sent2_results = sent2Results;
-        }
-      }
-      
-      // 发送请求以触发后端处理，实际回复通过 WebSocket 返回
-      // 等待请求返回（通常为确认/排队），错误时在 catch 中解锁按钮
-      await api_client.post('/chat/ai/chat2', requestBody);
-
-
-    } catch (error) {
-      console.error('[ChatModule] 发送消息时出错:', error);
-      this.addMessageToUI('ai', `抱歉，我无法回答你的问题。错误信息: ${error.message}`);
-      // 请求失败（不会有 WebSocket 结果），需要解锁按钮
-      this.setLoadingState(false);
-    }
-  }
+ 
      appendMessageContent(messageContentElement, content) {
     // 检查元素是否存在
     if (!messageContentElement) return;
@@ -404,18 +388,23 @@ websocket.subscribe("stream_end", (msg) => {
     // 滚动到底部
     this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
     
-    // 持久化消息
+    // 持久化消息 (对于AI消息，仅在非流式传输时保存，流式传输的消息由stream_end处理)
     try {
       if (persist) {
         const participantId = getParticipantId();
         if (participantId) {
-          chatStorage.append(participantId, {
-            role: sender === 'user' ? 'user' : 'assistant',
-            content: safeContent,
-            mode,
-            contentId,
-            ts: Date.now(),
-          });
+          // 对于AI消息且在流式传输过程中，不立即保存，等待stream_end处理
+          const isStreamingAI = sender === 'ai' && this.isLoading && this.aiMessageBuffer !== null;
+          
+          if (!isStreamingAI) {
+            chatStorage.append(participantId, {
+              role: sender === 'user' ? 'user' : 'assistant',
+              content: safeContent,
+              mode,
+              contentId,
+              ts: Date.now(),
+            });
+          }
         }
       }
     } catch (e) {
@@ -536,11 +525,11 @@ websocket.subscribe("stream_end", (msg) => {
         const markdownContent = element.querySelector('.markdown-content');
         
         if (markdownContent) {
-          // 如果是AI消息，markdownContent包含HTML，需要提取纯文本
-          // 如果是用户消息，markdownContent是纯文本节点
-          if (isAiMessage) {
-            textContent = markdownContent.textContent || markdownContent.innerText || '';
+          // 如果是AI消息且有渲染缓冲区，优先使用缓冲区内容
+          if (isAiMessage && markdownContent._renderBuffer) {
+            textContent = markdownContent._renderBuffer;
           } else {
+            // 否则使用元素的文本内容
             textContent = markdownContent.textContent || markdownContent.innerText || '';
           }
         } else {
