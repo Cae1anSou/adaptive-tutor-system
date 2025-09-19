@@ -450,8 +450,6 @@ websocket.subscribe("stream_end", (msg) => {
       loadingElement.id = 'ai-loading';
       loadingElement.classList.add('ai-message');
       loadingElement.innerHTML = `
-        <div class="ai-avatar">AI</div>
-        <div class="ai-content">
           <div class="loading-dots">
             <span></span>
             <span></span>
