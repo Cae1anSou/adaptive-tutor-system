@@ -164,7 +164,7 @@ websocket.subscribe("stream_end", (msg) => {
 
   /**
    * 初始化聊天模块
-   * @param {string} mode - 模式 ('learning' 或 'sent2')
+   * @param {string} mode - 模式 ('learning'、'test' 或 'sent2')
    * @param {string} contentId - 内容ID (学习内容ID或测试任务ID)
    * @param {Object} options - 配置选项
    * @param {boolean} options.enableEnterToSend - 是否启用Enter键发送消息，默认为true
@@ -208,7 +208,7 @@ websocket.subscribe("stream_end", (msg) => {
 
   /**
    * 绑定事件监听器
-   * @param {string} mode - 模式 ('learning' 或 'sent2')
+   * @param {string} mode - 模式 ('learning'、'test' 或 'sent2')
    * @param {string} contentId - 内容ID
    * @param {Object} options - 配置选项
    * @param {boolean} options.enableEnterToSend - 是否启用Enter键发送消息，默认为true
@@ -236,7 +236,7 @@ websocket.subscribe("stream_end", (msg) => {
 
   /**
    * 发送消息到后端
-   * @param {string} mode - 模式 ('learning' 或 'sent2')
+   * @param {string} mode - 模式 ('learning'、'test' 或 'sent2')
    * @param {string} contentId - 内容ID
    */
   async sendMessage(mode, contentId) {
@@ -274,6 +274,13 @@ websocket.subscribe("stream_end", (msg) => {
       };
 
       // 如果是测试模式，添加测试结果
+      if (mode === 'test') {
+        const testResults = this._getTestResults();
+        if (testResults) {
+          requestBody.test_results = testResults;
+        }
+      }
+
       if (mode === 'sent2') {
         const sent2Results = this._getsent2Results();
         if (sent2Results) {
@@ -482,39 +489,76 @@ websocket.subscribe("stream_end", (msg) => {
    * @returns {Array|null} 测试结果数组或null
    * @private
    */
+  _getTestResults() {
+    return this._extractResultsFromContainer({
+      containerId: 'test-results-content',
+      passedClass: 'test-result-passed',
+      failedClass: 'test-result-failed'
+    });
+  }
+
   _getsent2Results() {
-    const resultsContainer = document.getElementById('sent2-results-content');
+    return this._extractResultsFromContainer({
+      containerId: 'sent2-results-content',
+      passedClass: 'sent2-result-passed',
+      failedClass: 'sent2-result-failed'
+    });
+  }
+
+  _extractResultsFromContainer({ containerId, passedClass, failedClass }) {
+    if (!containerId) return null;
+
+    const resultsContainer = document.getElementById(containerId);
     if (!resultsContainer || !resultsContainer.innerHTML.trim()) {
       return null;
     }
 
     const results = [];
-    const overallStatus = resultsContainer.classList.contains('sent2-result-passed') ? 'success' : 'error';
+    let overallStatus = 'info';
+
+    if (passedClass && resultsContainer.classList.contains(passedClass)) {
+      overallStatus = 'success';
+    } else if (failedClass && resultsContainer.classList.contains(failedClass)) {
+      overallStatus = 'error';
+    }
 
     // 提取主标题和副标题
     const mainHeader = resultsContainer.querySelector('h4');
     const subMessage = resultsContainer.querySelector('p');
 
     if (mainHeader) {
-      results.push({
-        status: overallStatus,
-        message: mainHeader.textContent.trim()
-      });
+      const heading = mainHeader.textContent.trim();
+      if (heading) {
+        results.push({
+          status: overallStatus,
+          message: heading
+        });
+      }
     }
 
-    if (subMessage && subMessage.textContent.trim()) {
-      results.push({
-        status: 'info',
-        message: subMessage.textContent.trim()
-      });
+    if (subMessage) {
+      const summary = subMessage.textContent.trim();
+      if (summary) {
+        results.push({
+          status: 'info',
+          message: summary
+        });
+      }
     }
 
     // 提取详细信息
     const detailItems = resultsContainer.querySelectorAll('ul > li');
     detailItems.forEach(item => {
+      const detail = item.textContent.trim();
+      if (!detail) return;
+
+      const detailStatus = overallStatus === 'success'
+        ? 'info'
+        : (overallStatus === 'error' ? 'error' : 'info');
+
       results.push({
-        status: overallStatus === 'success' ? 'info' : 'error', // 细节项跟随总体状态
-        message: item.textContent.trim()
+        status: detailStatus, // 细节项跟随总体状态
+        message: detail
       });
     });
 
