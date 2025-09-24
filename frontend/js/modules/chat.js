@@ -241,9 +241,10 @@ websocket.subscribe("stream_end", (msg) => {
    */
   async sendMessage(mode, contentId) {
   // alert('sendMessage 我进来了'); 
+    let message = '';
     try { 
           console.log('[DEBUG]点击发送');
-          const message = this.inputElement.value.trim();
+          message = this.inputElement.value.trim();
           if (!message || this.isLoading) return;
 
           // 清空输入框
@@ -259,7 +260,10 @@ websocket.subscribe("stream_end", (msg) => {
           console.log('[chat] created streamElement', this.streamElement);
      } catch (error) {
       console.log('[ERROR] 发送消息时出错:', error);
+      return;
     }
+
+    if (!message) return;
     // 设置加载状态
     this.setLoadingState(true);
 
