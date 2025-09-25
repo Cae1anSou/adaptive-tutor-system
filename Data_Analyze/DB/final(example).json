@@ -1,0 +1,15 @@
+{
+  "baseline001": {
+    "assistant_token_num":0,
+    "pass_rate_avg":0,
+    "debug_dur_avg":0,
+    "topic_pass": [],
+    "topic_test_start": {"1_1": 234234234},
+    "topic_try_num":{"1_1":3, "1_3":5},
+    "topic_debug_dur":{"1_1":[1,20000], "1_3":[0,30000]},
+    "user_message": [],
+    "emotion": [
+      ["12334534", "1.1234", "1", "hello"]
+    ]
+  }
+}

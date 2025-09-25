@@ -1,0 +1,28 @@
+{
+  "exp": {
+    "interest-based Generation Module": {
+      "good": ["it is good", ""],
+      "bad": [],
+      "suggestion": []
+    },
+    "Open-ended Exploration Module": {
+      "good": ["it is good", ""],
+      "bad": [],
+      "suggestion": []
+    },
+
+  },
+  "baseline": {
+      "interest-based Generation Module": {
+      "good": ["it is good", ""],
+      "bad": [],
+      "suggestion": []
+    },
+    "Open-ended Exploration Module": {
+      "good": ["it is good", ""],
+      "bad": [],
+      "suggestion": []
+    },
+
+  }
+}
