@@ -1,0 +1,310 @@
+@startuml
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+rectangle "前端应用层" as Frontend #DCEBFF {
+  [浏览器] as Browser
+}
+
+rectangle "前端静态服务" as Nginx #DCEBFF
+
+node "API 网关" as APIGateway #DDF7D8 {
+  [REST API 路由] as APIRouter
+  [WebSocket 管理器] as WSManager
+  [Redis 订阅器] as RedisSub
+}
+
+package "服务编排层" as Orchestration #DDF7D8 {
+  [动态控制器] as Controller
+}
+
+package "智能服务层" as Services #DDF7D8 {
+  [用户状态服务] as UserState
+  [情感分析服务] as Sentiment
+  [进度聚类服务] as Clustering
+  [RAG 检索服务 + 知识块] as RAG
+  [提示词生成器] as PromptGen
+  [大模型网关] as LLM
+  [代码评测沙箱] as Sandbox
+}
+
+package "异步与消息" as Async #FFF2CC {
+  [Redis ] as Redis
+  [Celery\nchat_queue] as CeleryChat
+  [Celery\nsubmit_queue] as CelerySubmit
+  [Celery\ndb_writer_queue] as CeleryDB
+  [Celery\nbehavior_queue] as CeleryBehavior
+}
+
+database "关系型数据库" as DB #FFF2CC
+
+folder "向量与模型" as ModelFS #FFF2CC {
+  [进度聚类模型] as ClusterModels
+  [向量索引] as AnnIndex
+  [知识分块] as KBChunks
+}
+
+folder "学习内容" as ContentFS #FFF2CC
+
+cloud "外部推理服务" as LLMAPI
+
+' 接入关系
+Nginx --> Browser : "" 
+Browser --> APIRouter : HTTP/HTTPS\n会话/对话/内容/进度
+Browser --> WSManager : ""
+' 网关与编排
+APIRouter --> Controller
+WSManager --> Redis : ""
+RedisSub --> WSManager : 转发消息
+
+' 编排调用链
+Controller --> UserState
+Controller --> Sentiment
+Controller --> Clustering
+Controller --> RAG
+Controller --> PromptGen
+Controller --> LLM
+Controller --> Sandbox
+
+' 数据与存储
+UserState --> Redis : 状态缓存\n(BKT/情感/行为计数)
+UserState --> DB : 事件/会话 持久化
+RAG --> AnnIndex
+RAG --> KBChunks
+Clustering --> ClusterModels
+LLM --> LLMAPI
+
+' 异步任务编排
+APIRouter --> CeleryChat : 异步对话任务
+APIRouter --> CelerySubmit : 提交评测任务
+APIRouter --> CeleryDB : 持久化任务
+APIRouter --> CeleryBehavior : 行为分析任务
+CeleryChat --> Redis : 结果发布
+CelerySubmit --> Redis
+CeleryDB --> DB
+CeleryBehavior --> Redis
+
+note right of Controller
+- 编排“状态→情感→进度→检索→提示→推理”
+- 异常回退与节流控制
+end note
+
+note bottom of ModelFS
+通过 Docker 卷挂载，支持热更新与回滚
+end note
+
+@enduml
+
+
+@startuml
+
+skinparam shadowing false
+skinparam linetype ortho
+
+actor Browser as "浏览器"
+participant APIGW as "API网关(FastAPI)"
+participant WS as "WebSocket管理器"
+participant RedisSub as "Redis订阅器"
+participant DC as "动态控制器"
+participant USS as "用户状态服务"
+participant SA as "情感分析"
+participant CLU as "进度聚类"
+participant RAG as "RAG检索"
+participant PG as "提示词生成"
+participant LLM as "LLM网关"
+participant CeleryQ as "Celery队列"
+participant Worker as "Worker"
+database DB as "MySQL"
+participant RedisPS as "Redis Pub/Sub"
+
+== 会话建立 ==
+Browser -> APIGW: 登录/会话初始化
+APIGW -> USS: 获取或创建用户档案
+USS --> APIGW: 返回用户画像
+Browser -> WS: 建立WebSocket连接
+
+== 发起业务请求 ==
+Browser -> APIGW: 学习/对话/评测请求
+
+alt 同步路径（轻量请求）
+  APIGW -> DC: 触发服务编排
+  DC -> USS: 更新计数/读取画像
+  opt 情感与进度分析（按策略节流）
+    DC -> SA: 情感分析
+    SA --> DC: 情感结果
+    DC -> CLU: 进度聚类
+    CLU --> DC: 聚类结果
+  end
+  DC -> RAG: 相关知识召回（可选）
+  RAG --> DC: 检索片段
+  DC -> PG: 生成提示词
+  PG --> DC: 指令模板
+  DC -> LLM: 推理生成
+  LLM --> DC: AI答复
+  DC --> APIGW: 结构化结果
+  APIGW --> Browser: 同步响应
+  par 异步落库
+    APIGW -> CeleryQ: 提交 db_writer 任务
+    CeleryQ -> Worker: 拉取任务
+    Worker -> DB: 幂等写入
+  end
+else 异步路径（长耗时/评测）
+  APIGW -> CeleryQ: 投递 chat/submit/behavior 任务
+  APIGW --> Browser: 202 已受理（task_id）
+  CeleryQ -> Worker: 拉取并执行
+  group 推理/评测执行
+    Worker -> LLM: 推理 或 沙箱评测
+    LLM --> Worker: 结果/日志
+  end
+  Worker -> RedisPS: 发布结果到 ws:user:{id}
+  RedisPS -> RedisSub: 事件通知
+  RedisSub -> WS: 转发消息
+  WS --> Browser: WebSocket 实时推送
+end
+
+== 状态更新 ==
+APIGW -> CeleryQ: 行为/会话摘要入库
+CeleryQ -> Worker
+Worker -> DB: 持久化
+
+@enduml
+
+
+@startuml
+title 自适应助教系统 - 部署视角（Container/Deployment）
+
+left to right direction
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+skinparam nodesep 20
+skinparam ranksep 20
+
+actor "学习者/教师" as User #FFE0E6
+
+node "用户端" as Client #DCEBFF {
+  component "Browser SPA" <<client>> as Browser
+}
+
+node "前端交付" as Delivery #DCEBFF {
+  node "Nginx <<container>>\n:80 -> :8325" as NginxDeploy
+  artifact "静态资源\nHTML/CSS/JS" as StaticFiles
+}
+
+node "Compose Stack" as Stack #DDF7D8 {
+  node "Backend API <<container>>\nFastAPI :8000" as Backend {
+    component "WebSocket Manager\n+ Redis Subscriber" as WSComp
+    component "DynamicController\n(服务编排)" as DC
+  }
+
+  node "Workers <<containers>>" as Workers {
+    component "Celery chat_queue" as WChat
+    component "Celery submit_queue" as WSubmit
+    component "Celery db_writer_queue" as WDB
+    component "Celery behavior_queue" as WBehavior
+    component "Celery Beat" as WBeat
+  }
+
+  node "Redis <<service>>\n:6379" as RedisSvc
+  database "MySQL <<db>>\n:3306" as DBSvc
+
+  folder "Volumes" as Volumes {
+    folder "/models" as ModelsVol
+    folder "/vector_store" as VectorVol
+    folder "/content" as ContentVol
+  }
+}
+
+cloud "LLM Provider\n(ModelScope / OpenAI API)" as LLMCloud
+
+User --> Browser
+NginxDeploy --> Browser : 静态文件
+Browser --> NginxDeploy : HTTP :8325
+NginxDeploy --> Backend : 反向代理 /api,/ws
+
+Browser --> Backend : WebSocket /ws
+Backend --> WSComp : in-process
+
+Backend --> RedisSvc : Pub/Sub + 缓存
+Backend --> DBSvc : ORM 持久化
+Backend --> ModelsVol
+Backend --> VectorVol
+Backend --> ContentVol
+Backend --> LLMCloud : HTTPS 推理
+
+WChat --> RedisSvc
+WSubmit --> RedisSvc
+WDB --> RedisSvc
+WBehavior --> RedisSvc
+WBeat --> RedisSvc
+
+WDB --> DBSvc
+WChat --> RedisSvc : 发布结果
+WSubmit --> RedisSvc : 发布结果
+WBehavior --> RedisSvc : 发布事件
+RedisSvc --> Backend : 订阅消息
+Backend --> Browser : WS 推送
+
+note bottom of Volumes
+models: PCA/centers/scaler 等聚类工件
+vector_store: kb.ann, kb_chunks.json
+content: JSON/Markdown 学习素材
+end note
+
+@enduml
+
+
+@startuml
+title 自适应助教系统 - 总体简化图（泳道）
+
+left to right direction
+skinparam shadowing false
+skinparam linetype ortho
+skinparam componentStyle rectangle
+skinparam nodesep 20
+skinparam ranksep 25
+
+
+' 泳道（用 package 分组，兼容旧版本 PlantUML）
+package "持卡人/学习者" as LaneUser #FFFFFF {
+  actor "用户" as Learner
+}
+
+package "前端" as LaneFE #DCEBFF {
+  rectangle "自适应学习前端\n(C)" as C #FFC0CB
+  rectangle "自适应助教前置处理\n(P)" as P #A6CEE3
+  rectangle "学习过程监控\n(V)" as V #FFF2CC
+}
+
+package "ESB" as LaneESB #E7F7E7 {
+  rectangle "消息总线/任务队列\n(Redis/Celery)" as ESB #A8E6A1
+}
+
+package "后端" as LaneBE #EAF2FF {
+  rectangle "推理服务\n(LLM)" as Core1 #B7E1CD
+  rectangle "数据/知识库\n(DB/向量索引)" as Core2 #B7E1CD
+}
+
+' 交互编号与主链路
+Learner --> C : ① 请求
+C --> P : ② 请求
+P --> ESB : ③ 请求
+ESB --> Core1 : ④ 请求
+Core1 --> ESB : ⑤ 响应
+ESB --> P : ⑥ 响应
+P --> C : ⑦ 响应
+
+' 旁路：内容与进度
+P --> Core2 : 内容/进度查询
+V --> P : 监控数据
+P --> V : 事件/告警
+
+note bottom of ESB
+统一路由与缓冲\n解耦同步与异步
+end note
+
+@enduml

@@ -1,0 +1,1915 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Adaptive Tutor System",
+        "version": "0.1.0"
+    },
+    "paths": {
+        "/api/v1/session/initiate": {
+            "post": {
+                "tags": [
+                    "session"
+                ],
+                "summary": "Initiate Session",
+                "description": "初始化用户会话\n\nArgs:\n    response: HTTP响应对象\n    session_in: 会话初始化请求数据\n    user_state_service: 用户状态服务\n    db: 数据库会话\n    \nReturns:\n    StandardResponse[SessionInitiateResponse]: 会话初始化响应",
+                "operationId": "initiate_session_api_v1_session_initiate_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SessionInitiateRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StandardResponse_SessionInitiateResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/chat/ai/chat": {
+            "post": {
+                "tags": [
+                    "chat"
+                ],
+                "summary": "Chat With Ai",
+                "description": "与AI进行对话 (保持原有端点以确保向后兼容)\n\nArgs:\n    request: 聊天请求\n    background_tasks: 后台任务处理器\n    db: 数据库会话\n    \nReturns:\n    StandardResponse[ChatResponse]: AI回复",
+                "operationId": "chat_with_ai_api_v1_chat_ai_chat_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ChatRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StandardResponse_ChatResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/chat/ai/chat2": {
+            "post": {
+                "tags": [
+                    "chat"
+                ],
+                "summary": "Chat With Ai2",
+                "description": "与AI进行异步对话 (新端点，使用Celery任务队列)\n\nArgs:\n    request: 聊天请求\n    background_tasks: 后台任务处理器（保留以确保兼容性，但实际任务已委托给Celery）\n    db: 数据库会话（保留以确保兼容性，但实际任务已委托给Celery）\n    \nReturns:\n    StandardResponse[dict]: 包含任务ID的响应",
+                "operationId": "chat_with_ai2_api_v1_chat_ai_chat2_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ChatRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StandardResponse_dict_"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/chat/ai/chat2/result/{task_id}": {
+            "get": {
+                "tags": [
+                    "chat"
+                ],
+                "summary": "Get Chat Result",
+                "description": "获取异步聊天任务的结果。\n\nArgs:\n    task_id: 异步任务的ID\n    \nReturns:\n    StandardResponse[ChatResponse]: AI回复结果",
+                "operationId": "get_chat_result_api_v1_chat_ai_chat2_result__task_id__get",
+                "parameters": [
+                    {
+                        "name": "task_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Task Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StandardResponse_ChatResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/submission/submit-test2": {
+            "post": {
+                "tags": [
+                    "submission"
+                ],
+                "summary": "Submit Test2",
+                "description": "接收用户代码提交，异步进行评测，并返回任务ID。",
+                "operationId": "submit_test2_api_v1_submission_submit_test2_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TestSubmissionRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "202": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StandardResponse_TestSubmissionAsyncResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/submission/submit-test2/result/{task_id}": {
+            "get": {
+                "tags": [
+                    "submission"
+                ],
+                "summary": "Get Submission Result",
+                "description": "获取异步代码评测任务的结果。",
+                "operationId": "get_submission_result_api_v1_submission_submit_test2_result__task_id__get",
+                "parameters": [
+                    {
+                        "name": "task_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Task Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StandardResponse_TestSubmissionResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/submission/submit-test": {
+            "post": {
+                "tags": [
+                    "submission"
+                ],
+                "summary": "Submit Test",
+                "description": "接收用户代码提交，进行评测，更新BKT模型，并返回结果。",
+                "operationId": "submit_test_api_v1_submission_submit_test_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TestSubmissionRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StandardResponse_TestSubmissionResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/learning-content/{topic_id}": {
+            "get": {
+                "tags": [
+                    "learning-content",
+                    "test-tasks"
+                ],
+                "summary": "Get Learning Content",
+                "description": "获取指定主题的学习材料。",
+                "operationId": "get_learning_content_api_v1_learning_content__topic_id__get",
+                "parameters": [
+                    {
+                        "name": "topic_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Topic Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StandardResponse_LearningContent_"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/test-tasks/{topic_id}": {
+            "get": {
+                "tags": [
+                    "learning-content",
+                    "test-tasks"
+                ],
+                "summary": "Get Test Task",
+                "description": "获取指定主题的测试任务。",
+                "operationId": "get_test_task_api_v1_test_tasks__topic_id__get",
+                "parameters": [
+                    {
+                        "name": "topic_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Topic Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StandardResponse_TestTask_"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/config/": {
+            "get": {
+                "tags": [
+                    "config"
+                ],
+                "summary": "Get Frontend Config",
+                "description": "为前端应用程序提供安全、非敏感的配置变量集合。",
+                "operationId": "get_frontend_config_api_v1_config__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StandardResponse_FrontendConfig_"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/progress/participants/{participant_id}/progress": {
+            "get": {
+                "tags": [
+                    "progress"
+                ],
+                "summary": "Get User Progress",
+                "operationId": "get_user_progress_api_v1_progress_participants__participant_id__progress_get",
+                "parameters": [
+                    {
+                        "name": "participant_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Participant Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StandardResponse_UserProgressResponse_"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/knowledge-graph": {
+            "get": {
+                "tags": [
+                    "knowledge-graph"
+                ],
+                "summary": "Get Knowledge Graph",
+                "operationId": "get_knowledge_graph_api_v1_knowledge_graph_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StandardResponse_KnowledgeGraph_"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/behavior/log": {
+            "post": {
+                "tags": [
+                    "behavior"
+                ],
+                "summary": "记录行为事件",
+                "description": "接收、异步持久化并异步解释单个行为事件。\n\n- **异步持久化**: 将原始事件分派到`db_writer_queue`进行持久化。\n- **异步解释**: 将事件分派到`chat_queue`进行解释和状态更新。\n- **快速响应**: 立即返回 `202 Accepted`，不等待后台任务完成。",
+                "operationId": "log_behavior_api_v1_behavior_log_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BehaviorEvent"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "202": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ActionType": {
+                "type": "string",
+                "enum": [
+                    "click",
+                    "type_text",
+                    "hover",
+                    "focus",
+                    "blur",
+                    "scroll",
+                    "wait"
+                ],
+                "title": "ActionType",
+                "description": "动作类型枚举"
+            },
+            "AssertAttributeCheckpoint": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Name",
+                        "description": "检查点名称"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/CheckpointType",
+                        "description": "检查点类型"
+                    },
+                    "feedback": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Feedback",
+                        "description": "反馈信息"
+                    },
+                    "selector": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Selector",
+                        "description": "CSS选择器"
+                    },
+                    "attribute": {
+                        "type": "string",
+                        "title": "Attribute",
+                        "description": "属性名称",
+                        "default": ""
+                    },
+                    "assertion_type": {
+                        "$ref": "#/components/schemas/AssertionType",
+                        "description": "断言类型"
+                    },
+                    "value": {
+                        "type": "string",
+                        "title": "Value",
+                        "description": "期望值",
+                        "default": ""
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "type",
+                    "feedback",
+                    "selector",
+                    "assertion_type"
+                ],
+                "title": "AssertAttributeCheckpoint",
+                "description": "属性断言检查点模型\n\n用于检查DOM元素的属性是否存在或属性值。\n\nAttributes:\n    selector: 选择器，用于定位要检查的DOM元素\n    attribute: 属性名称（可选，如果为空则检查元素是否存在）\n    assertion_type: 断言方式，如 'exists' 等\n    value: 期望值（用于属性值比较）"
+            },
+            "AssertElementCheckpoint": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Name",
+                        "description": "检查点名称"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/CheckpointType",
+                        "description": "检查点类型"
+                    },
+                    "feedback": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Feedback",
+                        "description": "反馈信息"
+                    },
+                    "selector": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Selector",
+                        "description": "CSS选择器"
+                    },
+                    "assertion_type": {
+                        "$ref": "#/components/schemas/AssertionType",
+                        "description": "断言类型"
+                    },
+                    "value": {
+                        "type": "string",
+                        "title": "Value",
+                        "description": "期望值",
+                        "default": ""
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "type",
+                    "feedback",
+                    "selector",
+                    "assertion_type"
+                ],
+                "title": "AssertElementCheckpoint",
+                "description": "元素存在断言检查点模型\n\n用于检查DOM元素的存在性。\n\nAttributes:\n    selector: 选择器，用于定位要检查的DOM元素\n    assertion_type: 断言方式，如 'exists' 等\n    value: 期望值（用于元素文本内容比较）"
+            },
+            "AssertStyleCheckpoint": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Name",
+                        "description": "检查点名称"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/CheckpointType",
+                        "description": "检查点类型"
+                    },
+                    "feedback": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Feedback",
+                        "description": "反馈信息"
+                    },
+                    "selector": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Selector",
+                        "description": "CSS选择器"
+                    },
+                    "css_property": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Css Property",
+                        "description": "CSS属性"
+                    },
+                    "assertion_type": {
+                        "$ref": "#/components/schemas/AssertionType",
+                        "description": "断言类型"
+                    },
+                    "value": {
+                        "type": "string",
+                        "title": "Value",
+                        "description": "期望值"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "type",
+                    "feedback",
+                    "selector",
+                    "css_property",
+                    "assertion_type",
+                    "value"
+                ],
+                "title": "AssertStyleCheckpoint",
+                "description": "样式断言检查点模型\n\n用于检查DOM元素的CSS样式属性。\n\nAttributes:\n    selector: 选择器，用于定位要检查的DOM元素\n    css_property: CSS属性，用于检查元素的样式属性\n    assertion_type: 断言方式，如 'equals', 'contains' 等\n    value: 期望值，用于与实际值进行比较"
+            },
+            "AssertTextContentCheckpoint": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Name",
+                        "description": "检查点名称"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/CheckpointType",
+                        "description": "检查点类型"
+                    },
+                    "feedback": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Feedback",
+                        "description": "反馈信息"
+                    },
+                    "selector": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Selector",
+                        "description": "CSS选择器"
+                    },
+                    "assertion_type": {
+                        "$ref": "#/components/schemas/AssertionType",
+                        "description": "断言类型"
+                    },
+                    "value": {
+                        "type": "string",
+                        "title": "Value",
+                        "description": "期望值"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "type",
+                    "feedback",
+                    "selector",
+                    "assertion_type",
+                    "value"
+                ],
+                "title": "AssertTextContentCheckpoint",
+                "description": "文本内容断言检查点模型\n\n用于检查DOM元素的文本内容。\n\nAttributes:\n    selector: 选择器，用于定位要检查的DOM元素\n    assertion_type: 断言方式，如 'equals', 'contains' 等\n    value: 期望值，用于与实际值进行比较"
+            },
+            "AssertionType": {
+                "type": "string",
+                "enum": [
+                    "exists",
+                    "equals",
+                    "contains",
+                    "not_equals",
+                    "not_contains",
+                    "starts_with",
+                    "ends_with",
+                    "greater_than",
+                    "less_than",
+                    "regex",
+                    "matches"
+                ],
+                "title": "AssertionType",
+                "description": "断言类型枚举"
+            },
+            "BehaviorEvent": {
+                "properties": {
+                    "participant_id": {
+                        "type": "string",
+                        "title": "Participant Id",
+                        "description": "参与者ID，用于标识特定用户"
+                    },
+                    "event_type": {
+                        "$ref": "#/components/schemas/EventType",
+                        "description": "事件类型"
+                    },
+                    "event_data": {
+                        "additionalProperties": true,
+                        "type": "object",
+                        "title": "Event Data",
+                        "description": "事件数据，根据事件类型有不同的结构"
+                    },
+                    "timestamp": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Timestamp",
+                        "description": "事件发生的时间戳，可选字段，默认为当前时间"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "participant_id",
+                    "event_type",
+                    "event_data"
+                ],
+                "title": "BehaviorEvent",
+                "description": "行为事件模型，对应前端behavior_tracker.js捕获的事件\n\n记录用户在学习过程中的各种交互行为，用于行为分析和学习状态评估。\n\nAttributes:\n    participant_id: 参与者ID，用于标识特定用户\n    event_type: 事件类型，枚举值\n    event_data: 事件数据，根据事件类型有不同的结构\n    timestamp: 事件发生的时间戳，可选字段，默认为当前时间"
+            },
+            "ChatRequest": {
+                "properties": {
+                    "participant_id": {
+                        "type": "string",
+                        "title": "Participant Id"
+                    },
+                    "user_message": {
+                        "type": "string",
+                        "title": "User Message"
+                    },
+                    "conversation_history": {
+                        "anyOf": [
+                            {
+                                "items": {
+                                    "$ref": "#/components/schemas/ConversationMessage"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Conversation History",
+                        "default": []
+                    },
+                    "code_context": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/CodeContent"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "mode": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Mode"
+                    },
+                    "content_id": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Content Id"
+                    },
+                    "test_results": {
+                        "anyOf": [
+                            {
+                                "items": {
+                                    "additionalProperties": true,
+                                    "type": "object"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Test Results"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "participant_id",
+                    "user_message"
+                ],
+                "title": "ChatRequest",
+                "description": "聊天请求模型\n\n用户发送的聊天请求，包含消息内容和上下文信息。\n\nAttributes:\n    participant_id: 参与者ID，用于标识特定用户\n    user_message: 用户消息内容，当前发送的消息文本\n    conversation_history: 对话历史，包含之前的所有对话消息\n    code_context: 代码上下文，用户当前正在编辑的代码内容\n    mode: 模式，标识当前是学习模式还是测试模式 ('learning' 或 'test')\n    content_id: 内容ID，学习内容或测试任务的ID"
+            },
+            "ChatResponse": {
+                "properties": {
+                    "ai_response": {
+                        "type": "string",
+                        "title": "Ai Response"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "ai_response"
+                ],
+                "title": "ChatResponse",
+                "description": "聊天响应模型\n\nAI助手的聊天响应，只包含回复内容。\n\nAttributes:\n    ai_response: AI回复内容，助手生成的回复文本"
+            },
+            "CheckpointType": {
+                "type": "string",
+                "enum": [
+                    "assert_attribute",
+                    "assert_style",
+                    "assert_text_content",
+                    "custom_script",
+                    "interaction_and_assert",
+                    "assert_element"
+                ],
+                "title": "CheckpointType",
+                "description": "检查点类型枚举"
+            },
+            "CodeContent": {
+                "properties": {
+                    "html": {
+                        "type": "string",
+                        "title": "Html",
+                        "default": ""
+                    },
+                    "css": {
+                        "type": "string",
+                        "title": "Css",
+                        "default": ""
+                    },
+                    "js": {
+                        "type": "string",
+                        "title": "Js",
+                        "default": ""
+                    }
+                },
+                "type": "object",
+                "title": "CodeContent",
+                "description": "代码内容模型\n\n用于承载完整的Web代码内容，包含HTML、CSS和JavaScript三个部分。\n\nAttributes:\n    html: HTML代码内容，包含页面结构和内容\n    css: CSS样式代码内容，用于页面美化\n    js: JavaScript脚本代码内容，用于页面交互"
+            },
+            "CodePayload": {
+                "properties": {
+                    "html": {
+                        "type": "string",
+                        "title": "Html",
+                        "default": ""
+                    },
+                    "css": {
+                        "type": "string",
+                        "title": "Css",
+                        "default": ""
+                    },
+                    "js": {
+                        "type": "string",
+                        "title": "Js",
+                        "default": ""
+                    }
+                },
+                "type": "object",
+                "title": "CodePayload",
+                "description": "代码载荷模型\n\n用于承载用户提交的代码内容，包含HTML、CSS和JavaScript三个部分。\n\nAttributes:\n    html: HTML代码内容\n    css: CSS样式代码内容\n    js: JavaScript脚本代码内容"
+            },
+            "ConversationMessage": {
+                "properties": {
+                    "role": {
+                        "type": "string",
+                        "title": "Role"
+                    },
+                    "content": {
+                        "type": "string",
+                        "title": "Content"
+                    },
+                    "timestamp": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "role",
+                    "content"
+                ],
+                "title": "ConversationMessage",
+                "description": "对话消息模型\n\n对话中的单条消息记录，包含角色、内容和时间戳。\n\nAttributes:\n    role: 消息角色，'user'表示用户消息，'assistant'表示AI助手消息\n    content: 消息内容，文本格式的对话内容\n    timestamp: 时间戳，记录消息发送时间，可选字段"
+            },
+            "CustomScriptCheckpoint": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Name",
+                        "description": "检查点名称"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/CheckpointType",
+                        "description": "检查点类型"
+                    },
+                    "feedback": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Feedback",
+                        "description": "反馈信息"
+                    },
+                    "script": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Script",
+                        "description": "JavaScript脚本"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "type",
+                    "feedback",
+                    "script"
+                ],
+                "title": "CustomScriptCheckpoint",
+                "description": "自定义脚本检查点模型\n\n用于执行自定义JavaScript脚本来进行复杂检查。\n\nAttributes:\n    script: 要执行的JavaScript脚本"
+            },
+            "EventType": {
+                "type": "string",
+                "enum": [
+                    "code_edit",
+                    "ai_help_request",
+                    "test_submission",
+                    "dom_element_select",
+                    "user_idle",
+                    "click",
+                    "knowledge_level_access",
+                    "state_snapshot",
+                    "page_click",
+                    "significant_edits",
+                    "large_addition",
+                    "coding_problem",
+                    "coding_session_summary",
+                    "idle_hint_displayed",
+                    "page_focus_change",
+                    "test_failed",
+                    "submission_error"
+                ],
+                "title": "EventType",
+                "description": "行为事件类型枚举\n\n根据TDD-II-07文档定义，对应前端behavior_tracker.js捕获的所有事件类型\n以及后端生成的事件类型（如state_snapshot）"
+            },
+            "FrontendConfig": {
+                "properties": {
+                    "api_base_url": {
+                        "type": "string",
+                        "title": "Api Base Url"
+                    },
+                    "backend_port": {
+                        "type": "integer",
+                        "title": "Backend Port"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "api_base_url",
+                    "backend_port"
+                ],
+                "title": "FrontendConfig",
+                "description": "前端配置模型\n\n定义向前端暴露的非敏感配置变量，用于前端连接后端API和获取配置信息。\n\nAttributes:\n    api_base_url: API基础URL，供前端使用，用于构建完整的API请求地址\n    backend_port: 后端服务端口号，供前端动态构建完整URL使用"
+            },
+            "HTTPValidationError": {
+                "properties": {
+                    "detail": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        },
+                        "type": "array",
+                        "title": "Detail"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "InteractionAndAssertCheckpoint": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Name",
+                        "description": "检查点名称"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/CheckpointType",
+                        "description": "检查点类型"
+                    },
+                    "feedback": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Feedback",
+                        "description": "反馈信息"
+                    },
+                    "action_selector": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Action Selector",
+                        "description": "动作选择器"
+                    },
+                    "action_type": {
+                        "$ref": "#/components/schemas/ActionType",
+                        "description": "动作类型"
+                    },
+                    "action_value": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Action Value",
+                        "description": "动作值"
+                    },
+                    "assertion": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/AssertAttributeCheckpoint"
+                            },
+                            {
+                                "$ref": "#/components/schemas/AssertStyleCheckpoint"
+                            },
+                            {
+                                "$ref": "#/components/schemas/AssertTextContentCheckpoint"
+                            },
+                            {
+                                "$ref": "#/components/schemas/CustomScriptCheckpoint"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Assertion",
+                        "description": "断言对象，不能再次嵌套交互脚本"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "type",
+                    "feedback",
+                    "action_selector",
+                    "action_type"
+                ],
+                "title": "InteractionAndAssertCheckpoint",
+                "description": "交互和断言检查点模型\n\n用于模拟用户交互（点击、输入等）并进行断言检查。\n注意：断言对象不能再次嵌套交互脚本，只能嵌套其他类型的断言。\n\nAttributes:\n    action_selector: 动作选择器，用于定位要执行动作的元素\n    action_type: 动作类型，如 'click', 'type_text' 等\n    action_value: 动作值（用于输入文本等）\n    assertion: 断言对象，可以是除InteractionAndAssertCheckpoint外的任何检查点类型"
+            },
+            "KnowledgeGraph": {
+                "properties": {
+                    "nodes": {
+                        "items": {
+                            "$ref": "#/components/schemas/KnowledgeGraphNode"
+                        },
+                        "type": "array",
+                        "title": "Nodes",
+                        "description": "节点列表"
+                    },
+                    "edges": {
+                        "items": {
+                            "$ref": "#/components/schemas/KnowledgeGraphEdge"
+                        },
+                        "type": "array",
+                        "title": "Edges",
+                        "description": "边列表"
+                    },
+                    "dependent_edges": {
+                        "items": {
+                            "$ref": "#/components/schemas/KnowledgeGraphEdge"
+                        },
+                        "type": "array",
+                        "title": "Dependent Edges",
+                        "description": "依赖边列表"
+                    },
+                    "metadata": {
+                        "anyOf": [
+                            {
+                                "additionalProperties": true,
+                                "type": "object"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Metadata",
+                        "description": "图谱元数据"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "nodes",
+                    "edges",
+                    "dependent_edges"
+                ],
+                "title": "KnowledgeGraph",
+                "description": "知识图谱模型\n\n完整的知识图谱结构，包含所有节点和边。\n\nAttributes:\n    nodes: 节点列表，包含所有知识点节点\n    edges: 边列表，包含所有节点间的连接关系\n    dependent_edges: 依赖边列表，包含知识点间的依赖关系\n    metadata: 图谱元数据（可选）"
+            },
+            "KnowledgeGraphEdge": {
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/KnowledgeGraphEdgeData"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "data"
+                ],
+                "title": "KnowledgeGraphEdge",
+                "description": "知识图谱边模型\n\n知识图谱中的边结构，表示节点间的连接关系。\n这种结构是为了与Cypher.js等图形库兼容。\n\nAttributes:\n    data: 边数据对象，包含源节点和目标节点信息"
+            },
+            "KnowledgeGraphEdgeData": {
+                "properties": {
+                    "source": {
+                        "type": "string",
+                        "title": "Source",
+                        "description": "源节点ID"
+                    },
+                    "target": {
+                        "type": "string",
+                        "title": "Target",
+                        "description": "目标节点ID"
+                    },
+                    "edge_type": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Edge Type",
+                        "description": "边类型"
+                    },
+                    "weight": {
+                        "anyOf": [
+                            {
+                                "type": "number",
+                                "maximum": 1.0,
+                                "minimum": 0.0
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Weight",
+                        "description": "边权重(0-1)"
+                    },
+                    "label": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 50
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Label",
+                        "description": "边标签"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "source",
+                    "target"
+                ],
+                "title": "KnowledgeGraphEdgeData",
+                "description": "知识图谱边数据模型\n\n定义知识图谱中边的连接关系，采用Cypher.js兼容格式。\n\nAttributes:\n    source: 源节点ID\n    target: 目标节点ID\n    edge_type: 边类型（可选）\n    weight: 边权重（可选）\n    label: 边标签（可选）"
+            },
+            "KnowledgeGraphNode": {
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/KnowledgeGraphNodeData"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "data"
+                ],
+                "title": "KnowledgeGraphNode",
+                "description": "知识图谱节点模型\n\n知识图谱中的节点结构，包含节点数据对象。\n这种结构是为了与Cypher.js等图形库兼容。\n\nAttributes:\n    data: 节点数据对象，包含id和label信息"
+            },
+            "KnowledgeGraphNodeData": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "title": "Id",
+                        "description": "节点唯一标识符"
+                    },
+                    "label": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "minLength": 1,
+                        "title": "Label",
+                        "description": "节点显示标签"
+                    },
+                    "type": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Type",
+                        "description": "节点类型"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 500
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Description",
+                        "description": "节点描述"
+                    },
+                    "difficulty": {
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "maximum": 5.0,
+                                "minimum": 1.0
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Difficulty",
+                        "description": "难度等级(1-5)"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "label"
+                ],
+                "title": "KnowledgeGraphNodeData",
+                "description": "知识图谱节点数据模型\n\n定义知识图谱中单个节点的数据内容，采用Cypher.js兼容格式。\n\nAttributes:\n    id: 节点唯一标识符\n    label: 节点显示标签\n    type: 节点类型（可选）\n    description: 节点描述（可选）\n    difficulty: 难度等级（可选）"
+            },
+            "LearningContent": {
+                "properties": {
+                    "topic_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Topic Id",
+                        "description": "知识点ID"
+                    },
+                    "title": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Title",
+                        "description": "学习内容标题"
+                    },
+                    "levels": {
+                        "items": {
+                            "$ref": "#/components/schemas/LevelInfo"
+                        },
+                        "type": "array",
+                        "minItems": 1,
+                        "title": "Levels",
+                        "description": "等级信息列表"
+                    },
+                    "sc_all": {
+                        "items": {
+                            "$ref": "#/components/schemas/SelectElementInfo"
+                        },
+                        "type": "array",
+                        "title": "Sc All",
+                        "description": "选择元素信息列表"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "topic_id",
+                    "title",
+                    "levels",
+                    "sc_all"
+                ],
+                "title": "LearningContent",
+                "description": "学习内容模型\n\n完整的学习内容结构，包含主题信息、等级信息和选择元素信息。\n\nAttributes:\n    topic_id: 知识点ID，用于标识特定的学习主题\n    title: 学习内容标题\n    levels: 等级信息列表\n    sc_all: 选择元素信息列表"
+            },
+            "LevelInfo": {
+                "properties": {
+                    "level": {
+                        "type": "integer",
+                        "minimum": 1.0,
+                        "title": "Level",
+                        "description": "等级编号"
+                    },
+                    "description": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Description",
+                        "description": "等级描述"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "level",
+                    "description"
+                ],
+                "title": "LevelInfo",
+                "description": "等级信息模型\n\n学习内容的等级信息。\n\nAttributes:\n    level: 等级编号\n    description: 等级描述"
+            },
+            "SelectElementInfo": {
+                "properties": {
+                    "topic_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Topic Id",
+                        "description": "主题ID"
+                    },
+                    "select_element": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "minItems": 0,
+                        "title": "Select Element",
+                        "description": "选择元素列表"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "topic_id",
+                    "select_element"
+                ],
+                "title": "SelectElementInfo",
+                "description": "选择元素信息模型\n\n用于sc_all字段，包含主题ID和选择元素列表。\n\nAttributes:\n    topic_id: 主题ID\n    select_element: 选择元素列表"
+            },
+            "SessionInitiateRequest": {
+                "properties": {
+                    "participant_id": {
+                        "type": "string",
+                        "title": "Participant Id",
+                        "description": "User-provided or system-generated unique ID (UUID) for the participant"
+                    },
+                    "group": {
+                        "type": "string",
+                        "title": "Group",
+                        "description": "Assigned experiment group",
+                        "default": "experimental"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "participant_id"
+                ],
+                "title": "SessionInitiateRequest",
+                "description": "会话初始化请求模型\n\n用于初始化用户会话，包含参与者ID和分组信息。\n\nAttributes:\n    participant_id: 参与者唯一标识符（UUID格式）\n    group: 实验分组，默认为'experimental'实验组"
+            },
+            "SessionInitiateResponse": {
+                "properties": {
+                    "participant_id": {
+                        "type": "string",
+                        "title": "Participant Id",
+                        "description": "System-generated unique ID (UUID) for the participant"
+                    },
+                    "is_new_user": {
+                        "type": "boolean",
+                        "title": "Is New User",
+                        "description": "Whether the participant is a new user, used to determine if onboarding content should be displayed"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "participant_id",
+                    "is_new_user"
+                ],
+                "title": "SessionInitiateResponse",
+                "description": "会话初始化响应模型\n\n返回会话初始化结果，包含参与者ID和新用户状态。\n\nAttributes:\n    participant_id: 参与者唯一标识符（UUID格式）\n    is_new_user: 是否为新用户，用于判断是否需要显示引导内容"
+            },
+            "StandardResponse_ChatResponse_": {
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "title": "Code",
+                        "default": 200
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "success"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/ChatResponse"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "title": "StandardResponse[ChatResponse]"
+            },
+            "StandardResponse_FrontendConfig_": {
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "title": "Code",
+                        "default": 200
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "success"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/FrontendConfig"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "title": "StandardResponse[FrontendConfig]"
+            },
+            "StandardResponse_KnowledgeGraph_": {
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "title": "Code",
+                        "default": 200
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "success"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/KnowledgeGraph"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "title": "StandardResponse[KnowledgeGraph]"
+            },
+            "StandardResponse_LearningContent_": {
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "title": "Code",
+                        "default": 200
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "success"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/LearningContent"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "title": "StandardResponse[LearningContent]"
+            },
+            "StandardResponse_SessionInitiateResponse_": {
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "title": "Code",
+                        "default": 200
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "success"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/SessionInitiateResponse"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "title": "StandardResponse[SessionInitiateResponse]"
+            },
+            "StandardResponse_TestSubmissionAsyncResponse_": {
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "title": "Code",
+                        "default": 200
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "success"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/TestSubmissionAsyncResponse"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "title": "StandardResponse[TestSubmissionAsyncResponse]"
+            },
+            "StandardResponse_TestSubmissionResponse_": {
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "title": "Code",
+                        "default": 200
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "success"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/TestSubmissionResponse"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "title": "StandardResponse[TestSubmissionResponse]"
+            },
+            "StandardResponse_TestTask_": {
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "title": "Code",
+                        "default": 200
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "success"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/TestTask"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "title": "StandardResponse[TestTask]"
+            },
+            "StandardResponse_UserProgressResponse_": {
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "title": "Code",
+                        "default": 200
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "success"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/UserProgressResponse"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "title": "StandardResponse[UserProgressResponse]"
+            },
+            "StandardResponse_dict_": {
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "title": "Code",
+                        "default": 200
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "success"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "additionalProperties": true,
+                                "type": "object"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Data"
+                    }
+                },
+                "type": "object",
+                "title": "StandardResponse[dict]"
+            },
+            "TestSubmissionAsyncResponse": {
+                "properties": {
+                    "task_id": {
+                        "type": "string",
+                        "title": "Task Id",
+                        "description": "异步评测任务的ID"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "task_id"
+                ],
+                "title": "TestSubmissionAsyncResponse",
+                "description": "异步测试提交响应模型"
+            },
+            "TestSubmissionRequest": {
+                "properties": {
+                    "participant_id": {
+                        "type": "string",
+                        "title": "Participant Id",
+                        "description": "参与者ID"
+                    },
+                    "topic_id": {
+                        "type": "string",
+                        "title": "Topic Id",
+                        "description": "知识点ID"
+                    },
+                    "code": {
+                        "$ref": "#/components/schemas/CodePayload",
+                        "description": "用户提交的代码"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "participant_id",
+                    "topic_id",
+                    "code"
+                ],
+                "title": "TestSubmissionRequest",
+                "description": "测试提交请求模型\n\n用于接收用户提交的代码测试请求，包含用户信息和代码内容。\n\nAttributes:\n    participant_id: 参与者ID，用于标识特定用户\n    topic_id: 知识点ID，用于标识测试对应的知识点\n    code: 用户提交的代码内容，包含HTML、CSS、JS三部分"
+            },
+            "TestSubmissionResponse": {
+                "properties": {
+                    "passed": {
+                        "type": "boolean",
+                        "title": "Passed",
+                        "description": "是否所有检查点都通过"
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "description": "总体评测信息"
+                    },
+                    "details": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Details",
+                        "description": "详细的失败反馈列表"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "passed",
+                    "message",
+                    "details"
+                ],
+                "title": "TestSubmissionResponse",
+                "description": "测试提交响应模型\n\n用于返回代码测试结果，包含整体评测结果和详细反馈信息。\n\nAttributes:\n    passed: 是否所有检查点都通过，True表示全部通过\n    message: 总体评测信息，提供综合性的反馈\n    details: 详细的失败反馈列表，包含每个检查点的具体反馈信息"
+            },
+            "TestTask": {
+                "properties": {
+                    "topic_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Topic Id",
+                        "description": "知识点ID"
+                    },
+                    "title": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Title",
+                        "description": "测试任务标题"
+                    },
+                    "description_md": {
+                        "type": "string",
+                        "minLength": 1,
+                        "title": "Description Md",
+                        "description": "任务描述"
+                    },
+                    "start_code": {
+                        "$ref": "#/components/schemas/CodeContent",
+                        "description": "初始代码"
+                    },
+                    "checkpoints": {
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/components/schemas/AssertAttributeCheckpoint"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/AssertStyleCheckpoint"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/AssertTextContentCheckpoint"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/AssertElementCheckpoint"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/CustomScriptCheckpoint"
+                                },
+                                {
+                                    "$ref": "#/components/schemas/InteractionAndAssertCheckpoint"
+                                }
+                            ]
+                        },
+                        "type": "array",
+                        "minItems": 1,
+                        "title": "Checkpoints",
+                        "description": "检查点列表"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "topic_id",
+                    "title",
+                    "description_md",
+                    "start_code",
+                    "checkpoints"
+                ],
+                "title": "TestTask",
+                "description": "测试任务模型\n\n完整的测试任务定义，包含任务描述、初始代码和检查点列表。\n\nAttributes:\n    topic_id: 知识点ID，用于标识测试任务对应的知识点\n    title: 测试任务标题\n    description_md: 任务描述，Markdown格式的详细说明\n    start_code: 初始代码，用户开始测试时的基础代码\n    checkpoints: 检查点列表，包含所有需要验证的检查点"
+            },
+            "UserProgressResponse": {
+                "properties": {
+                    "completed_topics": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Completed Topics"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "completed_topics"
+                ],
+                "title": "UserProgressResponse",
+                "description": "用户学习进度响应模型\n\n用于返回用户已完成的所有知识点列表。\n\nAttributes:\n    completed_topics: 已完成的知识点ID列表"
+            },
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Error Type"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "title": "ValidationError"
+            }
+        }
+    }
+}
