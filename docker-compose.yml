@@ -15,7 +15,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.backend
-    container_name: adaptive-tutor-backend
+    container_name: ats-exp-backend
     ports:
       - "8000:8000"
     environment:
@@ -37,7 +37,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.backend
-    container_name: celery-chat-worker
+    container_name: ats-exp-celery-chat-worker
     command: celery -A app.celery_app worker -l info -Q chat_queue --pool=prefork -n ai_worker@%h -c 2
     environment:
       - REDIS_URL=redis://redis:6379/0
@@ -57,7 +57,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.backend
-    container_name: celery-submit-worker
+    container_name: ats-exp-celery-submit-worker
     command: celery -A app.celery_app worker -l info -Q submit_queue --pool=prefork -n submit_worker@%h -c 2
     environment:
       - REDIS_URL=redis://redis:6379/0
@@ -77,7 +77,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.backend
-    container_name: celery-db-worker
+    container_name: ats-exp-celery-db-worker
     command: celery -A app.celery_app worker -l info -Q db_writer_queue --pool=gevent -n db_worker@%h -c 10
     environment:
       - REDIS_URL=redis://redis:6379/0
@@ -97,7 +97,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.backend
-    container_name: celery-behavior-worker
+    container_name: ats-exp-celery-behavior-worker
     command: celery -A app.celery_app worker -l info -Q behavior_queue --pool=prefork -n behavior_worker@%h -c 2
     environment:
       - REDIS_URL=redis://redis:6379/0
@@ -117,7 +117,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.backend
-    container_name: celery-beat
+    container_name: ats-exp-celery-beat
     command: celery -A app.celery_app beat -l info
     environment:
       - REDIS_URL=redis://redis:6379/0
@@ -137,7 +137,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.frontend
-    container_name: adaptive-tutor-frontend
+    container_name: atx-exp-frontend
     ports:
       - "8325:80"
     volumes:
