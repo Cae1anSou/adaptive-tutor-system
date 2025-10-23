@@ -10,12 +10,12 @@ Args:
     db: 数据库会话
     
 Returns:
-    StandardResponse[ChatResponse]: AI回复 POST /api/v1/chat/ai/chat */
-export async function chatWithAiApiV1ChatAiChatPost(
+    StandardResponse[ChatResponse]: AI回复 POST /chat/ai/chat */
+export async function chatWithAiChatAiChatPost(
   body: API.ChatRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.StandardResponseChatResponse_>('/api/v1/chat/ai/chat', {
+  return request<API.StandardResponseChatResponse_>('/chat/ai/chat', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -33,12 +33,12 @@ Args:
     db: 数据库会话（保留以确保兼容性，但实际任务已委托给Celery）
     
 Returns:
-    StandardResponse[dict]: 包含任务ID的响应 POST /api/v1/chat/ai/chat2 */
-export async function chatWithAi2ApiV1ChatAiChat2Post(
+    StandardResponse[dict]: 包含任务ID的响应 POST /chat/ai/chat2 */
+export async function chatWithAi2ChatAiChat2Post(
   body: API.ChatRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.StandardResponseDict_>('/api/v1/chat/ai/chat2', {
+  return request<API.StandardResponseDict_>('/chat/ai/chat2', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -54,14 +54,14 @@ Args:
     task_id: 异步任务的ID
     
 Returns:
-    StandardResponse[ChatResponse]: AI回复结果 GET /api/v1/chat/ai/chat2/result/${param0} */
-export async function getChatResultApiV1ChatAiChat2ResultTaskIdGet(
+    StandardResponse[ChatResponse]: AI回复结果 GET /chat/ai/chat2/result/${param0} */
+export async function getChatResultChatAiChat2ResultTaskIdGet(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getChatResultApiV1ChatAiChat2ResultTaskIdGetParams,
+  params: API.getChatResultChatAiChat2ResultTaskIdGetParams,
   options?: { [key: string]: any }
 ) {
   const { task_id: param0, ...queryParams } = params
-  return request<API.StandardResponseChatResponse_>(`/api/v1/chat/ai/chat2/result/${param0}`, {
+  return request<API.StandardResponseChatResponse_>(`/chat/ai/chat2/result/${param0}`, {
     method: 'GET',
     params: { ...queryParams },
     ...(options || {}),

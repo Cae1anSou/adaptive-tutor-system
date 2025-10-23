@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     )
 
     PROJECT_NAME: str = "Adaptive Tutor System"
-    API_V1_STR: str = "/api/v1"
+    API_V1_STR: str = ""
 
     # TODO: 到时候可能需要约束，不能放所有都进来
     BACKEND_CORS_ORIGINS: List[str] = ["*"]

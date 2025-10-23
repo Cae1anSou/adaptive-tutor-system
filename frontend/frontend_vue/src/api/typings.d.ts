@@ -182,23 +182,23 @@ declare namespace API {
     backend_port: number
   }
 
-  type getChatResultApiV1ChatAiChat2ResultTaskIdGetParams = {
+  type getChatResultChatAiChat2ResultTaskIdGetParams = {
     task_id: string
   }
 
-  type getLearningContentApiV1LearningContentTopicIdGetParams = {
+  type getLearningContentLearningContentTopicIdGetParams = {
     topic_id: string
   }
 
-  type getSubmissionResultApiV1SubmissionSubmitTest2ResultTaskIdGetParams = {
+  type getSubmissionResultSubmissionSubmitTest2ResultTaskIdGetParams = {
     task_id: string
   }
 
-  type getTestTaskApiV1TestTasksTopicIdGetParams = {
+  type getTestTaskTestTasksTopicIdGetParams = {
     topic_id: string
   }
 
-  type getUserProgressApiV1ProgressParticipantsParticipantIdProgressGetParams = {
+  type getUserProgressProgressParticipantsParticipantIdProgressGetParams = {
     participant_id: string
   }
 

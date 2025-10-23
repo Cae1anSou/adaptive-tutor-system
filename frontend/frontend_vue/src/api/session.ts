@@ -11,12 +11,12 @@ Args:
     db: 数据库会话
     
 Returns:
-    StandardResponse[SessionInitiateResponse]: 会话初始化响应 POST /api/v1/session/initiate */
-export async function initiateSessionApiV1SessionInitiatePost(
+    StandardResponse[SessionInitiateResponse]: 会话初始化响应 POST /session/initiate */
+export async function initiateSessionSessionInitiatePost(
   body: API.SessionInitiateRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.StandardResponseSessionInitiateResponse_>('/api/v1/session/initiate', {
+  return request<API.StandardResponseSessionInitiateResponse_>('/session/initiate', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
