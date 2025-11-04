@@ -30,13 +30,23 @@ const router = createRouter({
       component: SiderLayout,
       children: [
         {
-          path: 'learning',
+          path: 'learning/:topicId',
           name: 'learning',
           component: LearningPage
         },
         {
-          path: 'test',
+          path: 'learning',
+          name: 'learning-default',
+          component: LearningPage
+        },
+        {
+          path: 'test/:topicId',
           name: 'test',
+          component: TestPage
+        },
+        {
+          path: 'test',
+          name: 'test-default',
           component: TestPage
         }
       ]
