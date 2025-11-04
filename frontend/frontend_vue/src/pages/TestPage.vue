@@ -11,7 +11,7 @@ import {
   CheckOutlined
 } from '@ant-design/icons-vue'
 import {marked} from 'marked'
-import * as monaco from 'monaco-editor'
+import type * as Monaco from 'monaco-editor'
 import loader from '@monaco-editor/loader'
 import {getTestTaskTestTasksTopicIdGet} from '@/api/testTasks'
 import {
@@ -27,7 +27,13 @@ const loading = ref(false)
 const submitting = ref(false)
 const testTask = ref<API.TestTask | null>(null)
 const testResult = ref<API.TestSubmissionResponse | null>(null)
-const currentCode = ref<API.CodeContent>({html: '', css: '', js: ''})
+type CodeState = {
+  html: string
+  css: string
+  js: string
+}
+
+const currentCode = ref<CodeState>({html: '', css: '', js: ''})
 const activeTab = ref('html')
 const showAskAI = ref(false)
 const chatMessages = ref<Array<{ role: 'user' | 'ai'; content: string; timestamp?: string }>>([])
@@ -35,9 +41,11 @@ const aiAskCount = ref(0)
 const submissionCount = ref(0)
 const failedSubmissionCount = ref(0)
 const participantId = ref('')
-const htmlEditor = ref<monaco.editor.IStandaloneCodeEditor | null>(null)
-const cssEditor = ref<monaco.editor.IStandaloneCodeEditor | null>(null)
-const jsEditor = ref<monaco.editor.IStandaloneCodeEditor | null>(null)
+type StandaloneCodeEditor = Monaco.editor.IStandaloneCodeEditor
+
+const htmlEditor = ref<StandaloneCodeEditor | null>(null)
+const cssEditor = ref<StandaloneCodeEditor | null>(null)
+const jsEditor = ref<StandaloneCodeEditor | null>(null)
 const htmlEditorRef = ref<HTMLElement | null>(null)
 const cssEditorRef = ref<HTMLElement | null>(null)
 const jsEditorRef = ref<HTMLElement | null>(null)
@@ -184,6 +192,21 @@ const resultPlaceholderStyle = {
   color: '#999'
 }
 
+// 确保拿到的初始代码结构始终是可变对象，避免后续编辑时报错
+function normalizeCodeContent(raw: unknown): CodeState {
+  if (!raw || typeof raw !== 'object') {
+    return {html: '', css: '', js: ''}
+  }
+
+  const code = raw as Partial<Record<'html' | 'css' | 'js', unknown>>
+
+  return {
+    html: typeof code.html === 'string' ? code.html : '',
+    css: typeof code.css === 'string' ? code.css : '',
+    js: typeof code.js === 'string' ? code.js : ''
+  }
+}
+
 // 测试结果通过样式
 const testResultPassedStyle = {
   color: '#52c41a',
@@ -237,10 +260,10 @@ async function initializeMonacoEditor() {
   try {
     // 配置 Monaco Editor
     const monacoInstance = await loader.init()
-    
+
     // 创建 HTML 编辑器
     if (htmlEditorRef.value) {
-      htmlEditor.value = monacoInstance.editor.create(htmlEditorRef.value, {
+      const editorInstance = monacoInstance.editor.create(htmlEditorRef.value, {
         value: currentCode.value.html,
         language: 'html',
         theme: 'vs',
@@ -251,15 +274,17 @@ async function initializeMonacoEditor() {
         automaticLayout: true
       })
 
+      htmlEditor.value = editorInstance as unknown as StandaloneCodeEditor
+
       // 监听内容变化
-      htmlEditor.value.onDidChangeModelContent(() => {
-        currentCode.value.html = htmlEditor.value?.getValue() || ''
+      editorInstance.onDidChangeModelContent(() => {
+        currentCode.value.html = editorInstance.getValue()
       })
     }
 
     // 创建 CSS 编辑器
     if (cssEditorRef.value) {
-      cssEditor.value = monacoInstance.editor.create(cssEditorRef.value, {
+      const editorInstance = monacoInstance.editor.create(cssEditorRef.value, {
         value: currentCode.value.css,
         language: 'css',
         theme: 'vs',
@@ -270,15 +295,17 @@ async function initializeMonacoEditor() {
         automaticLayout: true
       })
 
+      cssEditor.value = editorInstance as unknown as StandaloneCodeEditor
+
       // 监听内容变化
-      cssEditor.value.onDidChangeModelContent(() => {
-        currentCode.value.css = cssEditor.value?.getValue() || ''
+      editorInstance.onDidChangeModelContent(() => {
+        currentCode.value.css = editorInstance.getValue()
       })
     }
 
     // 创建 JS 编辑器
     if (jsEditorRef.value) {
-      jsEditor.value = monacoInstance.editor.create(jsEditorRef.value, {
+      const editorInstance = monacoInstance.editor.create(jsEditorRef.value, {
         value: currentCode.value.js,
         language: 'javascript',
         theme: 'vs',
@@ -289,9 +316,11 @@ async function initializeMonacoEditor() {
         automaticLayout: true
       })
 
+      jsEditor.value = editorInstance as unknown as StandaloneCodeEditor
+
       // 监听内容变化
-      jsEditor.value.onDidChangeModelContent(() => {
-        currentCode.value.js = jsEditor.value?.getValue() || ''
+      editorInstance.onDidChangeModelContent(() => {
+        currentCode.value.js = editorInstance.getValue()
       })
     }
   } catch (error) {
@@ -455,8 +484,24 @@ async function loadTestTask(topicId: string) {
     const response = await getTestTaskTestTasksTopicIdGet({topic_id: topicId})
 
     if (response.data?.code === 200 && response.data?.data) {
-      testTask.value = response.data.data
-      currentCode.value = response.data.data.start_code
+      const normalizedStartCode = normalizeCodeContent(response.data.data.start_code)
+
+      // 拆开副本，避免和 testTask 共用同一引用
+      testTask.value = {
+        ...response.data.data,
+        start_code: normalizedStartCode
+      }
+
+      currentCode.value = {
+        html: normalizedStartCode.html,
+        css: normalizedStartCode.css,
+        js: normalizedStartCode.js
+      }
+
+      // 若编辑器已初始化，确保展示的内容与最新数据同步
+      htmlEditor.value?.setValue(currentCode.value.html)
+      cssEditor.value?.setValue(currentCode.value.css)
+      jsEditor.value?.setValue(currentCode.value.js)
     } else {
       message.error(response.data?.message || '获取测试任务失败')
     }
@@ -579,10 +624,10 @@ ${(testResult.value.details || []).join('\n') || '无详细信息'}
 // Tab切换
 function handleTabChange(tab: string) {
   activeTab.value = tab
-  
+
   // 延迟重新布局当前编辑器，确保 DOM 更新完成
   setTimeout(() => {
-    const currentEditor = tab === 'html' ? htmlEditor.value : 
+    const currentEditor = tab === 'html' ? htmlEditor.value :
                          tab === 'css' ? cssEditor.value : jsEditor.value
     currentEditor?.layout()
     currentEditor?.focus()
@@ -715,7 +760,7 @@ ${testTask.value.description_md || '暂无描述'}
       <div :style="editorContentStyle as any">
         <!-- HTML编辑器 -->
         <div v-show="activeTab === 'html'" :style="codeEditorStyle as any">
-          <div 
+          <div
             ref="htmlEditorRef"
             :style="{ height: '100%', width: '100%' }"
           ></div>
@@ -723,7 +768,7 @@ ${testTask.value.description_md || '暂无描述'}
 
         <!-- CSS编辑器 -->
         <div v-show="activeTab === 'css'" :style="codeEditorStyle as any">
-          <div 
+          <div
             ref="cssEditorRef"
             :style="{ height: '100%', width: '100%' }"
           ></div>
@@ -731,7 +776,7 @@ ${testTask.value.description_md || '暂无描述'}
 
         <!-- JS编辑器 -->
         <div v-show="activeTab === 'js'" :style="codeEditorStyle as any">
-          <div 
+          <div
             ref="jsEditorRef"
             :style="{ height: '100%', width: '100%' }"
           ></div>
@@ -752,4 +797,3 @@ ${testTask.value.description_md || '暂无描述'}
     </div>
   </div>
 </template>
-
