@@ -40,7 +40,7 @@ const siderStyle: CSSProperties = {
   background: '#fff',
   borderRight: '1px solid #f0f0f0',
   padding: '0',
-  boxShadow: '2px 0 8px rgba(0, 0, 0, 0.04)'
+  boxShadow: '2px 0 8px rgba(0, 0, 0, 0.04)',
 };
 
 const footerStyle: CSSProperties = {
@@ -67,7 +67,7 @@ const footerText: string ='Copyright © 2025 syncPBL by 宋曹卢余蔡吴林';
         <a-layout-content :style="bodyStyle">
           <RouterView />
         </a-layout-content>
-        <a-layout-sider :style="siderStyle">Sider</a-layout-sider>
+        <a-layout-sider :style="siderStyle" :width="400">Sider</a-layout-sider>
       </a-layout>
       <a-layout-footer :style="footerStyle">{{ footerText }}</a-layout-footer>
     </a-layout>
