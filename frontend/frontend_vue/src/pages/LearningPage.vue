@@ -309,7 +309,7 @@ watch(
                   <div class="preview-section">
                     <div class="ratio-16x9">
                       <iframe
-                        :src="exampleUrl"
+                        src="/example_pages/index.html"
                         title="示例页面预览"
                         loading="lazy"
                       />

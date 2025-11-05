@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>猫咪展示 Demo</title>
+  <style>
+    #body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(to bottom, #006400, #00aa00);
+      color: #fff;
+    }
+
+    #header {
+      background-color: #004d00;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #headerTitle {
+      margin: 0;
+      font-size: 1.8rem;
+      color: #adff2f;
+      font-weight: bold;
+      font-style: italic;
+    }
+
+    #searchBar {
+      padding: 1rem 2rem;
+      background-color: #e0ffe0;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    #searchInput, #searchSelect, #searchButton {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    #cardContainer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 1rem;
+      gap: 1rem;
+    }
+
+    /* 卡片1 */
+    #card1 {
+      color:  #fff;
+      background-color: #004d00;
+      width: 200px;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+
+    #card1Img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+
+    #card1Content {
+      padding: 1rem;
+    }
+
+    /* 卡片2 */
+    #card2 {
+      color:  #fff;
+      background-color: #004d00;
+      width: 200px;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+
+    #card2Img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+
+    #card2Content {
+      padding: 1rem;
+    }
+
+    #footer {
+      background-color: #003300;
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+    }
+
+    #featuresSection {
+      width: 60%;
+      margin: 5rem auto;
+      border-radius: 10px;
+      background-color: #f0fff0;
+      color: #000;
+      padding: 2rem;
+    }
+
+    #featuresTitle {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    #listDemo1, #listDemo2, #formDemo {
+      margin: 2rem auto;
+      max-width: 600px;
+      background: #ffffff;
+      color: #000;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+
+    #listDemo1 h3, #listDemo2 h3, #formDemo h3 {
+      margin-top: 0;
+    }
+
+    #formDemo label {
+      display: block;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body id="body">
+  <header id="header">
+    <h1 id="headerTitle">WCF 猫咪展示 2025</h1>
+  </header>
+
+  <section id="featuresSection" class="features">
+    <div id="searchBar">
+      <input type="text" placeholder="搜索猫咪名称" id="searchInput" />
+      <select id="searchSelect">
+        <option>选择品种</option>
+        <option>英短</option>
+        <option>加菲</option>
+      </select>
+      <button id="searchButton" onclick="searchCat()">搜索</button>
+    </div>
+
+    <div id="cardContainer">
+      <div id="card1" class="card" data-name="黑豆" data-breed="英短">
+        <img id="card1Img" src="" alt="猫咪图片" />
+        <div id="card1Content" class="card-content">
+          <h3>黑豆</h3>
+          <p>品种：英短</p>
+          <p>得分：12345</p>
+        </div>
+      </div>
+      <div id="card2" class="card" data-name="雪球" data-breed="加菲">
+        <img id="card2Img" src="" alt="猫咪图片" />
+        <div id="card2Content" class="card-content">
+          <h3>雪球</h3>
+          <p>品种：加菲</p>
+          <p>得分：11200</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="listDemo1" class="list-demo">
+      <h3>猫咪照顾要点</h3>
+      <ol>
+        <li>每日梳毛</li>
+        <li>定时喂食</li>
+        <li>清洁猫砂盆</li>
+      </ol>
+
+      <h3>猫咪喜欢的活动</h3>
+      <ul>
+        <li>抓老鼠</li>
+        <li>晒太阳</li>
+        <li>玩毛线球</li>
+      </ul>
+    </div>
+
+    <div id="formDemo" class="form-demo">
+      <h3>猫咪偏好调查</h3>
+      <form onsubmit="handleForm(event)">
+        <label><input type="checkbox" name="likes" value="晒太阳" id="chkLikeSun"> 喜欢晒太阳</label>
+        <label><input type="checkbox" name="likes" value="抓老鼠" id="chkLikeMouse"> 爱抓老鼠</label>
+
+        <label id="genderLabel">性别偏好：</label>
+        <label><input type="radio" name="gender" value="公" id="radioMale"> 公猫</label>
+        <label><input type="radio" name="gender" value="母" id="radioFemale"> 母猫</label>
+
+        <button type="submit" id="submitBtn">提交</button>
+      </form>
+    </div>
+
+    <div id="listDemo2" class="list-demo">
+      <h3>猫咪叫声示例</h3>
+      <!-- 音频文件不存在，暂时注释
+      <audio id="catAudio" controls>
+        <source src="cat-sound.mp3" type="audio/mpeg" />
+        浏览器不支持音频播放。
+      </audio>
+      -->
+      <p>音频文件：cat-sound.mp3（文件不存在）</p>
+
+      <h3>猫咪日常视频</h3>
+      <!-- 视频文件不存在，暂时注释
+      <video id="catVideo" controls width="100%">
+        <source src="cat-video.mp4" type="video/mp4" />
+        浏览器不支持视频播放。
+      </video>
+      -->
+      <p>视频文件：cat-video.mp4（文件不存在）</p>
+    </div>
+  </section>
+
+  <footer id="footer">
+    <p>© 2025 猫咪前端示例页面 - 教学用途</p>
+  </footer>
+
+     <!-- 加载选择器模块 -->
+   <script type="module" src="../../js/modules/iframe-selector.js"></script>
+   
+   <script>
+     function searchCat() {
+         const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+         const breed = document.getElementById("searchSelect").value;
+         const cards = document.querySelectorAll("#cardContainer .card");
+
+         cards.forEach(card => {
+             const name = card.getAttribute("data-name").toLowerCase();
+             const cardBreed = card.getAttribute("data-breed");
+
+             const matchesKeyword = keyword === "" || name.includes(keyword);
+             const matchesBreed = breed === "选择品种" || cardBreed === breed;
+
+             if (matchesKeyword && matchesBreed) {
+                 card.style.display = "";
+             } else {
+                 card.style.display = "none";
+             }
+         });
+     }
+
+     function handleForm(event) {
+         event.preventDefault();
+         const likes = Array.from(document.querySelectorAll('input[name="likes"]:checked')).map(el => el.value);
+         const gender = document.querySelector('input[name="gender"]:checked')?.value || '未选择';
+         alert("猫咪偏好：" + likes.join(", ") + "\n性别：" + gender);
+     }
+
+     // 页面加载完成后记录日志
+     document.addEventListener('DOMContentLoaded', () => {
+         console.log('示例页面加载完成，元素选择器已准备就绪');
+     });
+   </script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WCF Best Cat - Cat Exhibition</title>
+    <style>
+        body {
+            font-family: "Roboto", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f4ed;
+            color: #333333;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        header {
+            background-color: #ffffff;
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .header-title {
+            font-size: 2.5rem;
+            color: #b88a44;
+            text-align: center;
+        }
+        
+        .flex-container {
+            display: flex;
+            flex-grow: 1;
+            padding: 40px;
+        }
+        
+        .main {
+            flex: 0 0 70%;
+            padding-right: 20px;
+            box-sizing: border-box;
+        }
+        
+        .sidebar {
+            flex: 0 0 30%;
+            box-sizing: border-box;
+            padding-left: 20px;
+        }
+        
+        .media-container {
+            background-color: #fff;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden; 
+        }
+        
+        h1, h2, h3 {
+            color: #b88a44;
+            margin-bottom: 20px;
+        }
+
+        p {
+            line-height: 1.6;
+        }
+        
+        .bold-text {
+            font-weight: bold;
+        }
+
+        .italic-text {
+            font-style: italic;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 6px;
+            aspect-ratio: 4/3;
+        }
+        
+        .gallery img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+        
+        .gallery img:hover {
+            transform: scale(1.05);
+        }
+        
+        
+        #media_audio_track, #media_video_video {
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .ol-custom, .ul-custom {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .ol-custom li, .ul-custom li {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .btn {
+            background-color: #b88a44;
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #9a7630;
+        }
+
+        form {
+            margin-top: 40px;
+        }
+
+        input[type="text"], input[type="email"], button {
+            display: block;
+            width: 100%;
+            margin-bottom: 16px;
+            padding: 12px;
+            box-sizing: border-box;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 16px;
+            font-family: "Roboto", sans-serif;
+        }
+
+        input[type="text"]:focus, input[type="email"]:focus {
+            border-color: #b88a44;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="header-title" id="structure_header_header">Best Cat Exhibition</h1>
+        </header>
+        <div class="flex-container">
+            <div class="main">
+                <article id="structure_div_main-content">
+                    <h2 id="text_paragraph_title">Welcome to the Cat Exhibition</h2>
+                    <p id="text_format_paragraph">Join us for a <span class="bold-text">purr-fect</span> celebration of feline beauty and <span class="italic-text">grace</span>. Discover various cat breeds and experience the excitement of the event!</p>
+                    
+                    <div class="media-container">
+                        <div class="gallery">
+                            <div class="gallery-item">
+                                <img src="./src/1.jpeg" alt="Cat Thumbnail 1">
+                            </div>
+                            <div class="gallery-item">
+                                <img src="./src/2.jpg" alt="Cat Thumbnail 2">
+                            </div>
+                            <div class="gallery-item">
+                                <img src="./src/3.jpg" alt="Cat Thumbnail 3">
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 id="text_list_ol_events">Event Highlights</h3>
+                    <ol class="ol-custom">
+                        <li>Opening Ceremony</li>
+                        <li>Cat Parades</li>
+                        <li>Best in Show Award</li>
+                    </ol>
+
+                    <form id="form_submit_form">
+                        <input type="text" id="form_input_name" placeholder="Your Name" required>
+                        <input type="email" id="form_input_email" placeholder="Your Email" required>
+                        <label><input type="checkbox" id="form_checkbox_news" checked> Subscribe to newsletter</label>
+                        <button class="btn" type="submit" data-target="form-submit">Join the Cat Family</button>
+                    </form>
+                </article>
+            </div>
+            <aside class="sidebar">
+                <div class="media-container">
+                    <h3 id="text_list_ul_schedule">Daily Schedule</h3>
+                    <ul class="ul-custom">
+                        <li>10:00 AM - Doors Open</li>
+                        <li>12:00 PM - Lunch Break</li>
+                        <li>03:00 PM - Cat Parade</li>
+                    </ul>
+
+                    <audio id="media_audio_track" controls>
+                        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
+                        Your browser does not support the audio element.
+                    </audio>
+                    
+                    <video id="media_video_video" controls>
+                        <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                        Your browser does not support the video element.
+                    </video>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- 加载选择器模块 -->
+    <script type="module" src="../../js/modules/iframe-selector.js"></script>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('form_input_name').value;
+            const email = document.getElementById('form_input_email').value;
+            alert(`Thank you, ${name}, for joining us! We've sent a confirmation to ${email}.`);
+        });
+
+        // 页面加载完成后记录日志
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('示例页面加载完成，元素选择器已准备就绪');
+        });
+    </script>
+</body>
+</html>

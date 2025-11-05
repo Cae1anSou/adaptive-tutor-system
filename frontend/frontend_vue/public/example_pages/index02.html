@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>示例页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        p {
+            margin: 10px 0;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        ul {
+            list-style-type: square;
+        }
+        label {
+            margin-right: 10px;
+        }
+        input[type="checkbox"] {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>HTML 基础结构</h1>
+        <p>这是一个简单的HTML页面示例，包含了各种基本元素。</p>
+        
+        <h2>使用 h 元素表示标题</h2>
+        <h3>这是一个三级标题</h3>
+        <h4>这是一个四级标题</h4>
+        <h5>这是一个五级标题</h5>
+        <h6>这是一个六级标题</h6>
+        
+        <h2>用 <p> 段落组织文本</h2>
+        <p>这是一个段落文本。</p>
+        
+        <h2>创建列表</h2>
+        <ul>
+            <li>列表项1</li>
+            <li>列表项2</li>
+            <li>列表项3</li>
+        </ul>
+        
+        <h2>插入图片</h2>
+        <img src="https://via.placeholder.com/150" alt="示例图片">
+        
+        <h2>创建复选框（使用 label）</h2>
+        <label for="checkbox1">选项1</label>
+        <input type="checkbox" id="checkbox1" name="checkbox1">
+        
+        <h2>构建基本表格</h2>
+        <table>
+            <tr>
+                <th>标题1</th>
+                <th>标题2</th>
+            </tr>
+            <tr>
+                <td>数据1</td>
+                <td>数据2</td>
+            </tr>
+            <tr>
+                <td>数据3</td>
+                <td>数据4</td>
+            </tr>
+        </table>
+        
+        <h2>JS 入门</h2>
+        <script>
+            // alert("这是一个简单的JavaScript示例！");
+            console.log("这是一个简单的JavaScript示例！");
+        </script>
+        
+        <h2>了解什么是 CSS</h2>
+        <p>CSS（层叠样式表）用于设置HTML元素的样式。</p>
+        
+        <h2>使用 style 设置行内样式</h2>
+        <p style="color: red;">这是一个红色文本。</p>
+        
+        <h2>通过选择器应用样式</h2>
+        <div class="box">这是一个带有类选择器的div。</div>
+        
+        <h2>设置颜色与背景</h2>
+        <div style="color: blue; background-color: yellow;">
+            这是一个带有颜色和背景色的div。
+        </div>
+        
+        <h2>掌握盒模型</h2>
+        <div class="box" style="border: 1px solid #000; padding: 10px; margin: 10px;">
+            这是一个带有边框、内边距和外边距的div。
+        </div>
+        
+        <h2>使用 Flex 进行布局</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>左边的div</div>
+            <div>右边的div</div>
+        </div>
+    </div>
+
+    <!-- 加载配置模块 -->
+    <script type="module" src="../../js/modules/config.js"></script>
+    
+    <script>
+        // ==================== iframe选择器初始化 ====================
+        const MESSAGE_TYPES = {
+            START: 'SW_SELECT_START',
+            STOP: 'SW_SELECT_STOP',
+            CHOSEN: 'SW_SELECT_CHOSEN',
+        };
+
+        function initIframeSelector(options = {}) {
+            const { allowed = true, allowedOrigins = ['*'], allowedTags = [] } = options;
+            if (!allowed) return () => {};
+            
+            let selector = null;
+            const handleMessage = (event) => {
+                if (allowedOrigins[0] !== '*' && !allowedOrigins.includes(event.origin)) return;
+                
+                let message;
+                try {
+                    message = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+                } catch (e) { return; }
+                
+                switch (message.type) {
+                    case MESSAGE_TYPES.START:
+                        console.log('[initIframeSelector] 接收到START消息:', message);
+                        
+                        if (selector) {
+                            selector.stop();
+                        }
+                        const startMessage = message;
+                        const allowedElements = startMessage.allowedElements || [];
+                        let currentElements = [];
+                        let cumulativeElements = [];
+                        
+                        if (typeof allowedElements === 'object' && !Array.isArray(allowedElements)) {
+                            currentElements = allowedElements.current || [];
+                            cumulativeElements = allowedElements.cumulative || [];
+                        } else {
+                            cumulativeElements = allowedElements;
+                        }
+                        
+                        console.log('[initIframeSelector] 解析后的元素列表:', {
+                            allowedElements: startMessage.allowedElements,
+                            currentElements: currentElements,
+                            cumulativeElements: cumulativeElements
+                        });
+                        
+                        // 这里可以添加ElementSelector的实现
+                        // 为了简化，我们只记录消息
+                        console.log('[initIframeSelector] 选择器启动，允许元素:', cumulativeElements);
+                        break;
+                    case MESSAGE_TYPES.STOP:
+                        if (selector) {
+                            selector.stop();
+                            selector = null;
+                        }
+                        console.log('[initIframeSelector] 选择器停止');
+                        break;
+                }
+            };
+            
+            window.addEventListener('message', handleMessage);
+            return () => {
+                window.removeEventListener('message', handleMessage);
+                if (selector) {
+                    selector.stop();
+                    selector = null;
+                }
+            };
+        }
+        
+        // 页面加载完成后记录日志
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('示例页面加载完成，元素选择器已准备就绪');
+            // 初始化iframe选择器
+            initIframeSelector();
+        });
+    </script>
+</body>
+</html>
