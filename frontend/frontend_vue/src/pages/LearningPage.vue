@@ -12,6 +12,7 @@ import {
   CloseCircleOutlined,
   BulbOutlined,
   PlayCircleOutlined,
+  ArrowLeftOutlined,
   ArrowRightOutlined
 } from '@ant-design/icons-vue'
 
@@ -61,6 +62,11 @@ const parsedLevels = computed<LevelCard[]>(() => {
 })
 
 const expandedLevels = ref<number[]>([])
+const activeLevelCard = computed<LevelCard | null>(() => {
+  const activeLevel = expandedLevels.value[0]
+  if (!activeLevel) return null
+  return parsedLevels.value.find(level => level.level === activeLevel) ?? null
+})
 
 
 const showError = computed(() => Boolean(errorMessage.value))
@@ -174,15 +180,11 @@ function clearError() {
 }
 
 function toggleLevel(level: number) {
-  if (expandedLevels.value.includes(level)) {
-    expandedLevels.value = []
-  } else {
-    expandedLevels.value = [level]
-  }
+  expandedLevels.value = expandedLevels.value[0] === level ? [] : [level]
 }
 
-function isLevelExpanded(level: number) {
-  return expandedLevels.value.includes(level)
+function collapseLevels() {
+  expandedLevels.value = []
 }
 
 onMounted(() => {
@@ -215,13 +217,16 @@ watch(
     selectedElementCode.value = defaultCodeMessage
     includeCumulative.value = false
     isSelecting.value = false
+    expandedLevels.value = []
   }
 )
 
 watch(
   parsedLevels,
   levels => {
-    expandedLevels.value = levels.length ? [levels[0].level] : []
+    if (!levels.length || !levels.some(level => level.level === expandedLevels.value[0])) {
+      expandedLevels.value = []
+    }
   },
   {immediate: true}
 )
@@ -245,8 +250,8 @@ watch(
     <a-spin :spinning="loading" tip="加载学习内容...">
       <template v-if="learningContent">
         <div class="content-container">
-          <div class="left-group">
-            <div class="panel example-panel">
+          <div class="page-stack">
+            <section class="panel example-panel">
               <div class="panel-header">
                 <GlobalOutlined class="panel-icon"/>
                 <div>
@@ -309,9 +314,9 @@ watch(
                   </div>
                 </div>
               </div>
-            </div>
+            </section>
 
-            <div class="panel knowledge-panel">
+            <section class="panel knowledge-panel">
               <div class="panel-header">
                 <BulbOutlined class="panel-icon"/>
                 <div>
@@ -320,30 +325,41 @@ watch(
                 </div>
               </div>
               <div class="panel-body">
-                <div v-if="parsedLevels.length" class="levels-flow">
-                  <template v-for="(level, index) in parsedLevels" :key="level.level">
+                <div v-if="parsedLevels.length">
+                  <div v-if="!activeLevelCard" class="levels-overview">
                     <div
-                      :class="['level-card', { 'level-card--expanded': isLevelExpanded(level.level) }]"
+                      v-for="level in parsedLevels"
+                      :key="level.level"
+                      class="level-card level-card--compact"
                       @click="toggleLevel(level.level)"
                     >
+                      <div class="level-card__badge">Level {{ level.level }}</div>
+                      <p class="level-summary level-summary--compact">{{ level.summary }}</p>
+                      <div class="level-card__hint">
+                        查看详情
+                        <ArrowRightOutlined/>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-else class="level-detail">
+                    <div class="level-detail__actions">
+                      <a-button type="link" @click="collapseLevels">
+                        <template #icon>
+                          <ArrowLeftOutlined/>
+                        </template>
+                        返回知识点列表
+                      </a-button>
+                    </div>
+                    <div class="level-card level-card--expanded">
                       <div class="level-header">
-                        <h3>Level {{ level.level }}</h3>
-                        <p class="level-summary">{{ level.summary }}</p>
+                        <h3>Level {{ activeLevelCard.level }}</h3>
+                        <p class="level-summary">{{ activeLevelCard.summary }}</p>
                       </div>
-                      <div class="level-content">
-                        <div class="markdown-body" v-html="level.html"/>
-                      </div>
-                      <div class="level-click-hint">
-                        点击{{ isLevelExpanded(level.level) ? '收起' : '展开' }}详细内容
+                      <div class="level-body">
+                        <div class="markdown-body" v-html="activeLevelCard.html"/>
                       </div>
                     </div>
-                    <div
-                      v-if="index < parsedLevels.length - 1"
-                      class="level-arrow"
-                    >
-                      <ArrowRightOutlined/>
-                    </div>
-                  </template>
+                  </div>
                 </div>
                 <a-empty v-else description="暂无知识点内容"/>
               </div>
@@ -355,7 +371,7 @@ watch(
                   开始练习
                 </a-button>
               </div>
-            </div>
+            </section>
           </div>
         </div>
       </template>
@@ -382,26 +398,27 @@ watch(
 
 .content-container {
   display: flex;
-  gap: 18px;
-  align-items: stretch;
-  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  padding: 0 12px;
+  box-sizing: border-box;
   backdrop-filter: blur(2px);
 }
 
-.learning-page--mobile .content-container {
-  flex-direction: column;
-  gap: 16px;
-}
-
-.left-group {
+.page-stack {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  min-width: 0;
+  width: 100%;
+  max-width: 1280px;
+  gap: 24px;
 }
 
-.left-group {
-  flex: 3;
+.learning-page--mobile .content-container {
+  padding: 0 8px;
+}
+
+.learning-page--mobile .page-stack {
+  gap: 20px;
 }
 
 .panel {
@@ -461,15 +478,11 @@ watch(
 }
 
 .exploration-content {
-  display: flex;
-  gap: 22px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 24px;
   flex: 1;
   min-height: 320px;
-}
-
-.learning-page--mobile .exploration-content {
-  flex-direction: column;
-  gap: 16px;
 }
 
 .preview-section {
@@ -547,6 +560,7 @@ watch(
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-top: auto;
 }
 
 .selector-controls {
@@ -580,26 +594,39 @@ watch(
   gap: 0;
 }
 
-.levels-flow {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
 .level-card {
   position: relative;
-  padding: 20px;
   border-radius: 16px;
   border: 1px solid rgba(196, 181, 253, 0.65);
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(237, 233, 254, 0.85));
-  cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
 }
 
-.level-card:hover {
+.levels-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.level-card--compact {
+  padding: 18px;
+  min-height: 150px;
+  cursor: pointer;
+}
+
+.level-card--compact:hover {
   border-color: #a855f7;
   box-shadow: 0 16px 32px rgba(168, 85, 247, 0.15);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+}
+
+.level-card__badge {
+  font-weight: 700;
+  color: #4338ca;
+  font-size: 14px;
+  margin-bottom: 8px;
 }
 
 .level-header h3 {
@@ -616,32 +643,50 @@ watch(
   line-height: 1.6;
 }
 
-.level-content {
-  margin-top: 0;
-  max-height: 0;
+.level-summary--compact {
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  transition: max-height 0.25s ease, margin-top 0.25s ease;
 }
 
-.level-card--expanded .level-content {
-  margin-top: 12px;
-  max-height: 600px;
-}
-
-.level-click-hint {
-  margin-top: 12px;
-  font-size: 12px;
-  color: #4c1d95;
-  font-weight: 500;
-}
-
-.level-arrow {
+.level-card__hint {
+  margin-top: auto;
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: #7c3aed;
-  font-size: 20px;
-  opacity: 0.8;
+  gap: 6px;
+  color: #4c1d95;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.level-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 360px;
+}
+
+.level-detail__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.level-card--expanded {
+  padding: 26px 24px;
+  box-shadow: 0 18px 40px rgba(168, 85, 247, 0.18);
+  border-color: #a855f7;
+  flex: 1;
+  cursor: default;
+}
+
+.level-body {
+  margin-top: 18px;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .knowledge-actions {
@@ -718,12 +763,19 @@ watch(
 }
 
 @media (max-width: 1280px) {
-  .left-group {
-    flex: 1 1 100%;
+  .page-stack {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .exploration-content {
+    grid-template-columns: 1fr;
+    gap: 18px;
   }
 
-  .right-group {
-    flex: 1 1 100%;
+  .levels-overview {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 }
 
@@ -742,6 +794,10 @@ watch(
 
   .knowledge-actions {
     padding: 12px 16px 16px;
+  }
+
+  .levels-overview {
+    grid-template-columns: 1fr;
   }
 }
 </style>
