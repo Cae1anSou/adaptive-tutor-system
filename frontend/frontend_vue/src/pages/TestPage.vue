@@ -625,11 +625,10 @@ ${(testResult.value.details || []).join('\n') || '无详细信息'}
 function handleTabChange(tab: string) {
   activeTab.value = tab
 
-  // 延迟重新布局当前编辑器，确保 DOM 更新完成
+  // 延迟聚焦当前编辑器
   setTimeout(() => {
     const currentEditor = tab === 'html' ? htmlEditor.value :
                          tab === 'css' ? cssEditor.value : jsEditor.value
-    currentEditor?.layout()
     currentEditor?.focus()
   }, 100)
 }
