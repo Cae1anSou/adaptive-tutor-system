@@ -22,6 +22,42 @@ type LevelCard = {
   summary: string
 }
 
+type AllowedElements = {
+  current: string[]
+  cumulative: string[]
+}
+
+type ElementSelectionPayload = {
+  tagName: string
+  id: string
+  className: string
+  classList: string[]
+  textContent: string
+  outerHTML: string
+  selector: string
+  bounds: { x: number; y: number; width: number; height: number }
+  styles: {
+    backgroundColor: string
+    color: string
+    fontSize: string
+  }
+  pageURL: string
+}
+
+type SelectorBridge = {
+  start: (isCumulative: boolean, elements: AllowedElements) => void
+  stop: () => void
+  updateMode: (isCumulative: boolean, elements: AllowedElements) => void
+  destroy: () => void
+}
+
+const MESSAGE_TYPES = {
+  START: 'SW_SELECT_START',
+  STOP: 'SW_SELECT_STOP',
+  CHOSEN: 'SW_SELECT_CHOSEN',
+  UPDATE_MODE: 'SW_UPDATE_CUMULATIVE_MODE'
+} as const
+
 const route = useRoute()
 const router = useRouter()
 
@@ -35,8 +71,11 @@ const isMobile = ref(isClient ? window.innerWidth <= 768 : false)
 
 const defaultCodeMessage = '在示例页面中选取元素后，会在此显示对应的HTML代码。'
 const selectedElementCode = ref(defaultCodeMessage)
+const selectedElementMeta = ref<ElementSelectionPayload | null>(null)
 const isSelecting = ref(false)
 const includeCumulative = ref(false)
+const selectorBridge = ref<SelectorBridge | null>(null)
+const exampleIframeRef = ref<HTMLIFrameElement | null>(null)
 
 const allTopics = [
   '1_1', '1_2', '1_3',
@@ -68,9 +107,16 @@ const activeLevelCard = computed<LevelCard | null>(() => {
   return parsedLevels.value.find(level => level.level === activeLevel) ?? null
 })
 
+const allowedElements = computed<AllowedElements>(() => {
+  if (!learningContent.value || !currentTopicId.value) {
+    return {current: [], cumulative: []}
+  }
+  return computeAllowedElements(learningContent.value.sc_all ?? [], currentTopicId.value)
+})
+
 
 const showError = computed(() => Boolean(errorMessage.value))
-const hasSelection = computed(() => selectedElementCode.value !== defaultCodeMessage)
+const hasSelection = computed(() => Boolean(selectedElementMeta.value))
 
 const topicTitle = computed(() => learningContent.value?.title ?? '未加载知识点')
 
@@ -146,6 +192,176 @@ async function loadLearningContent(topicId: string) {
 }
 
 
+function normalizeElementName(element: string | null | undefined): string | null {
+  if (!element) return null
+  const trimmed = element.trim()
+  if (!trimmed) return null
+  if (/^<!/i.test(trimmed)) {
+    return null
+  }
+  return trimmed.toLowerCase()
+}
+
+function deduplicate(elements: string[]): string[] {
+  const seen = new Set<string>()
+  const result: string[] = []
+  for (const item of elements) {
+    const normalized = normalizeElementName(item)
+    if (normalized && !seen.has(normalized)) {
+      seen.add(normalized)
+      result.push(normalized)
+    }
+  }
+  return result
+}
+
+function computeAllowedElements(scAll: API.SelectElementInfo[], topicId: string): AllowedElements {
+  const cumulativeSet = new Set<string>()
+  let currentElements: string[] = []
+
+  for (const entry of scAll) {
+    const normalizedList = deduplicate(entry.select_element ?? [])
+    normalizedList.forEach(value => cumulativeSet.add(value))
+    if (entry.topic_id === topicId) {
+      currentElements = normalizedList
+      break
+    }
+  }
+
+  return {
+    current: currentElements,
+    cumulative: Array.from(cumulativeSet)
+  }
+}
+
+function prepareAllowedElements(elements: AllowedElements): AllowedElements {
+  return {
+    current: Array.from(new Set(elements.current)),
+    cumulative: Array.from(new Set(elements.cumulative))
+  }
+}
+
+function createSelectorBridgeInstance(
+  iframe: HTMLIFrameElement,
+  onChosen: (payload: ElementSelectionPayload) => void,
+  onError?: (error: Error) => void
+): SelectorBridge {
+  const iframeWindow = iframe.contentWindow
+  if (!iframeWindow) {
+    throw new Error('示例页面尚未加载，请稍后重试。')
+  }
+
+  const targetOrigin = '*'
+
+  const handleMessage = (event: MessageEvent) => {
+    if (event.source !== iframeWindow) return
+
+    let data: unknown = event.data
+    if (typeof data === 'string') {
+      try {
+        data = JSON.parse(data)
+      } catch {
+        return
+      }
+    }
+
+    if (!data || typeof data !== 'object') return
+    const message = data as {type?: string; payload?: ElementSelectionPayload}
+
+    if (message.type === MESSAGE_TYPES.CHOSEN && message.payload) {
+      onChosen(message.payload)
+    }
+  }
+
+  window.addEventListener('message', handleMessage)
+
+  const postMessage = (message: Record<string, unknown>) => {
+    try {
+      iframeWindow.postMessage(message, targetOrigin)
+    } catch (error) {
+      if (onError) {
+        onError(error instanceof Error ? error : new Error(String(error)))
+      }
+    }
+  }
+
+  return {
+    start(isCumulative, elements) {
+      const payload = prepareAllowedElements(elements)
+      postMessage({
+        type: MESSAGE_TYPES.START,
+        ignore: ['.sw-selector', '.sw-highlight'],
+        allowedElements: payload,
+        isCumulative
+      })
+    },
+    stop() {
+      postMessage({type: MESSAGE_TYPES.STOP})
+    },
+    updateMode(isCumulative, elements) {
+      const payload = prepareAllowedElements(elements)
+      postMessage({
+        type: MESSAGE_TYPES.UPDATE_MODE,
+        isCumulative,
+        allowedElements: payload
+      })
+    },
+    destroy() {
+      window.removeEventListener('message', handleMessage)
+    }
+  }
+}
+
+function ensureSelectorBridge(): SelectorBridge | null {
+  if (!exampleIframeRef.value) {
+    message.error('示例页面尚未加载，请稍后重试。')
+    return null
+  }
+
+  if (!selectorBridge.value) {
+    try {
+      selectorBridge.value = createSelectorBridgeInstance(
+        exampleIframeRef.value,
+        handleSelectorChosen,
+        handleSelectorError
+      )
+    } catch (error) {
+      selectorBridge.value = null
+      handleSelectorError(error instanceof Error ? error : new Error(String(error)))
+      return null
+    }
+  }
+
+  return selectorBridge.value
+}
+
+function handleSelectorChosen(payload: ElementSelectionPayload) {
+  selectedElementMeta.value = payload
+  const outerHTML = payload.outerHTML?.trim()
+  selectedElementCode.value = outerHTML && outerHTML.length ? outerHTML : `<${payload.tagName}>`
+  isSelecting.value = false
+  message.success(`已选中元素 <${payload.tagName}>`)
+}
+
+function handleSelectorError(error: Error | unknown) {
+  const detail = error instanceof Error ? error.message : String(error)
+  message.error(detail ? `元素选择器出错：${detail}` : '元素选择器出错')
+  isSelecting.value = false
+}
+
+function handleIframeLoad(event: Event) {
+  const iframe = event.target as HTMLIFrameElement | null
+  if (!iframe) return
+
+  if (selectorBridge.value) {
+    selectorBridge.value.destroy()
+    selectorBridge.value = null
+  }
+
+  exampleIframeRef.value = iframe
+  isSelecting.value = false
+}
+
 function handleNavigateToTest() {
   if (!currentTopicId.value) return
   router.push({name: 'test', params: {topicId: currentTopicId.value}})
@@ -153,19 +369,42 @@ function handleNavigateToTest() {
 
 function handleStartSelector() {
   if (isSelecting.value) return
+
+  if (!learningContent.value) {
+    message.warning('请先加载学习内容后再试。')
+    return
+  }
+
+  const elements = allowedElements.value
+  if (!elements.current.length && !elements.cumulative.length) {
+    message.warning('当前知识点暂无可选元素。')
+    return
+  }
+
+  const bridge = ensureSelectorBridge()
+  if (!bridge) return
+
   isSelecting.value = true
-  message.info('元素选择功能将在后续版本中接入新的交互逻辑。')
-  // TODO: 添加元素选择功能
+  try {
+    bridge.start(includeCumulative.value, elements)
+    const modeText = includeCumulative.value ? '累积模式，包含之前章节元素' : '当前章节模式'
+    message.info(`已开启选择器（${modeText}），请在右侧示例页面中点击目标元素。`)
+  } catch (error) {
+    isSelecting.value = false
+    handleSelectorError(error instanceof Error ? error : new Error(String(error)))
+  }
 }
 
 function handleStopSelector() {
-  if (!isSelecting.value) return
+  if (!isSelecting.value && !selectorBridge.value) return
+  selectorBridge.value?.stop()
   isSelecting.value = false
   message.success('已停止元素选择。')
 }
 
 function handleClearSelection() {
   if (!hasSelection.value) return
+  selectedElementMeta.value = null
   selectedElementCode.value = defaultCodeMessage
   message.success('已清除已选元素。')
 }
@@ -200,6 +439,10 @@ onUnmounted(() => {
   if (isClient) {
     window.removeEventListener('resize', handleResize)
   }
+  selectorBridge.value?.stop()
+  selectorBridge.value?.destroy()
+  selectorBridge.value = null
+  exampleIframeRef.value = null
 })
 
 watch(
@@ -214,12 +457,24 @@ watch(
 watch(
   () => learningContent.value?.topic_id,
   () => {
+    selectorBridge.value?.stop()
+    selectedElementMeta.value = null
     selectedElementCode.value = defaultCodeMessage
     includeCumulative.value = false
     isSelecting.value = false
     expandedLevels.value = []
   }
 )
+
+watch(includeCumulative, newValue => {
+  if (!selectorBridge.value) return
+  selectorBridge.value.updateMode(newValue, allowedElements.value)
+})
+
+watch(allowedElements, newElements => {
+  if (!selectorBridge.value) return
+  selectorBridge.value.updateMode(includeCumulative.value, newElements)
+})
 
 watch(
   parsedLevels,
@@ -264,9 +519,12 @@ watch(
                   <div class="preview-section">
                     <div class="ratio-16x9">
                       <iframe
+                        id="element-selector-iframe"
+                        ref="exampleIframeRef"
                         src="/example_pages/index.html"
                         title="示例页面预览"
                         loading="lazy"
+                        @load="handleIframeLoad"
                       />
                     </div>
                   </div>
