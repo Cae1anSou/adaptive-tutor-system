@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { message } from 'ant-design-vue'
-import { marked } from 'marked'
-import { getLearningContentLearningContentTopicIdGet } from '@/api/learningContent'
+import {computed, onMounted, onUnmounted, ref, watch} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {message} from 'ant-design-vue'
+import {marked} from 'marked'
+import {getLearningContentLearningContentTopicIdGet} from '@/api/learningContent'
 import {
   GlobalOutlined,
   CodeOutlined,
@@ -12,8 +12,6 @@ import {
   CloseCircleOutlined,
   BulbOutlined,
   PlayCircleOutlined,
-  ProfileOutlined,
-  ApartmentOutlined,
   ArrowRightOutlined
 } from '@ant-design/icons-vue'
 
@@ -48,7 +46,6 @@ const allTopics = [
   '6_1', '6_2', '6_3'
 ]
 
-const exampleUrl = computed(() => '/example_pages/index.html')
 
 const parsedLevels = computed<LevelCard[]>(() => {
   if (!learningContent.value) return []
@@ -64,48 +61,12 @@ const parsedLevels = computed<LevelCard[]>(() => {
 })
 
 const expandedLevels = ref<number[]>([])
-const scAllList = computed(() => learningContent.value?.sc_all ?? [])
 
-const cumulativeSelectors = computed(() => {
-  if (!learningContent.value) return []
-  const selectors = new Set<string>()
-  for (const item of learningContent.value.sc_all) {
-    item.select_element.forEach(selector => selectors.add(selector))
-    if (item.topic_id === currentTopicId.value) break
-  }
-  return Array.from(selectors)
-})
 
-const currentSelectors = computed(() => {
-  if (!learningContent.value) return []
-  const match = learningContent.value.sc_all.find(item => item.topic_id === currentTopicId.value)
-  return match?.select_element ?? []
-})
-
-const topicOptions = computed(() => {
-  if (scAllList.value.length) {
-    return scAllList.value.map(item => ({
-      value: item.topic_id,
-      label: item.topic_id
-    }))
-  }
-  return allTopics.map(topic => ({
-    value: topic,
-    label: topic
-  }))
-})
-
-const hasSelectors = computed(() => cumulativeSelectors.value.length > 0 || currentSelectors.value.length > 0)
 const showError = computed(() => Boolean(errorMessage.value))
 const hasSelection = computed(() => selectedElementCode.value !== defaultCodeMessage)
 
 const topicTitle = computed(() => learningContent.value?.title ?? '未加载知识点')
-const topicIdentifier = computed(() => learningContent.value?.topic_id ?? '-')
-const knowledgeLevelCount = computed(() => parsedLevels.value.length)
-const selectorStats = computed(() => ({
-  current: currentSelectors.value.length,
-  cumulative: cumulativeSelectors.value.length
-}))
 
 function resolveTopicFromRoute(): string {
   const paramTopic = route.params.topicId
@@ -142,7 +103,7 @@ async function syncTopicFromRoute(force = false) {
     topicId = getDefaultTopicId()
     message.info(`未指定知识点，已为你加载 ${topicId}`)
     try {
-      await router.replace({ name: 'learning', params: { topicId } })
+      await router.replace({name: 'learning', params: {topicId}})
     } catch (error) {
       console.warn('[LearningPage] 跳转默认知识点失败:', error)
     }
@@ -159,7 +120,7 @@ async function loadLearningContent(topicId: string) {
   loading.value = true
   errorMessage.value = ''
   try {
-    const response = await getLearningContentLearningContentTopicIdGet({ topic_id: topicId })
+    const response = await getLearningContentLearningContentTopicIdGet({topic_id: topicId})
     const body = response.data
     if (body?.code === 200 && body.data) {
       learningContent.value = body.data
@@ -178,28 +139,17 @@ async function loadLearningContent(topicId: string) {
   }
 }
 
-function handleTopicChange(value: string) {
-  if (!value || value === currentTopicId.value) return
-  router.push({ name: 'learning', params: { topicId: value } })
-}
 
 function handleNavigateToTest() {
   if (!currentTopicId.value) return
-  router.push({ name: 'test', params: { topicId: currentTopicId.value } })
-}
-
-function handleRetry() {
-  if (currentTopicId.value) {
-    loadLearningContent(currentTopicId.value)
-  } else {
-    syncTopicFromRoute(true)
-  }
+  router.push({name: 'test', params: {topicId: currentTopicId.value}})
 }
 
 function handleStartSelector() {
   if (isSelecting.value) return
   isSelecting.value = true
   message.info('元素选择功能将在后续版本中接入新的交互逻辑。')
+  // TODO: 添加元素选择功能
 }
 
 function handleStopSelector() {
@@ -273,7 +223,7 @@ watch(
   levels => {
     expandedLevels.value = levels.length ? [levels[0].level] : []
   },
-  { immediate: true }
+  {immediate: true}
 )
 </script>
 
@@ -298,7 +248,7 @@ watch(
           <div class="left-group">
             <div class="panel example-panel">
               <div class="panel-header">
-                <GlobalOutlined class="panel-icon" />
+                <GlobalOutlined class="panel-icon"/>
                 <div>
                   <h2 class="panel-title">开放式示例页面探索</h2>
                   <p class="panel-subtitle">{{ topicTitle }}</p>
@@ -318,28 +268,28 @@ watch(
                   <div class="code-section">
                     <div class="info-content">
                       <div class="info-header">
-                        <CodeOutlined />
+                        <CodeOutlined/>
                         <h3>选中元素代码</h3>
                       </div>
-                      <pre class="code-display" v-text="selectedElementCode" />
+                      <pre class="code-display" v-text="selectedElementCode"/>
                     </div>
                     <div class="code-panel-footer">
                       <div class="selector-controls">
                         <a-button type="primary" :disabled="isSelecting" @click="handleStartSelector">
                           <template #icon>
-                            <SelectOutlined />
+                            <SelectOutlined/>
                           </template>
                           选取元素
                         </a-button>
                         <a-button danger :disabled="!isSelecting" @click="handleStopSelector">
                           <template #icon>
-                            <PauseCircleOutlined />
+                            <PauseCircleOutlined/>
                           </template>
                           停止选择
                         </a-button>
                         <a-button :disabled="!hasSelection" @click="handleClearSelection">
                           <template #icon>
-                            <CloseCircleOutlined />
+                            <CloseCircleOutlined/>
                           </template>
                           清除选择
                         </a-button>
@@ -363,7 +313,7 @@ watch(
 
             <div class="panel knowledge-panel">
               <div class="panel-header">
-                <BulbOutlined class="panel-icon" />
+                <BulbOutlined class="panel-icon"/>
                 <div>
                   <h2 class="panel-title">渐进式知识点展示</h2>
                   <p class="panel-subtitle">分层深入当前知识点的核心概念</p>
@@ -381,7 +331,7 @@ watch(
                         <p class="level-summary">{{ level.summary }}</p>
                       </div>
                       <div class="level-content">
-                        <div class="markdown-body" v-html="level.html" />
+                        <div class="markdown-body" v-html="level.html"/>
                       </div>
                       <div class="level-click-hint">
                         点击{{ isLevelExpanded(level.level) ? '收起' : '展开' }}详细内容
@@ -391,134 +341,26 @@ watch(
                       v-if="index < parsedLevels.length - 1"
                       class="level-arrow"
                     >
-                      <ArrowRightOutlined />
+                      <ArrowRightOutlined/>
                     </div>
                   </template>
                 </div>
-                <a-empty v-else description="暂无知识点内容" />
+                <a-empty v-else description="暂无知识点内容"/>
               </div>
               <div class="knowledge-actions">
                 <a-button type="primary" size="large" @click="handleNavigateToTest">
                   <template #icon>
-                    <PlayCircleOutlined />
+                    <PlayCircleOutlined/>
                   </template>
                   开始练习
                 </a-button>
               </div>
             </div>
           </div>
-
-          <div class="right-group">
-            <div class="panel navigation-panel">
-              <div class="panel-header">
-                <ProfileOutlined class="panel-icon" />
-                <div>
-                  <h2 class="panel-title">学习导航</h2>
-                  <p class="panel-subtitle">快速切换知识点并查看基础信息</p>
-                </div>
-              </div>
-              <div class="panel-body">
-                <a-select
-                  :value="currentTopicId"
-                  :options="topicOptions"
-                  show-search
-                  option-filter-prop="label"
-                  placeholder="选择知识点"
-                  @change="handleTopicChange"
-                  style="width: 100%;"
-                />
-                <a-descriptions :column="1" size="small">
-                  <a-descriptions-item label="知识点 ID">
-                    {{ topicIdentifier }}
-                  </a-descriptions-item>
-                  <a-descriptions-item label="等级数量">
-                    {{ knowledgeLevelCount }}
-                  </a-descriptions-item>
-                  <a-descriptions-item label="累计可选元素">
-                    {{ selectorStats.cumulative }}
-                  </a-descriptions-item>
-                </a-descriptions>
-                <a-button :loading="loading" block @click="handleRetry">
-                  重新加载内容
-                </a-button>
-              </div>
-            </div>
-
-            <div class="panel selectors-panel">
-              <div class="panel-header">
-                <ApartmentOutlined class="panel-icon" />
-                <div>
-                  <h2 class="panel-title">可选元素参考</h2>
-                  <p class="panel-subtitle">了解当前及历史章节允许使用的元素</p>
-                </div>
-              </div>
-              <div class="panel-body">
-                <div class="selector-groups" v-if="hasSelectors">
-                  <div class="selector-section">
-                    <div class="selector-title">
-                      当前章节（{{ selectorStats.current }}）
-                    </div>
-                    <div class="selector-tags" v-if="currentSelectors.length">
-                      <a-tag v-for="selector in currentSelectors" :key="`current-${selector}`">
-                        {{ selector }}
-                      </a-tag>
-                    </div>
-                    <a-empty v-else description="暂无可选元素" />
-                  </div>
-                  <div class="selector-section">
-                    <div class="selector-title">
-                      累计进度（{{ selectorStats.cumulative }}）
-                    </div>
-                    <div class="selector-tags" v-if="cumulativeSelectors.length">
-                      <a-tag v-for="selector in cumulativeSelectors" :key="`cumulative-${selector}`">
-                        {{ selector }}
-                      </a-tag>
-                    </div>
-                    <a-empty v-else description="暂无累计可选元素" />
-                  </div>
-                </div>
-                <a-empty v-else description="暂无可选元素数据" />
-              </div>
-            </div>
-
-            <div class="panel topics-panel">
-              <div class="panel-header">
-                <GlobalOutlined class="panel-icon" />
-                <div>
-                  <h2 class="panel-title">章节元素速览</h2>
-                  <p class="panel-subtitle">查看全部章节对应的可选元素</p>
-                </div>
-              </div>
-              <div class="panel-body">
-                <a-collapse
-                  v-if="scAllList.length"
-                  class="topic-collapse"
-                  destroy-inactive-panel
-                >
-                  <a-collapse-panel
-                    v-for="item in scAllList"
-                    :key="item.topic_id"
-                    :header="item.topic_id === currentTopicId ? `${item.topic_id}（当前）` : item.topic_id"
-                  >
-                    <div v-if="item.select_element.length" class="selector-tags">
-                      <a-tag
-                        v-for="selector in item.select_element"
-                        :key="`topic-${item.topic_id}-${selector}`"
-                      >
-                        {{ selector }}
-                      </a-tag>
-                    </div>
-                    <a-empty v-else description="暂无数据" />
-                  </a-collapse-panel>
-                </a-collapse>
-                <a-empty v-else description="暂无章节数据" />
-              </div>
-            </div>
-          </div>
         </div>
       </template>
 
-      <a-empty v-else-if="!loading" description="尚未加载学习内容" />
+      <a-empty v-else-if="!loading" description="尚未加载学习内容"/>
     </a-spin>
   </div>
 </template>
@@ -551,8 +393,7 @@ watch(
   gap: 16px;
 }
 
-.left-group,
-.right-group {
+.left-group {
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -561,10 +402,6 @@ watch(
 
 .left-group {
   flex: 3;
-}
-
-.right-group {
-  flex: 2;
 }
 
 .panel {
@@ -775,7 +612,7 @@ watch(
 .level-summary {
   margin: 6px 0 0;
   color: #5b21b6;
-  font-size: 12.5px;
+  font-size: 14px;
   line-height: 1.6;
 }
 
