@@ -432,10 +432,6 @@ watch(
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.panel:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 26px 50px rgba(99, 102, 241, 0.12);
-}
 
 .panel-header {
   display: flex;
@@ -614,12 +610,6 @@ watch(
   padding: 18px;
   min-height: 150px;
   cursor: pointer;
-}
-
-.level-card--compact:hover {
-  border-color: #a855f7;
-  box-shadow: 0 16px 32px rgba(168, 85, 247, 0.15);
-  transform: translateY(-2px);
 }
 
 .level-card__badge {
