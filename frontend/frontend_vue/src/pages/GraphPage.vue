@@ -164,21 +164,7 @@ onMounted(() => {
 
 <template>
   <div id="GraphPage">
-    <h2>Playing with Physics</h2>
-    <div style="width: 700px; font-size: 14px; text-align: justify">
-      Every dataset is different. Nodes can have different sizes based on
-      content, interconnectivity can be high or low etc. Because of this, the
-      network configurator can be used to explore which settings may be good for
-      him or her. This is ment to be used during the development phase when you
-      are implementing vis.js. Once you have found settings you are happy with,
-      you can supply them to network using the documented physics options.
-    </div>
-    
-    <div class="info-box">
-      <strong>注意:</strong> 如果网络没有立即显示，请尝试调整右侧物理参数或稍微移动节点以触发布局计算。
-    </div>
-    
-    <div class="clearfix">
+    <div class="graph-container">
       <div ref="networkContainer" id="mynetwork"></div>
     </div>
 
@@ -187,38 +173,10 @@ onMounted(() => {
 </template>
 
 <style scoped>
-body {
-  font: 10pt sans;
-  margin: 20px;
-}
-
 #mynetwork {
-  float: left;
-  width: 600px;
-  height: 600px;
-  margin: 5px;
+  width: 100%;
+  height: 80vh;
   border: 1px solid lightgray;
   background-color: #f7f7f7;
-}
-
-#config {
-  float: left;
-  width: 400px;
-  height: 600px;
-  padding: 10px;
-  overflow-y: auto;
-}
-
-.clearfix::after {
-  content: "";
-  clear: both;
-  display: table;
-}
-
-.info-box {
-  background-color: #f0f8ff;
-  border-left: 4px solid #4a90e2;
-  padding: 10px;
-  margin-bottom: 15px;
 }
 </style>
