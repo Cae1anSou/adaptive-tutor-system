@@ -25,7 +25,6 @@ interface Edge {
 }
 
 const networkContainer = ref<HTMLElement | null>(null)
-const configContainer = ref<HTMLElement | null>(null)
 const selectionText = ref('')
 
 // 修复随机数生成函数
@@ -103,7 +102,7 @@ function getRandomColor(): string {
 }
 
 onMounted(() => {
-  if (!networkContainer.value || !configContainer.value) return
+  if (!networkContainer.value) return
   
   // 动态导入 vis-network
   import('vis-network').then((vis) => {
@@ -148,17 +147,7 @@ onMounted(() => {
         tooltipDelay: 200
       },
       configure: {
-        filter: function (option: string, path: string[]) {
-          if (path.indexOf("physics") !== -1) {
-            return true;
-          }
-          if (path.indexOf("smooth") !== -1 || option === "smooth") {
-            return true;
-          }
-          return false;
-        },
-        container: configContainer.value,
-        showButton: false
+        enabled: false
       }
     }
 
@@ -191,7 +180,6 @@ onMounted(() => {
     
     <div class="clearfix">
       <div ref="networkContainer" id="mynetwork"></div>
-      <div ref="configContainer" id="config"></div>
     </div>
 
     <p id="selection">{{ selectionText }}</p>
