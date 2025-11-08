@@ -13,7 +13,8 @@ interface Node {
   font: {
     size: number
     color: string
-  }
+  },
+  size: number
 }
 
 interface Edge {
@@ -41,16 +42,17 @@ function generateRandomNodesAndEdges(nodeCount: number): { nodes: Node[]; edges:
   for (let i = 0; i < nodeCount; i++) {
     nodes.push({
       id: i,
-      label: String(i),
+      label: String("知识点111111111" + String(i)),
       color: {
         background: getRandomColor(),
         border: '#2B7CE9'
       },
       shape: 'circle',
       font: {
-        size: 14,
+        size: 30,
         color: '#ffffff'
-      }
+      },
+      size: 100
     })
 
     connectionCount[i] = 0
@@ -120,18 +122,18 @@ onMounted(() => {
         forceAtlas2Based: {
           gravitationalConstant: -50,
           centralGravity: 0.01,
-          springLength: 100,
-          springConstant: 0.08,
-          damping: 0.4,
+          springLength: 50,
+          springConstant: 0.05,
+          damping: 0.5,
           avoidOverlap: 1
         },
-        maxVelocity: 50,
+        maxVelocity: 100,
         minVelocity: 0.1,
         timestep: 0.5
       },
       nodes: {
         borderWidth: 2,
-        size: 30,
+        size: 100,
         shadow: true
       },
       edges: {
@@ -139,7 +141,7 @@ onMounted(() => {
         shadow: true,
         smooth: {
           enabled: true,
-          type: 'continuous'
+          type: 'dynamic'
         }
       },
       interaction: {
