@@ -23,12 +23,12 @@ onMounted(() => {
           background: '#4a90e2',
           border: '#2270b0'
         },
-        shape: 'circle',
+        shape: 'dot',
         font: {
-          size: 16,
-          color: '#ffffff'
+          size: 40,
+          color: '#000000'
         },
-        size: 30
+        size: 70
       }))
 
       // 转换边数据
@@ -55,9 +55,9 @@ onMounted(() => {
           solver: 'forceAtlas2Based',
           forceAtlas2Based: {
             gravitationalConstant: -200,
-            centralGravity: 0.05,
-            springLength: 150,
-            springConstant: 0.08,
+            centralGravity: 0.005,
+            springLength: 200,  // 减小弹簧长度以增加张力
+            springConstant: 0.1, // 增加弹簧常数以增加张力
             damping: 0.5,
             avoidOverlap: 1
           },
@@ -80,7 +80,7 @@ onMounted(() => {
           }
         },
         edges: {
-          width: 3,
+          width: 15,
           shadow: true,
           smooth: {
             enabled: true,
