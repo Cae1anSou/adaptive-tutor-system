@@ -1,164 +1,117 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-
-// 定义节点和边的类型
-interface Node {
-  id: number
-  label: string
-  color: {
-    background: string
-    border: string
-  }
-  shape: string
-  font: {
-    size: number
-    color: string
-  },
-  size: number
-}
-
-interface Edge {
-  from: number
-  to: number
-  color: { 
-    color: string 
-  }
-}
+import { getKnowledgeGraphKnowledgeGraphGet } from '@/api/knowledgeGraph'
 
 const networkContainer = ref<HTMLElement | null>(null)
 const selectionText = ref('')
-
-// 修复随机数生成函数
-function seededRandom() {
-  return Math.random();
-}
-
-function generateRandomNodesAndEdges(nodeCount: number): { nodes: Node[]; edges: Edge[] } {
-  const nodes: Node[] = []
-  const edges: Edge[] = []
-  const connectionCount: number[] = []
-
-  // 创建节点和边
-  for (let i = 0; i < nodeCount; i++) {
-    nodes.push({
-      id: i,
-      label: String("知识点111111111" + String(i)),
-      color: {
-        background: getRandomColor(),
-        border: '#2B7CE9'
-      },
-      shape: 'circle',
-      font: {
-        size: 30,
-        color: '#ffffff'
-      },
-      size: 100
-    })
-
-    connectionCount[i] = 0
-
-    // 创建边
-    if (i === 1) {
-      const from = i
-      const to = 0
-      edges.push({
-        from: from,
-        to: to,
-        color: { color: '#848484' }
-      })
-      connectionCount[from]++
-      connectionCount[to]++
-    } else if (i > 1) {
-      const conn = edges.length * 2
-      const rand = Math.floor(seededRandom() * conn)
-      let cum = 0
-      let j = 0
-      while (j < connectionCount.length && cum < rand) {
-        cum += connectionCount[j]
-        j++
-      }
-
-      const from = i
-      const to = j
-      edges.push({
-        from: from,
-        to: to,
-        color: { color: '#848484' }
-      })
-      connectionCount[from]++
-      connectionCount[to]++
-    }
-  }
-
-  return { nodes: nodes, edges: edges }
-}
-
-// 生成随机颜色
-function getRandomColor(): string {
-  const letters = '0123456789ABCDEF'
-  let color = '#'
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)]
-  }
-  return color
-}
 
 onMounted(() => {
   if (!networkContainer.value) return
   
   // 动态导入 vis-network
   import('vis-network').then((vis) => {
-    // 生成数据
-    const data = generateRandomNodesAndEdges(25) // 减少节点数量以便更快渲染
+    // 从后端获取知识图谱数据
+    getKnowledgeGraphKnowledgeGraphGet().then(response => {
+      const graphData = response.data?.data
+      if (!graphData) return
 
-    const options = {
-      physics: {
-        enabled: true,
-        stabilization: {
-          enabled: true,
-          iterations: 100
+      // 转换节点数据
+      const nodes = graphData.nodes.map(node => ({
+        id: node.data.id,
+        label: node.data.label,
+        color: {
+          background: '#4a90e2',
+          border: '#2270b0'
         },
-        solver: 'forceAtlas2Based',
-        forceAtlas2Based: {
-          gravitationalConstant: -50,
-          centralGravity: 0.01,
-          springLength: 50,
-          springConstant: 0.05,
-          damping: 0.5,
-          avoidOverlap: 1
+        shape: 'circle',
+        font: {
+          size: 16,
+          color: '#ffffff'
         },
-        maxVelocity: 100,
-        minVelocity: 0.1,
-        timestep: 0.5
-      },
-      nodes: {
-        borderWidth: 2,
-        size: 100,
-        shadow: true
-      },
-      edges: {
-        width: 2,
-        shadow: true,
-        smooth: {
-          enabled: true,
-          type: 'dynamic'
+        size: 30
+      }))
+
+      // 转换边数据
+      const edges = graphData.edges.map(edge => ({
+        from: edge.data.source,
+        to: edge.data.target,
+        color: { 
+          color: '#848484' 
         }
-      },
-      interaction: {
-        hover: true,
-        tooltipDelay: 200
-      },
-      configure: {
-        enabled: false
+      }))
+
+      const data = {
+        nodes: nodes,
+        edges: edges
       }
-    }
 
-    // 创建网络
-    const network = new vis.Network(networkContainer.value, data, options)
+      const options = {
+        physics: {
+          enabled: true,
+          stabilization: {
+            enabled: true,
+            iterations: 1000
+          },
+          solver: 'forceAtlas2Based',
+          forceAtlas2Based: {
+            gravitationalConstant: -200,
+            centralGravity: 0.05,
+            springLength: 150,
+            springConstant: 0.08,
+            damping: 0.5,
+            avoidOverlap: 1
+          },
+          maxVelocity: 50,
+          minVelocity: 0.1,
+          timestep: 0.5
+        },
+        nodes: {
+          borderWidth: 3,
+          size: 40,
+          shadow: true,
+          shape: 'dot',
+          color: {
+            background: '#4a90e2',
+            border: '#2270b0',
+            highlight: {
+              background: '#ff9800',
+              border: '#e65100'
+            }
+          }
+        },
+        edges: {
+          width: 3,
+          shadow: true,
+          smooth: {
+            enabled: true,
+            type: 'continuous'
+          },
+          color: {
+            color: '#848484',
+            highlight: '#ff9800'
+          }
+        },
+        interaction: {
+          hover: true,
+          tooltipDelay: 200,
+          dragNodes: true,
+          dragView: true,
+          zoomView: true
+        },
+        configure: {
+          enabled: false
+        }
+      }
 
-    // 添加选择事件监听
-    network.on("select", function (params: any) {
-      selectionText.value = 'Selected nodes: ' + params.nodes + ', Edges: ' + params.edges
+      // 创建网络
+      const network = new vis.Network(networkContainer.value, data, options)
+
+      // 添加选择事件监听
+      network.on("select", function (params: any) {
+        selectionText.value = 'Selected nodes: ' + params.nodes + ', Edges: ' + params.edges
+      })
+    }).catch(error => {
+      console.error('获取知识图谱数据失败:', error)
     })
   })
 })
