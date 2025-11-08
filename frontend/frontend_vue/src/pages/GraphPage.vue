@@ -615,6 +615,21 @@ function showChapterModal(chapterId: string, nodeLabel: string, learnedNodes: st
       <div ref="networkContainer" id="mynetwork"></div>
     </div>
 
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-color learned"></div>
+        <span>已学完的节点</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color unlocked"></div>
+        <span>未学但可解锁的节点</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color locked"></div>
+        <span>未学且不可解锁的节点</span>
+      </div>
+    </div>
+
     <p id="selection">{{ selectionText }}</p>
   </div>
 </template>
@@ -622,8 +637,49 @@ function showChapterModal(chapterId: string, nodeLabel: string, learnedNodes: st
 <style scoped>
 #mynetwork {
   width: 100%;
-  height: 80vh;
+  height: 70vh;
   border: 1px solid lightgray;
   background-color: #f7f7f7;
+  position: relative;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+}
+
+.legend-color {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  margin-right: 5px;
+  border: 1px solid #666;
+}
+
+.learned {
+  background-color: #4CAF50;
+}
+
+.unlocked {
+  background-color: #4a90e2;
+}
+
+.locked {
+  background-color: #cccccc;
 }
 </style>
