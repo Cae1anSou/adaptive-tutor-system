@@ -338,6 +338,12 @@ const handleLearn = () => {
     const chapterTestId = `${dialogState.knowledgeId.split('_')[0]}_end`;
     console.log();
     if (dialogState.reason === 'chapter_locked') {
+      // 设置跳转目标，测试完成后自动跳转回来
+      localStorage.setItem('jumpLearningTarget', JSON.stringify({
+        knowledgeId: dialogState.knowledgeId,
+        timestamp: Date.now()
+      }));
+      
       // 测试已完成的章节
       router.push({ name: 'test', params: { topicId: chapterTestId } });
     } else {
@@ -355,6 +361,12 @@ const handleLearn = () => {
         // 直接测试当前章节
         router.push({ name: 'test', params: { topicId: chapterTestId } });
       } else {
+        // 设置跳转目标，测试完成后自动跳转回来
+        localStorage.setItem('jumpLearningTarget', JSON.stringify({
+          knowledgeId: dialogState.knowledgeId,
+          timestamp: Date.now()
+        }));
+        
         // 跳转到前置章节测试
         router.push({ name: 'test', params: { topicId: previousChapterTestId } });
       }
@@ -371,10 +383,20 @@ const handleTest = () => {
       router.push({ name: 'test', params: { topicId: dialogState.knowledgeId } });
     } else if(dialogState.reason === 'chapter_locked'){
       // 对于未解锁的知识点，也允许测试
-      //console.log(dialogState.requiredChapterId)
+      // 设置跳转目标，测试完成后自动跳转回来
+      localStorage.setItem('jumpLearningTarget', JSON.stringify({
+        knowledgeId: dialogState.knowledgeId,
+        timestamp: Date.now()
+      }));
+      
       router.push({ name: 'test', params: { topicId: `${dialogState.requiredChapterId.split('_')[1]}_end`} });
-    }else if (dialogState.reason === 'previous_knowledge_required') {
-      console.log(dialogState.requiredKnowledgeId)
+    }else if (dialogState.reason === 'previous_knowledge_required' || dialogState.reason === 'previous_chapter_test_required') {
+      // 设置跳转目标，测试完成后自动跳转回来
+      localStorage.setItem('jumpLearningTarget', JSON.stringify({
+        knowledgeId: dialogState.knowledgeId,
+        timestamp: Date.now()
+      }));
+      
       router.push({ name: 'test', params: { topicId: dialogState.requiredKnowledgeId } });
     }
   
@@ -383,11 +405,17 @@ const handleTest = () => {
     const chapterTestId = `${dialogState.knowledgeId.split('_')[0]}_end`;
     //console.log(dialogState.requiredChapter);    
     if(dialogState.isUnlocked){
-    router.push({ name: 'test', params: { topicId: chapterTestId } });
+      router.push({ name: 'test', params: { topicId: chapterTestId } });
     }
     else{
-    const lastchapterTestId = `${dialogState.requiredChapter.split('_')[1]}_end`;
-    router.push({ name: 'test', params: { topicId: lastchapterTestId } });
+      // 设置跳转目标，测试完成后自动跳转回来
+      localStorage.setItem('jumpLearningTarget', JSON.stringify({
+        knowledgeId: dialogState.knowledgeId,
+        timestamp: Date.now()
+      }));
+      
+      const lastchapterTestId = `${dialogState.requiredChapter.split('_')[1]}_end`;
+      router.push({ name: 'test', params: { topicId: lastchapterTestId } });
     }
   }
   
