@@ -21,8 +21,9 @@ const dialogState = reactive({
   action: 'learn', // 'learn' 或 'test'
   requiredKnowledgeId: '',
   requiredKnowledgeName: '',
-  requiredChapter: '',
-  requiredChapterName: ''
+  requiredChapterId: '',
+  requiredChapterName: '',
+  reason:''
 })
 
 // 存储展开的章节集合
@@ -47,7 +48,7 @@ const canJumpToKnowledge = (knowledgeId: string, graphData: any, learnedNodes: s
   // 解析知识点ID，获取章节和序号
   const parts = knowledgeId.split('_');
   if (parts.length < 2) {
-    return { canJump: true, reason: 'invalid_format' };
+    return { canJump: false, reason: 'invalid_format' };
   }
   
   const chapter = parseInt(parts[0]);
@@ -69,7 +70,7 @@ const canJumpToKnowledge = (knowledgeId: string, graphData: any, learnedNodes: s
       return {
         canJump: false,
         reason: 'chapter_locked',
-        requiredChapter: `chapter${chapter - 1}`,
+        requiredChapter: `chapter_${chapter - 1}`,
         requiredChapterName: chapterName
       };
     }
@@ -218,7 +219,7 @@ const shouldShowLearnButton = () => {
 }
 
 const isTestButtonPrimary = () => {
-  if (!dialogState.isUnlocked||(dialogState.isLearned&&dialogState.type==='chapter')) {
+  if (!dialogState.isUnlocked||(dialogState.isLearned&&dialogState.type==='chapter')||(!dialogState.isLearned&&dialogState.isUnlocked&&dialogState.type==='chapter')) {
     return true;
   }
   return false;
@@ -242,10 +243,11 @@ const showKnowledgeModal = (knowledgeId: string, nodeLabel: string, learnedNodes
   } else if (dialogState.isUnlocked) {
     dialogState.status = '您可以开始学习该知识点或直接进行测试';
   } else {
+    dialogState.reason = jumpResult.reason;
     // 根据不能解锁的原因显示不同的提示
     if (jumpResult.reason === 'chapter_locked') {
       dialogState.status = `您还未完成前置章节"${jumpResult.requiredChapterName}"的测试，需要先完成该章节的测试才能学习本知识点。是否现在开始测试前置章节？`;
-      dialogState.requiredChapter = jumpResult.requiredChapter;
+      dialogState.requiredChapterId = jumpResult.requiredChapter;
       dialogState.requiredChapterName = jumpResult.requiredChapterName;
     } else if (jumpResult.reason === 'previous_knowledge_required' || jumpResult.reason === 'previous_chapter_test_required') {
       dialogState.status = `您还未学习前置知识点"${jumpResult.requiredKnowledgeName}"，需要先完成该知识点的测试才能学习本知识点。是否现在开始测试前置知识点？`;
@@ -283,13 +285,15 @@ const showChapterModal = (chapterId: string, nodeLabel: string, learnedNodes: st
   if (dialogState.isLearned) {
     // 章节已完成
     dialogState.status = '您已学过本章节，是否再次进行测试？';
+    dialogState.isUnlocked = true;
   } else if (previousChapterCompleted) {
     // 章节未完成但可以学习
     dialogState.status = '您还未学完当前章节内容，是否直接开始测试？';
+    dialogState.isUnlocked = true;
   } else {
     // 章节未完成且前置章节未完成
     dialogState.status = `您还未完成前置章节（第${previousChapterNumber}章）的学习，无法学习当前章节。是否前往学习前置章节？`;
-    dialogState.requiredChapter = `chapter${previousChapterNumber}`;
+    dialogState.requiredChapter = `chapter_${previousChapterNumber}`;
     dialogState.requiredChapterName = `第${previousChapterNumber}章`;
   }
   
@@ -332,8 +336,8 @@ const handleLearn = () => {
   } else {
     // 章节类型
     const chapterTestId = `${dialogState.knowledgeId.split('_')[0]}_end`;
-    
-    if (dialogState.isLearned) {
+    console.log();
+    if (dialogState.reason === 'chapter_locked') {
       // 测试已完成的章节
       router.push({ name: 'test', params: { topicId: chapterTestId } });
     } else {
@@ -365,14 +369,26 @@ const handleTest = () => {
     if (dialogState.isLearned || dialogState.isUnlocked) {
       // 测试知识点
       router.push({ name: 'test', params: { topicId: dialogState.knowledgeId } });
-    } else {
+    } else if(dialogState.reason === 'chapter_locked'){
       // 对于未解锁的知识点，也允许测试
-      router.push({ name: 'test', params: { topicId: dialogState.knowledgeId } });
+      //console.log(dialogState.requiredChapterId)
+      router.push({ name: 'test', params: { topicId: `${dialogState.requiredChapterId.split('_')[1]}_end`} });
+    }else if (dialogState.reason === 'previous_knowledge_required') {
+      console.log(dialogState.requiredKnowledgeId)
+      router.push({ name: 'test', params: { topicId: dialogState.requiredKnowledgeId } });
     }
+  
   } else {
     // 章节类型
     const chapterTestId = `${dialogState.knowledgeId.split('_')[0]}_end`;
+    //console.log(dialogState.requiredChapter);    
+    if(dialogState.isUnlocked){
     router.push({ name: 'test', params: { topicId: chapterTestId } });
+    }
+    else{
+    const lastchapterTestId = `${dialogState.requiredChapter.split('_')[1]}_end`;
+    router.push({ name: 'test', params: { topicId: lastchapterTestId } });
+    }
   }
   
   dialogState.visible = false;
@@ -380,8 +396,22 @@ const handleTest = () => {
 
 const handleCancel = () => {
   dialogState.visible = false;
+  resetDialogState(); // 清理状态
 };
-
+const resetDialogState = () => {
+  dialogState.title = '';
+  dialogState.status = '';
+  dialogState.knowledgeId = '';
+  dialogState.isLearned = false;
+  dialogState.isUnlocked = false;
+  dialogState.type = 'knowledge';
+  dialogState.action = 'learn';
+  dialogState.requiredKnowledgeId = '';
+  dialogState.requiredKnowledgeName = '';
+  dialogState.requiredChapterId = '';
+  dialogState.requiredChapterName = '';
+  dialogState.reason = '';
+};
 onMounted(() => {
   if (!networkContainer.value) return
   
@@ -527,7 +557,7 @@ onMounted(() => {
             clickState.lastId = null
             
             // 双击节点跳转功能
-            router.push({ name: 'learning', params: { topicId: nodeId } })
+            //router.push({ name: 'learning', params: { topicId: nodeId } })
           } else {
             // 单击事件
             clickState.lastId = nodeId
