@@ -102,3 +102,4 @@ sentiment_bert/
 
 frontend/frontend_vue/node_modules
 /frontend/frontend_vue/yarn.lock
+/frontend/frontend_vue/yarn.lock
