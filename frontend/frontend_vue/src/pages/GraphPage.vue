@@ -50,7 +50,7 @@ const canJumpToKnowledge = (knowledgeId: string, graphData: any, learnedNodes: s
   if (parts.length < 2) {
     return { canJump: false, reason: 'invalid_format' };
   }
-  
+
   const chapter = parseInt(parts[0]);
   const section = parseInt(parts[1]);
 
@@ -66,7 +66,7 @@ const canJumpToKnowledge = (knowledgeId: string, graphData: any, learnedNodes: s
       // 查找章节名称
       const chapterNode = graphData.nodes.find((n: any) => n.data.id === `chapter${chapter - 1}`);
       const chapterName = chapterNode ? chapterNode.data.label : `第${chapter - 1}章`;
-      
+
       return {
         canJump: false,
         reason: 'chapter_locked',
@@ -84,7 +84,7 @@ const canJumpToKnowledge = (knowledgeId: string, graphData: any, learnedNodes: s
       // 查找知识点名称
       const knowledgeNode = graphData.nodes.find((n: any) => n.data.id === previousKnowledgeId);
       const knowledgeName = knowledgeNode ? knowledgeNode.data.label : previousKnowledgeId;
-      
+
       return {
         canJump: false,
         reason: 'previous_knowledge_required',
@@ -120,9 +120,9 @@ const updateNodeColors = (nodes: any[], learnedNodes: string[], graphData: any) 
   return nodes.map(node => {
     const isLearned = isNodeLearned(node.id, learnedNodes)
     const isUnlocked = isKnowledgeUnlocked(node.id, graphData, learnedNodes)
-    
+
     let backgroundColor, borderColor;
-    
+
     if (isLearned) {
       // 已学完的节点使用绿色
       backgroundColor = '#4CAF50';
@@ -136,7 +136,7 @@ const updateNodeColors = (nodes: any[], learnedNodes: string[], graphData: any) 
       backgroundColor = '#cccccc';
       borderColor = '#888888';
     }
-    
+
     return {
       ...node,
       color: {
@@ -229,14 +229,14 @@ const showKnowledgeModal = (knowledgeId: string, nodeLabel: string, learnedNodes
   dialogState.title = nodeLabel || knowledgeId;
   dialogState.knowledgeId = knowledgeId;
   dialogState.type = 'knowledge';
-  
+
   // 检查知识点是否已学习
   dialogState.isLearned = learnedNodes.includes(knowledgeId);
-  
+
   // 检查知识点是否已解锁
   const jumpResult = canJumpToKnowledge(knowledgeId, graphData, learnedNodes);
   dialogState.isUnlocked = jumpResult.canJump;
-  
+
   // 根据学习状态设置按钮文本和行为
   if (dialogState.isLearned) {
     dialogState.status = '您已学过该知识点，是否再次复习或重新测试？';
@@ -257,7 +257,7 @@ const showKnowledgeModal = (knowledgeId: string, nodeLabel: string, learnedNodes
       dialogState.status = '该知识点尚未解锁，您是否要直接开始测试？';
     }
   }
-  
+
   dialogState.visible = true;
 };
 
@@ -266,22 +266,22 @@ const showChapterModal = (chapterId: string, nodeLabel: string, learnedNodes: st
   dialogState.title = nodeLabel || chapterId;
   dialogState.knowledgeId = chapterId;
   dialogState.type = 'chapter';
-  
+
   // 检查章节是否已完成（通过章节测试）
   const chapterTestId = `${chapterId.split('_')[0]}_end`;
   dialogState.isLearned = learnedNodes.includes(chapterTestId);
-  
+
   // 检查章节是否可以学习（前置章节是否已完成）
   const chapterNumber = parseInt(chapterId.replace('chapter', ''));
   let previousChapterCompleted = true;
   let previousChapterNumber = 0;
-  
+
   if (chapterNumber > 1) {
     const previousChapterTestId = `${chapterNumber - 1}_end`;
     previousChapterCompleted = learnedNodes.includes(previousChapterTestId);
     previousChapterNumber = chapterNumber - 1;
   }
-  
+
   if (dialogState.isLearned) {
     // 章节已完成
     dialogState.status = '您已学过本章节，是否再次进行测试？';
@@ -296,7 +296,7 @@ const showChapterModal = (chapterId: string, nodeLabel: string, learnedNodes: st
     dialogState.requiredChapter = `chapter_${previousChapterNumber}`;
     dialogState.requiredChapterName = `第${previousChapterNumber}章`;
   }
-  
+
   dialogState.visible = true;
 };
 
@@ -312,14 +312,14 @@ const handleLearn = () => {
     } else {
       // 跳转到前置章节或知识点测试
       const jumpResult = canJumpToKnowledge(dialogState.knowledgeId, graphDataRef.value, learnedNodesRef.value);
-      
+
       if (jumpResult.reason === 'chapter_locked') {
         // 设置跳转目标，测试完成后自动跳转回来
         localStorage.setItem('jumpLearningTarget', JSON.stringify({
           knowledgeId: dialogState.knowledgeId,
           timestamp: Date.now()
         }));
-        
+
         const chapterNum = parseInt(jumpResult.requiredChapter.replace('chapter', ''));
         const chapterTestId = `${chapterNum}_end`;
         router.push({ name: 'test', params: { topicId: chapterTestId } });
@@ -329,7 +329,7 @@ const handleLearn = () => {
           knowledgeId: dialogState.knowledgeId,
           timestamp: Date.now()
         }));
-        
+
         router.push({ name: 'test', params: { topicId: jumpResult.requiredKnowledgeId } });
       }
     }
@@ -343,7 +343,7 @@ const handleLearn = () => {
         knowledgeId: dialogState.knowledgeId,
         timestamp: Date.now()
       }));
-      
+
       // 测试已完成的章节
       router.push({ name: 'test', params: { topicId: chapterTestId } });
     } else {
@@ -351,12 +351,12 @@ const handleLearn = () => {
       const chapterNumber = parseInt(dialogState.knowledgeId.replace('chapter', ''));
       let previousChapterCompleted = true;
       let previousChapterTestId = '';
-      
+
       if (chapterNumber > 1) {
         previousChapterTestId = `${chapterNumber - 1}_end`;
         previousChapterCompleted = learnedNodesRef.value.includes(previousChapterTestId);
       }
-      
+
       if (previousChapterCompleted) {
         // 直接测试当前章节
         router.push({ name: 'test', params: { topicId: chapterTestId } });
@@ -366,13 +366,13 @@ const handleLearn = () => {
           knowledgeId: dialogState.knowledgeId,
           timestamp: Date.now()
         }));
-        
+
         // 跳转到前置章节测试
         router.push({ name: 'test', params: { topicId: previousChapterTestId } });
       }
     }
   }
-  
+
   dialogState.visible = false;
 };
 
@@ -388,7 +388,7 @@ const handleTest = () => {
         knowledgeId: dialogState.knowledgeId,
         timestamp: Date.now()
       }));
-      
+
       router.push({ name: 'test', params: { topicId: `${dialogState.requiredChapterId.split('_')[1]}_end`} });
     }else if (dialogState.reason === 'previous_knowledge_required' || dialogState.reason === 'previous_chapter_test_required') {
       // 设置跳转目标，测试完成后自动跳转回来
@@ -396,14 +396,14 @@ const handleTest = () => {
         knowledgeId: dialogState.knowledgeId,
         timestamp: Date.now()
       }));
-      
+
       router.push({ name: 'test', params: { topicId: dialogState.requiredKnowledgeId } });
     }
-  
+
   } else {
     // 章节类型
     const chapterTestId = `${dialogState.knowledgeId.split('_')[0]}_end`;
-    //console.log(dialogState.requiredChapter);    
+    //console.log(dialogState.requiredChapter);
     if(dialogState.isUnlocked){
       router.push({ name: 'test', params: { topicId: chapterTestId } });
     }
@@ -413,12 +413,12 @@ const handleTest = () => {
         knowledgeId: dialogState.knowledgeId,
         timestamp: Date.now()
       }));
-      
+
       const lastchapterTestId = `${dialogState.requiredChapter.split('_')[1]}_end`;
       router.push({ name: 'test', params: { topicId: lastchapterTestId } });
     }
   }
-  
+
   dialogState.visible = false;
 };
 
@@ -442,7 +442,7 @@ const resetDialogState = () => {
 };
 onMounted(() => {
   if (!networkContainer.value) return
-  
+
   // 动态导入 vis-network
   import('vis-network').then((vis) => {
     // 获取用户ID
@@ -462,12 +462,12 @@ onMounted(() => {
     ]).then(([graphResponse, progressResponse]) => {
       const graphData = graphResponse.data?.data
       const progressData = progressResponse.data?.data
-      
+
       if (!graphData) return
-      
+
       // 保存数据引用
       graphDataRef.value = graphData;
-      
+
       // 获取已学习的节点
       const learnedNodes = progressData?.completed_topics || []
       learnedNodesRef.value = learnedNodes;
@@ -496,8 +496,8 @@ onMounted(() => {
       const edges = graphData.edges.map(edge => ({
         from: edge.data.source,
         to: edge.data.target,
-        color: { 
-          color: '#848484' 
+        color: {
+          color: '#848484'
         }
       }))
 
@@ -566,7 +566,7 @@ onMounted(() => {
 
       // 创建网络
       const network = new vis.Network(networkContainer.value, data, options)
-      
+
       // 单击/双击处理状态
       const clickState = { lastId: null as string | null, timer: null as number | null, ts: 0 }
       const DBL_DELAY = 280
@@ -575,15 +575,15 @@ onMounted(() => {
       network.on("click", function (params: any) {
         if (params.nodes.length > 0) {
           const nodeId = params.nodes[0]
-    
+
           const now = Date.now()
-          
+
           if (clickState.lastId === nodeId && (now - clickState.ts) < DBL_DELAY) {
             // 双击事件
             clearTimeout(clickState.timer!)
             clickState.timer = null
             clickState.lastId = null
-            
+
             // 双击节点跳转功能
             //router.push({ name: 'learning', params: { topicId: nodeId } })
           } else {
@@ -609,7 +609,7 @@ onMounted(() => {
                   showKnowledgeModal(nodeId, nodeData.data.label, learnedNodes, graphData)
                 }
               }
-              
+
               clickState.timer = null
               clickState.lastId = null
             }, DBL_DELAY)
@@ -620,7 +620,7 @@ onMounted(() => {
       // 添加选择事件监听
       // network.on("select", function (params: any) {
       //   selectionText.value = 'Selected nodes: ' + params.nodes + ', Edges: ' + params.edges
-        
+
       //   // 点击节点聚焦功能
       //   if (params.nodes.length > 0) {
       //     const nodeId = params.nodes[0];
@@ -663,8 +663,8 @@ onMounted(() => {
     </div>
 
     <!-- 知识点/章节弹窗 -->
-    <a-modal 
-      v-model:open="dialogState.visible" 
+    <a-modal
+      v-model:open="dialogState.visible"
       :title="dialogState.title"
       @ok="handleLearn"
       @cancel="handleCancel"
@@ -672,17 +672,17 @@ onMounted(() => {
     >
       <p>{{ dialogState.status }}</p>
       <div class="modal-buttons">
-        <a-button 
+        <a-button
         key="learn"
-        :type="isTestButtonPrimary()?'default' :'primary'"  
+        :type="isTestButtonPrimary()?'default' :'primary'"
          @click="handleLearn"
          v-if="shouldShowLearnButton()"
         >{{ getLearnButtonText() }}
         </a-button>
-        <a-button 
-          key="test" 
-          :type="isTestButtonPrimary() ? 'primary' : 'default'" 
-          @click="handleTest" 
+        <a-button
+          key="test"
+          :type="isTestButtonPrimary() ? 'primary' : 'default'"
+          @click="handleTest"
           v-if="shouldShowTestButton()"
         >
           {{ getTestButtonText() }}
@@ -698,7 +698,7 @@ onMounted(() => {
 <style scoped>
 #mynetwork {
   width: 100%;
-  height: 70vh;
+  height: 90vh;
   border: 1px solid lightgray;
   background-color: #f7f7f7;
   position: relative;
