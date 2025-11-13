@@ -1,0 +1,50 @@
+// @ts-ignore
+/* eslint-disable */
+import request from '@/request'
+
+/** Submit Test 接收用户代码提交，进行评测，更新BKT模型，并返回结果。 POST /submission/submit-test */
+export async function submitTestSubmissionSubmitTestPost(
+  body: API.TestSubmissionRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.StandardResponseTestSubmissionResponse_>('/submission/submit-test', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
+/** Submit Test2 接收用户代码提交，异步进行评测，并返回任务ID。 POST /submission/submit-test2 */
+export async function submitTest2SubmissionSubmitTest2Post(
+  body: API.TestSubmissionRequest,
+  options?: { [key: string]: any }
+) {
+  return request<any>('/submission/submit-test2', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
+/** Get Submission Result 获取异步代码评测任务的结果。 GET /submission/submit-test2/result/${param0} */
+export async function getSubmissionResultSubmissionSubmitTest2ResultTaskIdGet(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getSubmissionResultSubmissionSubmitTest2ResultTaskIdGetParams,
+  options?: { [key: string]: any }
+) {
+  const { task_id: param0, ...queryParams } = params
+  return request<API.StandardResponseTestSubmissionResponse_>(
+    `/submission/submit-test2/result/${param0}`,
+    {
+      method: 'GET',
+      params: { ...queryParams },
+      ...(options || {}),
+    }
+  )
+}

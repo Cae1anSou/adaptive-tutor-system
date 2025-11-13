@@ -1,0 +1,365 @@
+{
+    "exp": {
+        "Interest-Based Generation Module": {
+            "Advantages": [
+                "Yes.Helps align content with my personal interests, which increases engagement.",
+                "A little? I don't know since I didn't finish mine.",
+                "helpful",
+                "No help,I think it complex.",
+                "It is somewhat helpful and can to some extent determine the direction of one’s learning in web design.",
+                "I find it helpful as this module provides multiple options, allowing me to choose content that interests me for learning. I believe this format enhances my learning interest. Compared to other monotonous content, I prefer this approach because it boosts my engagement and motivation to learn.",
+                "I think it is great to be able to study what I like based on my different interests. This can greatly stimulate my interest in learning.",
+                "Yes, it is helpful. It allows me to receive outputs that are more closely aligned with my personal preferences and learning interests. It increases engagement and makes the content feel more relevant.",
+                "I think it's very good and it taught me how to get started with HTML.",
+                "It helps. It has a higher degree of freedom.",
+                "It looks very intuitive"
+            ],
+            "Disadvantage": [
+                "Quality of suggestions depends heavily on accurate interest detection.",
+                "No difficulties. It could be a good part but I didn't use all of it and would say nothing on that.",
+                "no difficulties encountered, it helps to find everything I forgot",
+                "Sometimes the search function cannot be used",
+                "there is not",
+                "There are basically no difficulties. The usage is very simple and the effectiveness is excellent, but the response speed still needs improvement.",
+                "No",
+                "Sometimes the recommendations can become too narrow, which may limit exposure to new perspectives. In addition, the module may require some time to “learn” my interests accurately.",
+                "I haven't encountered any difficulties.",
+                "Slow loading or loading failure",
+                "Too little interactive content"
+            ],
+            "Suggestion": [
+                "Provide transparency: explain why a topic was recommended.",
+                "I don't have.",
+                "show less about how I progress",
+                "Can we upgrade the AI function",
+                "Different examples can be designed in different directions.",
+                "I think the range of topics provided could be further expanded, or users could be allowed to input topics freely to enhance flexibility.",
+                "I think we can add more interest modules for us to choose from, but it would be better if we can manually input our own interests and then generate corresponding topics based on these interests.",
+                "I suggest adding options to adjust the balance between “personalized” and “exploratory” content, so users can control how much novelty they want. Transparency about why certain outputs are generated would also be useful.",
+                "I think the layout of the page could be improved. For instance, the \"Open Sample Page Exploration\" section on the homepage could occupy the entire left part. After this module is displayed, then sliding down, it could be the \"Progressive Knowledge Point Presentation\" module. In this way, each module's specific page won't appear so cramped.",
+                "Optimize running speed",
+                "Increase more interaction"
+            ]
+        },
+        "Open-ended Exploration Module": {
+            "Advantages": [
+                "Yes.Promotes creativity and critical thinking through unconstrained exploration.",
+                "Yes. A beginner like me could know what code is.",
+                "yes, it helps understanding grammar",
+                "Can help me make clearer choices about the level of difficulty",
+                "It is somewhat helpful and can simply check the implementation principles of certain parts of the website.",
+                "I think this module allows me to freely choose the elements I want to learn, and the element labels and code are displayed, which helps me better understand their implementation. I also like the knowledge graph in this module, which allows me to jump around freely. However, my favorite thing is the degree of freedom it provides.",
+                "By grabbing elements in this way, I can understand more clearly how this element is used in practice and where it should be placed. In addition, I can switch to view the elements of knowledge points that I have learned before, which is very helpful when I forget.",
+                "Yes, it is very helpful. It encourages creativity, critical thinking, and the exploration of topics beyond a fixed scope. It is flexible and fosters curiosity-driven learning.",
+                "It is helpful to understand what kind of code constitutes what kind of image.",
+                "Yes, it can be freely selected",
+                "It looks very intuitive"
+            ],
+            "Disadvantage": [
+                "No difficulties. No disadvantages to me.",
+                "windows are too small, maybe there are other ways to do the job",
+                "AI cannot understand my question",
+                "The objects that can be selected at the beginning are not clear.",
+                "I didn't encounter any issues while using it. The only drawback I noticed was the lack of CSS styling and JS node selection. However, the module does offer a feature that unlocks previously learned node elements, allowing users to select elements from previous lessons in other nodes. I think this is a very well-designed feature.",
+                "No",
+                "Sometimes it provides results that are too broad or unfocused, which can make it harder to extract concrete conclusions. It may also require more guidance for beginners.",
+                "There were no difficulties encountered.",
+                "Small selection range",
+                "no"
+            ],
+            "Suggestion": [
+                "It could be more professional.",
+                "no",
+                "It's best to be able to return independently",
+                "Provide appropriate guiding effects such as highlighting optional elements according to the chapters.",
+                "I think this module only needs to expand the selection of node elements, allowing the choice of CSS and JS.",
+                "No",
+                "Providing a structured option (like suggested directions or focus areas) could make exploration more efficient while still keeping it open-ended.",
+                "The page is still a bit small and it doesn't look very comfortable.",
+                "Increase selection",
+                "It looks very intuitive"
+            ]
+        },
+        "Progressive Knowledge Unfolding Module": {
+            "Advantages": [
+                "Yes.Supports step-by-step understanding of complex topics.",
+                "Yes. 1. Each section has different functions, and the progression of difficulty is appropriate. 2. Easy to use.",
+                "yes, it teaches me step by step",
+                "Can clearly to know how to use HTML",
+                "Not much help",
+                "This progressive knowledge expansion module consists of four levels of knowledge cards, with content difficulty increasing gradually. I believe it can effectively assist me in learning.",
+                "Learning incrementally like this has reduced my cognitive load, which is great.",
+                "Yes, it is very helpful. It breaks down complex knowledge into manageable steps, making it easier to understand and retain. It supports gradual and logical learning.",
+                "It's good. It helped me understand some basic concepts.",
+                "Yes, the advantage is that it is gradual",
+                "Help me learn knowledge"
+            ],
+            "Disadvantage": [
+                "No I didn't.",
+                "No difficulties. No disadvantages to me.",
+                "no",
+                "Ask a single question and AI will directly provide thr entire code",
+                "No",
+                "I don't think there are any issues with the usability, and the interaction is quite comfortable. In terms of drawbacks, I believe the content in the progressive expansion could be more concise.",
+                "No",
+                "The pace may sometimes feel too slow for advanced users, and it might oversimplify certain topics.",
+                "No difficulties were encountered.",
+                "Easy to fail to load",
+                "no"
+            ],
+            "Suggestion": [
+                "Enhance personalization with dynamic pacing.",
+                "Network lag should be solved.",
+                "no",
+                "Add a simplified version",
+                "The gradual knowledge expansion modules for learning should make corresponding changes in conjunction with the learning chapters, clearly defining specific learning content. For example, for level 1, tags should be added at least on the section such as <title><h2>. Particularly, changes in the chapter titles that are not very noticeable in the upper left corner should be highlighted; otherwise, if you just look at the four levels written without delving into the text content and the different test questions, one might mistakenly think there is only this amount of content in this chapter.",
+                "As for improving the progressive knowledge expansion module, I believe the content could be further streamlined.",
+                "No",
+                "Allow users to choose their own learning depth and speed, for example by providing “basic,” “intermediate,” and “advanced” modes.",
+                "I suggest that the layout could be made more comfortable.",
+                "Optimize loading",
+                "no"
+            ]
+        },
+        "Programming Module": {
+            "Advantages": [
+                "There is an inspiration button that can provide hints to help me learn programming.",
+                "Yes. 1. Clear enough make it easily got my targets. 2. It checked my code and could tell me where I made mistakes.",
+                "yes, it can give me a test",
+                "Be able to clearly understand each stop",
+                "The programming module is quite helpful, as it definitely implements the auxiliary input function of programming software and has done color differentiation.",
+                "I think this programming module is very well designed. It functions similarly to commonly used editors like VSCode and PyCharm, featuring code suggestions, static checks, shortcut keys, etc. Its advantage, in my opinion, lies in its flexibility of being embedded directly into web pages, along with the ability to instantly display front-end rendering results.",
+                "It's great to be able to see the rendering effect in real time while writing code. The test questions are also of reasonable difficulty, and the error reports are very detailed.",
+                "Allow users to choose their own learning depth and speed, for example by providing “basic,” “intermediate,” and “advanced” modes.",
+                "I think it's great! It is possible to conduct immediate inspection and correction.",
+                "Yes, you can check it in real time",
+                "Programming is very convenient."
+            ],
+            "Disadvantage": [
+                "Technical glitches (e.g., execution environment issues) can interrupt flow.",
+                "No. No.",
+                "no",
+                "I want to ask AI, AI is stuck",
+                "When encountering tags like <h1></h1>, the auxiliary input function has not been well implemented.",
+                "I haven't encountered any difficulties while using it, and currently I don't see any drawbacks.",
+                "No",
+                "Sometimes the generated code may not be fully optimized or adapted to specific environments. In some cases, error handling is not detailed enough.",
+                "I didn't encounter any difficulties and didn't find any shortcomings.",
+                "Easy to fail to load",
+                "no"
+            ],
+            "Suggestion": [
+                "Ensure robust sandboxing and smooth code execution.",
+                "Good enough.",
+                "make minor adjustment to the text description",
+                "Strengthen AI deep learning capabilities",
+                "So far, there haven't been any other issues encountered except for improving the label assistance input.",
+                "I think this programming module could also add a file tree to enable switching between multiple files.",
+                "No",
+                "Include more context-specific debugging guidance and provide alternative coding approaches. Integration with testing frameworks would also be valuable.",
+                "There are no specific suggestions.",
+                "Optimize loading",
+                "no"
+            ]
+        },
+        "Al Teaching Assistant Module": {
+            "Advantages": [
+                "Yes.Can act as a patient, always-available assistant.He won't directly tell me the answer but will guide me to complete the task step by step.",
+                "A lot. I can ask all the questions I want to know quickly.",
+                "yes, it knows everything",
+                "A little help",
+                "Very helpful, most general coding problems and Q&A functions can be well implemented.",
+                "I believe the AI teaching assistant module can provide immediate answers to my difficulties and questions at any time. The advantage of this module, in my opinion, lies in the interoperability of chat histories between the learning page and the testing page, allowing me to revisit my previously asked questions whenever needed.",
+                "When I don't understand something, I can ask it. It seems to know exactly what I'm not understanding, which is amazing. When I'm stuck on a test, the \"Give Me Ideas\" button is handy. When I'm feeling frustrated, it seems to sense my emotions, which is amazing.",
+                "Yes, it is very helpful. It offers instant explanations, personalized feedback, and learning support, which greatly enhance the learning experience.",
+                "I think this is the best module! AI can detect the current code situation, make real-time analyses, and the analyses are very accurate. The teaching content is also very helpful, giving the impression of being a teacher.",
+                "Yes, you can ask questions in real time",
+                "Help me solve the problems I can't understand."
+            ],
+            "Disadvantage": [
+                "May sometimes misinterpret questions or provide overly generic answers.",
+                "Yes. Too many professional terminologys are beyond the understanding of a beginner like me.",
+                "no, show everything including answer",
+                "It's a big laggy.",
+                "There are individual instances where the response was not output in Chinese.",
+                "I haven't encountered any difficulties while using it, and find it very user-friendly. I don't see any significant drawbacks.",
+                "No",
+                "At times, the explanations can be too general, and it may not always adapt perfectly to the learner’s prior knowledge.",
+                "No difficulties were encountered.",
+                "Easy to fail to load",
+                "Response too slow"
+            ],
+            "Suggestion": [
+                "Improve context awareness: better memory of prior interactions.",
+                "If you can, make it simpler to use like the \"Programming Module\".",
+                "don't show answer",
+                "Enhance AI self-learning capabilities",
+                "No",
+                "I think the AI teaching assistant module could be improved in terms of its output method. Currently, it delivers responses in entire paragraphs at once. I believe it could adopt a streaming output approach instead.",
+                "No",
+                "Make the feedback more adaptive by considering the learner’s level, and provide step-by-step examples in addition to general explanations.",
+                " I think AI could be more guiding rather than simply providing the answers.",
+                "Optimize loading",
+                "Improve response speed"
+            ]
+        }
+    },
+    "baseline": {
+        "Interest-Based Generation Module": {
+            "Advantages": [
+                "Firstly, it is helpful to me. Its sample code allows me to quickly understand the meaning of the article and makes it convenient for me to write code.",
+                "yes,you can study according to your own situation.",
+                "Yes,it is helpful to me.The content of the webpage is very rich.The explanation of the knowledge points is very detailed.The AI teaching assistant on the right side of the webpage is very creative",
+                "Yes, generate interest and learn about the front-end",
+                "I think the page is okay, but I can't really say it has any advantages, it's just like most pages",
+                "有帮助。优势是直观，内容有趣",
+                "Yes, he allows me to learn from web pages related to topics that interest me, which makes the learning process more enjoyable for me",
+                "none",
+                "Yes, because I can freely choose what I want to learn.",
+                "I feel very free to choose what I want to learn at my own discretion.",
+                "It allows me to know the approximate effect of the finished product",
+                "If I can see the content I want to learn, it can make me more interested. For example, I really like kittens, and there are pet-themed websites here."
+            ],
+            "Disadvantage": [
+                "No difficulties encountered, overall simple and easy to use. ",
+                "yes,It is impossible to review the key concepts while coding.",
+                "Yes,I have encountered difficulties before.The webpage has too many elements and is too crowded, which is very unfriendly to low resolution and small screen computers. The design of the knowledge point display module is not very user-friendly. When I place my mouse over it, the content of the module automatically floats up; After moving the mouse, the module content automatically sinks, which makes it difficult for me to focus on reading the knowledge points.",
+                "Yes, I'm not very familiar with HTML, CSS, and JS, but I don't think they have any shortcomings",
+                "There are no major problems, but there are some minor flaws. In the sample code, if the code is very long, it will be very troublesome to move the text box, and it will be difficult to view.",
+                "代码太长时滑动查看代码不方便",
+                "No difficulties encountered",
+                "none",
+                "no",
+                "No",
+                "No",
+                "No"
+            ],
+            "Suggestion": [
+                "A page contains three parts: articles, sample code, and knowledge points display, which looks a bit crowded. Especially the knowledge points display, with abundant content but occupying less than a third of the page area, it requires me to scroll the side scrollbar repeatedly, which is very wearing on my patience. I suggest displaying the most important knowledge points on a separate page and increasing the font size appropriately.",
+                "Add a module for example code.",
+                "Do not let the content of the knowledge point display module automatically float up and down. Simplify the content appropriately and avoid making the entire page appear so crowded.",
+                "It's best to have HTML, CSS, JS, templates for changes, and intuitive understanding of methods for font, color, and other transformations, which is beneficial for beginners",
+                "In the example part of the knowledge point, it would be better if you could format the sample code or show the web page effect corresponding to the code.",
+                "可以把代码区域改成自动换行显示，或者增加一键复制按钮和折叠，这样就不用来回拖动查看了。\n",
+                "I hope to be able to choose which features to generate, which features to remove, and allow me to personalize the description of the effects I want to generate",
+                "none",
+                "no",
+                "No",
+                "Add the ability to freely adjust the size",
+                "It would be better to have more options, and then you can adjust the difficulty."
+            ]
+        },
+        "Open-ended Exploration Module": {
+            "Advantages": [
+                "In general, you can see the finished product effect.",
+                "A little",
+                "Yes, but not many"
+            ],
+            "Disadvantage": [
+                "You will hardly notice the display interface during the process.",
+                "No",
+                "Too small to read"
+            ],
+            "Suggestion": [
+                "Increase some interaction with the display interface.",
+                "No",
+                "Allow this module to be dragged and resized for easier reading"
+            ]
+        },
+        "Progressive Knowledge Unfolding Module": {
+            "Advantages": [
+                "there are some，No need to look up information.",
+                "Let me know what knowledge points are in this part"
+            ],
+            "Disadvantage": [
+                "The knowledge interface is too compact, making it uncomfortable to view.",
+                "The text is very long and has few paragraphs, making it difficult to read."
+            ],
+            "Suggestion": [
+                "Provide separate displays for each knowledge point, instead of putting all knowledge points in one document.",
+                "Optimize segmentation to make it more concise"
+            ]
+        },
+        "Programming Module": {
+            "Advantages": [
+                "Helpful. 1. It has word completion features 2. It can quickly evaluate the correctness of my code online and display my errors with multiple points",
+                "yes,the compilation module is diverse.",
+                "Yes,it is helpful.Online IDE allows for real-time preview of code results, making the written code what you see is what you get.Separating HTML, CSS, and javascript code can make learners pay more attention to code learning\n",
+                "Yes, I have learned how to program and have gained a preliminary understanding of how to transform HTML into CSS",
+                "Yes, it is really helpful to me. Compared with many programming modules, I think the most advantageous one is its clear introduction and the layout is not troublesome to read. Moreover, its multi-bit integrated compiler is very convenient to view.",
+                "有，查漏补缺能纠错小细节",
+                "Helpful, this programming module is very intelligent and can help me fill in tags or attributes, and I can also immediately see the generated code effect. The user experience is very good!",
+                "just so so",
+                "It's very cool to be able to see the code you write rendered in real-time.",
+                "I think it's pretty good",
+                "I think this design is great. After I finished learning it, I could immediately practice and found many problems that I thought I understood but actually didn't."
+            ],
+            "Disadvantage": [
+                "During use, as a beginner, I often forget the fixed format and word spelling in the knowledge points display, frequently switching back and forth between the compiler and the knowledge points display, which is very inconvenient. ",
+                "yes,sometimes the response speed is slow.",
+                "I don't think there are any shortcomings",
+                "Yes, for beginners, it's a bit difficult to transform HTML and change it to CSS",
+                "I encountered some problems in the chapter on check boxes and radio buttons in Module 3. The task description was not clear enough, and I think there were also some problems with the evaluation of the test results. You can see the details in the video I uploaded.",
+                "有，部分问题对于错误的定位不精准",
+                "No difficulties encountered",
+                "Nonethere are little bugs",
+                "No",
+                "No",
+                "I found that the current code completion can only complete tags like <div>, but it actually also has the corresponding closing tag </div>, and the current programming modules can't help us complete this closing tag at the same time."
+            ],
+            "Suggestion": [
+                " It would be better if the compiler could remember my code instead of resetting it by switching pages.",
+                "Increase response speed and error prompt information.",
+                "No suggestion",
+                "It's a bit difficult to transform HTML into CSS, and I hope to have an intuitive template",
+                "It would be better if the test requirements and test results could be optimized",
+                "最好改进布局实现代码一边写，右边实时预览",
+                "no",
+                "No",
+                "No",
+                "When I enter tags like <div>, it's best to also add the corresponding </div>."
+            ]
+        },
+        "Al Teaching Assistant Module": {
+            "Advantages": [
+                "You answered my question very meticulously, even going so far as to guide me gently",
+                "Yes，easy to browse.",
+                "Integrating AI is very creative and greatly helpful for learning",
+                "Yes, it helps to learn programming and front-end knowledge",
+                "A very novel thing that can help programmers or learners learn front-end more conveniently. Adding AI to programming allows users to ask questions and solve problems anytime and anywhere without having to jump to other AI web pages.",
+                "有，方便是引导学习而不是纯告诉答案",
+                "Helpful, he introduced me to unfamiliar concepts very carefully based on my level, and instead of directly providing answers to questions, he gradually guided me and helped me understand the knowledge, which was very thoughtful",
+                "just so so,Asking questions is more convenient.",
+                "When I don't know, I can ask AI, which resolves my confusion.",
+                "It is very easy to use, allowing me to check errors, organize knowledge points, etc.",
+                "There's one advantage, which is that there's an AI next to it, so I don't have to switch pages frequently"
+            ],
+            "Disadvantage": [
+                "Sometimes AI can't grasp the key point of my question",
+                "No",
+                "The AI response speed is too slow, and there is no feedback during the AI response process, which can easily make users think that the program is stuck.The content answered by AI is very diverse, with code and textual descriptions mixed together",
+                "Yes, it helps to learn programming and front-end knowledge",
+                "I haven't encountered any difficulties yet, but maybe due to the settings, sometimes his answers are too long.",
+                "无",
+                "He cannot directly read the code I output in the compiler and the test results of the code. I need to manually copy it to him in order for him to help me analyze it. This experience is a bit troublesome",
+                "I don't understand the meaning of the question, it distorts my requirements, and it has too weak a presence; I hardly use it most of the time.",
+                "No",
+                "No",
+                "Everything requires me to copy and paste into this, making it difficult to use. It's no different from other AIs; basically, it's like I've opened a split screen and placed another AI next to it."
+            ],
+            "Suggestion": [
+                "no",
+                "No",
+                "Optimize AI's response speed and feedback。Optimize code correction speed.Optimize AI answer content",
+                "No, I don't think there are any flaws",
+                "No ideas at the moment",
+                "建议可以折叠,建议代码区块可以一键复制",
+                "I hope to have direct functionality so that he can read the code and test results in the compiler without me having to manually copy them. It would be best to switch modes between the teaching assistant and the code assistant. When changing the code, I don't need him to guide me slowly. I hope he can immediately point out the problem and tell me the solution",
+                "Allow it to access the current learning content.",
+                "No",
+                "No",
+                "I hope he can know the content in my web page, such as being able to see my code like a cursor, or being able to see my current test questions and results, or giving me a button so I can one-click share the information with AI."
+            ]
+        }
+    }
+}
