@@ -630,7 +630,7 @@ function collapseWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], ch
   var currentStep = 0;
   
   var animationInterval = setInterval(function() {
-    console.log('currentStep:', currentStep);
+    //console.log('currentStep:', currentStep);
     currentStep++;
     
     var progress = currentStep / steps;
@@ -753,7 +753,7 @@ function interpolateColor(color1: string, color2: string, progress: number) {
 function updateChapterNodeIndicator(chapterId: string, isExpanded: boolean) {
   var chapterNode = nodes.get(chapterId);
   if (!chapterNode) return;
-  console.log('更新章节节点的指示器:', chapterId, isExpanded);
+  //console.log('更新章节节点的指示器:', chapterId, isExpanded);
   var newLabel = !isExpanded ? 
     '[-] ' + chapterNode.label.replace(/^\[[+-]\]\s*/, '') :
     '[+] ' + chapterNode.label.replace(/^\[[+-]\]\s*/, '');
@@ -769,7 +769,7 @@ function initializeNodesWithOriginalColor(allNodes: any[]) {
   allNodes.forEach(function(node: any) {
     // 保存整个color对象而不是仅仅background颜色
     if (node.color) {
-      console.log('保存原始颜色:', node.id, node.color);
+      //console.log('保存原始颜色:', node.id, node.color);
       node.originalColor = {...node.color};
     }
   });
@@ -940,7 +940,16 @@ const BASE_EDGE_WIDTH = 5;
             clearTimeout(clickState.timer!)
             clickState.timer = null
             clickState.lastId = null
-            
+            console.log('1双击击章节节点：', nodeId);
+            const nodeData = graphData.nodes.find((n: any) => n.data.id === nodeId)
+            if (nodeData) {
+                if (nodeData.data.type === 'chapter') {
+                  // 章节节点处理：展开/折叠
+                  console.log('2双击击章节节点：', nodeId);
+                  showChapterModal(nodeId, nodeData.data.label, learnedNodes, graphData);
+                  //showChapterModal(nodeId, nodeData.data.label, learnedNodes, graphData)
+                }
+              }
             // 双击节点跳转功能
             //router.push({ name: 'learning', params: { topicId: nodeId } })
           } else {
@@ -957,7 +966,7 @@ const BASE_EDGE_WIDTH = 5;
                   //showChapterModal(nodeId, nodeData.data.label, learnedNodes, graphData)
                 } else if (nodeData.data.type === 'knowledge') {
                   // 知识点节点处理
-                  showKnowledgeModal(nodeId, nodeData.data.label, learnedNodes, graphData)
+                  showKnowledgeModal(nodeId, nodeData.data.label, learnedNodes, graphData);
                 }
               }
               
@@ -1020,6 +1029,7 @@ const BASE_EDGE_WIDTH = 5;
       @ok="handleLearn"
       @cancel="handleCancel"
       :footer="null"
+      centered
     >
       <p>{{ dialogState.status }}</p>
       <div class="modal-buttons">
