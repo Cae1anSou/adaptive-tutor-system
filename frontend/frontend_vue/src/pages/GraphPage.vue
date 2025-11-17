@@ -508,7 +508,7 @@ function expandWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], chap
       hidden: false,
       size: MIN_NODE_SIZE,  // 最小尺寸 (100的1/10)
       font: { size: MIN_FONT_SIZE },  // 最小字体 (80的1/10)
-      color: {
+      color: section.originalColor || {
         background: '#E3F2FD',
         border: '#2196F3'
       }
@@ -554,8 +554,9 @@ function expandWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], chap
           id: section.id,
           size: currentSize,
           font: { size: Math.max(1, currentFontSize) },
-          color: {
-            background: interpolateColor('#E3F2FD', section.originalColor || '#4a90e2', easeProgress),
+          // 使用节点的原始颜色，避免硬编码
+          color: section.originalColor || {
+            background: interpolateColor('#E3F2FD', '#4a90e2', easeProgress),
             border: '#2196F3'
           }
         };
@@ -584,8 +585,8 @@ function expandWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], chap
         var finalUpdates = sectionNodes.map(function (section: any) {
           return {
             id: section.id,
-            color: {
-              background: section.originalColor || '#4a90e2',
+            color: section.originalColor || {
+              background: '#4a90e2',
               border: '#2270b0'
             }
           };
@@ -647,8 +648,9 @@ function collapseWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], ch
         id: section.id,
         size: Math.max(MIN_NODE_SIZE, currentSize),
         font: { size: Math.max(MIN_FONT_SIZE, currentFontSize) },
-        color: {
-          background: interpolateColor(section.originalColor || '#4a90e2', '#E3F2FD', easeProgress),
+        // 使用完整的原始颜色对象
+        color: section.originalColor || {
+          background: interpolateColor('#4a90e2', '#E3F2FD', easeProgress),
           border: '#2196F3'
         }
       };
@@ -758,19 +760,17 @@ function updateChapterNodeIndicator(chapterId: string, isExpanded: boolean) {
   
   nodes.update({
     id: chapterId,
-    label: newLabel,
-    color: {
-      background: isExpanded ? '#388E3C' : '#4CAF50',
-      border: isExpanded ? '#2E7D32' : '#388E3C'
-    }
+    label: newLabel
   });
 }
 
 // 在节点初始化时保存原始颜色
 function initializeNodesWithOriginalColor(allNodes: any[]) {
   allNodes.forEach(function(node: any) {
-    if (node.level === 'section' && node.color && node.color.background) {
-      node.originalColor = node.color.background;
+    // 保存整个color对象而不是仅仅background颜色
+    if (node.color) {
+      console.log('保存原始颜色:', node.id, node.color);
+      node.originalColor = {...node.color};
     }
   });
   nodes.update(allNodes);
