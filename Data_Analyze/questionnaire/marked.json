@@ -1,0 +1,28 @@
+{
+    "感知能力": {
+        "上下文感知": [],
+        "个性化": [
+            "Yes.Helps align content with my personal interests, which increases engagement.（exp0015)",
+            "I find it helpful as this module provides multiple options, allowing me to choose content that interests me for learning. （exp004)",
+            "I think it is great to be able to study what I like based on my different interests. This can greatly stimulate my interest in learning.(exp003)",
+            "Yes, it is helpful. It allows me to receive outputs that are more closely aligned with my personal preferences and learning interests. It increases engagement and makes the content feel more relevant.(exp0014)",
+            "I think it's very good and it taught me how to get started with HTML.(exp0014)",
+            "It helps. It has a higher degree of freedom.(exp00121)"
+        ],
+        "情绪感知": []
+    },
+    "学习过程": {
+        "引导性": [],
+        "认知负荷": [],
+        "自主性": []
+    },
+    "挫折感来源": {
+        "可用性导致": [],
+        "系统盲目性导致": [],
+        "平台性能导致": []
+    },
+    "功能与舒适度": {
+        "整合度": [],
+        "冒犯感": []
+    }
+}

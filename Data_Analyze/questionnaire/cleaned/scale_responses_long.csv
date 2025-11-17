@@ -1,0 +1,672 @@
+participant_id,group,scale,item_code,item_text,value
+baseline003,baseline,SUS,SUS_Q1,I think that I would like to use this system frequently.,4.0
+baseline001,baseline,SUS,SUS_Q1,I think that I would like to use this system frequently.,2.0
+exp004,exp,SUS,SUS_Q1,I think that I would like to use this system frequently.,4.0
+exp003,exp,SUS,SUS_Q1,I think that I would like to use this system frequently.,3.0
+baseline007,baseline,SUS,SUS_Q1,I think that I would like to use this system frequently.,5.0
+baseline008,baseline,SUS,SUS_Q1,I think that I would like to use this system frequently.,3.0
+baseline009,baseline,SUS,SUS_Q1,I think that I would like to use this system frequently.,4.0
+baseline004,baseline,SUS,SUS_Q1,I think that I would like to use this system frequently.,3.0
+baseline005,baseline,SUS,SUS_Q1,I think that I would like to use this system frequently.,4.0
+exp009,exp,SUS,SUS_Q1,I think that I would like to use this system frequently.,3.0
+exp015,exp,SUS,SUS_Q1,I think that I would like to use this system frequently.,4.0
+exp007,exp,SUS,SUS_Q1,I think that I would like to use this system frequently.,3.0
+exp00121,exp,SUS,SUS_Q1,I think that I would like to use this system frequently.,5.0
+exp0010,exp,SUS,SUS_Q1,I think that I would like to use this system frequently.,3.0
+exp0014,exp,SUS,SUS_Q1,I think that I would like to use this system frequently.,5.0
+baseline0011,baseline,SUS,SUS_Q1,I think that I would like to use this system frequently.,2.0
+baseline0012,baseline,SUS,SUS_Q1,I think that I would like to use this system frequently.,3.0
+exp0011,exp,SUS,SUS_Q1,I think that I would like to use this system frequently.,5.0
+baseline006,baseline,SUS,SUS_Q1,I think that I would like to use this system frequently.,4.0
+baseline0013,baseline,SUS,SUS_Q1,I think that I would like to use this system frequently.,3.0
+baseline0010,baseline,SUS,SUS_Q1,I think that I would like to use this system frequently.,4.0
+exp005,exp,SUS,SUS_Q1,I think that I would like to use this system frequently.,3.0
+exp006,exp,SUS,SUS_Q1,I think that I would like to use this system frequently.,2.0
+exp0013,exp,SUS,SUS_Q1,I think that I would like to use this system frequently.,4.0
+baseline003,baseline,SUS,SUS_Q2,I found the system unnecessarily complex.,2.0
+baseline001,baseline,SUS,SUS_Q2,I found the system unnecessarily complex.,2.0
+exp004,exp,SUS,SUS_Q2,I found the system unnecessarily complex.,1.0
+exp003,exp,SUS,SUS_Q2,I found the system unnecessarily complex.,2.0
+baseline007,baseline,SUS,SUS_Q2,I found the system unnecessarily complex.,4.0
+baseline008,baseline,SUS,SUS_Q2,I found the system unnecessarily complex.,4.0
+baseline009,baseline,SUS,SUS_Q2,I found the system unnecessarily complex.,2.0
+baseline004,baseline,SUS,SUS_Q2,I found the system unnecessarily complex.,3.0
+baseline005,baseline,SUS,SUS_Q2,I found the system unnecessarily complex.,2.0
+exp009,exp,SUS,SUS_Q2,I found the system unnecessarily complex.,2.0
+exp015,exp,SUS,SUS_Q2,I found the system unnecessarily complex.,2.0
+exp007,exp,SUS,SUS_Q2,I found the system unnecessarily complex.,1.0
+exp00121,exp,SUS,SUS_Q2,I found the system unnecessarily complex.,2.0
+exp0010,exp,SUS,SUS_Q2,I found the system unnecessarily complex.,2.0
+exp0014,exp,SUS,SUS_Q2,I found the system unnecessarily complex.,4.0
+baseline0011,baseline,SUS,SUS_Q2,I found the system unnecessarily complex.,3.0
+baseline0012,baseline,SUS,SUS_Q2,I found the system unnecessarily complex.,2.0
+exp0011,exp,SUS,SUS_Q2,I found the system unnecessarily complex.,1.0
+baseline006,baseline,SUS,SUS_Q2,I found the system unnecessarily complex.,2.0
+baseline0013,baseline,SUS,SUS_Q2,I found the system unnecessarily complex.,3.0
+baseline0010,baseline,SUS,SUS_Q2,I found the system unnecessarily complex.,3.0
+exp005,exp,SUS,SUS_Q2,I found the system unnecessarily complex.,2.0
+exp006,exp,SUS,SUS_Q2,I found the system unnecessarily complex.,3.0
+exp0013,exp,SUS,SUS_Q2,I found the system unnecessarily complex.,1.0
+baseline003,baseline,SUS,SUS_Q3,I thought the system was easy to use.,5.0
+baseline001,baseline,SUS,SUS_Q3,I thought the system was easy to use.,2.0
+exp004,exp,SUS,SUS_Q3,I thought the system was easy to use.,5.0
+exp003,exp,SUS,SUS_Q3,I thought the system was easy to use.,4.0
+baseline007,baseline,SUS,SUS_Q3,I thought the system was easy to use.,4.0
+baseline008,baseline,SUS,SUS_Q3,I thought the system was easy to use.,4.0
+baseline009,baseline,SUS,SUS_Q3,I thought the system was easy to use.,5.0
+baseline004,baseline,SUS,SUS_Q3,I thought the system was easy to use.,4.0
+baseline005,baseline,SUS,SUS_Q3,I thought the system was easy to use.,4.0
+exp009,exp,SUS,SUS_Q3,I thought the system was easy to use.,5.0
+exp015,exp,SUS,SUS_Q3,I thought the system was easy to use.,4.0
+exp007,exp,SUS,SUS_Q3,I thought the system was easy to use.,5.0
+exp00121,exp,SUS,SUS_Q3,I thought the system was easy to use.,5.0
+exp0010,exp,SUS,SUS_Q3,I thought the system was easy to use.,4.0
+exp0014,exp,SUS,SUS_Q3,I thought the system was easy to use.,5.0
+baseline0011,baseline,SUS,SUS_Q3,I thought the system was easy to use.,4.0
+baseline0012,baseline,SUS,SUS_Q3,I thought the system was easy to use.,4.0
+exp0011,exp,SUS,SUS_Q3,I thought the system was easy to use.,5.0
+baseline006,baseline,SUS,SUS_Q3,I thought the system was easy to use.,5.0
+baseline0013,baseline,SUS,SUS_Q3,I thought the system was easy to use.,4.0
+baseline0010,baseline,SUS,SUS_Q3,I thought the system was easy to use.,4.0
+exp005,exp,SUS,SUS_Q3,I thought the system was easy to use.,1.0
+exp006,exp,SUS,SUS_Q3,I thought the system was easy to use.,2.0
+exp0013,exp,SUS,SUS_Q3,I thought the system was easy to use.,5.0
+baseline003,baseline,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,2.0
+baseline001,baseline,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,2.0
+exp004,exp,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,1.0
+exp003,exp,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,2.0
+baseline007,baseline,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,1.0
+baseline008,baseline,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,1.0
+baseline009,baseline,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,2.0
+baseline004,baseline,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,1.0
+baseline005,baseline,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,3.0
+exp009,exp,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,1.0
+exp015,exp,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,4.0
+exp007,exp,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,1.0
+exp00121,exp,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,2.0
+exp0010,exp,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,2.0
+exp0014,exp,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,3.0
+baseline0011,baseline,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,1.0
+baseline0012,baseline,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,2.0
+exp0011,exp,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,2.0
+baseline006,baseline,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,3.0
+baseline0013,baseline,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,1.0
+baseline0010,baseline,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,2.0
+exp005,exp,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,1.0
+exp006,exp,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,4.0
+exp0013,exp,SUS,SUS_Q4,I think that I would need the support of a technical person to be able to use this system.,1.0
+baseline003,baseline,SUS,SUS_Q5,I found the various functions in this system were well integrated.,5.0
+baseline001,baseline,SUS,SUS_Q5,I found the various functions in this system were well integrated.,4.0
+exp004,exp,SUS,SUS_Q5,I found the various functions in this system were well integrated.,5.0
+exp003,exp,SUS,SUS_Q5,I found the various functions in this system were well integrated.,5.0
+baseline007,baseline,SUS,SUS_Q5,I found the various functions in this system were well integrated.,5.0
+baseline008,baseline,SUS,SUS_Q5,I found the various functions in this system were well integrated.,5.0
+baseline009,baseline,SUS,SUS_Q5,I found the various functions in this system were well integrated.,4.0
+baseline004,baseline,SUS,SUS_Q5,I found the various functions in this system were well integrated.,4.0
+baseline005,baseline,SUS,SUS_Q5,I found the various functions in this system were well integrated.,4.0
+exp009,exp,SUS,SUS_Q5,I found the various functions in this system were well integrated.,4.0
+exp015,exp,SUS,SUS_Q5,I found the various functions in this system were well integrated.,4.0
+exp007,exp,SUS,SUS_Q5,I found the various functions in this system were well integrated.,4.0
+exp00121,exp,SUS,SUS_Q5,I found the various functions in this system were well integrated.,5.0
+exp0010,exp,SUS,SUS_Q5,I found the various functions in this system were well integrated.,4.0
+exp0014,exp,SUS,SUS_Q5,I found the various functions in this system were well integrated.,5.0
+baseline0011,baseline,SUS,SUS_Q5,I found the various functions in this system were well integrated.,3.0
+baseline0012,baseline,SUS,SUS_Q5,I found the various functions in this system were well integrated.,3.0
+exp0011,exp,SUS,SUS_Q5,I found the various functions in this system were well integrated.,5.0
+baseline006,baseline,SUS,SUS_Q5,I found the various functions in this system were well integrated.,4.0
+baseline0013,baseline,SUS,SUS_Q5,I found the various functions in this system were well integrated.,2.0
+baseline0010,baseline,SUS,SUS_Q5,I found the various functions in this system were well integrated.,2.0
+exp005,exp,SUS,SUS_Q5,I found the various functions in this system were well integrated.,4.0
+exp006,exp,SUS,SUS_Q5,I found the various functions in this system were well integrated.,3.0
+exp0013,exp,SUS,SUS_Q5,I found the various functions in this system were well integrated.,3.0
+baseline003,baseline,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,1.0
+baseline001,baseline,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,3.0
+exp004,exp,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,2.0
+exp003,exp,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,2.0
+baseline007,baseline,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,2.0
+baseline008,baseline,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,3.0
+baseline009,baseline,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,1.0
+baseline004,baseline,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,2.0
+baseline005,baseline,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,2.0
+exp009,exp,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,1.0
+exp015,exp,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,2.0
+exp007,exp,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,1.0
+exp00121,exp,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,2.0
+exp0010,exp,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,2.0
+exp0014,exp,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,3.0
+baseline0011,baseline,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,3.0
+baseline0012,baseline,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,2.0
+exp0011,exp,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,2.0
+baseline006,baseline,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,2.0
+baseline0013,baseline,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,4.0
+baseline0010,baseline,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,2.0
+exp005,exp,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,1.0
+exp006,exp,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,4.0
+exp0013,exp,SUS,SUS_Q6,I thought there was too much inconsistency in this system.,3.0
+baseline003,baseline,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,5.0
+baseline001,baseline,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,4.0
+exp004,exp,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,5.0
+exp003,exp,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,3.0
+baseline007,baseline,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,5.0
+baseline008,baseline,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,4.0
+baseline009,baseline,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,4.0
+baseline004,baseline,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,5.0
+baseline005,baseline,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,4.0
+exp009,exp,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,5.0
+exp015,exp,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,3.0
+exp007,exp,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,5.0
+exp00121,exp,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,5.0
+exp0010,exp,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,4.0
+exp0014,exp,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,5.0
+baseline0011,baseline,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,5.0
+baseline0012,baseline,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,4.0
+exp0011,exp,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,4.0
+baseline006,baseline,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,5.0
+baseline0013,baseline,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,4.0
+baseline0010,baseline,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,4.0
+exp005,exp,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,1.0
+exp006,exp,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,2.0
+exp0013,exp,SUS,SUS_Q7,I would imagine that most people would learn to use this system very quickly.,5.0
+baseline003,baseline,SUS,SUS_Q8,I found the system very cumbersome to use.,1.0
+baseline001,baseline,SUS,SUS_Q8,I found the system very cumbersome to use.,5.0
+exp004,exp,SUS,SUS_Q8,I found the system very cumbersome to use.,1.0
+exp003,exp,SUS,SUS_Q8,I found the system very cumbersome to use.,2.0
+baseline007,baseline,SUS,SUS_Q8,I found the system very cumbersome to use.,1.0
+baseline008,baseline,SUS,SUS_Q8,I found the system very cumbersome to use.,1.0
+baseline009,baseline,SUS,SUS_Q8,I found the system very cumbersome to use.,1.0
+baseline004,baseline,SUS,SUS_Q8,I found the system very cumbersome to use.,1.0
+baseline005,baseline,SUS,SUS_Q8,I found the system very cumbersome to use.,2.0
+exp009,exp,SUS,SUS_Q8,I found the system very cumbersome to use.,1.0
+exp015,exp,SUS,SUS_Q8,I found the system very cumbersome to use.,2.0
+exp007,exp,SUS,SUS_Q8,I found the system very cumbersome to use.,3.0
+exp00121,exp,SUS,SUS_Q8,I found the system very cumbersome to use.,2.0
+exp0010,exp,SUS,SUS_Q8,I found the system very cumbersome to use.,2.0
+exp0014,exp,SUS,SUS_Q8,I found the system very cumbersome to use.,1.0
+baseline0011,baseline,SUS,SUS_Q8,I found the system very cumbersome to use.,2.0
+baseline0012,baseline,SUS,SUS_Q8,I found the system very cumbersome to use.,4.0
+exp0011,exp,SUS,SUS_Q8,I found the system very cumbersome to use.,2.0
+baseline006,baseline,SUS,SUS_Q8,I found the system very cumbersome to use.,2.0
+baseline0013,baseline,SUS,SUS_Q8,I found the system very cumbersome to use.,2.0
+baseline0010,baseline,SUS,SUS_Q8,I found the system very cumbersome to use.,3.0
+exp005,exp,SUS,SUS_Q8,I found the system very cumbersome to use.,1.0
+exp006,exp,SUS,SUS_Q8,I found the system very cumbersome to use.,2.0
+exp0013,exp,SUS,SUS_Q8,I found the system very cumbersome to use.,1.0
+baseline003,baseline,SUS,SUS_Q9,I felt very confident using the system.,4.0
+baseline001,baseline,SUS,SUS_Q9,I felt very confident using the system.,2.0
+exp004,exp,SUS,SUS_Q9,I felt very confident using the system.,4.0
+exp003,exp,SUS,SUS_Q9,I felt very confident using the system.,4.0
+baseline007,baseline,SUS,SUS_Q9,I felt very confident using the system.,4.0
+baseline008,baseline,SUS,SUS_Q9,I felt very confident using the system.,3.0
+baseline009,baseline,SUS,SUS_Q9,I felt very confident using the system.,4.0
+baseline004,baseline,SUS,SUS_Q9,I felt very confident using the system.,3.0
+baseline005,baseline,SUS,SUS_Q9,I felt very confident using the system.,5.0
+exp009,exp,SUS,SUS_Q9,I felt very confident using the system.,5.0
+exp015,exp,SUS,SUS_Q9,I felt very confident using the system.,5.0
+exp007,exp,SUS,SUS_Q9,I felt very confident using the system.,5.0
+exp00121,exp,SUS,SUS_Q9,I felt very confident using the system.,5.0
+exp0010,exp,SUS,SUS_Q9,I felt very confident using the system.,3.0
+exp0014,exp,SUS,SUS_Q9,I felt very confident using the system.,5.0
+baseline0011,baseline,SUS,SUS_Q9,I felt very confident using the system.,3.0
+baseline0012,baseline,SUS,SUS_Q9,I felt very confident using the system.,3.0
+exp0011,exp,SUS,SUS_Q9,I felt very confident using the system.,5.0
+baseline006,baseline,SUS,SUS_Q9,I felt very confident using the system.,5.0
+baseline0013,baseline,SUS,SUS_Q9,I felt very confident using the system.,3.0
+baseline0010,baseline,SUS,SUS_Q9,I felt very confident using the system.,4.0
+exp005,exp,SUS,SUS_Q9,I felt very confident using the system.,4.0
+exp006,exp,SUS,SUS_Q9,I felt very confident using the system.,2.0
+exp0013,exp,SUS,SUS_Q9,I felt very confident using the system.,5.0
+baseline003,baseline,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,2.0
+baseline001,baseline,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,2.0
+exp004,exp,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,2.0
+exp003,exp,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,2.0
+baseline007,baseline,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,1.0
+baseline008,baseline,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,1.0
+baseline009,baseline,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,1.0
+baseline004,baseline,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,3.0
+baseline005,baseline,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,3.0
+exp009,exp,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,1.0
+exp015,exp,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,2.0
+exp007,exp,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,1.0
+exp00121,exp,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,2.0
+exp0010,exp,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,4.0
+exp0014,exp,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,1.0
+baseline0011,baseline,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,2.0
+baseline0012,baseline,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,2.0
+exp0011,exp,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,3.0
+baseline006,baseline,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,4.0
+baseline0013,baseline,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,1.0
+baseline0010,baseline,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,2.0
+exp005,exp,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,2.0
+exp006,exp,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,4.0
+exp0013,exp,SUS,SUS_Q10,I needed to learn a lot of things before I could get going with this system.,1.0
+baseline003,baseline,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",5.0
+baseline001,baseline,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",9.0
+exp004,exp,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",7.0
+exp003,exp,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",4.0
+baseline007,baseline,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",4.0
+baseline008,baseline,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",4.0
+baseline009,baseline,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",7.0
+baseline004,baseline,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",4.0
+baseline005,baseline,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",8.0
+exp009,exp,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",9.0
+exp015,exp,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",8.0
+exp007,exp,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",8.0
+exp00121,exp,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",9.0
+exp0010,exp,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",7.0
+exp0014,exp,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",7.0
+baseline0011,baseline,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",2.0
+baseline0012,baseline,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",6.0
+exp0011,exp,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",2.0
+baseline006,baseline,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",7.0
+baseline0013,baseline,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",3.0
+baseline0010,baseline,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",4.0
+exp005,exp,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",3.0
+exp006,exp,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",8.0
+exp0013,exp,NASA_TLX,NASA_Q1_MentalDemand,"How much mental and perceptual activity was required (e.g., thinking, deciding, calculating, remembering, looking, searching, etc.)?",8.0
+baseline003,baseline,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",2.0
+baseline001,baseline,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",6.0
+exp004,exp,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",5.0
+exp003,exp,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",1.0
+baseline007,baseline,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",4.0
+baseline008,baseline,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",2.0
+baseline009,baseline,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",8.0
+baseline004,baseline,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",4.0
+baseline005,baseline,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",8.0
+exp009,exp,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",4.0
+exp015,exp,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",3.0
+exp007,exp,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",3.0
+exp00121,exp,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",3.0
+exp0010,exp,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",2.0
+exp0014,exp,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",7.0
+baseline0011,baseline,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",2.0
+baseline0012,baseline,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",7.0
+exp0011,exp,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",3.0
+baseline006,baseline,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",2.0
+baseline0013,baseline,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",5.0
+baseline0010,baseline,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",4.0
+exp005,exp,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",1.0
+exp006,exp,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",6.0
+exp0013,exp,NASA_TLX,NASA_Q2_PhysicalDemand,"How much physical activity was required (e.g., pushing, pulling, turning, controlling, activating, etc.)?",1.0
+baseline003,baseline,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,6.0
+baseline001,baseline,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,5.0
+exp004,exp,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,6.0
+exp003,exp,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,2.0
+baseline007,baseline,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,5.0
+baseline008,baseline,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,5.0
+baseline009,baseline,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,5.0
+baseline004,baseline,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,4.0
+baseline005,baseline,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,8.0
+exp009,exp,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,3.0
+exp015,exp,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,7.0
+exp007,exp,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,1.0
+exp00121,exp,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,3.0
+exp0010,exp,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,8.0
+exp0014,exp,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,5.0
+baseline0011,baseline,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,2.0
+baseline0012,baseline,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,6.0
+exp0011,exp,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,2.0
+baseline006,baseline,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,5.0
+baseline0013,baseline,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,1.0
+baseline0010,baseline,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,3.0
+exp005,exp,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,2.0
+exp006,exp,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,7.0
+exp0013,exp,NASA_TLX,NASA_Q3_TemporalDemand,How much time pressure did you feel due to the rate or pace at which the tasks occurred?,8.0
+baseline003,baseline,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,8.0
+baseline001,baseline,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,3.0
+exp004,exp,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,8.0
+exp003,exp,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,8.0
+baseline007,baseline,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,9.0
+baseline008,baseline,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,5.0
+baseline009,baseline,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,8.0
+baseline004,baseline,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,9.0
+baseline005,baseline,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,9.0
+exp009,exp,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,8.0
+exp015,exp,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,8.0
+exp007,exp,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,6.0
+exp00121,exp,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,8.0
+exp0010,exp,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,7.0
+exp0014,exp,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,5.0
+baseline0011,baseline,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,8.0
+baseline0012,baseline,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,4.0
+exp0011,exp,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,2.0
+baseline006,baseline,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,7.0
+baseline0013,baseline,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,8.0
+baseline0010,baseline,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,5.0
+exp005,exp,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,6.0
+exp006,exp,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,6.0
+exp0013,exp,NASA_TLX,NASA_Q4_Performance,How successful do you think you were in accomplishing the goals of the task set by the experimenter (or yourself)? How satisfied were you with your performance in accomplishing these goals?,7.0
+baseline003,baseline,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,3.0
+baseline001,baseline,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,7.0
+exp004,exp,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,7.0
+exp003,exp,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,4.0
+baseline007,baseline,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,5.0
+baseline008,baseline,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,5.0
+baseline009,baseline,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,5.0
+baseline004,baseline,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,5.0
+baseline005,baseline,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,5.0
+exp009,exp,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,8.0
+exp015,exp,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,5.0
+exp007,exp,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,3.0
+exp00121,exp,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,4.0
+exp0010,exp,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,4.0
+exp0014,exp,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,7.0
+baseline0011,baseline,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,3.0
+baseline0012,baseline,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,5.0
+exp0011,exp,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,2.0
+baseline006,baseline,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,5.0
+baseline0013,baseline,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,3.0
+baseline0010,baseline,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,3.0
+exp005,exp,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,7.0
+exp006,exp,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,8.0
+exp0013,exp,NASA_TLX,NASA_Q5_Effort,How hard did you have to work (mentally and physically) to accomplish your level of performance?,6.0
+baseline003,baseline,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",2.0
+baseline001,baseline,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",8.0
+exp004,exp,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",3.0
+exp003,exp,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",3.0
+baseline007,baseline,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",3.0
+baseline008,baseline,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",2.0
+baseline009,baseline,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",3.0
+baseline004,baseline,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",5.0
+baseline005,baseline,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",5.0
+exp009,exp,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",1.0
+exp015,exp,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",2.0
+exp007,exp,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",5.0
+exp00121,exp,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",4.0
+exp0010,exp,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",2.0
+exp0014,exp,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",6.0
+baseline0011,baseline,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",3.0
+baseline0012,baseline,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",5.0
+exp0011,exp,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",2.0
+baseline006,baseline,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",8.0
+baseline0013,baseline,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",5.0
+baseline0010,baseline,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",4.0
+exp005,exp,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",1.0
+exp006,exp,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",6.0
+exp0013,exp,NASA_TLX,NASA_Q6_Frustration,"How insecure, discouraged, irritated, stressed, and annoyed versus secure, gratified, content, relaxed, and complacent did you feel during the task?",5.0
+baseline003,baseline,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",5.0
+baseline001,baseline,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",2.0
+exp004,exp,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",4.0
+exp003,exp,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",4.0
+baseline007,baseline,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",5.0
+baseline008,baseline,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",4.0
+baseline009,baseline,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",4.0
+baseline004,baseline,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",4.0
+baseline005,baseline,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",4.0
+exp009,exp,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",3.0
+exp015,exp,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",4.0
+exp007,exp,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",4.0
+exp00121,exp,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",5.0
+exp0010,exp,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",4.0
+exp0014,exp,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",4.0
+baseline0011,baseline,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",5.0
+baseline0012,baseline,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",4.0
+exp0011,exp,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",5.0
+baseline006,baseline,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",3.0
+baseline0013,baseline,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",5.0
+baseline0010,baseline,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",4.0
+exp005,exp,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",4.0
+exp006,exp,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",3.0
+exp0013,exp,SelfEfficacy,SE_Q1,"I can understand the basic logical structure of HTML, CSS, and JavaScript code.",4.0
+baseline003,baseline,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",5.0
+baseline001,baseline,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",4.0
+exp004,exp,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",4.0
+exp003,exp,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",4.0
+baseline007,baseline,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",4.0
+baseline008,baseline,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",4.0
+baseline009,baseline,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",5.0
+baseline004,baseline,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",4.0
+baseline005,baseline,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",4.0
+exp009,exp,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",3.0
+exp015,exp,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",5.0
+exp007,exp,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",5.0
+exp00121,exp,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",5.0
+exp0010,exp,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",4.0
+exp0014,exp,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",4.0
+baseline0011,baseline,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",4.0
+baseline0012,baseline,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",3.0
+exp0011,exp,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",5.0
+baseline006,baseline,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",4.0
+baseline0013,baseline,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",5.0
+baseline0010,baseline,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",4.0
+exp005,exp,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",5.0
+exp006,exp,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",3.0
+exp0013,exp,SelfEfficacy,SE_Q2,"I can understand how conditional statements (e.g., if...else) work with AI support.",5.0
+baseline003,baseline,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,5.0
+baseline001,baseline,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,3.0
+exp004,exp,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,4.0
+exp003,exp,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,2.0
+baseline007,baseline,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,4.0
+baseline008,baseline,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,2.0
+baseline009,baseline,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,4.0
+baseline004,baseline,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,4.0
+baseline005,baseline,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,3.0
+exp009,exp,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,3.0
+exp015,exp,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,3.0
+exp007,exp,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,4.0
+exp00121,exp,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,5.0
+exp0010,exp,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,4.0
+exp0014,exp,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,2.0
+baseline0011,baseline,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,5.0
+baseline0012,baseline,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,4.0
+exp0011,exp,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,5.0
+baseline006,baseline,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,2.0
+baseline0013,baseline,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,5.0
+baseline0010,baseline,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,2.0
+exp005,exp,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,3.0
+exp006,exp,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,3.0
+exp0013,exp,SelfEfficacy,SE_Q3,I can predict the result of a JavaScript program when given specific input values.,3.0
+baseline003,baseline,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",5.0
+baseline001,baseline,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",3.0
+exp004,exp,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",5.0
+exp003,exp,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",3.0
+baseline007,baseline,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",4.0
+baseline008,baseline,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",4.0
+baseline009,baseline,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",4.0
+baseline004,baseline,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",4.0
+baseline005,baseline,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",4.0
+exp009,exp,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",5.0
+exp015,exp,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",5.0
+exp007,exp,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",5.0
+exp00121,exp,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",5.0
+exp0010,exp,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",5.0
+exp0014,exp,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",3.0
+baseline0011,baseline,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",5.0
+baseline0012,baseline,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",3.0
+exp0011,exp,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",4.0
+baseline006,baseline,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",3.0
+baseline0013,baseline,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",5.0
+baseline0010,baseline,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",5.0
+exp005,exp,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",5.0
+exp006,exp,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",4.0
+exp0013,exp,SelfEfficacy,SE_Q4,"I can identify and correct errors in my HTML, CSS, or JavaScript code with the help of AI.",5.0
+baseline003,baseline,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,5.0
+baseline001,baseline,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,2.0
+exp004,exp,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,5.0
+exp003,exp,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,4.0
+baseline007,baseline,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,4.0
+baseline008,baseline,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,4.0
+baseline009,baseline,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,4.0
+baseline004,baseline,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,4.0
+baseline005,baseline,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,4.0
+exp009,exp,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,5.0
+exp015,exp,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,5.0
+exp007,exp,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,5.0
+exp00121,exp,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,5.0
+exp0010,exp,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,5.0
+exp0014,exp,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,4.0
+baseline0011,baseline,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,4.0
+baseline0012,baseline,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,4.0
+exp0011,exp,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,4.0
+baseline006,baseline,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,3.0
+baseline0013,baseline,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,5.0
+baseline0010,baseline,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,4.0
+exp005,exp,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,5.0
+exp006,exp,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,3.0
+exp0013,exp,SelfEfficacy,SE_Q5,I can understand error messages and AI-generated explanations when my code does not run correctly.,5.0
+baseline003,baseline,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,5.0
+baseline001,baseline,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,4.0
+exp004,exp,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,4.0
+exp003,exp,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,4.0
+baseline007,baseline,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,3.0
+baseline008,baseline,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,4.0
+baseline009,baseline,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,5.0
+baseline004,baseline,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,5.0
+baseline005,baseline,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,4.0
+exp009,exp,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,5.0
+exp015,exp,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,5.0
+exp007,exp,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,5.0
+exp00121,exp,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,5.0
+exp0010,exp,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,5.0
+exp0014,exp,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,4.0
+baseline0011,baseline,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,4.0
+baseline0012,baseline,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,3.0
+exp0011,exp,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,5.0
+baseline006,baseline,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,4.0
+baseline0013,baseline,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,3.0
+baseline0010,baseline,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,5.0
+exp005,exp,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,5.0
+exp006,exp,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,4.0
+exp0013,exp,SelfEfficacy,SE_Q6,I can improve my programming skills by learning from AI debugging suggestions.,5.0
+baseline003,baseline,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",5.0
+baseline001,baseline,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",4.0
+exp004,exp,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",4.0
+exp003,exp,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",4.0
+baseline007,baseline,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",5.0
+baseline008,baseline,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",4.0
+baseline009,baseline,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",5.0
+baseline004,baseline,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",4.0
+baseline005,baseline,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",4.0
+exp009,exp,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",2.0
+exp015,exp,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",4.0
+exp007,exp,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",5.0
+exp00121,exp,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",5.0
+exp0010,exp,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",5.0
+exp0014,exp,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",4.0
+baseline0011,baseline,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",4.0
+baseline0012,baseline,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",4.0
+exp0011,exp,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",4.0
+baseline006,baseline,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",3.0
+baseline0013,baseline,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",5.0
+baseline0010,baseline,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",4.0
+exp005,exp,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",4.0
+exp006,exp,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",4.0
+exp0013,exp,SelfEfficacy,SE_Q7,"I can write a simple web page using HTML, CSS, and JavaScript with AI guidance.",4.0
+baseline003,baseline,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",5.0
+baseline001,baseline,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",4.0
+exp004,exp,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",5.0
+exp003,exp,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",3.0
+baseline008,baseline,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",3.0
+baseline009,baseline,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",5.0
+baseline004,baseline,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",5.0
+baseline005,baseline,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",3.0
+exp009,exp,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",3.0
+exp015,exp,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",3.0
+exp007,exp,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",3.0
+exp00121,exp,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",5.0
+exp0010,exp,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",5.0
+exp0014,exp,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",4.0
+baseline0011,baseline,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",4.0
+baseline0012,baseline,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",4.0
+exp0011,exp,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",4.0
+baseline006,baseline,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",3.0
+baseline0013,baseline,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",5.0
+baseline0010,baseline,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",3.0
+exp005,exp,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",4.0
+exp006,exp,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",3.0
+exp0013,exp,SelfEfficacy,SE_Q8,"I can use AI to help me apply loops, conditions, or functions in JavaScript.",4.0
+baseline003,baseline,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,5.0
+baseline001,baseline,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,4.0
+exp004,exp,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,5.0
+exp003,exp,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,3.0
+baseline007,baseline,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,4.0
+baseline008,baseline,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,3.0
+baseline009,baseline,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,5.0
+baseline004,baseline,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,5.0
+baseline005,baseline,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,5.0
+exp009,exp,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,1.0
+exp015,exp,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,5.0
+exp007,exp,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,5.0
+exp00121,exp,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,5.0
+exp0010,exp,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,5.0
+exp0014,exp,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,5.0
+baseline0011,baseline,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,5.0
+baseline0012,baseline,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,3.0
+exp0011,exp,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,4.0
+baseline006,baseline,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,4.0
+baseline0013,baseline,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,5.0
+baseline0010,baseline,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,4.0
+exp005,exp,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,4.0
+exp006,exp,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,4.0
+exp0013,exp,SelfEfficacy,SE_Q9,I can combine AI suggestions with my own knowledge to solve a programming task.,4.0
+baseline003,baseline,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,5.0
+baseline001,baseline,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,3.0
+exp004,exp,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,5.0
+exp003,exp,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,4.0
+baseline007,baseline,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,5.0
+baseline008,baseline,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,4.0
+baseline009,baseline,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,5.0
+baseline004,baseline,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,5.0
+baseline005,baseline,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,4.0
+exp009,exp,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,5.0
+exp015,exp,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,5.0
+exp007,exp,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,5.0
+exp00121,exp,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,5.0
+exp0010,exp,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,5.0
+exp0014,exp,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,5.0
+baseline0011,baseline,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,5.0
+baseline0012,baseline,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,3.0
+exp0011,exp,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,4.0
+baseline006,baseline,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,4.0
+baseline0013,baseline,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,5.0
+baseline0010,baseline,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,4.0
+exp005,exp,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,5.0
+exp006,exp,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,3.0
+exp0013,exp,SelfEfficacy,SE_Q10,I feel confident that I can complete programming exercises with AI support.,4.0
+baseline003,baseline,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,5.0
+baseline001,baseline,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,4.0
+exp004,exp,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,4.0
+exp003,exp,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,4.0
+baseline007,baseline,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,5.0
+baseline008,baseline,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,3.0
+baseline009,baseline,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,5.0
+baseline004,baseline,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,5.0
+baseline005,baseline,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,4.0
+exp009,exp,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,4.0
+exp015,exp,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,5.0
+exp007,exp,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,5.0
+exp00121,exp,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,5.0
+exp0010,exp,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,5.0
+exp0014,exp,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,5.0
+baseline0011,baseline,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,3.0
+baseline0012,baseline,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,4.0
+exp0011,exp,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,5.0
+baseline006,baseline,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,4.0
+baseline0013,baseline,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,3.0
+baseline0010,baseline,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,4.0
+exp005,exp,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,5.0
+exp006,exp,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,3.0
+exp0013,exp,SelfEfficacy,SE_Q11,I believe I can continue learning web development effectively with AI assistance.,4.0
+baseline003,baseline,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",5.0
+baseline001,baseline,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",4.0
+exp004,exp,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",5.0
+exp003,exp,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",5.0
+baseline007,baseline,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",5.0
+baseline008,baseline,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",4.0
+baseline009,baseline,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",5.0
+baseline004,baseline,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",5.0
+baseline005,baseline,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",4.0
+exp009,exp,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",5.0
+exp015,exp,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",5.0
+exp007,exp,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",3.0
+exp00121,exp,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",5.0
+exp0010,exp,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",5.0
+exp0014,exp,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",4.0
+baseline0011,baseline,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",4.0
+baseline0012,baseline,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",4.0
+exp0011,exp,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",5.0
+baseline006,baseline,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",4.0
+baseline0013,baseline,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",4.0
+baseline0010,baseline,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",4.0
+exp005,exp,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",4.0
+exp006,exp,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",3.0
+exp0013,exp,SelfEfficacy,SE_Q12,"I can work more efficiently by dividing tasks between myself and AI (e.g., I focus on design, AI helps with debugging).",1.0
