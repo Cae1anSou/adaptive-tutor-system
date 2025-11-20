@@ -502,70 +502,85 @@ watch(
       />
     </div>
 
-    <a-spin :spinning="loading" tip="加载学习内容...">
+    <a-spin :spinning="loading" tip="正在初始化学习环境...">
       <template v-if="learningContent">
         <div class="content-container">
           <div class="page-stack">
+
             <section class="panel example-panel">
               <div class="panel-header">
-                <GlobalOutlined class="panel-icon"/>
-                <div>
-                  <h2 class="panel-title">开放式示例页面探索</h2>
-                  <p class="panel-subtitle">{{ topicTitle }}</p>
+                <div class="header-title-group">
+                  <div class="icon-box"><GlobalOutlined /></div>
+                  <div>
+                    <h2 class="panel-title">示例探索</h2>
+                    <p class="panel-subtitle">{{ topicTitle }}</p>
+                  </div>
                 </div>
               </div>
+
               <div class="panel-body">
-                <div class="exploration-content">
-                  <div class="preview-section">
-                    <div class="ratio-16x9">
-                      <iframe
-                        id="element-selector-iframe"
-                        ref="exampleIframeRef"
-                        src="/example_pages/index.html"
-                        title="示例页面预览"
-                        loading="lazy"
-                        @load="handleIframeLoad"
-                      />
+                <div class="exploration-layout">
+                  <div class="preview-column">
+                    <div class="browser-mockup">
+                      <div class="browser-header">
+                        <div class="browser-dots">
+                          <span class="dot dot-red"></span>
+                          <span class="dot dot-yellow"></span>
+                          <span class="dot dot-green"></span>
+                        </div>
+                        <div class="browser-address">example_pages/index.html</div>
+                      </div>
+                      <div class="browser-content">
+                        <iframe
+                          id="element-selector-iframe"
+                          ref="exampleIframeRef"
+                          src="/example_pages/index.html"
+                          title="示例页面预览"
+                          loading="lazy"
+                          @load="handleIframeLoad"
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div class="code-section">
-                    <div class="info-content">
-                      <div class="info-header">
-                        <CodeOutlined/>
-                        <h3>选中元素代码</h3>
+
+                  <div class="code-column">
+                    <div class="code-editor-card">
+                      <div class="editor-header">
+                        <div class="tab-active">
+                          <CodeOutlined class="tab-icon"/> 选中元素源码
+                        </div>
                       </div>
-                      <pre class="code-display" v-text="selectedElementCode"/>
+                      <div class="editor-body">
+                        <pre class="code-content" v-text="selectedElementCode"></pre>
+                      </div>
                     </div>
-                    <div class="code-panel-footer">
-                      <div class="selector-controls">
+
+                    <div class="control-panel">
+                      <div class="control-group main-actions">
                         <a-button type="primary" :disabled="isSelecting" @click="handleStartSelector">
-                          <template #icon>
-                            <SelectOutlined/>
-                          </template>
-                          选取元素
+                          <template #icon><SelectOutlined/></template>
+                          开始选取
                         </a-button>
-                        <a-button danger :disabled="!isSelecting" @click="handleStopSelector">
-                          <template #icon>
-                            <PauseCircleOutlined/>
-                          </template>
-                          停止选择
+                        <a-button v-if="isSelecting" danger class="pulse-btn" @click="handleStopSelector">
+                          <template #icon><PauseCircleOutlined/></template>
+                          停止
                         </a-button>
-                        <a-button :disabled="!hasSelection" @click="handleClearSelection">
-                          <template #icon>
-                            <CloseCircleOutlined/>
-                          </template>
-                          清除选择
+                        <a-button v-else :disabled="!hasSelection" @click="handleClearSelection">
+                          <template #icon><CloseCircleOutlined/></template>
+                          清除
                         </a-button>
                       </div>
-                      <div class="selector-toggle-container">
-                        <div class="toggle-text">包含之前章节的元素</div>
-                        <a-switch
-                          v-model:checked="includeCumulative"
-                          :checked-children="'开启'"
-                          :un-checked-children="'关闭'"
-                        />
-                        <p class="toggle-hint">
-                          开启后可选择当前及之前所有章节的元素，关闭时仅可选择当前章节元素。
+
+                      <div class="control-group settings">
+                        <div class="setting-item">
+                          <span class="setting-label">累积模式</span>
+                          <a-switch
+                            v-model:checked="includeCumulative"
+                            size="small"
+                          />
+                        </div>
+                        <p class="setting-hint">
+                          {{ includeCumulative ? '可选择所有已学章节的元素' : '仅限当前章节元素' }}
                         </p>
                       </div>
                     </div>
@@ -576,322 +591,378 @@ watch(
 
             <section class="panel knowledge-panel">
               <div class="panel-header">
-                <BulbOutlined class="panel-icon"/>
-                <div>
-                  <h2 class="panel-title">渐进式知识点展示</h2>
-                  <p class="panel-subtitle">分层深入当前知识点的核心概念</p>
+                <div class="header-title-group">
+                  <div class="icon-box icon-box-purple"><BulbOutlined /></div>
+                  <div>
+                    <h2 class="panel-title">核心知识点</h2>
+                    <p class="panel-subtitle">循序渐进的理解过程</p>
+                  </div>
                 </div>
               </div>
+
               <div class="panel-body">
                 <div v-if="parsedLevels.length">
-                  <div v-if="!activeLevelCard" class="levels-overview">
-                    <div
-                      v-for="level in parsedLevels"
-                      :key="level.level"
-                      class="level-card level-card--compact"
-                      @click="toggleLevel(level.level)"
-                    >
-                      <div class="level-card__badge">Level {{ level.level }}</div>
-                      <p class="level-summary level-summary--compact">{{ level.summary }}</p>
-                      <div class="level-card__hint">
-                        查看详情
-                        <ArrowRightOutlined/>
+
+                  <transition name="fade-slide" mode="out-in">
+                    <div v-if="!activeLevelCard" class="levels-grid" key="list">
+                      <div
+                        v-for="level in parsedLevels"
+                        :key="level.level"
+                        class="level-card"
+                        @click="toggleLevel(level.level)"
+                      >
+                        <div class="level-card-top">
+                          <span class="level-badge">Level {{ level.level }}</span>
+                          <ArrowRightOutlined class="arrow-icon"/>
+                        </div>
+                        <p class="level-summary">{{ level.summary }}</p>
                       </div>
                     </div>
-                  </div>
-                  <div v-else class="level-detail">
-                    <div class="level-detail__actions">
-                      <a-button type="link" @click="collapseLevels">
-                        <template #icon>
-                          <ArrowLeftOutlined/>
-                        </template>
-                        返回知识点列表
-                      </a-button>
-                    </div>
-                    <div class="level-card level-card--expanded">
-                      <div class="level-header">
-                        <h3>Level {{ activeLevelCard.level }}</h3>
-                        <p class="level-summary">{{ activeLevelCard.summary }}</p>
+
+                    <div v-else class="level-detail-view" key="detail">
+                      <div class="detail-sidebar">
+                        <a-button type="text" @click="collapseLevels" class="back-btn">
+                          <ArrowLeftOutlined/> 返回列表
+                        </a-button>
+                        <div class="current-level-indicator">
+                          Level {{ activeLevelCard.level }}
+                        </div>
                       </div>
-                      <div class="level-body">
+                      <div class="detail-content paper-style">
                         <div class="markdown-body" v-html="activeLevelCard.html"/>
                       </div>
                     </div>
-                  </div>
+                  </transition>
+
                 </div>
-                <a-empty v-else description="暂无知识点内容"/>
+                <a-empty v-else description="暂无知识点内容" :image="simpleImage"/>
               </div>
-              <div class="knowledge-actions">
-                <a-button type="primary" size="large" @click="handleNavigateToTest">
-                  <template #icon>
-                    <PlayCircleOutlined/>
-                  </template>
-                  开始练习
+
+              <div class="panel-footer">
+                <a-button type="primary" size="large" shape="round" @click="handleNavigateToTest" class="action-btn">
+                  前往练习 <PlayCircleOutlined/>
                 </a-button>
               </div>
             </section>
+
           </div>
         </div>
       </template>
-
-      <a-empty v-else-if="!loading" description="尚未加载学习内容"/>
+      <div v-else-if="!loading" class="empty-state-wrapper">
+        <a-empty description="尚未加载学习内容" />
+      </div>
     </a-spin>
   </div>
 </template>
 
 <style scoped>
+/* 全局容器与背景 */
 .learning-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f8fafc; /* 极简灰背景 */
+  background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+  background-size: 24px 24px; /* 点阵背景纹理 */
+  padding-bottom: 40px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  width: 100%;
-  min-height: 100%;
-  padding-bottom: 12px;
-  background: linear-gradient(160deg, #f5f7fb 0%, #ecf2ff 55%, #f7f8ff 100%);
-}
-
-.learning-page__error {
-  margin-bottom: 4px;
 }
 
 .content-container {
-  display: flex;
-  justify-content: center;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px;
   width: 100%;
-  padding: 0 12px;
-  box-sizing: border-box;
-  backdrop-filter: blur(2px);
 }
 
 .page-stack {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-width: 1280px;
   gap: 24px;
 }
 
-.learning-page--mobile .content-container {
-  padding: 0 8px;
-}
-
-.learning-page--mobile .page-stack {
-  gap: 20px;
-}
-
+/* 通用面板样式 */
 .panel {
-  background: rgba(255, 255, 255, 0.92);
-  border-radius: 18px;
-  border: 1px solid rgba(209, 213, 219, 0.6);
-  box-shadow: 0 20px 45px rgba(79, 70, 229, 0.08);
-  display: flex;
-  flex-direction: column;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(226, 232, 240, 0.8);
   overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: box-shadow 0.3s ease;
 }
 
+.panel:hover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+}
 
 .panel-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #f1f5f9;
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 18px 22px 16px;
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.08), rgba(236, 233, 255, 0.5));
-  border-bottom: 1px solid rgba(199, 210, 254, 0.65);
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
 }
 
-.panel-icon {
+.header-title-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #eff6ff;
+  color: #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 20px;
-  color: #4f46e5;
-  margin-top: 2px;
+}
+
+.icon-box-purple {
+  background: #f5f3ff;
+  color: #8b5cf6;
 }
 
 .panel-title {
   margin: 0;
-  font-size: 19px;
-  font-weight: 600;
-  color: #1e1b4b;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.2;
 }
 
 .panel-subtitle {
-  margin: 4px 0 0;
-  color: #6b7280;
+  margin: 2px 0 0;
   font-size: 13px;
+  color: #64748b;
 }
 
 .panel-body {
-  padding: 20px 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  flex: 1;
+  padding: 24px;
 }
 
-.example-panel {
-  flex: 1;
-}
-
-.exploration-content {
+/* 探索区布局 */
+.exploration-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  grid-template-columns: 1.6fr 1fr; /* 左宽右窄 */
   gap: 24px;
-  flex: 1;
-  min-height: 320px;
+  align-items: stretch;
 }
 
-.preview-section {
-  flex: 1;
-  min-height: 280px;
-}
-
-.ratio-16x9 {
-  position: relative;
-  width: 100%;
-  padding-top: 56.25%;
-  border-radius: 14px;
+/* 浏览器 Mockup 样式 */
+.browser-mockup {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  background: rgba(17, 24, 39, 0.03);
-}
-
-.ratio-16x9 iframe {
-  position: absolute;
-  inset: 0;
-  width: 100%;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  border: 0;
-  background: #fff;
+  min-height: 400px;
 }
 
-.code-section {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.info-content {
-  background: linear-gradient(135deg, #f9fafe 0%, #f1f5ff 100%);
-  border: 1px solid rgba(191, 219, 254, 0.7);
-  border-radius: 14px;
-  padding: 18px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.info-header {
+.browser-header {
+  background: #f1f5f9;
+  padding: 10px 16px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #1f2937;
-  margin-bottom: 12px;
+  gap: 16px;
+  border-bottom: 1px solid #e2e8f0;
 }
 
-.info-header h3 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.code-display {
-  flex: 1;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 10px;
-  padding: 14px;
-  font-family: 'Menlo', 'Courier New', monospace;
-  font-size: 13px;
-  color: #111827;
-  overflow: auto;
-  white-space: pre-wrap;
-  word-break: break-word;
-  border: 1px solid rgba(203, 213, 225, 0.85);
-  line-height: 1.7;
-}
-
-.code-panel-footer {
+.browser-dots {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: auto;
-}
-
-.selector-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.selector-toggle-container {
-  border-top: 1px dashed #dbe0ea;
-  padding-top: 12px;
-  display: flex;
-  flex-direction: column;
   gap: 6px;
 }
 
-.toggle-text {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1f2937;
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
 }
+.dot-red { background: #ef4444; }
+.dot-yellow { background: #f59e0b; }
+.dot-green { background: #22c55e; }
 
-.toggle-hint {
-  margin: 0;
-  color: #6b7280;
+.browser-address {
+  flex: 1;
+  background: white;
+  border-radius: 6px;
+  padding: 4px 12px;
   font-size: 12px;
-  line-height: 1.5;
+  color: #64748b;
+  text-align: center;
+  border: 1px solid #e2e8f0;
 }
 
-.knowledge-panel {
-  gap: 0;
-}
-
-.level-card {
+.browser-content {
+  flex: 1;
   position: relative;
-  border-radius: 16px;
-  border: 1px solid rgba(196, 181, 253, 0.65);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(237, 233, 254, 0.85));
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  background: white;
+}
+
+.browser-content iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* 代码编辑器与控制台 */
+.code-column {
   display: flex;
   flex-direction: column;
-}
-
-.levels-overview {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
 }
 
-.level-card--compact {
-  padding: 18px;
-  min-height: 150px;
-  cursor: pointer;
+.code-editor-card {
+  background: #1e293b; /* 深色背景 */
+  border-radius: 12px;
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
 }
 
-.level-card__badge {
-  font-weight: 700;
-  color: #4338ca;
-  font-size: 14px;
-  margin-bottom: 8px;
+.editor-header {
+  background: #0f172a;
+  padding: 8px 0;
+  display: flex;
 }
 
-.level-header h3 {
+.tab-active {
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 6px 16px;
+  font-size: 12px;
+  border-top: 2px solid #3b82f6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editor-body {
+  flex: 1;
+  padding: 16px;
+  overflow: auto;
+}
+
+.code-content {
+  font-family: 'Fira Code', 'Menlo', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #a5b4fc; /* 浅蓝紫色代码高亮 */
   margin: 0;
-  font-size: 17px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* 控制面板 */
+.control-panel {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.control-group.main-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.settings {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.setting-label {
+  font-size: 13px;
   font-weight: 600;
-  color: #312e81;
+  color: #475569;
+}
+
+.setting-hint {
+  margin: 0;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+/* 知识卡片区 */
+.levels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.level-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.level-card:hover {
+  border-color: #8b5cf6;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(139, 92, 246, 0.1);
+}
+
+.level-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.level-badge {
+  background: #f5f3ff;
+  color: #7c3aed;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.arrow-icon {
+  color: #cbd5e1;
+  transition: transform 0.2s;
+}
+
+.level-card:hover .arrow-icon {
+  color: #7c3aed;
+  transform: translateX(4px);
 }
 
 .level-summary {
-  margin: 6px 0 0;
-  color: #5b21b6;
+  color: #475569;
   font-size: 14px;
   line-height: 1.6;
-}
-
-.level-summary--compact {
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -899,152 +970,158 @@ watch(
   overflow: hidden;
 }
 
-.level-card__hint {
-  margin-top: auto;
+/* 知识详情视图 */
+.level-detail-view {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #4c1d95;
-  font-size: 13px;
-  font-weight: 600;
-  opacity: 0.85;
+  gap: 32px;
+  background: #fff;
+  min-height: 400px;
 }
 
-.level-detail {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  min-height: 360px;
-}
-
-.level-detail__actions {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.level-card--expanded {
-  padding: 26px 24px;
-  box-shadow: 0 18px 40px rgba(168, 85, 247, 0.18);
-  border-color: #a855f7;
-  flex: 1;
-  cursor: default;
-}
-
-.level-body {
-  margin-top: 18px;
-  flex: 1;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.knowledge-actions {
-  padding: 18px 22px 22px;
-  border-top: 1px solid rgba(199, 210, 254, 0.6);
-  display: flex;
-  justify-content: flex-end;
-}
-
-.knowledge-actions .ant-btn {
-  min-width: 160px;
-}
-
-.selector-groups {
+.detail-sidebar {
+  width: 180px;
+  flex-shrink: 0;
+  border-right: 1px solid #f1f5f9;
+  padding-right: 16px;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.selector-section {
+.current-level-indicator {
+  font-size: 24px;
+  font-weight: 800;
+  color: #e2e8f0;
+  text-align: right;
+  margin-top: 20px;
+}
+
+.detail-content {
+  flex: 1;
+  max-width: 800px;
+}
+
+.paper-style {
+  font-size: 16px;
+}
+
+/* 底部操作栏 */
+.panel-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #f1f5f9;
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  background: rgba(248, 250, 255, 0.85);
-  border: 1px solid rgba(191, 219, 254, 0.7);
-  border-radius: 12px;
-  padding: 14px;
+  justify-content: flex-end;
+  background: #f8fafc;
 }
 
-.selector-title {
+.action-btn {
+  height: 48px;
+  padding-left: 32px;
+  padding-right: 32px;
   font-weight: 600;
-  color: #1d4ed8;
+  font-size: 15px;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
-.selector-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+/* 动效 */
+.pulse-btn {
+  animation: pulse 2s infinite;
 }
 
-.topic-collapse :deep(.ant-collapse-header) {
-  font-weight: 600;
-  color: #1f2937;
-  padding: 12px 16px !important;
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
-.topic-collapse :deep(.ant-collapse-item-active) .ant-collapse-header {
-  color: #4338ca;
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.3s ease;
 }
 
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* Markdown 样式覆盖 */
 .markdown-body {
-  line-height: 1.7;
-  color: #1f2937;
+  color: #334155;
+  line-height: 1.8;
 }
 
-.markdown-body :deep(p) {
-  margin-bottom: 12px;
-}
-
-.markdown-body :deep(pre) {
-  background: #111827;
-  color: #f9fafb;
-  padding: 14px;
-  border-radius: 10px;
-  overflow-x: auto;
+.markdown-body :deep(h1),
+.markdown-body :deep(h2),
+.markdown-body :deep(h3) {
+  color: #1e293b;
+  border-bottom: none;
 }
 
 .markdown-body :deep(code) {
-  background: rgba(99, 102, 241, 0.12);
-  border-radius: 4px;
+  color: #ec4899;
+  background: #fdf2f8;
   padding: 2px 6px;
-  font-family: 'Menlo', 'Courier New', monospace;
-  font-size: 13px;
+  border-radius: 4px;
 }
 
-@media (max-width: 1280px) {
-  .page-stack {
-    gap: 20px;
-  }
+.markdown-body :deep(pre) {
+  background: #1e293b;
+  border-radius: 8px;
 }
 
+/* 响应式适配 */
 @media (max-width: 1024px) {
-  .exploration-content {
+  .exploration-layout {
     grid-template-columns: 1fr;
-    gap: 18px;
   }
 
-  .levels-overview {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  .browser-mockup {
+    min-height: 300px;
+  }
+
+  .code-editor-card {
+    min-height: 160px;
+  }
+
+  .level-detail-view {
+    flex-direction: column;
+  }
+
+  .detail-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 12px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .current-level-indicator {
+    margin-top: 0;
+    font-size: 18px;
   }
 }
 
 @media (max-width: 768px) {
-  .panel {
-    border-radius: 16px;
+  .content-container {
+    padding: 12px;
+  }
+
+  .panel-header {
+    padding: 16px;
   }
 
   .panel-body {
     padding: 16px;
   }
 
-  .exploration-content {
-    min-height: 0;
-  }
-
-  .knowledge-actions {
-    padding: 12px 16px 16px;
-  }
-
-  .levels-overview {
+  .levels-grid {
     grid-template-columns: 1fr;
   }
 }
