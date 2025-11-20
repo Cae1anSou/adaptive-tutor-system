@@ -33,6 +33,15 @@ const expandedChapters = ref<Set<string>>(new Set())
 const graphDataRef = ref<any>(null)
 const learnedNodesRef = ref<string[]>([])
 
+// 动画状态管理
+const animationInProgress = ref<{[key: string]: boolean}>({})
+const chapterState = ref<{[key: string]: boolean}>({})
+
+// vis-network 实例
+let network: any = null
+let nodes: any = null
+let edges: any = null
+
 // 从localStorage获取用户ID
 const getParticipantId = (): string | null => {
   return localStorage.getItem('participant_id')
@@ -164,7 +173,7 @@ const getLearnButtonText = () => {
     } else {
       return dialogState.status.includes('前置') ? '是' : '测试';
     }
-  }
+  };
 };
 
 // 获取测试按钮文本
@@ -440,6 +449,333 @@ const resetDialogState = () => {
   dialogState.requiredChapterName = '';
   dialogState.reason = '';
 };
+
+// 定义常量
+const ANIMATION_STEPS = 8;
+const BASE_NODE_SIZE = 100;
+const MIN_NODE_SIZE = 10;
+const BASE_FONT_SIZE = 80;
+const MIN_FONT_SIZE = 8;
+const BASE_EDGE_WIDTH = 5;
+const MIN_EDGE_WIDTH = 0.5;
+const ANIMATION_INTERVAL = 40;
+const STABILIZE_ITERATIONS = 50;
+const STABILIZATION_ITERATIONS = 1000;
+
+// 缩放动画实现 - 适配当前大小配置
+function toggleChapterWithScaleAnimation(chapterId: string) {
+  // 防止重复点击
+  if (animationInProgress.value[chapterId]) return;
+  animationInProgress.value[chapterId] = true;
+  console.log('node:', nodes.get());
+  // 获取该章节下所有的小节节点
+  var sectionNodes = nodes.get({
+    filter: function (node: any) {
+      return !node.id.endsWith('_end') && node.id.startsWith(chapterId.replace('_end', '_'));
+    }
+  });
+  console.log('s:', sectionNodes);
+  var sectionEdges = edges.get({
+    filter: function (edge: any) {
+      var fromNode = nodes.get(edge.from);
+      var toNode = nodes.get(edge.to);
+      return (fromNode && fromNode.id === chapterId && toNode && toNode.type === 'knowledge' && toNode.id.startsWith(chapterId.replace('_end', '_'))) || 
+             (toNode && toNode.id === chapterId && fromNode && fromNode.type === 'knowledge' && fromNode.id.startsWith(chapterId.replace('_end', '_')));
+    }
+  });
+  
+  var isCurrentlyExpanded = chapterState.value[chapterId];
+  var newHiddenState = !isCurrentlyExpanded;
+  
+  // 更新章节节点的视觉状态
+  updateChapterNodeIndicator(chapterId, newHiddenState);
+  
+  // 根据状态执行展开或收缩动画
+  if (newHiddenState) {
+    expandWithScaleAnimation(sectionNodes, sectionEdges, chapterId);
+  } else {
+    collapseWithScaleAnimation(sectionNodes, sectionEdges, chapterId);
+  }
+}
+
+// 展开动画 - 适配当前大小
+function expandWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], chapterId: string) {
+  // 1. 先显示节点和边，但设置为最小状态
+  console.log('展开:', chapterId);
+  var nodeUpdates = sectionNodes.map(function (section: any) {
+    return {
+      id: section.id,
+      hidden: false,
+      size: MIN_NODE_SIZE,  // 最小尺寸 (100的1/10)
+      font: { size: MIN_FONT_SIZE },  // 最小字体 (80的1/10)
+      color: section.originalColor || {
+        background: '#E3F2FD',
+        border: '#2196F3'
+      }
+    };
+  });
+  
+  var edgeUpdates = sectionEdges.map(function (edge: any) {
+    return {
+      id: edge.id,
+      hidden: false,
+      width: MIN_EDGE_WIDTH,  // 最小宽度 (5的1/10)
+      color: {
+        color: 'rgba(132, 132, 132, 0.3)',
+        highlight: 'rgba(132, 132, 132, 0.5)'
+      }
+    };
+  });
+  
+  nodes.update(nodeUpdates);
+  edges.update(edgeUpdates);
+  
+  // 2. 给物理引擎一点时间适应新节点
+  setTimeout(function() {
+    // 3. 逐步放大节点和边
+    var steps = ANIMATION_STEPS;
+    var currentStep = 0;
+    
+    var animationInterval = setInterval(function() {
+      currentStep++;
+      
+      var progress = currentStep / steps;
+      var easeProgress = easeOutCubic(progress);
+      
+      // 计算当前步骤的大小 - 适配当前配置
+      var currentSize = MIN_NODE_SIZE + ((BASE_NODE_SIZE - MIN_NODE_SIZE) * easeProgress); // 从10到100
+      var currentFontSize = MIN_FONT_SIZE + ((BASE_FONT_SIZE - MIN_FONT_SIZE) * easeProgress); // 从8到80
+      var currentEdgeWidth = MIN_EDGE_WIDTH + ((BASE_EDGE_WIDTH - MIN_EDGE_WIDTH) * easeProgress); // 从0.5到5
+      var currentEdgeOpacity = 0.3 + (0.7 * easeProgress); // 从0.3到1
+      
+      // 更新节点
+      var nodeUpdates = sectionNodes.map(function (section: any) {
+        return {
+          id: section.id,
+          size: currentSize,
+          font: { size: Math.max(1, currentFontSize) },
+          // 使用节点的原始颜色，避免硬编码
+          color: section.originalColor || {
+            background: interpolateColor('#E3F2FD', '#4a90e2', easeProgress),
+            border: '#2196F3'
+          }
+        };
+      });
+      
+      // 更新边
+      var edgeUpdates = sectionEdges.map(function (edge: any) {
+        return {
+          id: edge.id,
+          width: currentEdgeWidth,
+          color: {
+            color: `rgba(132, 132, 132, ${currentEdgeOpacity})`,
+            highlight: `rgba(132, 132, 132, ${Math.min(1, currentEdgeOpacity + 0.2)})`
+          }
+        };
+      });
+      
+      nodes.update(nodeUpdates);
+      edges.update(edgeUpdates);
+      
+      // 动画完成
+      if (currentStep >= steps) {
+        clearInterval(animationInterval);
+        
+        // 恢复节点原始颜色
+        var finalUpdates = sectionNodes.map(function (section: any) {
+          return {
+            id: section.id,
+            color: section.originalColor || {
+              background: '#4a90e2',
+              border: '#2270b0'
+            }
+          };
+        });
+        nodes.update(finalUpdates);
+        
+        // 恢复边原始样式
+        var finalEdgeUpdates = sectionEdges.map(function (edge: any) {
+          return {
+            id: edge.id,
+            color: {
+              color: '#848484',
+              highlight: '#ff9800'
+            }
+          };
+        });
+        edges.update(finalEdgeUpdates);
+        
+        // 更新章节状态
+        chapterState.value[chapterId] = true;
+        
+        // 重新稳定布局
+        network.stopSimulation();
+        network.stabilize(STABILIZE_ITERATIONS);
+        
+        // 允许再次点击
+        setTimeout(function() {
+          animationInProgress.value[chapterId] = false;
+        }, 200);
+      }
+    }, ANIMATION_INTERVAL);
+  }, 50);
+}
+
+// 收缩动画 - 适配当前大小
+function collapseWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], chapterId: string) {
+   console.log('收缩:', chapterId);
+   console.log('sectionNodes:', sectionNodes);
+  // 逐步缩小节点和边
+  var steps = ANIMATION_STEPS;
+  var currentStep = 0;
+  
+  var animationInterval = setInterval(function() {
+    //console.log('currentStep:', currentStep);
+    currentStep++;
+    
+    var progress = currentStep / steps;
+    var easeProgress = easeInCubic(progress);
+    
+    // 计算当前步骤的大小 - 适配当前配置
+    var currentSize = BASE_NODE_SIZE - ((BASE_NODE_SIZE - MIN_NODE_SIZE) * easeProgress); // 从100到10
+    var currentFontSize = BASE_FONT_SIZE - ((BASE_FONT_SIZE - MIN_FONT_SIZE) * easeProgress); // 从80到8
+    var currentEdgeWidth = BASE_EDGE_WIDTH - ((BASE_EDGE_WIDTH - MIN_EDGE_WIDTH) * easeProgress); // 从5到0.5
+    var currentEdgeOpacity = 1 - (0.7 * easeProgress); // 从1到0.3
+    
+    // 更新节点
+    var nodeUpdates = sectionNodes.map(function (section: any) {
+      return {
+        id: section.id,
+        size: Math.max(MIN_NODE_SIZE, currentSize),
+        font: { size: Math.max(MIN_FONT_SIZE, currentFontSize) },
+        // 使用完整的原始颜色对象
+        color: section.originalColor || {
+          background: interpolateColor('#4a90e2', '#E3F2FD', easeProgress),
+          border: '#2196F3'
+        }
+      };
+    });
+    
+    // 更新边
+    var edgeUpdates = sectionEdges.map(function (edge: any) {
+      return {
+        id: edge.id,
+        width: Math.max(MIN_EDGE_WIDTH, currentEdgeWidth),
+        color: {
+          color: `rgba(132, 132, 132, ${currentEdgeOpacity})`,
+          highlight: `rgba(132, 132, 132, ${Math.max(0.3, currentEdgeOpacity - 0.2)})`
+        }
+      };
+    });
+    
+    nodes.update(nodeUpdates);
+    edges.update(edgeUpdates);
+    
+    // 动画完成
+    if (currentStep >= steps) {
+      clearInterval(animationInterval);
+      
+      // 隐藏节点和边
+      var hideNodeUpdates = sectionNodes.map(function (section: any) {
+        return {
+          id: section.id,
+          hidden: true,
+          // 恢复原始大小，以便下次展开时正确动画
+          size: BASE_NODE_SIZE,
+          font: { size: BASE_FONT_SIZE }
+        };
+      });
+      
+      var hideEdgeUpdates = sectionEdges.map(function (edge: any) {
+        return {
+          id: edge.id,
+          hidden: true,
+          width: BASE_EDGE_WIDTH
+        };
+      });
+      
+      nodes.update(hideNodeUpdates);
+      edges.update(hideEdgeUpdates);
+      
+      // 更新章节状态
+      chapterState.value[chapterId] = false;
+      
+      // 重新稳定布局
+      network.stopSimulation();
+      network.stabilize(STABILIZE_ITERATIONS);
+      
+      // 允许再次点击
+      setTimeout(function() {
+        animationInProgress.value[chapterId] = false;
+      }, 200);
+    }
+  }, ANIMATION_INTERVAL);
+}
+
+// 缓动函数
+function easeOutCubic(t: number) {
+  return 1 - Math.pow(1 - t, 3);
+}
+
+function easeInCubic(t: number) {
+  return t * t * t;
+}
+
+// 颜色插值函数
+function interpolateColor(color1: string, color2: string, progress: number) {
+  // 将十六进制颜色转换为RGB
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : { r: 0, g: 0, b: 0 };
+  };
+  
+  // 将RGB转换为十六进制颜色
+  const rgbToHex = (r: number, g: number, b: number) => {
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  };
+  
+  const rgb1 = hexToRgb(color1);
+  const rgb2 = hexToRgb(color2);
+  
+  // 在两种颜色之间进行插值
+  const r = Math.round(rgb1.r + (rgb2.r - rgb1.r) * progress);
+  const g = Math.round(rgb1.g + (rgb2.g - rgb1.g) * progress);
+  const b = Math.round(rgb1.b + (rgb2.b - rgb1.b) * progress);
+  
+  return rgbToHex(r, g, b);
+}
+
+// 更新章节节点的指示器
+function updateChapterNodeIndicator(chapterId: string, isExpanded: boolean) {
+  var chapterNode = nodes.get(chapterId);
+  if (!chapterNode) return;
+  //console.log('更新章节节点的指示器:', chapterId, isExpanded);
+  var newLabel = !isExpanded ? 
+    '[-] ' + chapterNode.label.replace(/^\[[+-]\]\s*/, '') :
+    '[+] ' + chapterNode.label.replace(/^\[[+-]\]\s*/, '');
+  
+  nodes.update({
+    id: chapterId,
+    label: newLabel
+  });
+}
+
+// 在节点初始化时保存原始颜色
+function initializeNodesWithOriginalColor(allNodes: any[]) {
+  allNodes.forEach(function(node: any) {
+    // 保存整个color对象而不是仅仅background颜色
+    if (node.color) {
+      //console.log('保存原始颜色:', node.id, node.color);
+      node.originalColor = {...node.color};
+    }
+  });
+  nodes.update(allNodes);
+}
+
 onMounted(() => {
   if (!networkContainer.value) return
 
@@ -472,8 +808,12 @@ onMounted(() => {
       const learnedNodes = progressData?.completed_topics || []
       learnedNodesRef.value = learnedNodes;
 
-      // 转换节点数据并根据学习状态更新颜色
-      const nodes = updateNodeColors(
+      // 转换节点数据并根据学习状态更新颜色// 定义常量
+const BASE_NODE_SIZE = 100;
+const BASE_FONT_SIZE = 80;
+const BASE_EDGE_WIDTH = 5;
+
+      const nodeData = updateNodeColors(
         graphData.nodes.map(node => ({
           id: node.data.id,
           label: node.data.label,
@@ -483,27 +823,28 @@ onMounted(() => {
           },
           shape: 'dot',
           font: {
-            size: 80,
+            size: BASE_FONT_SIZE,
             color: '#000000'
           },
-          size: 100
+          size: BASE_NODE_SIZE
         })),
         learnedNodes,
         graphData
       )
 
       // 转换边数据
-      const edges = graphData.edges.map(edge => ({
+      const edgeData = graphData.edges.map(edge => ({
         from: edge.data.source,
         to: edge.data.target,
-        color: {
-          color: '#848484'
-        }
+        color: { 
+          color: '#848484' 
+        },
+        width: BASE_EDGE_WIDTH
       }))
 
       const data = {
-        nodes: nodes,
-        edges: edges
+        nodes: nodeData,
+        edges: edgeData
       }
 
       const options = {
@@ -511,7 +852,7 @@ onMounted(() => {
           enabled: true,
           stabilization: {
             enabled: true,
-            iterations: 1000
+            iterations: STABILIZATION_ITERATIONS
           },
           solver: 'forceAtlas2Based',
           forceAtlas2Based: {
@@ -528,7 +869,7 @@ onMounted(() => {
         },
         nodes: {
           borderWidth: 3,
-          size: 40,
+          size: BASE_NODE_SIZE * 0.4,
           shadow: true,
           shape: 'dot',
           color: {
@@ -541,7 +882,7 @@ onMounted(() => {
           }
         },
         edges: {
-          width: 5,
+          width: BASE_EDGE_WIDTH,
           shadow: false,
           smooth: {
             enabled: true,
@@ -565,8 +906,24 @@ onMounted(() => {
       }
 
       // 创建网络
-      const network = new vis.Network(networkContainer.value, data, options)
-
+      network = new vis.Network(networkContainer.value, data, options)
+      
+      // 获取节点和边的数据集
+      nodes = network.body.data.nodes;
+      edges = network.body.data.edges;
+      
+      // 初始化章节状态，使所有章节默认展开
+      graphData.nodes.forEach((node: any) => {
+        if (node.data.type === 'chapter') {
+          chapterState.value[node.data.id] = true;
+          // 更新章节节点的指示器显示为展开状态
+          updateChapterNodeIndicator(node.data.id, true);
+        }
+      });
+      
+      // 初始化节点原始颜色
+      initializeNodesWithOriginalColor(nodeData);
+      
       // 单击/双击处理状态
       const clickState = { lastId: null as string | null, timer: null as number | null, ts: 0 }
       const DBL_DELAY = 280
@@ -583,7 +940,16 @@ onMounted(() => {
             clearTimeout(clickState.timer!)
             clickState.timer = null
             clickState.lastId = null
-
+            console.log('1双击击章节节点：', nodeId);
+            const nodeData = graphData.nodes.find((n: any) => n.data.id === nodeId)
+            if (nodeData) {
+                if (nodeData.data.type === 'chapter') {
+                  // 章节节点处理：展开/折叠
+                  console.log('2双击击章节节点：', nodeId);
+                  showChapterModal(nodeId, nodeData.data.label, learnedNodes, graphData);
+                  //showChapterModal(nodeId, nodeData.data.label, learnedNodes, graphData)
+                }
+              }
             // 双击节点跳转功能
             //router.push({ name: 'learning', params: { topicId: nodeId } })
           } else {
@@ -596,17 +962,11 @@ onMounted(() => {
               if (nodeData) {
                 if (nodeData.data.type === 'chapter') {
                   // 章节节点处理：展开/折叠
-                  // if (expandedChapters.value.has(nodeId)) {
-                  //   // 收起章节
-                  //   expandedChapters.value.delete(nodeId)
-                  // } else {
-                  //   // 展开章节
-                  //   expandedChapters.value.add(nodeId)
-                  // }
-                  showChapterModal(nodeId, nodeData.data.label, learnedNodes, graphData)
+                  toggleChapterWithScaleAnimation(nodeId);
+                  //showChapterModal(nodeId, nodeData.data.label, learnedNodes, graphData)
                 } else if (nodeData.data.type === 'knowledge') {
                   // 知识点节点处理
-                  showKnowledgeModal(nodeId, nodeData.data.label, learnedNodes, graphData)
+                  showKnowledgeModal(nodeId, nodeData.data.label, learnedNodes, graphData);
                 }
               }
 
@@ -669,6 +1029,7 @@ onMounted(() => {
       @ok="handleLearn"
       @cancel="handleCancel"
       :footer="null"
+      centered
     >
       <p>{{ dialogState.status }}</p>
       <div class="modal-buttons">
