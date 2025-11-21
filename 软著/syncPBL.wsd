@@ -1,0 +1,340 @@
+@startuml
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+rectangle "前端应用层" as Frontend #DCEBFF {
+  [浏览器] as Browser
+}
+
+rectangle "前端静态服务" as Nginx #DCEBFF
+
+node "API 网关" as APIGateway #DDF7D8 {
+  [REST API 路由] as APIRouter
+  [WebSocket 管理器] as WSManager
+  [Redis 订阅器] as RedisSub
+}
+
+package "服务编排层" as Orchestration #DDF7D8 {
+  [动态控制器] as Controller
+}
+
+package "智能服务层" as Services #DDF7D8 {
+  [用户状态服务] as UserState
+  [情感分析服务] as Sentiment
+  [进度聚类服务] as Clustering
+  [RAG 检索服务 + 知识块] as RAG
+  [提示词生成器] as PromptGen
+  [大模型网关] as LLM
+  [代码评测沙箱] as Sandbox
+}
+
+package "异步与消息" as Async #FFF2CC {
+  [Redis ] as Redis
+  [Celery\nchat_queue] as CeleryChat
+  [Celery\nsubmit_queue] as CelerySubmit
+  [Celery\ndb_writer_queue] as CeleryDB
+  [Celery\nbehavior_queue] as CeleryBehavior
+}
+
+database "关系型数据库" as DB #FFF2CC
+
+folder "向量与模型" as ModelFS #FFF2CC {
+  [进度聚类模型] as ClusterModels
+  [向量索引] as AnnIndex
+  [知识分块] as KBChunks
+}
+
+folder "学习内容" as ContentFS #FFF2CC
+
+cloud "外部推理服务" as LLMAPI
+
+' 接入关系
+Nginx --> Browser : "" 
+Browser --> APIRouter : HTTP/HTTPS\n会话/对话/内容/进度
+Browser --> WSManager : ""
+' 网关与编排
+APIRouter --> Controller
+WSManager --> Redis : ""
+RedisSub --> WSManager : 转发消息
+
+' 编排调用链
+Controller --> UserState
+Controller --> Sentiment
+Controller --> Clustering
+Controller --> RAG
+Controller --> PromptGen
+Controller --> LLM
+Controller --> Sandbox
+
+' 数据与存储
+UserState --> Redis : 状态缓存\n(BKT/情感/行为计数)
+UserState --> DB : 事件/会话 持久化
+RAG --> AnnIndex
+RAG --> KBChunks
+Clustering --> ClusterModels
+LLM --> LLMAPI
+
+' 异步任务编排
+APIRouter --> CeleryChat : 异步对话任务
+APIRouter --> CelerySubmit : 提交评测任务
+APIRouter --> CeleryDB : 持久化任务
+APIRouter --> CeleryBehavior : 行为分析任务
+CeleryChat --> Redis : 结果发布
+CelerySubmit --> Redis
+CeleryDB --> DB
+CeleryBehavior --> Redis
+
+note right of Controller
+- 编排“状态→情感→进度→检索→提示→推理”
+- 异常回退与节流控制
+end note
+
+note bottom of ModelFS
+通过 Docker 卷挂载，支持热更新与回滚
+end note
+
+@enduml
+
+@startuml
+title 知识图谱数据获取流图
+skinparam defaultFontSize 25
+skinparam titleFontSize 40
+skinparam participantFontSize 25
+skinparam noteFontSize 10
+skinparam legendFontSize 1
+
+actor Browser as "前端浏览器"
+participant APIRouter as "FastAPI路由\n(/api/v1/knowledge-graph)"
+participant KnowledgeAPI as "知识图谱API\n(get_knowledge_graph)"
+participant Cache as "全局缓存\n(_knowledge_graph_cache)"
+participant FileSystem as "文件系统"
+participant JSONFile as "knowledge_graph.json"
+participant Pydantic as "Pydantic模型\n(KnowledgeGraph)"
+
+Browser -> APIRouter: GET /api/v1/knowledge-graph
+APIRouter -> KnowledgeAPI: 调用get_knowledge_graph()
+
+KnowledgeAPI -> Cache: 检查缓存是否存在
+alt 缓存命中
+    Cache --> KnowledgeAPI: 返回缓存数据
+    KnowledgeAPI --> APIRouter: StandardResponse(cached_data)
+    APIRouter --> Browser: JSON响应
+else 缓存未命中
+    KnowledgeAPI -> FileSystem: 检查文件存在性
+
+    FileSystem -> JSONFile: 读取文件内容 (utf-8-sig)
+    JSONFile --> FileSystem: 原始JSON字符串
+    FileSystem --> KnowledgeAPI: 返回文件内容
+
+        KnowledgeAPI -> KnowledgeAPI: json.loads(raw_content)
+            KnowledgeAPI -> Pydantic: KnowledgeGraph(**data)
+            group Pydantic验证
+                Pydantic -> Pydantic: 验证节点ID唯一性
+                Pydantic -> Pydantic: 验证边连接的节点存在
+                Pydantic -> Pydantic: 验证依赖边有效性
+            end
+            Pydantic --> KnowledgeAPI: 验证后的KnowledgeGraph对象
+            KnowledgeAPI -> Cache: 更新全局缓存
+            KnowledgeAPI --> APIRouter: StandardResponse(validated_data)
+            APIRouter --> Browser: 结构化JSON响应
+end
+
+@enduml
+
+@startuml
+title 元素选择预览功能交互流程图
+skinparam defaultFontSize 25
+skinparam titleFontSize 40
+skinparam participantFontSize 25
+skinparam noteFontSize 10
+skinparam legendFontSize 1
+' --- 结束 ---
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam componentStyle rectangle
+actor User as "用户"
+participant ParentPage as "父页面\n(learning_page.html)"
+participant Button as "选择器控制按钮"
+participant Bridge as "选择器桥接\n(createSelectorBridge)"
+participant Iframe as "iframe\n(element-selector-iframe)"
+participant Selector as "元素选择器\n(ElementSelector)"
+participant DOM as "iframe内DOM元素"
+participant Highlight as "高亮效果"
+
+== 功能初始化 ==
+ParentPage -> Bridge: 创建选择器桥接
+ParentPage -> Iframe: 加载示例页面\n(example_pages/index.html)
+Iframe -> Selector: 初始化initIframeSelector()
+
+== 启动元素选择 ==
+User -> Button: 点击"选取元素"按钮
+Button -> ParentPage: 触发startSelector事件
+ParentPage -> Bridge: bridge.start(allowedElements)
+Bridge -> Iframe: postMessage(START, allowedElements)
+Iframe -> Selector: 创建ElementSelector实例
+Selector -> DOM: 为所有元素绑定事件监听器
+DOM --> Selector: 事件绑定完成
+
+== 鼠标悬停高亮 ==
+User -> DOM: 鼠标悬停在某个元素上
+DOM -> Selector: mousemove事件
+Selector -> Selector: getElementAtPoint()定位元素
+Selector -> Selector: shouldIgnoreElement()过滤
+    Selector -> Highlight: updateHighlight()显示高亮
+    Highlight --> User: 元素显示高亮边框
+
+== 选择元素获取代码 ==
+User -> DOM: 点击选中元素
+DOM -> Selector: click事件
+Selector -> Selector: 阻止默认行为
+Selector -> Selector: getElementInfo()获取元素信息
+Selector -> Iframe: postMessage
+Iframe -> ParentPage: postMessage到父页面
+ParentPage -> Bridge: onChosen回调处理
+Bridge -> ParentPage: 返回元素信息
+ParentPage -> ParentPage: 更新代码显示容器
+note over ParentPage
+end note
+ParentPage --> User: 显示选中元素的HTML代码
+@enduml
+
+@startuml
+title AI同步模块数据流图
+skinparam defaultFontSize 25
+skinparam titleFontSize 40
+skinparam participantFontSize 25
+skinparam noteFontSize 10
+skinparam legendFontSize 1
+' --- 结束 ---
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam componentStyle rectangle
+
+participant DynamicCtrl as "Dynamic_Controller"
+participant UserState as "用户状态服务\n(Redis缓存)"
+participant RAGService as "RAG检索服务"
+participant Clustering as "进度聚类服务"
+participant Sentiment as "情感分析服务"
+participant PromptGen as "提示词生成器"
+participant LLMGateway as "LLM网关"
+participant LLM_API as "外部LLM API"
+database DB as "MySQL数据库"
+participant RedisPub as "Redis Pub/Sub"
+participant WebSocket as "WebSocket管理器"
+
+
+
+== 用户状态获取与更新 ==
+DynamicCtrl -> UserState: get_or_create_profile(id)
+UserState -> UserState: 从Redis查询用户画像
+UserState --> DynamicCtrl: 返回StudentProfile
+
+DynamicCtrl -> UserState: handle_ai_help_request()\n递增求助计数
+UserState -> UserState: 更新Redis中的行为计数
+
+== 情感分析 ==
+DynamicCtrl -> Sentiment: analyze_sentiment(user_message)
+Sentiment -> Sentiment: BERT情感分析
+Sentiment --> DynamicCtrl: SentimentAnalysisResult\n{label, confidence, details}
+
+== RAG知识检索 ==
+DynamicCtrl -> RAGService: retrieve(user_message)
+RAGService -> RAGService: 文本向量化(Embedding)
+RAGService -> RAGService: Annoy相似性搜索
+RAGService -> RAGService: 检索相关知识片段
+RAGService --> DynamicCtrl: retrieved_knowledge[]
+
+== 学习内容加载 ==
+DynamicCtrl -> DynamicCtrl: load_json_content(topic_id)
+DynamicCtrl --> DynamicCtrl: loaded_content_json
+
+== 进度聚类分析 ==
+DynamicCtrl -> UserState: 更新用户画像聚类结果
+
+== 用户状态摘要构建 ==
+DynamicCtrl -> DynamicCtrl: _build_user_state_summary()
+DynamicCtrl --> DynamicCtrl: UserStateSummary
+
+== 提示词生成 ==
+DynamicCtrl -> PromptGen: create_prompts()
+PromptGen -> PromptGen: 组装结构化提示词
+PromptGen --> DynamicCtrl: system_prompt, messages, context_snapshot
+
+== LLM推理调用 ==
+DynamicCtrl -> LLMGateway: get_completion(system_prompt, messages)
+LLMGateway -> LLM_API: HTTP请求流式输出
+LLM_API --> LLMGateway: 流式Token响应
+LLMGateway --> DynamicCtrl: ai_response流
+
+== 流式响应推送 ==
+DynamicCtrl -> RedisPub: 发布stream_start消息
+RedisPub -> WebSocket: 广播到用户
+
+
+DynamicCtrl -> RedisPub: 发布stream_end消息
+RedisPub -> WebSocket: 广播结束
+
+== 数据缓存机制 ==
+DynamicCtrl <-> UserState: Redis缓存交互
+
+
+@enduml
+
+
+@startuml
+title 代码评测流程图
+
+skinparam defaultFontSize 25
+skinparam titleFontSize 40
+skinparam participantFontSize 25
+skinparam noteFontSize 10
+skinparam legendFontSize 1
+
+actor Student as "学生"
+participant Frontend as "前端编辑器"
+participant APIGW as "API网关\n(/api/v1/submissions)"
+participant DBWriterQ as "db_writer_queue"
+participant SubmitQ as "submit_queue"
+participant SubmitWorker as "评测Worker"
+participant Sandbox as "Playwright沙箱"
+participant TestTaskFile as "检查点配置文件"
+participant BKTService as "BKT模型服务"
+participant ProgressDB as "进度数据库"
+participant RedisPub as "Redis发布器"
+participant WebSocket as "WebSocket管理器"
+
+Student -> Frontend: 点击提交按钮
+Frontend -> Frontend: 封装JSON格式\n{participantId, task_id, code}
+
+Frontend -> APIGW: POST /api/v1/submissions/submit-test2
+APIGW -> DBWriterQ: 异步保存代码到数据库
+APIGW -> SubmitQ: 投递评测任务\n(process_submission_task)
+APIGW --> Frontend: 202 Accepted + task_id
+
+SubmitWorker -> SubmitWorker: 拉取任务并启动
+SubmitWorker -> TestTaskFile: 加载题目检查点\n(checkpoints数组)
+TestTaskFile --> SubmitWorker: 返回检查点列表
+
+SubmitWorker -> Sandbox: run_evaluation()\n启动Playwright
+Sandbox -> Sandbox: 创建Chromium无头浏览器\n(安全隔离环境)
+        Sandbox -> Sandbox: 直接使用用户完整HTML
+        Sandbox -> Sandbox: 注入CSS和JS到页面
+
+Sandbox -> Sandbox: _evaluate_checkpoint()
+
+Sandbox --> SubmitWorker: 返回评测报告\n{passed, message, details}
+
+SubmitWorker -> BKTService: 更新BKT模型\n(update_bkt_on_submission)
+SubmitWorker -> ProgressDB: 如果通过则更新进度记录
+SubmitWorker -> RedisPub: 发布结果到\nws:user:{participant_id}
+RedisPub -> WebSocket: 推送实时结果
+WebSocket --> Frontend: WebSocket通知评测结果
+
+
+
+@enduml

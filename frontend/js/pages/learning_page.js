@@ -416,8 +416,8 @@ function unifyAIAvatars() {
         const originalAddMessageToUI = chatModule.addMessageToUI.bind(chatModule);
 
         chatModule.addMessageToUI = function (sender, content) {
-            // 调用原始方法
-            originalAddMessageToUI(sender, content);
+           
+            const ret = originalAddMessageToUI(sender, content);
 
             // 处理新生成的头像
             setTimeout(() => {
@@ -441,6 +441,8 @@ function unifyAIAvatars() {
                     });
                 }
             }, 0);
+
+            return ret;
         };
 
         console.log('[MainApp] 已重写chatModule.addMessageToUI方法以确保头像一致性');

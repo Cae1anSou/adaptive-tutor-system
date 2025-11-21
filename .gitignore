@@ -99,3 +99,7 @@ backend/celerybeat-schedule
 /Data_Analyze/DB/for老师.json
 /Data_Analyze/DB/按id分.json
 sentiment_bert/
+
+frontend/frontend_vue/node_modules
+.gemini/
+gha-creds-*.json

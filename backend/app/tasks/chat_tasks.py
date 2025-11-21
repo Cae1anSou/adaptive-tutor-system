@@ -17,22 +17,38 @@ def process_chat_request(self,request_data: dict):
         # 将 db 会话传递给需要它的服务方法
         # 调用生成回复（使用同步函数）
         request_obj = ChatRequest(**request_data)
-        response = controller.generate_adaptive_response_sync(
+        redis_client = get_redis_client()
+        # stream_start
+        message = SocketResponse2(
+                type="stream_start",
+                taskid=self.request.id,
+                timestamp=datetime.now(timezone.utc),
+                message="开始",
+            )
+        redis_client.publish(f"ws:user:{request_data['participant_id']}",  message.model_dump_json() )    
+        #streaming
+        for trunk in controller.generate_adaptive_response_sync(
             request=request_obj,
             db=db,
             background_tasks=None  # Celery任务中不使用FastAPI的BackgroundTasks
-        )
+        ):
         # 注意：响应结果会自动存储在Celery的result backend中
-        redis_client = get_redis_client()
-       
+            message = SocketResponse2(
+                type="streaming",
+                taskid=self.request.id,
+                timestamp=datetime.now(timezone.utc),
+                message=trunk,
+            )
+            redis_client.publish(f"ws:user:{request_data['participant_id']}",  message.model_dump_json() )
+        #stream_end
         message = SocketResponse2(
-            type="chat_result",
+            type="stream_end",
             taskid=self.request.id,
             timestamp=datetime.now(timezone.utc),
-            message=response.model_dump(),
+            message="结束",
         )
         redis_client.publish(f"ws:user:{request_data['participant_id']}",  message.model_dump_json() )
-        logger.info("已public到Redis")
-        return response.model_dump()
+        #logger.info("已public到Redis")
+        #return response.model_dump()
     finally:
         db.close()
