@@ -10,7 +10,7 @@ const footerText = 'Copyright © 2025 syncPBL by 宋曹卢余蔡吴林';
       <a-layout-header class="layout-header">
         <div class="header-inner">
           <div class="logo-area">
-            <span>SyncPBL Platform</span>
+            <span>SyncPBL智能教学平台</span>
           </div>
           <div class="nav-area">
             Header Content
@@ -36,10 +36,6 @@ const footerText = 'Copyright © 2025 syncPBL by 宋曹卢余蔡吴林';
 </template>
 
 <style scoped lang="less">
-/* 全局容器：
-  使用 Flexbox 确保 Footer 始终在底部，
-  背景色采用高级灰，营造干净的视觉基调
-*/
 #BasicLayout {
   min-height: 100vh;
   background-color: #f0f2f5;
