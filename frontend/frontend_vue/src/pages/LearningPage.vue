@@ -659,7 +659,7 @@ watch(
 /* 全局容器与背景 */
 .learning-page {
   width: 100%;
-  min-height: 100vh;
+  min-height: 100%;
   background-color: #f8fafc; /* 极简灰背景 */
   background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
   background-size: 24px 24px; /* 点阵背景纹理 */
