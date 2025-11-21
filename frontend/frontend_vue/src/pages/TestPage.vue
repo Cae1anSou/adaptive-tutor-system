@@ -55,7 +55,7 @@ const testPageStyle = computed(() => ({
   gridTemplateColumns: isMobile.value ? '1fr' : '380px 1fr', // 左侧定宽或比例，右侧自适应
   gridTemplateRows: isMobile.value ? 'auto auto 500px' : '1fr', // 桌面端单行两列
   gap: '16px',
-  height: '100vh',
+  height: '100%',
   padding: '16px',
   width: '100%',
   boxSizing: 'border-box',
@@ -369,5 +369,10 @@ function handleTabChange(tab: string) {
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #d1d5db;
+}
+
+#DefaultPage {
+  flex: 1;
+  height: 100%;
 }
 </style>

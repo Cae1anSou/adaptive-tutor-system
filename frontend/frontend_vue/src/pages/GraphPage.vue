@@ -479,17 +479,17 @@ function toggleChapterWithScaleAnimation(chapterId: string) {
     filter: function (edge: any) {
       var fromNode = nodes.get(edge.from);
       var toNode = nodes.get(edge.to);
-      return (fromNode && fromNode.id === chapterId && toNode && toNode.type === 'knowledge' && toNode.id.startsWith(chapterId.replace('_end', '_'))) || 
+      return (fromNode && fromNode.id === chapterId && toNode && toNode.type === 'knowledge' && toNode.id.startsWith(chapterId.replace('_end', '_'))) ||
              (toNode && toNode.id === chapterId && fromNode && fromNode.type === 'knowledge' && fromNode.id.startsWith(chapterId.replace('_end', '_')));
     }
   });
-  
+
   var isCurrentlyExpanded = chapterState.value[chapterId];
   var newHiddenState = !isCurrentlyExpanded;
-  
+
   // 更新章节节点的视觉状态
   updateChapterNodeIndicator(chapterId, newHiddenState);
-  
+
   // 根据状态执行展开或收缩动画
   if (newHiddenState) {
     expandWithScaleAnimation(sectionNodes, sectionEdges, chapterId);
@@ -514,7 +514,7 @@ function expandWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], chap
       }
     };
   });
-  
+
   var edgeUpdates = sectionEdges.map(function (edge: any) {
     return {
       id: edge.id,
@@ -526,28 +526,28 @@ function expandWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], chap
       }
     };
   });
-  
+
   nodes.update(nodeUpdates);
   edges.update(edgeUpdates);
-  
+
   // 2. 给物理引擎一点时间适应新节点
   setTimeout(function() {
     // 3. 逐步放大节点和边
     var steps = ANIMATION_STEPS;
     var currentStep = 0;
-    
+
     var animationInterval = setInterval(function() {
       currentStep++;
-      
+
       var progress = currentStep / steps;
       var easeProgress = easeOutCubic(progress);
-      
+
       // 计算当前步骤的大小 - 适配当前配置
       var currentSize = MIN_NODE_SIZE + ((BASE_NODE_SIZE - MIN_NODE_SIZE) * easeProgress); // 从10到100
       var currentFontSize = MIN_FONT_SIZE + ((BASE_FONT_SIZE - MIN_FONT_SIZE) * easeProgress); // 从8到80
       var currentEdgeWidth = MIN_EDGE_WIDTH + ((BASE_EDGE_WIDTH - MIN_EDGE_WIDTH) * easeProgress); // 从0.5到5
       var currentEdgeOpacity = 0.3 + (0.7 * easeProgress); // 从0.3到1
-      
+
       // 更新节点
       var nodeUpdates = sectionNodes.map(function (section: any) {
         return {
@@ -561,7 +561,7 @@ function expandWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], chap
           }
         };
       });
-      
+
       // 更新边
       var edgeUpdates = sectionEdges.map(function (edge: any) {
         return {
@@ -573,14 +573,14 @@ function expandWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], chap
           }
         };
       });
-      
+
       nodes.update(nodeUpdates);
       edges.update(edgeUpdates);
-      
+
       // 动画完成
       if (currentStep >= steps) {
         clearInterval(animationInterval);
-        
+
         // 恢复节点原始颜色
         var finalUpdates = sectionNodes.map(function (section: any) {
           return {
@@ -592,7 +592,7 @@ function expandWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], chap
           };
         });
         nodes.update(finalUpdates);
-        
+
         // 恢复边原始样式
         var finalEdgeUpdates = sectionEdges.map(function (edge: any) {
           return {
@@ -604,14 +604,14 @@ function expandWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], chap
           };
         });
         edges.update(finalEdgeUpdates);
-        
+
         // 更新章节状态
         chapterState.value[chapterId] = true;
-        
+
         // 重新稳定布局
         network.stopSimulation();
         network.stabilize(STABILIZE_ITERATIONS);
-        
+
         // 允许再次点击
         setTimeout(function() {
           animationInProgress.value[chapterId] = false;
@@ -628,20 +628,20 @@ function collapseWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], ch
   // 逐步缩小节点和边
   var steps = ANIMATION_STEPS;
   var currentStep = 0;
-  
+
   var animationInterval = setInterval(function() {
     //console.log('currentStep:', currentStep);
     currentStep++;
-    
+
     var progress = currentStep / steps;
     var easeProgress = easeInCubic(progress);
-    
+
     // 计算当前步骤的大小 - 适配当前配置
     var currentSize = BASE_NODE_SIZE - ((BASE_NODE_SIZE - MIN_NODE_SIZE) * easeProgress); // 从100到10
     var currentFontSize = BASE_FONT_SIZE - ((BASE_FONT_SIZE - MIN_FONT_SIZE) * easeProgress); // 从80到8
     var currentEdgeWidth = BASE_EDGE_WIDTH - ((BASE_EDGE_WIDTH - MIN_EDGE_WIDTH) * easeProgress); // 从5到0.5
     var currentEdgeOpacity = 1 - (0.7 * easeProgress); // 从1到0.3
-    
+
     // 更新节点
     var nodeUpdates = sectionNodes.map(function (section: any) {
       return {
@@ -655,7 +655,7 @@ function collapseWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], ch
         }
       };
     });
-    
+
     // 更新边
     var edgeUpdates = sectionEdges.map(function (edge: any) {
       return {
@@ -667,14 +667,14 @@ function collapseWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], ch
         }
       };
     });
-    
+
     nodes.update(nodeUpdates);
     edges.update(edgeUpdates);
-    
+
     // 动画完成
     if (currentStep >= steps) {
       clearInterval(animationInterval);
-      
+
       // 隐藏节点和边
       var hideNodeUpdates = sectionNodes.map(function (section: any) {
         return {
@@ -685,7 +685,7 @@ function collapseWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], ch
           font: { size: BASE_FONT_SIZE }
         };
       });
-      
+
       var hideEdgeUpdates = sectionEdges.map(function (edge: any) {
         return {
           id: edge.id,
@@ -693,17 +693,17 @@ function collapseWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], ch
           width: BASE_EDGE_WIDTH
         };
       });
-      
+
       nodes.update(hideNodeUpdates);
       edges.update(hideEdgeUpdates);
-      
+
       // 更新章节状态
       chapterState.value[chapterId] = false;
-      
+
       // 重新稳定布局
       network.stopSimulation();
       network.stabilize(STABILIZE_ITERATIONS);
-      
+
       // 允许再次点击
       setTimeout(function() {
         animationInProgress.value[chapterId] = false;
@@ -732,20 +732,20 @@ function interpolateColor(color1: string, color2: string, progress: number) {
       b: parseInt(result[3], 16)
     } : { r: 0, g: 0, b: 0 };
   };
-  
+
   // 将RGB转换为十六进制颜色
   const rgbToHex = (r: number, g: number, b: number) => {
     return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   };
-  
+
   const rgb1 = hexToRgb(color1);
   const rgb2 = hexToRgb(color2);
-  
+
   // 在两种颜色之间进行插值
   const r = Math.round(rgb1.r + (rgb2.r - rgb1.r) * progress);
   const g = Math.round(rgb1.g + (rgb2.g - rgb1.g) * progress);
   const b = Math.round(rgb1.b + (rgb2.b - rgb1.b) * progress);
-  
+
   return rgbToHex(r, g, b);
 }
 
@@ -754,10 +754,10 @@ function updateChapterNodeIndicator(chapterId: string, isExpanded: boolean) {
   var chapterNode = nodes.get(chapterId);
   if (!chapterNode) return;
   //console.log('更新章节节点的指示器:', chapterId, isExpanded);
-  var newLabel = !isExpanded ? 
+  var newLabel = !isExpanded ?
     '[-] ' + chapterNode.label.replace(/^\[[+-]\]\s*/, '') :
     '[+] ' + chapterNode.label.replace(/^\[[+-]\]\s*/, '');
-  
+
   nodes.update({
     id: chapterId,
     label: newLabel
@@ -836,8 +836,8 @@ const BASE_EDGE_WIDTH = 5;
       const edgeData = graphData.edges.map(edge => ({
         from: edge.data.source,
         to: edge.data.target,
-        color: { 
-          color: '#848484' 
+        color: {
+          color: '#848484'
         },
         width: BASE_EDGE_WIDTH
       }))
@@ -907,11 +907,11 @@ const BASE_EDGE_WIDTH = 5;
 
       // 创建网络
       network = new vis.Network(networkContainer.value, data, options)
-      
+
       // 获取节点和边的数据集
       nodes = network.body.data.nodes;
       edges = network.body.data.edges;
-      
+
       // 初始化章节状态，使所有章节默认展开
       graphData.nodes.forEach((node: any) => {
         if (node.data.type === 'chapter') {
@@ -920,10 +920,10 @@ const BASE_EDGE_WIDTH = 5;
           updateChapterNodeIndicator(node.data.id, true);
         }
       });
-      
+
       // 初始化节点原始颜色
       initializeNodesWithOriginalColor(nodeData);
-      
+
       // 单击/双击处理状态
       const clickState = { lastId: null as string | null, timer: null as number | null, ts: 0 }
       const DBL_DELAY = 280
@@ -1057,12 +1057,27 @@ const BASE_EDGE_WIDTH = 5;
 </template>
 
 <style scoped>
+#GraphPage {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.graph-container {
+  flex: 1;
+  position: relative;
+  min-height: 0; /* 重要：允许flex子项收缩 */
+}
+
 #mynetwork {
   width: 100%;
-  height: 90vh;
+  height: 100%;
   border: 1px solid lightgray;
   background-color: #f7f7f7;
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .legend {
@@ -1074,7 +1089,7 @@ const BASE_EDGE_WIDTH = 5;
   border-radius: 5px;
   background-color: #f9f9f9;
   position: absolute;
-  bottom: 10px;
+  bottom: 5%;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
