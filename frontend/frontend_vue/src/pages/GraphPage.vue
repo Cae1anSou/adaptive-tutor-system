@@ -1089,7 +1089,7 @@ const BASE_EDGE_WIDTH = 5;
   border-radius: 5px;
   background-color: #f9f9f9;
   position: absolute;
-  bottom: 5%;
+  bottom: -4%;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
