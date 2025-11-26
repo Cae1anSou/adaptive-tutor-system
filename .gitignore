@@ -91,13 +91,9 @@ backend/models/sentiment_bert/tokenizer_config.json
 backend/models/sentiment_bert/tokenizer.json
 backend/models/sentiment_bert/vocab.txt
 
-Data_Analyze/DB/ai_exp_database_export.json
 backend/celerybeat-schedule
 backend/celerybeat-schedule
 
-/backend/scripts/cleaned_grouped_data.json
-/Data_Analyze/DB/for老师.json
-/Data_Analyze/DB/按id分.json
 sentiment_bert/
 
 frontend/frontend_vue/node_modules
