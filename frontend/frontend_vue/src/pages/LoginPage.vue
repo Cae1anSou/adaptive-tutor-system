@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
-import { message } from 'ant-design-vue'
-import { initiateSessionSessionInitiatePost } from '../api/session'
-import { useUserStore } from '../stores/user'
+import {ref, reactive} from 'vue'
+import {useRouter} from 'vue-router'
+import {message} from 'ant-design-vue'
+import {initiateSessionSessionInitiatePost} from '../api/session'
+import {useUserStore} from '../stores/user'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -16,9 +16,9 @@ const formState = reactive({
 const loading = ref(false)
 
 const themes = [
-  { value: 'pets', label: '🐱 萌宠乐园' },
-  { value: 'shopping', label: '🛒 时尚购物' },
-  { value: 'music', label: '🎵 影音娱乐' },
+  {value: 'pets', label: '🐱 萌宠乐园'},
+  {value: 'shopping', label: '🛒 时尚购物'},
+  {value: 'music', label: '🎵 影音娱乐'},
 ]
 
 const handleStart = async () => {
@@ -36,9 +36,9 @@ const handleStart = async () => {
     const cleanNickname = formState.nickname.replace(/[^\w\u4e00-\u9fa5]/g, '').trim()
     const participantId = cleanNickname
     const res = await initiateSessionSessionInitiatePost({
-        participant_id: participantId,
-        nickname: formState.nickname,
-        theme: formState.theme
+      participant_id: participantId,
+      nickname: formState.nickname,
+      theme: formState.theme
     } as any)
     // Adjust logic based on actual API response structure
     // Assuming backend returns { code: 200, data: { participant_id: '...' } }
@@ -65,67 +65,46 @@ const handleStart = async () => {
 </script>
 
 <template>
-  <div class="login-container">
-    <!-- Header -->
-    <header class="top-header">
-      <h1 class="header-title">sync-PBL学习平台</h1>
-      <button class="lang-btn">
-        <span>🌐</span> EN
-      </button>
-    </header>
+  <div class="entry-content">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+      <div class="welcome-icon">🤖</div>
+      <h2>和AI一起学HTML</h2>
+      <p>选择你喜欢的主题，让sync-PBL带你亲手打造第一个网站 ✨</p>
+    </div>
 
-    <div class="content-container">
-      <div class="panel">
-        <div class="panel-header">
-          <span>✨</span>
-          <h2>欢迎使用sync-PBL学习平台</h2>
+    <!-- Form Section -->
+    <div class="form-section">
+      <div class="input-row">
+        <div class="input-group">
+          <span class="prefix-icon">👤</span>
+          <input
+            v-model="formState.nickname"
+            type="text"
+            placeholder="输入你的昵称"
+            maxlength="20"
+            @keyup.enter="handleStart"
+          />
         </div>
-
-        <div class="entry-container">
-          <div class="entry-content">
-            <!-- Welcome Section -->
-            <div class="welcome-section">
-              <div class="welcome-icon">🤖</div>
-              <h2>和AI一起学HTML</h2>
-              <p>选择你喜欢的主题，让sync-PBL带你亲手打造第一个网站 ✨</p>
-            </div>
-
-            <!-- Form Section -->
-            <div class="form-section">
-              <div class="input-row">
-                <div class="input-group">
-                  <span class="prefix-icon">👤</span>
-                  <input 
-                    v-model="formState.nickname" 
-                    type="text" 
-                    placeholder="输入你的昵称" 
-                    maxlength="20"
-                    @keyup.enter="handleStart"
-                  />
-                </div>
-                <div class="input-group">
-                  <span class="prefix-icon">⭐</span>
-                  <select v-model="formState.theme">
-                    <option :value="undefined" disabled>选择学习主题</option>
-                    <option v-for="t in themes" :key="t.value" :value="t.value">
-                      {{ t.label }}
-                    </option>
-                  </select>
-                </div>
-              </div>
-
-              <button 
-                class="start-button" 
-                :disabled="loading || !formState.nickname || !formState.theme"
-                @click="handleStart"
-              >
-                <span v-if="loading">⏳ 启动中...</span>
-                <span v-else>▶️ 开始学习</span>
-              </button>
-            </div>
-          </div>
+        <div class="input-group">
+          <span class="prefix-icon">⭐</span>
+          <select v-model="formState.theme">
+            <option :value="undefined" disabled>选择学习主题</option>
+            <option v-for="t in themes" :key="t.value" :value="t.value">
+              {{ t.label }}
+            </option>
+          </select>
         </div>
       </div>
+
+      <button
+        class="start-button"
+        :disabled="loading || !formState.nickname || !formState.theme"
+        @click="handleStart"
+      >
+        <span v-if="loading">⏳ 启动中...</span>
+        <span v-else>▶️ 开始学习</span>
+      </button>
     </div>
   </div>
 </template>
@@ -143,10 +122,8 @@ const handleStart = async () => {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100vh;
   overflow: hidden;
   position: relative;
-  background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c, #4facfe, #00f2fe);
   background-size: 400% 400%;
   animation: gradientShift 8s ease-in-out infinite;
   font-family: 'Inter', system-ui, sans-serif;
@@ -178,7 +155,7 @@ const handleStart = async () => {
   padding: 0 32px;
   background: linear-gradient(90deg, #2563eb, #7c3aed);
   color: white;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .header-title {
@@ -199,6 +176,7 @@ const handleStart = async () => {
   cursor: pointer;
   transition: all 0.2s ease;
 }
+
 .lang-btn:hover {
   background-color: rgba(255, 255, 255, 0.3);
 }
@@ -214,7 +192,7 @@ const handleStart = async () => {
 .panel {
   background: white;
   border-radius: 12px;
-  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 900px;
   overflow: hidden;
@@ -230,6 +208,7 @@ const handleStart = async () => {
   background: linear-gradient(90deg, #2563eb, #7c3aed);
   color: white;
 }
+
 .panel-header h2 {
   font-size: 18px;
   margin: 0;
@@ -246,20 +225,29 @@ const handleStart = async () => {
   width: 100%;
   max-width: 500px;
   text-align: center;
+
+  /* 添加这些属性来实现完全居中 */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .welcome-section {
   margin-bottom: 40px;
 }
+
 .welcome-icon {
   font-size: 64px;
   margin-bottom: 16px;
 }
+
 .welcome-section h2 {
   font-size: 24px;
   font-weight: 700;
   margin-bottom: 8px;
 }
+
 .welcome-section p {
   color: #64748b;
 }
@@ -268,7 +256,7 @@ const handleStart = async () => {
   background: white;
   border-radius: 16px;
   padding: 32px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
 }
 
@@ -277,6 +265,7 @@ const handleStart = async () => {
   gap: 16px;
   margin-bottom: 32px;
 }
+
 @media (max-width: 640px) {
   .input-row {
     flex-direction: column;
@@ -310,7 +299,7 @@ input, select {
 
 input:focus, select:focus {
   border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 .start-button {
@@ -329,18 +318,26 @@ input:focus, select:focus {
   justify-content: center;
   gap: 8px;
 }
+
 .start-button:hover:not(:disabled) {
   background: #3730a3;
   transform: translateY(-2px);
 }
+
 .start-button:disabled {
   background: #d1d5db;
   cursor: not-allowed;
 }
 
 @keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 100%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 </style>
