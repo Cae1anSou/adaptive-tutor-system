@@ -15,6 +15,7 @@ import {
   ArrowLeftOutlined,
   ArrowRightOutlined
 } from '@ant-design/icons-vue'
+import { useChatContextStore } from '@/stores/chatContext'
 
 type LevelCard = {
   level: number
@@ -60,6 +61,7 @@ const MESSAGE_TYPES = {
 
 const route = useRoute()
 const router = useRouter()
+const chatContextStore = useChatContextStore()
 
 const loading = ref(false)
 const errorMessage = ref('')
@@ -164,8 +166,9 @@ async function syncTopicFromRoute(force = false) {
   if (!force && topicId === currentTopicId.value && learningContent.value) {
     return
   }
+  loadLearningContent(topicId)
   currentTopicId.value = topicId
-  await loadLearningContent(topicId)
+  chatContextStore.setContext('learning', topicId)
 }
 
 async function loadLearningContent(topicId: string) {
@@ -505,7 +508,8 @@ watch(
     <a-spin :spinning="loading" tip="正在初始化学习环境...">
       <template v-if="learningContent">
         <div class="content-container">
-          <div class="page-stack">
+          <div class="layout-grid">
+            <div class="main-column">
 
             <section class="panel example-panel">
               <div class="panel-header">
@@ -645,6 +649,9 @@ watch(
               </div>
             </section>
 
+            </div>
+            
+            <!-- side-column removed, using global SiderAI -->
           </div>
         </div>
       </template>
@@ -675,10 +682,30 @@ watch(
   width: 100%;
 }
 
-.page-stack {
+.layout-grid {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.main-column {
+  flex: 3;
+  min-width: 0; /* Prevent flexitem overflow */
   display: flex;
   flex-direction: column;
   gap: 24px;
+}
+
+/* DEPRECATED: side-column removed */
+
+.side-column {
+  display: none; /* 已移除侧边栏，因为 SiderLayout 已包含 AI 面板 */
+}
+
+.sticky-chat {
+  position: sticky;
+  top: 24px;
+  height: calc(100vh - 48px);
 }
 
 /* 通用面板样式 */
@@ -1076,8 +1103,19 @@ watch(
 
 /* 响应式适配 */
 @media (max-width: 1024px) {
-  .exploration-layout {
+  .layout-grid, .exploration-layout {
     grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+  
+  .side-column {
+    height: 600px;
+    min-width: 100%;
+  }
+  
+  .sticky-chat {
+    position: static;
+    height: 100%;
   }
 
   .browser-mockup {

@@ -24,7 +24,9 @@
     "tslib": "^2.8.1",
     "vis-network": "^10.0.2",
     "vue": "^3.5.12",
-    "vue-router": "^4.4.5"
+    "vue-router": "^4.4.5",
+    "ws": "^8.18.3",
+    "yarn": "^1.22.22"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",

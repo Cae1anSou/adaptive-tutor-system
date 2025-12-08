@@ -75,11 +75,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick } from 'vue';
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { RobotOutlined, EditOutlined, ArrowUpOutlined, LoadingOutlined } from '@ant-design/icons-vue';
 import MarkdownIt from 'markdown-it';
+import { message as antMessage } from 'ant-design-vue';
 
-// --- 逻辑部分完全保持不变 ---
+import websocket from '@/api/websocket';
+import { chatWithAi2ChatAiChat2Post } from '@/api/chat';
+import chatStorage, { type ChatMessage } from '@/utils/chatStorage';
+import { useUserStore } from '@/stores/user';
+import { useChatContextStore } from '@/stores/chatContext';
+
+// Store & State
+const userStore = useUserStore();
+const chatContextStore = useChatContextStore();
+
 interface Message {
   role: 'user' | 'assistant';
   content: string;
@@ -87,9 +97,7 @@ interface Message {
   isEditing?: boolean;
 }
 
-const messages = ref<Message[]>([
-  { role: 'assistant', content: '你好！我是你的 AI 助手，有什么可以帮你的吗？' }
-]);
+const messages = ref<Message[]>([]);
 const inputMessage = ref('');
 const editingContent = ref('');
 const isGlobalLoading = ref(false);
@@ -97,6 +105,7 @@ const isInputFocused = ref(false);
 const scrollRef = ref<HTMLElement | null>(null);
 const md = new MarkdownIt({ html: true, linkify: true });
 
+// Scroll Helper
 const scrollToBottom = async () => {
   await nextTick();
   if (scrollRef.value) {
@@ -106,33 +115,129 @@ const scrollToBottom = async () => {
 
 const renderMarkdown = (text: string) => md.render(text);
 
-const simulateStreamResponse = async () => {
-  isGlobalLoading.value = true;
-  const aiMsgIndex = messages.value.push({ role: 'assistant', content: '', isStreaming: true }) - 1;
-  await scrollToBottom();
+// --- Real Logic ---
 
-  const fullResponse = "这是一个模拟的流式回复。\n\n现在这个组件使用的是 **纯 CSS**，可以直接在 Antd 项目中使用而没有冲突。\n- 列表项 1\n- 列表项 2";
-  const chars = fullResponse.split('');
-
-  for (let char of chars) {
-    await new Promise(r => setTimeout(r, 30));
-    messages.value[aiMsgIndex].content += char;
+// 1. Initialize & Load History
+const initChat = () => {
+  if (userStore.participantId) {
+    const history = chatStorage.load(userStore.participantId);
+    // Transform storage format to UI format if needed
+    messages.value = history.map(h => ({
+      role: h.role, // 'user' | 'assistant'
+      content: h.content
+    })) as Message[];
+    
+    // If empty, add greeting
+    if (messages.value.length === 0) {
+       messages.value.push({ role: 'assistant', content: '你好！我是你的 AI 助手，有什么可以帮你的吗？' });
+    }
+    
     scrollToBottom();
   }
-
-  messages.value[aiMsgIndex].isStreaming = false;
-  isGlobalLoading.value = false;
 };
 
-const handleSend = () => {
-  const content = inputMessage.value.trim();
-  if (!content || isGlobalLoading.value) return;
-  messages.value.push({ role: 'user', content });
+// 2. WebSocket Subscription
+onMounted(() => {
+  initChat();
+  websocket.connect(); // Explicitly connect
+  websocket.subscribe('stream_start', handleStreamStart);
+  websocket.subscribe('streaming', handleStreaming);
+  websocket.subscribe('stream_end', handleStreamEnd);
+  
+  // Watch for external triggers (e.g. from TestPage)
+  watch(() => chatContextStore.pendingMessage, (newMsg) => {
+      if (newMsg) {
+          inputMessage.value = newMsg;
+          chatContextStore.clearPendingMessage();
+          handleSend();
+      }
+  });
+});
+
+onUnmounted(() => {
+  websocket.unsubscribe('stream_start', handleStreamStart);
+  websocket.unsubscribe('streaming', handleStreaming);
+  websocket.unsubscribe('stream_end', handleStreamEnd);
+});
+
+// 3. WS Handlers
+const handleStreamStart = () => {
+    isGlobalLoading.value = true;
+    messages.value.push({ role: 'assistant', content: '', isStreaming: true });
+    scrollToBottom();
+};
+
+const handleStreaming = (data: any) => {
+    const lastMsg = messages.value[messages.value.length - 1];
+    if (lastMsg && lastMsg.role === 'assistant') {
+        lastMsg.content += (data.message || '');
+        scrollToBottom();
+    }
+};
+
+const handleStreamEnd = () => {
+    isGlobalLoading.value = false;
+    const lastMsg = messages.value[messages.value.length - 1];
+    if (lastMsg) {
+        lastMsg.isStreaming = false;
+        // Persist to storage
+        if (userStore.participantId) {
+            chatStorage.append(userStore.participantId, {
+                role: 'assistant',
+                content: lastMsg.content,
+                ts: Date.now(),
+                mode: chatContextStore.mode,
+                contentId: chatContextStore.contentId
+            });
+        }
+    }
+};
+
+// 4. Send Message
+const handleSend = async () => {
+  const text = inputMessage.value.trim();
+  if (!text || isGlobalLoading.value) return;
+
+  // Add User Message
+  messages.value.push({ role: 'user', content: text });
   inputMessage.value = '';
   scrollToBottom();
-  simulateStreamResponse();
+
+  // Save user message
+  if (userStore.participantId) {
+      chatStorage.append(userStore.participantId, {
+          role: 'user',
+          content: text,
+          ts: Date.now(),
+          mode: chatContextStore.mode,
+          contentId: chatContextStore.contentId
+      });
+  }
+
+  isGlobalLoading.value = true;
+
+  try {
+      // Prepare context code if available (from context store or basic implementation)
+      // For now, we use a simple placeholder, but this can be enhanced
+      const codeContext = { html: '', css: '', js: '' }; 
+      
+      await chatWithAi2ChatAiChat2Post({
+         participant_id: userStore.participantId || '',
+         user_message: text,
+         conversation_history: messages.value.map(m => ({ role: m.role, content: m.content })),
+         mode: chatContextStore.mode,
+         content_id: chatContextStore.contentId,
+         code_context: codeContext 
+      });
+  } catch (e) {
+      console.error(e);
+      antMessage.error('发送失败，请稍后重试');
+      isGlobalLoading.value = false;
+      // Optionally remove the user message or show error state
+  }
 };
 
+// 5. Editing Logic (Kept mostly same, adjusted to call handleSend)
 const startEditing = (index: number) => {
   messages.value.forEach(m => m.isEditing = false);
   messages.value[index].isEditing = true;
@@ -146,9 +251,12 @@ const cancelEditing = (index: number) => {
 const confirmEdit = (index: number) => {
   const newContent = editingContent.value.trim();
   if (!newContent) return;
+  
+  // Cut off history after this point
   messages.value = messages.value.slice(0, index);
-  messages.value.push({ role: 'user', content: newContent });
-  simulateStreamResponse();
+  // Set as input and send
+  inputMessage.value = newContent;
+  handleSend();
 };
 </script>
 
