@@ -22,6 +22,10 @@ class WebSocketManager {
         if (this.subscribers[type]) {
             this.subscribers[type].forEach(cb => cb(data))
         }
+        // Fallback: also try 'message' type if not found, or generic handler
+        if (this.subscribers['*']) {
+            this.subscribers['*'].forEach(cb => cb(data))
+        }
     }
 
     connect() {

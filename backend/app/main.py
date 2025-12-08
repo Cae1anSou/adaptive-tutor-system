@@ -20,14 +20,16 @@ async def lifespan(app: FastAPI):
     在应用生命周期里启动 redis_subscriber 作为后台任务，并在关闭时取消它。
     保证订阅器和 ws_manager 在同一进程内。
     """
-    # 启动订阅协程（不会阻塞主线程）
     logging.info("启动 Redis 订阅器任务")
-    app.state.redis_task = asyncio.create_task(redis_subscriber())
+    
+    try:
+        app.state.redis_task = asyncio.create_task(redis_subscriber())
+    except Exception as e:
+        logging.error(f"Redis 订阅器启动失败: {e}", exc_info=True)
 
     try:
         yield
     finally:
-        # 关闭时取消任务并等待其结束
         logging.info("取消 Redis 订阅器任务")
         task = getattr(app.state, "redis_task", None)
         if task:

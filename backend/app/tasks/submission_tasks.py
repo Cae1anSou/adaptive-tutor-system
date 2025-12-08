@@ -68,8 +68,9 @@ def process_submission_task(self, submission_data: dict):
             message=evaluation_result,
         )
         redis_client = get_redis_client()
-        redis_client.publish(f"ws:user:{submission_data['participant_id']}",  message.model_dump_json())
-        logger.info("测评结果已Publish到Redis")
+        channel = f"ws:user:{submission_data['participant_id']}"
+        redis_client.publish(channel, message.model_dump_json())
+        logger.info(f"测评结果已发布到 {channel}")
 
         # 5. 返回评测结果
         return evaluation_result

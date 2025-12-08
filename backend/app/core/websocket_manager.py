@@ -22,5 +22,4 @@ class WebSocketManager:
         if participant_id in self.active_connections:
             websocket = self.active_connections[participant_id]
             await websocket.send_text(message)
-            print(f"发送完毕")
 ws_manager = WebSocketManager()

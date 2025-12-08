@@ -21,10 +21,11 @@ async def redis_subscriber():
                 channel = message["channel"]
                 if isinstance(channel, bytes):
                     channel = channel.decode()
-                print(channel)
                 #channel = message["channel"].decode()  # ws:user:{participant_id}
                 raw_data = message["data"]
-                print(raw_data)
+                if isinstance(raw_data, bytes):
+                    raw_data = raw_data.decode('utf-8')
+                logger.info(f"[redis_subscriber] 原始数据: {raw_data[:200]}...")
 
                 try:
                     payload = json.loads(raw_data)
@@ -33,7 +34,8 @@ async def redis_subscriber():
                     continue
 
                 participant_id = channel.split(":")[-1]
-                logger.debug(f"准备分发消息给用户 {participant_id}: {payload}")
+                logger.info(f"[redis_subscriber] 准备分发消息给用户: {participant_id}")
+                logger.info(f"[redis_subscriber] 当前活跃连接: {list(ws_manager.active_connections.keys())}")
 
                 # 启动异步任务，防止阻塞主循环
                 asyncio.create_task(ws_manager.send_to_user(participant_id, raw_data))

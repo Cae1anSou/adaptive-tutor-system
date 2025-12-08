@@ -19,7 +19,7 @@ class Settings(BaseSettings):
 
 
     # Embedding API (can be different from OpenAI)
-    TUTOR_EMBEDDING_API_KEY: str = "ms-e9cb1ee1-d248-4f05-87d1-fbc2083c41ae"
+    TUTOR_EMBEDDING_API_KEY: str = "ms-08d66bd4-9c6c-4c18-9b46-100501d4894b"
     TUTOR_EMBEDDING_API_BASE: str = "https://ms-fc-1d889e1e-d2ad.api-inference.modelscope.cn/v1"
     TUTOR_EMBEDDING_MODEL: str = "Qwen/Qwen3-Embedding-4B-GGUF"
 

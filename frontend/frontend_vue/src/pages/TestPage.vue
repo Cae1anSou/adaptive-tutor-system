@@ -18,9 +18,9 @@ import type * as Monaco from 'monaco-editor'
 import loader from '@monaco-editor/loader'
 import {getTestTaskTestTasksTopicIdGet} from '@/api/testTasks'
 import {
-  submitTest2SubmissionSubmitTest2Post,
-  getSubmissionResultSubmissionSubmitTest2ResultTaskIdGet
+  submitTest2SubmissionSubmitTest2Post
 } from '@/api/submission'
+import websocket from '@/api/websocket'
 
 const route = useRoute()
 const router = useRouter()
@@ -61,6 +61,7 @@ watch(testResult, (v) => {
 })
 const chatMessages = ref<any[]>([])
 const participantId = ref('')
+const currentTaskId = ref('')
 type StandaloneCodeEditor = Monaco.editor.IStandaloneCodeEditor
 const htmlEditor = ref<StandaloneCodeEditor | null>(null)
 const cssEditor = ref<StandaloneCodeEditor | null>(null)
@@ -205,17 +206,23 @@ async function initializeMonacoEditor() {
 // 生命周期
 onMounted(async () => {
   await initializePage()
+  
+  // Setup WebSocket for real-time results
+  websocket.connect()
+  websocket.subscribe('submission_result', handleSubmissionResult)
+  
   await nextTick()
   await initializeMonacoEditor()
 })
 onUnmounted(() => {
+  websocket.unsubscribe('submission_result', handleSubmissionResult)
   htmlEditor.value?.dispose(); cssEditor.value?.dispose(); jsEditor.value?.dispose()
 })
 
 // 业务函数简化 (保持原有核心逻辑)
 async function initializePage() {
   let topicId = route.params.topicId as string || route.query.topic as string || '1_1'
-  participantId.value = localStorage.getItem('participantId') || 'anonymous'
+  participantId.value = localStorage.getItem('participant_id') || 'anonymous'
   
   // Initialize AI Context
   chatStore.setContext('test', topicId)
@@ -241,29 +248,52 @@ async function loadTestTask(topicId: string) {
 async function submitCode() {
   if (!testTask.value) return
   submitting.value = true
+  testResult.value = null // Clear previous result
   try {
     const res = await submitTest2SubmissionSubmitTest2Post({
       participant_id: participantId.value, topic_id: testTask.value.topic_id, code: currentCode.value
     })
-    if (res.data?.data) pollSubmissionResult(res.data.data.task_id)
-  } catch (e) { message.error('提交异常'); submitting.value = false }
+    if (res.data?.data) {
+      currentTaskId.value = res.data.data.task_id
+      message.loading({ content: '正在运行测试用例...', key: 'testing' })
+    }
+  } catch (e) { 
+    message.error('提交异常'); 
+    submitting.value = false 
+  }
 }
 
-async function pollSubmissionResult(taskId: string) {
-  let attempts = 0
-  const poll = async () => {
-    try {
-      const res = await getSubmissionResultSubmissionSubmitTest2ResultTaskIdGet({task_id: taskId})
-      if (res.data?.data) {
-        testResult.value = res.data.data
-        showAskAI.value = !res.data.data.passed
-        submitting.value = false
-        if (res.data.data.passed) message.success('测试通过')
-      } else if (attempts++ < 30) setTimeout(poll, 1000)
-      else { message.error('超时'); submitting.value = false }
-    } catch { submitting.value = false }
+function handleSubmissionResult(payload: any) {
+  // Payload is SocketResponse2: { type, taskid, message: EvaluationResult, ... }
+  // EvaluationResult: { passed, message, details, ... }
+
+  // Verify if this result matches our current task
+  // Backend sends 'taskid', distinct from 'task_id' in other places
+  const incomingTaskId = payload.taskid || payload.task_id
+  if (incomingTaskId && currentTaskId.value && incomingTaskId !== currentTaskId.value) {
+    return
   }
-  poll()
+  
+  message.destroy('testing') // Stop loading message
+  
+  const result = payload.message || payload // Fallback if structure changes
+  
+  if (payload.error || result.error) {
+     const errMsg = (payload.error?.message || payload.error) ?? result.error
+     message.error('测试运行出错: ' + errMsg)
+     submitting.value = false
+     return
+  }
+
+  testResult.value = result
+  showAskAI.value = !result.passed
+  submitting.value = false
+  
+  if (result.passed) {
+    message.success('测试通过')
+  } else {
+    message.error('测试未通过')
+  }
 }
 
 function handleTabChange(tab: string) {
