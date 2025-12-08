@@ -217,23 +217,63 @@ const handleSend = async () => {
   isGlobalLoading.value = true;
 
   try {
-      // Prepare context code if available (from context store or basic implementation)
-      // For now, we use a simple placeholder, but this can be enhanced
-      const codeContext = { html: '', css: '', js: '' }; 
-      
+      // Prepare Context
+      let codeContext = { html: '', css: '', js: '' };
+      let testResults = null;
+      let augmentedMessage = text;
+
+      if (chatContextStore.mode === 'test') {
+          // Code Context
+          codeContext = { ...chatContextStore.codeContext };
+          
+          // Test Results Context
+          if (chatContextStore.taskContext.status) {
+              testResults = [{
+                  passed: chatContextStore.taskContext.status === 'success',
+                  message: chatContextStore.taskContext.error || ''
+              }];
+              
+              // Append status to message to ensure AI attention
+              augmentedMessage += `\n\n[System Context]\nTest Status: ${chatContextStore.taskContext.status}`;
+              if (chatContextStore.taskContext.error) {
+                  augmentedMessage += `\nError Message: ${chatContextStore.taskContext.error}`;
+              }
+          }
+          
+          // Task Description (Optional, if AI needs it explicitly in context)
+          if (chatContextStore.taskContext.description) {
+             // Just a hint, usually content_id handles this on backend, but we can provide snippet if needed
+             // augmentedMessage += `\nTask Description Snippet: ...`;
+          }
+
+      } else if (chatContextStore.mode === 'learning') {
+          // Selection Context
+          if (chatContextStore.selectionContext.code) {
+              codeContext.html = chatContextStore.selectionContext.code; // Treat selected HTML as the html context
+              
+              if (chatContextStore.selectionContext.meta) {
+                  augmentedMessage += `\n\n[Selected Element Info]\nMetadata: ${JSON.stringify(chatContextStore.selectionContext.meta)}`;
+              }
+          }
+          
+          if (chatContextStore.additionalContext.title) {
+               // augmentedMessage += `\nLearning Topic: ${chatContextStore.additionalContext.title}`;
+          }
+      }
+
       await chatWithAi2ChatAiChat2Post({
          participant_id: userStore.participantId || '',
-         user_message: text,
+         user_message: augmentedMessage,
          conversation_history: messages.value.map(m => ({ role: m.role, content: m.content })),
          mode: chatContextStore.mode,
          content_id: chatContextStore.contentId,
-         code_context: codeContext 
+         code_context: codeContext,
+         test_results: testResults
       });
   } catch (e) {
       console.error(e);
       antMessage.error('发送失败，请稍后重试');
       isGlobalLoading.value = false;
-      // Optionally remove the user message or show error state
   }
 };
 

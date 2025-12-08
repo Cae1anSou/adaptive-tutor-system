@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import {ref, onMounted, onUnmounted, computed, nextTick} from 'vue'
+import {ref, onMounted, onUnmounted, computed, nextTick, watch} from 'vue'
+import {useChatContextStore} from '@/stores/chatContext'
 import {useRoute, useRouter} from 'vue-router'
 import {message} from 'ant-design-vue'
 import {
@@ -23,6 +24,9 @@ import {
 
 const route = useRoute()
 const router = useRouter()
+const chatStore = useChatContextStore()
+
+
 
 // --- 业务逻辑保持不变 ---
 const loading = ref(false)
@@ -33,6 +37,28 @@ type CodeState = { html: string; css: string; js: string }
 const currentCode = ref<CodeState>({html: '', css: '', js: ''})
 const activeTab = ref('html')
 const showAskAI = ref(false)
+
+// Sync Code
+watch(currentCode, (v) => {
+  chatStore.updateCodeContext(v.html, v.css, v.js)
+}, { deep: true })
+
+// Sync Task Info
+watch(testTask, (v) => {
+  if (v) {
+    chatStore.updateTaskContext({ description: v.description_md })
+  }
+})
+
+// Sync Result
+watch(testResult, (v) => {
+  if (v) {
+    chatStore.updateTaskContext({
+      status: v.passed ? 'success' : 'failed',
+      error: v.message
+    })
+  }
+})
 const chatMessages = ref<any[]>([])
 const participantId = ref('')
 type StandaloneCodeEditor = Monaco.editor.IStandaloneCodeEditor
@@ -190,6 +216,10 @@ onUnmounted(() => {
 async function initializePage() {
   let topicId = route.params.topicId as string || route.query.topic as string || '1_1'
   participantId.value = localStorage.getItem('participantId') || 'anonymous'
+  
+  // Initialize AI Context
+  chatStore.setContext('test', topicId)
+  
   await loadTestTask(topicId)
 }
 

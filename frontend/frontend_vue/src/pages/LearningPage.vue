@@ -168,6 +168,7 @@ async function syncTopicFromRoute(force = false) {
   }
   loadLearningContent(topicId)
   currentTopicId.value = topicId
+  // Update context ID, content will be updated when loaded
   chatContextStore.setContext('learning', topicId)
 }
 
@@ -179,6 +180,11 @@ async function loadLearningContent(topicId: string) {
     const body = response.data
     if (body?.code === 200 && body.data) {
       learningContent.value = body.data
+      // Sync content details to AI context
+      chatContextStore.additionalContext = {
+        title: body.data.title,
+        levels: body.data.levels
+      }
     } else {
       learningContent.value = null
       errorMessage.value = body?.message || '加载学习内容失败'
@@ -477,6 +483,11 @@ watch(includeCumulative, newValue => {
 watch(allowedElements, newElements => {
   if (!selectorBridge.value) return
   selectorBridge.value.updateMode(includeCumulative.value, newElements)
+})
+
+// Sync selection to AI context
+watch([selectedElementCode, selectedElementMeta], ([code, meta]) => {
+  chatContextStore.updateSelectionContext(code, meta)
 })
 
 watch(
