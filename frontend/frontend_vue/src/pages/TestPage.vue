@@ -2,6 +2,7 @@
 import {ref, onMounted, onUnmounted, computed, nextTick, watch} from 'vue'
 import {useChatContextStore} from '@/stores/chatContext'
 import {useRoute, useRouter} from 'vue-router'
+import {useActiveHint, type HintEventDetail} from '@/composables/useActiveHint'
 import {message} from 'ant-design-vue'
 import {
   FileTextOutlined,
@@ -59,6 +60,35 @@ watch(testResult, (v) => {
     })
   }
 })
+
+// --- 主动提示逻辑 ---
+// 为了让 useActiveHint 能监听 specific code changes，我们需要传递 Ref
+const htmlCode = computed(() => currentCode.value.html)
+const cssCode = computed(() => currentCode.value.css)
+const jsCode = computed(() => currentCode.value.js)
+
+const handleHintTriggered = (detail: HintEventDetail) => {
+  console.log('[ActiveHint Triggered]', detail)
+  
+  // 直接通过 ChatStore 添加系统消息
+  chatStore.messages.push({
+    role: 'system',
+    id: Date.now().toString(),
+    content: detail.message,
+    createdAt: Date.now()
+  })
+  
+  // 如果需要弹窗提醒也可以在这里做 message.info(detail.message)
+}
+
+// 初始化主动提示 Hook
+// 注意：topicId 是响应式的，但在 hook 内部我们只取了初始值或者需要 watch 它的变化
+// 这里简单起见，我们假设 page reload 才会换 topic，或者我们传递一个 getter
+const activeHint = useActiveHint(
+  { html: htmlCode, css: cssCode, js: jsCode },
+  route.params.topicId as string || 'unknown',
+  handleHintTriggered
+)
 const chatMessages = ref<any[]>([])
 const participantId = ref('')
 const currentTaskId = ref('')

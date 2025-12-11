@@ -15,6 +15,9 @@ export const useChatContextStore = defineStore('chatContext', () => {
     const taskContext = ref({ description: '', error: '', status: '' }) // For TestPage
     const selectionContext = ref<{ code: string, meta: any }>({ code: '', meta: null }) // For LearningPage
 
+    // Chat Message History (Centralized)
+    const messages = ref<Array<{ role: string, content: string, id: string, createdAt: number }>>([])
+
     function setContext(newMode: string, newContentId: string, contextData: any = {}) {
         mode.value = newMode
         contentId.value = newContentId
@@ -45,6 +48,15 @@ export const useChatContextStore = defineStore('chatContext', () => {
         pendingMessage.value = ''
     }
 
+    function addMessage(role: 'user' | 'ai' | 'system', content: string) {
+        messages.value.push({
+            role,
+            content,
+            id: Date.now().toString() + Math.random().toString().slice(2, 6),
+            createdAt: Date.now()
+        })
+    }
+
     return {
         mode,
         contentId,
@@ -53,9 +65,11 @@ export const useChatContextStore = defineStore('chatContext', () => {
         codeContext,
         taskContext,
         selectionContext,
+        messages, // Export messages
         setContext,
         triggerAskAI,
         clearPendingMessage,
+        addMessage, // Export action
         updateCodeContext,
         updateTaskContext,
         updateSelectionContext

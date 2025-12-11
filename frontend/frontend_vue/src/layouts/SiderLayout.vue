@@ -2,6 +2,9 @@
 import { ref } from 'vue';
 import { RouterView } from 'vue-router';
 import SiderAI from "@/components/SiderAI.vue";
+import { useUserStore } from "@/stores/user";
+
+const userStore = useUserStore();
 
 // 底部版权信息
 const footerText = 'Copyright © 2025 syncPBL by 宋曹卢余蔡吴林';
@@ -17,7 +20,7 @@ const collapsed = ref(false);
         <span>SyncPBL智能教学平台</span>
       </div>
       <div class="header-menu">
-        Header Content
+            <span>欢迎您，{{ userStore.nickname }}</span>
       </div>
     </a-layout-header>
 

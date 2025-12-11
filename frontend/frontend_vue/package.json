@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@monaco-editor/loader": "^1.6.1",
+    "@vueuse/core": "^14.1.0",
     "ant-design-vue": "^4.2.6",
     "axios": "^1.12.2",
     "markdown-it": "^14.1.0",

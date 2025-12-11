@@ -6,7 +6,7 @@
         <robot-outlined class="icon" />
         <span>AI Assistant</span>
       </div>
-      <span class="model-tag">GPT-4o</span>
+      <span class="model-tag">Deepseek-V3.1</span>
     </div>
 
     <div ref="scrollRef" class="message-list custom-scrollbar">
@@ -20,6 +20,13 @@
             <div class="markdown-body" v-html="renderMarkdown(msg.content)"></div>
             <span v-if="msg.isStreaming" class="cursor-blink"></span>
           </div>
+        </div>
+
+        <div v-else-if="msg.role === 'system'" class="msg-system animate-fade-in">
+             <div class="system-bubble">
+                <div class="system-icon"><bulb-outlined /></div>
+                <div class="system-content">{{ msg.content }}</div>
+             </div>
         </div>
 
         <div v-else class="msg-user animate-slide-up">
@@ -76,7 +83,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
-import { RobotOutlined, EditOutlined, ArrowUpOutlined, LoadingOutlined } from '@ant-design/icons-vue';
+import { RobotOutlined, EditOutlined, ArrowUpOutlined, LoadingOutlined, BulbOutlined } from '@ant-design/icons-vue';
 import MarkdownIt from 'markdown-it';
 import { message as antMessage } from 'ant-design-vue';
 
@@ -91,10 +98,11 @@ const userStore = useUserStore();
 const chatContextStore = useChatContextStore();
 
 interface Message {
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'system';
   content: string;
   isStreaming?: boolean;
   isEditing?: boolean;
+  id?: string; // Optional ID for de-duplication
 }
 
 const messages = ref<Message[]>([]);
@@ -123,7 +131,7 @@ const initChat = () => {
     const history = chatStorage.load(userStore.participantId);
     // Transform storage format to UI format if needed
     messages.value = history.map(h => ({
-      role: h.role, // 'user' | 'assistant'
+      role: h.role as any, // 'user' | 'assistant'
       content: h.content
     })) as Message[];
     
@@ -145,6 +153,7 @@ onMounted(() => {
   websocket.subscribe('stream_end', handleStreamEnd);
   
   // Watch for external triggers (e.g. from TestPage)
+  // Input trigger
   watch(() => chatContextStore.pendingMessage, (newMsg) => {
       if (newMsg) {
           inputMessage.value = newMsg;
@@ -152,6 +161,28 @@ onMounted(() => {
           handleSend();
       }
   });
+
+  // Message Sync Trigger (From ActiveHint or other sources)
+  watch(() => chatContextStore.messages, (newStoreMessages) => {
+      if (newStoreMessages && newStoreMessages.length > 0) {
+          // Find messages that are not in local state
+          // Using a simple check: loop through store messages and see if ID matches
+          // Since local messages might not have IDs (from storage), we might need to rely on timestamps or content if ID missing
+          // But ActiveHint messages HAVE IDs.
+          
+          newStoreMessages.forEach(storeMsg => {
+             const exists = messages.value.some(m => m.id === storeMsg.id);
+             if (!exists) {
+                 messages.value.push({
+                     role: storeMsg.role as any,
+                     content: storeMsg.content,
+                     id: storeMsg.id
+                 });
+                 scrollToBottom();
+             }
+          });
+      }
+  }, { deep: true });
 });
 
 onUnmounted(() => {
@@ -383,6 +414,37 @@ const confirmEdit = (index: number) => {
   font-size: 14px;
   line-height: 1.6;
   color: #4b5563;
+}
+
+/* 系统消息样式 */
+.msg-system {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.system-bubble {
+  background: #f0f7ff; /* 浅蓝色背景 */
+  border: 1px solid #bae0ff;
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 90%;
+  color: #1677ff;
+  font-size: 13px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.system-icon {
+  font-size: 16px;
+  margin-top: 2px;
+}
+
+.system-content {
+  line-height: 1.5;
+  color: #1f2937;
 }
 
 /* 用户消息样式 */

@@ -13,7 +13,7 @@ const footerText = 'Copyright © 2025 syncPBL by 宋曹卢余蔡吴林';
             <span>SyncPBL智能教学平台</span>
           </div>
           <div class="nav-area">
-            Header Content
+            <span>欢迎您，{{ userStore.name }}</span>
           </div>
         </div>
       </a-layout-header>
