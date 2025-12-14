@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router';
+import { computed } from 'vue';
+import { RouterView, useRoute } from 'vue-router';
+import { useUserStore } from '@/stores/user';
+
+const userStore = useUserStore();
+const route = useRoute();
+
+const isLoginPage = computed(() => route.name === 'login');
 
 const footerText = 'Copyright © 2025 syncPBL by 宋曹卢余蔡吴林';
 </script>
@@ -13,7 +20,8 @@ const footerText = 'Copyright © 2025 syncPBL by 宋曹卢余蔡吴林';
             <span>SyncPBL智能教学平台</span>
           </div>
           <div class="nav-area">
-            <span>欢迎您，{{ userStore.name }}</span>
+            <span v-if="!isLoginPage">欢迎您，{{ userStore.nickname }}</span>
+            <span v-else>未登录</span>
           </div>
         </div>
       </a-layout-header>
