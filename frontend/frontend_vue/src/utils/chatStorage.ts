@@ -21,10 +21,12 @@ export default {
     },
 
     append(participantId: string, message: ChatMessage) {
+        const key = STORAGE_KEY_PREFIX + participantId
         try {
-            const history = this.load(participantId)
+            const existing = localStorage.getItem(key)
+            const history = existing ? JSON.parse(existing) : []
             history.push(message)
-            localStorage.setItem(STORAGE_KEY_PREFIX + participantId, JSON.stringify(history))
+            localStorage.setItem(key, JSON.stringify(history))
         } catch (e) {
             console.error('Failed to save chat history', e)
         }

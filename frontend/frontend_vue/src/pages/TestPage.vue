@@ -106,18 +106,23 @@ const isMobile = computed(() => window.innerWidth <= 768)
 
 // --- 现代简洁风格定义 (Modern Clean UI) ---
 
-// 1. 页面容器：使用浅灰背景，营造沉浸式工作台感觉
-const testPageStyle = computed(() => ({
+// 1. 页面容器静态样式（提升性能，避免每次创建新对象）
+const STATIC_PAGE_STYLE = {
   display: 'grid',
-  gridTemplateColumns: isMobile.value ? '1fr' : '380px 1fr', // 左侧定宽或比例，右侧自适应
-  gridTemplateRows: isMobile.value ? 'auto auto 500px' : '1fr', // 桌面端单行两列
+  gridTemplateRows: isMobile.value ? 'auto auto 500px' : '1fr',
   gap: '16px',
   height: '100%',
   padding: '16px',
   width: '100%',
   boxSizing: 'border-box',
-  backgroundColor: '#f5f7fa', // 极浅的蓝灰色背景
+  backgroundColor: '#f5f7fa',
   fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+}
+
+// 1. 页面容器：使用浅灰背景，营造沉浸式工作台感觉
+const testPageStyle = computed(() => ({
+  ...STATIC_PAGE_STYLE,
+  gridTemplateColumns: isMobile.value ? '1fr' : '380px 1fr'
 }))
 
 // 2. 左侧侧边栏容器（包含题目和结果）

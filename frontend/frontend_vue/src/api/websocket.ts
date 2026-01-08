@@ -34,7 +34,21 @@ class WebSocketManager {
             console.warn('No participant ID, skipping WS connect')
             return
         }
-        if (this.socket && this.socket.readyState === WebSocket.OPEN) return
+
+        // 已有活跃连接，不重复创建
+        if (this.socket?.readyState === WebSocket.OPEN) {
+            return
+        }
+
+        // 连接中，不重复创建
+        if (this.socket?.readyState === WebSocket.CONNECTING) {
+            return
+        }
+
+        // 关闭旧连接后重建
+        if (this.socket) {
+            this.socket.close()
+        }
 
         let protocol = 'ws'
         if (window.location.protocol === 'https:') {

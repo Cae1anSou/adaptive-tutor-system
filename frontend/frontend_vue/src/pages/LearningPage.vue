@@ -460,18 +460,21 @@ watch(
     syncTopicFromRoute().catch(error => {
       console.error('[LearningPage] 路由同步失败:', error)
     })
-  }
+  },
+  { deep: false }
 )
 
 watch(
   () => learningContent.value?.topic_id,
-  () => {
-    selectorBridge.value?.stop()
-    selectedElementMeta.value = null
-    selectedElementCode.value = defaultCodeMessage
-    includeCumulative.value = false
-    isSelecting.value = false
-    expandedLevels.value = []
+  (newVal, oldVal) => {
+    if (newVal !== oldVal) {
+      selectorBridge.value?.stop()
+      selectedElementMeta.value = null
+      selectedElementCode.value = defaultCodeMessage
+      includeCumulative.value = false
+      isSelecting.value = false
+      expandedLevels.value = []
+    }
   }
 )
 

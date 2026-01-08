@@ -498,7 +498,7 @@ function toggleChapterWithScaleAnimation(chapterId: string) {
   }
 }
 
-// 展开动画 - 适配当前大小
+// 展开动画 - 适配当前大小 (优化：使用 requestAnimationFrame)
 function expandWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], chapterId: string) {
   // 1. 先显示节点和边，但设置为最小状态
   console.log('展开:', chapterId);
@@ -532,14 +532,23 @@ function expandWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], chap
 
   // 2. 给物理引擎一点时间适应新节点
   setTimeout(function() {
-    // 3. 逐步放大节点和边
+    // 3. 使用 requestAnimationFrame 逐步放大节点和边
     var steps = ANIMATION_STEPS;
     var currentStep = 0;
+    var startTime: number | null = null;
+    var animationFrameId: number;
 
-    var animationInterval = setInterval(function() {
-      currentStep++;
+    // 动画总时长 (ms)
+    var ANIMATION_DURATION = steps * ANIMATION_INTERVAL;
 
-      var progress = currentStep / steps;
+    function animateExpand(timestamp: number) {
+      if (!startTime) startTime = timestamp;
+      var elapsed = timestamp - startTime;
+
+      // 计算当前进度
+      var progress = Math.min(elapsed / ANIMATION_DURATION, 1);
+      currentStep = Math.floor(progress * steps);
+
       var easeProgress = easeOutCubic(progress);
 
       // 计算当前步骤的大小 - 适配当前配置
@@ -578,9 +587,7 @@ function expandWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], chap
       edges.update(edgeUpdates);
 
       // 动画完成
-      if (currentStep >= steps) {
-        clearInterval(animationInterval);
-
+      if (progress >= 1) {
         // 恢复节点原始颜色
         var finalUpdates = sectionNodes.map(function (section: any) {
           return {
@@ -616,24 +623,38 @@ function expandWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], chap
         setTimeout(function() {
           animationInProgress.value[chapterId] = false;
         }, 200);
+      } else {
+        // 继续动画
+        animationFrameId = requestAnimationFrame(animateExpand);
       }
-    }, ANIMATION_INTERVAL);
+    }
+
+    animationFrameId = requestAnimationFrame(animateExpand);
   }, 50);
 }
 
-// 收缩动画 - 适配当前大小
+// 收缩动画 - 适配当前大小 (优化：使用 requestAnimationFrame)
 function collapseWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], chapterId: string) {
    console.log('收缩:', chapterId);
    console.log('sectionNodes:', sectionNodes);
+
   // 逐步缩小节点和边
   var steps = ANIMATION_STEPS;
   var currentStep = 0;
+  var startTime: number | null = null;
+  var animationFrameId: number;
 
-  var animationInterval = setInterval(function() {
-    //console.log('currentStep:', currentStep);
-    currentStep++;
+  // 动画总时长 (ms)
+  var ANIMATION_DURATION = steps * ANIMATION_INTERVAL;
 
-    var progress = currentStep / steps;
+  function animateCollapse(timestamp: number) {
+    if (!startTime) startTime = timestamp;
+    var elapsed = timestamp - startTime;
+
+    // 计算当前进度
+    var progress = Math.min(elapsed / ANIMATION_DURATION, 1);
+    currentStep = Math.floor(progress * steps);
+
     var easeProgress = easeInCubic(progress);
 
     // 计算当前步骤的大小 - 适配当前配置
@@ -672,9 +693,7 @@ function collapseWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], ch
     edges.update(edgeUpdates);
 
     // 动画完成
-    if (currentStep >= steps) {
-      clearInterval(animationInterval);
-
+    if (progress >= 1) {
       // 隐藏节点和边
       var hideNodeUpdates = sectionNodes.map(function (section: any) {
         return {
@@ -708,8 +727,13 @@ function collapseWithScaleAnimation(sectionNodes: any[], sectionEdges: any[], ch
       setTimeout(function() {
         animationInProgress.value[chapterId] = false;
       }, 200);
+    } else {
+      // 继续动画
+      animationFrameId = requestAnimationFrame(animateCollapse);
     }
-  }, ANIMATION_INTERVAL);
+  }
+
+  animationFrameId = requestAnimationFrame(animateCollapse);
 }
 
 // 缓动函数

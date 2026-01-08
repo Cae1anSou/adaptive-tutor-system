@@ -163,26 +163,25 @@ onMounted(() => {
   });
 
   // Message Sync Trigger (From ActiveHint or other sources)
-  watch(() => chatContextStore.messages, (newStoreMessages) => {
-      if (newStoreMessages && newStoreMessages.length > 0) {
-          // Find messages that are not in local state
-          // Using a simple check: loop through store messages and see if ID matches
-          // Since local messages might not have IDs (from storage), we might need to rely on timestamps or content if ID missing
-          // But ActiveHint messages HAVE IDs.
-          
-          newStoreMessages.forEach(storeMsg => {
-             const exists = messages.value.some(m => m.id === storeMsg.id);
-             if (!exists) {
-                 messages.value.push({
-                     role: storeMsg.role as any,
-                     content: storeMsg.content,
-                     id: storeMsg.id
-                 });
-                 scrollToBottom();
-             }
-          });
+  // 优化：监听数组长度变化而非 deep watch，提升性能
+  watch(
+    () => chatContextStore.messages.length,
+    (newLength, oldLength) => {
+      if (newLength > oldLength && chatContextStore.messages.length > 0) {
+          const newMsg = chatContextStore.messages[chatContextStore.messages.length - 1]
+          // 使用 ID 去重，避免重复添加
+          const exists = messages.value.some(m => m.id === newMsg.id)
+          if (!exists) {
+              messages.value.push({
+                  role: newMsg.role as any,
+                  content: newMsg.content,
+                  id: newMsg.id
+              })
+              scrollToBottom()
+          }
       }
-  }, { deep: true });
+    }
+  )
 });
 
 onUnmounted(() => {
