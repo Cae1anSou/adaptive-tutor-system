@@ -21,6 +21,7 @@ const dialogState = reactive({
   action: 'learn', // 'learn' 或 'test'
   requiredKnowledgeId: '',
   requiredKnowledgeName: '',
+  requiredChapter: '',
   requiredChapterId: '',
   requiredChapterName: '',
   reason:''
@@ -52,8 +53,17 @@ const isNodeLearned = (nodeId: string, learnedNodes: string[]): boolean => {
   return learnedNodes.includes(nodeId)
 }
 
+interface JumpResult {
+  canJump: boolean;
+  reason: string;
+  requiredChapter?: string;
+  requiredChapterName?: string;
+  requiredKnowledgeId?: string;
+  requiredKnowledgeName?: string;
+}
+
 // 检查知识点是否可以跳跃学习（新规则：章节测试解锁下一章节，知识点间需要内部解锁）
-const canJumpToKnowledge = (knowledgeId: string, graphData: any, learnedNodes: string[]) => {
+const canJumpToKnowledge = (knowledgeId: string, graphData: any, learnedNodes: string[]): JumpResult => {
   // 解析知识点ID，获取章节和序号
   const parts = knowledgeId.split('_');
   if (parts.length < 2) {
@@ -256,12 +266,13 @@ const showKnowledgeModal = (knowledgeId: string, nodeLabel: string, learnedNodes
     // 根据不能解锁的原因显示不同的提示
     if (jumpResult.reason === 'chapter_locked') {
       dialogState.status = `您还未完成前置章节"${jumpResult.requiredChapterName}"的测试，需要先完成该章节的测试才能学习本知识点。是否现在开始测试前置章节？`;
-      dialogState.requiredChapterId = jumpResult.requiredChapter;
-      dialogState.requiredChapterName = jumpResult.requiredChapterName;
+      dialogState.requiredChapter = jumpResult.requiredChapter || '';
+      dialogState.requiredChapterId = jumpResult.requiredChapter || '';
+      dialogState.requiredChapterName = jumpResult.requiredChapterName || '';
     } else if (jumpResult.reason === 'previous_knowledge_required' || jumpResult.reason === 'previous_chapter_test_required') {
       dialogState.status = `您还未学习前置知识点"${jumpResult.requiredKnowledgeName}"，需要先完成该知识点的测试才能学习本知识点。是否现在开始测试前置知识点？`;
-      dialogState.requiredKnowledgeId = jumpResult.requiredKnowledgeId;
-      dialogState.requiredKnowledgeName = jumpResult.requiredKnowledgeName;
+      dialogState.requiredKnowledgeId = jumpResult.requiredKnowledgeId || '';
+      dialogState.requiredKnowledgeName = jumpResult.requiredKnowledgeName || '';
     } else {
       dialogState.status = '该知识点尚未解锁，您是否要直接开始测试？';
     }
@@ -322,7 +333,7 @@ const handleLearn = () => {
       // 跳转到前置章节或知识点测试
       const jumpResult = canJumpToKnowledge(dialogState.knowledgeId, graphDataRef.value, learnedNodesRef.value);
 
-      if (jumpResult.reason === 'chapter_locked') {
+      if (jumpResult.reason === 'chapter_locked' && jumpResult.requiredChapter) {
         // 设置跳转目标，测试完成后自动跳转回来
         localStorage.setItem('jumpLearningTarget', JSON.stringify({
           knowledgeId: dialogState.knowledgeId,
@@ -423,7 +434,7 @@ const handleTest = () => {
         timestamp: Date.now()
       }));
 
-      const lastchapterTestId = `${dialogState.requiredChapter.split('_')[1]}_end`;
+      const lastchapterTestId = dialogState.requiredChapter ? `${dialogState.requiredChapter.split('_')[1]}_end` : chapterTestId;
       router.push({ name: 'test', params: { topicId: lastchapterTestId } });
     }
   }
@@ -910,7 +921,8 @@ const BASE_EDGE_WIDTH = 5;
           shadow: false,
           smooth: {
             enabled: true,
-            type: 'continuous'
+            type: 'continuous',
+            roundness: 0.5
           },
           color: {
             color: '#848484',
@@ -930,7 +942,7 @@ const BASE_EDGE_WIDTH = 5;
       }
 
       // 创建网络
-      network = new vis.Network(networkContainer.value, data, options)
+      network = new vis.Network(networkContainer.value!, data, options)
 
       // 获取节点和边的数据集
       nodes = network.body.data.nodes;
