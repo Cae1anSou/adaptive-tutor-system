@@ -89,14 +89,14 @@ const allTopics = [
 ]
 
 
-const parsedLevels = computed<LevelCard[]>(() => {
+const parsedLevels = computed(() => {
   if (!learningContent.value) return []
   return learningContent.value.levels.map(level => {
     const plain = level.description.replace(/\s+/g, ' ').trim()
     const summary = plain.length > 64 ? `${plain.slice(0, 64)}…` : plain
     return {
       level: level.level,
-      html: marked.parse(level.description),
+      html: marked.parse(level.description) as string,
       summary
     }
   })
@@ -653,7 +653,7 @@ watch(
                   </transition>
 
                 </div>
-                <a-empty v-else description="暂无知识点内容" :image="simpleImage"/>
+                <a-empty v-else description="暂无知识点内容"/>
               </div>
 
               <div class="panel-footer">
@@ -677,13 +677,11 @@ watch(
 </template>
 
 <style scoped>
-/* 全局容器与背景 */
+/* 全局容器与背景 - Google/Meta 极简风格 */
 .learning-page {
   width: 100%;
   min-height: 100%;
-  background-color: #f8fafc; /* 极简灰背景 */
-  background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
-  background-size: 24px 24px; /* 点阵背景纹理 */
+  background-color: #FFFFFF;
   padding-bottom: 40px;
   display: flex;
   flex-direction: column;
@@ -704,16 +702,14 @@ watch(
 
 .main-column {
   flex: 3;
-  min-width: 0; /* Prevent flexitem overflow */
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-/* DEPRECATED: side-column removed */
-
 .side-column {
-  display: none; /* 已移除侧边栏，因为 SiderLayout 已包含 AI 面板 */
+  display: none;
 }
 
 .sticky-chat {
@@ -724,83 +720,81 @@ watch(
 
 /* 通用面板样式 */
 .panel {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  background: #FFFFFF;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.1);
+  border: 1px solid #E8EAED;
   overflow: hidden;
-  transition: box-shadow 0.3s ease;
 }
 
 .panel:hover {
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.15);
 }
 
 .panel-header {
-  padding: 20px 24px;
-  border-bottom: 1px solid #f1f5f9;
+  padding: 16px 20px;
+  border-bottom: 1px solid #E8EAED;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #fff;
+  background: #FFFFFF;
 }
 
 .header-title-group {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .icon-box {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: #eff6ff;
-  color: #3b82f6;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #E8F0FE;
+  color: #4285F4;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .icon-box-purple {
-  background: #f5f3ff;
-  color: #8b5cf6;
+  background: #E8F0FE;
+  color: #4285F4;
 }
 
 .panel-title {
   margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: #1e293b;
+  font-size: 16px;
+  font-weight: 500;
+  color: #202124;
   line-height: 1.2;
 }
 
 .panel-subtitle {
   margin: 2px 0 0;
   font-size: 13px;
-  color: #64748b;
+  color: #5F6368;
 }
 
 .panel-body {
-  padding: 24px;
+  padding: 20px;
 }
 
 /* 探索区布局 */
 .exploration-layout {
   display: grid;
-  grid-template-columns: 1.6fr 1fr; /* 左宽右窄 */
-  gap: 24px;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 20px;
   align-items: stretch;
 }
 
 /* 浏览器 Mockup 样式 */
 .browser-mockup {
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border: 1px solid #E8EAED;
+  border-radius: 8px;
   overflow: hidden;
   background: white;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -808,12 +802,12 @@ watch(
 }
 
 .browser-header {
-  background: #f1f5f9;
-  padding: 10px 16px;
+  background: #F1F3F4;
+  padding: 8px 16px;
   display: flex;
   align-items: center;
-  gap: 16px;
-  border-bottom: 1px solid #e2e8f0;
+  gap: 12px;
+  border-bottom: 1px solid #E8EAED;
 }
 
 .browser-dots {
@@ -826,19 +820,19 @@ watch(
   height: 10px;
   border-radius: 50%;
 }
-.dot-red { background: #ef4444; }
-.dot-yellow { background: #f59e0b; }
-.dot-green { background: #22c55e; }
+.dot-red { background: #EA4335; }
+.dot-yellow { background: #FBBC05; }
+.dot-green { background: #34A853; }
 
 .browser-address {
   flex: 1;
   background: white;
-  border-radius: 6px;
+  border-radius: 4px;
   padding: 4px 12px;
   font-size: 12px;
-  color: #64748b;
+  color: #5F6368;
   text-align: center;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #E8EAED;
 }
 
 .browser-content {
@@ -861,28 +855,27 @@ watch(
 }
 
 .code-editor-card {
-  background: #1e293b; /* 深色背景 */
-  border-radius: 12px;
+  background: #202124;
+  border-radius: 8px;
   overflow: hidden;
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 200px;
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
 }
 
 .editor-header {
-  background: #0f172a;
+  background: #303134;
   padding: 8px 0;
   display: flex;
 }
 
 .tab-active {
-  background: #1e293b;
-  color: #e2e8f0;
+  background: #202124;
+  color: #E8EAED;
   padding: 6px 16px;
   font-size: 12px;
-  border-top: 2px solid #3b82f6;
+  border-top: 2px solid #4285F4;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -895,10 +888,10 @@ watch(
 }
 
 .code-content {
-  font-family: 'Fira Code', 'Menlo', monospace;
+  font-family: 'Menlo', 'Consolas', monospace;
   font-size: 13px;
   line-height: 1.6;
-  color: #a5b4fc; /* 浅蓝紫色代码高亮 */
+  color: #9AA0A6;
   margin: 0;
   white-space: pre-wrap;
   word-break: break-all;
@@ -907,8 +900,8 @@ watch(
 /* 控制面板 */
 .control-panel {
   background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border: 1px solid #E8EAED;
+  border-radius: 8px;
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -926,7 +919,7 @@ watch(
   align-items: center;
   justify-content: space-between;
   padding-top: 12px;
-  border-top: 1px dashed #e2e8f0;
+  border-top: 1px solid #E8EAED;
 }
 
 .setting-item {
@@ -937,73 +930,70 @@ watch(
 
 .setting-label {
   font-size: 13px;
-  font-weight: 600;
-  color: #475569;
+  font-weight: 500;
+  color: #5F6368;
 }
 
 .setting-hint {
   margin: 0;
   font-size: 12px;
-  color: #94a3b8;
+  color: #9AA0A6;
 }
 
 /* 知识卡片区 */
 .levels-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+  gap: 16px;
 }
 
 .level-card {
   background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 20px;
+  border: 1px solid #E8EAED;
+  border-radius: 8px;
+  padding: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
-  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
 .level-card:hover {
-  border-color: #8b5cf6;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(139, 92, 246, 0.1);
+  border-color: #4285F4;
+  box-shadow: 0 1px 3px rgba(66, 133, 244, 0.2);
 }
 
 .level-card-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .level-badge {
-  background: #f5f3ff;
-  color: #7c3aed;
+  background: #E8F0FE;
+  color: #4285F4;
   padding: 4px 10px;
   border-radius: 100px;
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+  font-weight: 500;
 }
 
 .arrow-icon {
-  color: #cbd5e1;
+  color: #BDC1C6;
   transition: transform 0.2s;
 }
 
 .level-card:hover .arrow-icon {
-  color: #7c3aed;
+  color: #4285F4;
   transform: translateX(4px);
 }
 
 .level-summary {
-  color: #475569;
+  color: #5F6368;
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.5;
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -1014,15 +1004,15 @@ watch(
 /* 知识详情视图 */
 .level-detail-view {
   display: flex;
-  gap: 32px;
+  gap: 24px;
   background: #fff;
   min-height: 400px;
 }
 
 .detail-sidebar {
-  width: 180px;
+  width: 160px;
   flex-shrink: 0;
-  border-right: 1px solid #f1f5f9;
+  border-right: 1px solid #E8EAED;
   padding-right: 16px;
   display: flex;
   flex-direction: column;
@@ -1031,8 +1021,8 @@ watch(
 
 .current-level-indicator {
   font-size: 24px;
-  font-weight: 800;
-  color: #e2e8f0;
+  font-weight: 700;
+  color: #E8EAED;
   text-align: right;
   margin-top: 20px;
 }
@@ -1048,20 +1038,19 @@ watch(
 
 /* 底部操作栏 */
 .panel-footer {
-  padding: 16px 24px;
-  border-top: 1px solid #f1f5f9;
+  padding: 16px 20px;
+  border-top: 1px solid #E8EAED;
   display: flex;
   justify-content: flex-end;
-  background: #f8fafc;
+  background: #FFFFFF;
 }
 
 .action-btn {
-  height: 48px;
-  padding-left: 32px;
-  padding-right: 32px;
-  font-weight: 600;
-  font-size: 15px;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  height: 44px;
+  padding-left: 24px;
+  padding-right: 24px;
+  font-weight: 500;
+  font-size: 14px;
 }
 
 /* 动效 */
@@ -1070,49 +1059,47 @@ watch(
 }
 
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-  70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(234, 67, 53, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(234, 67, 53, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(234, 67, 53, 0); }
 }
 
 .fade-slide-enter-active,
 .fade-slide-leave-active {
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .fade-slide-enter-from {
   opacity: 0;
-  transform: translateY(10px);
 }
 
 .fade-slide-leave-to {
   opacity: 0;
-  transform: translateY(-10px);
 }
 
 /* Markdown 样式覆盖 */
 .markdown-body {
-  color: #334155;
-  line-height: 1.8;
+  color: #3C4043;
+  line-height: 1.7;
 }
 
 .markdown-body :deep(h1),
 .markdown-body :deep(h2),
 .markdown-body :deep(h3) {
-  color: #1e293b;
+  color: #202124;
   border-bottom: none;
 }
 
 .markdown-body :deep(code) {
-  color: #ec4899;
-  background: #fdf2f8;
+  color: #4285F4;
+  background: #E8F0FE;
   padding: 2px 6px;
   border-radius: 4px;
 }
 
 .markdown-body :deep(pre) {
-  background: #1e293b;
-  border-radius: 8px;
+  background: #202124;
+  border-radius: 6px;
 }
 
 /* 响应式适配 */
@@ -1121,12 +1108,12 @@ watch(
     grid-template-columns: 1fr;
     flex-direction: column;
   }
-  
+
   .side-column {
     height: 600px;
     min-width: 100%;
   }
-  
+
   .sticky-chat {
     position: static;
     height: 100%;
@@ -1147,7 +1134,7 @@ watch(
   .detail-sidebar {
     width: 100%;
     border-right: none;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid #E8EAED;
     padding-bottom: 12px;
     flex-direction: row;
     justify-content: space-between;
@@ -1166,7 +1153,7 @@ watch(
   }
 
   .panel-header {
-    padding: 16px;
+    padding: 12px 16px;
   }
 
   .panel-body {

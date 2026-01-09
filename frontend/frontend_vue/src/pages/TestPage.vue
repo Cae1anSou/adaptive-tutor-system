@@ -104,9 +104,9 @@ const hasCodeContent = computed(() => currentCode.value.html || currentCode.valu
 const parsedDescription = computed(() => testTask.value?.description_md ? marked(testTask.value.description_md) : '')
 const isMobile = computed(() => window.innerWidth <= 768)
 
-// --- 现代简洁风格定义 (Modern Clean UI) ---
+// --- Google/Meta 极简蓝色调风格 ---
 
-// 1. 页面容器静态样式（提升性能，避免每次创建新对象）
+// 1. 页面容器静态样式
 const STATIC_PAGE_STYLE = {
   display: 'grid',
   gridTemplateRows: isMobile.value ? 'auto auto 500px' : '1fr',
@@ -115,17 +115,17 @@ const STATIC_PAGE_STYLE = {
   padding: '16px',
   width: '100%',
   boxSizing: 'border-box',
-  backgroundColor: '#f5f7fa',
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+  backgroundColor: '#FFFFFF',
+  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
 }
 
-// 1. 页面容器：使用浅灰背景，营造沉浸式工作台感觉
+// 1. 页面容器
 const testPageStyle = computed(() => ({
   ...STATIC_PAGE_STYLE,
   gridTemplateColumns: isMobile.value ? '1fr' : '380px 1fr'
 }))
 
-// 2. 左侧侧边栏容器（包含题目和结果）
+// 2. 左侧侧边栏容器
 const sidebarContainerStyle = computed(() => ({
   display: 'flex',
   flexDirection: 'column',
@@ -134,29 +134,28 @@ const sidebarContainerStyle = computed(() => ({
   overflow: 'hidden'
 }))
 
-// 3. 通用卡片样式：白底，微弱阴影，圆角
+// 3. 通用卡片样式
 const cardStyle = {
-  background: '#ffffff',
+  background: '#FFFFFF',
   borderRadius: '8px',
-  boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02)', // 非常细腻的阴影
-  border: '1px solid #f0f0f0', // 极淡的边框
+  boxShadow: '0 1px 3px rgba(60, 64, 67, 0.1)',
+  border: '1px solid #E8EAED',
   display: 'flex',
   flexDirection: 'column' as const,
-  overflow: 'hidden',
-  transition: 'all 0.3s ease'
+  overflow: 'hidden'
 }
 
-// 4. 卡片头部：极简，只有底部细线
+// 4. 卡片头部
 const cardHeaderStyle = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
   padding: '0 16px',
   height: '48px',
-  borderBottom: '1px solid #f0f0f0',
-  backgroundColor: '#fff', // 纯白头部
-  color: '#1f1f1f',
-  fontWeight: 600,
+  borderBottom: '1px solid #E8EAED',
+  backgroundColor: '#FFFFFF',
+  color: '#202124',
+  fontWeight: 500,
   fontSize: '14px'
 }
 
@@ -169,8 +168,8 @@ const cardContentStyle = {
 
 const cardFooterStyle = {
   padding: '12px 16px',
-  borderTop: '1px solid #f0f0f0',
-  backgroundColor: '#fafafa', // 浅灰底脚
+  borderTop: '1px solid #E8EAED',
+  backgroundColor: '#FFFFFF',
   display: 'flex',
   justifyContent: 'flex-end',
   alignItems: 'center',
@@ -182,26 +181,26 @@ const editorContainerStyle = computed(() => ({
   ...cardStyle,
   gridRow: isMobile.value ? 'auto' : '1',
   gridColumn: isMobile.value ? '1' : '2',
-  height: '100%' // 撑满高度
+  height: '100%'
 }))
 
-// Markdown 样式：模仿 GitHub Readme 的干净风格
+// Markdown 样式
 const markdownStyle = {
   lineHeight: 1.7,
   fontSize: '14px',
-  color: '#374151',
-  '& h1, h2, h3': { marginTop: '1em', marginBottom: '0.6em', color: '#111827', fontWeight: 600 },
+  color: '#3C4043',
+  '& h1, h2, h3': { marginTop: '1em', marginBottom: '0.6em', color: '#202124', fontWeight: 600 },
   '& p': { marginBottom: '1em' },
-  '& code': { background: '#f3f4f6', padding: '2px 5px', borderRadius: '4px', color: '#ef4444', fontSize: '12px' },
-  '& pre': { background: '#f8fafc', padding: '12px', borderRadius: '6px', overflowX: 'auto', border: '1px solid #e2e8f0' }
+  '& code': { background: '#E8F0FE', padding: '2px 5px', borderRadius: '4px', color: '#4285F4', fontSize: '12px' },
+  '& pre': { background: '#202124', padding: '12px', borderRadius: '6px', overflowX: 'auto', border: 'none' }
 }
 
-// 结果状态颜色
+// 结果状态颜色 - Google 风格
 const statusColors = {
-  successBg: '#f6ffed',
-  successBorder: '#b7eb8f',
-  errorBg: '#fff2f0',
-  errorBorder: '#ffccc7'
+  successBg: '#E6F4EA',
+  successBorder: '#34A853',
+  errorBg: '#FCE8E6',
+  errorBorder: '#EA4335'
 }
 
 // --- 工具函数 ---
@@ -349,16 +348,16 @@ function handleTabChange(tab: string) {
       <div :style="{ ...cardStyle, flex: testResult ? '1' : '2' } as any">
         <div :style="cardHeaderStyle">
           <div style="display:flex; align-items:center; gap:8px">
-            <FileTextOutlined style="color: #1890ff"/>
+            <FileTextOutlined style="color: #4285F4"/>
             <span>题目描述</span>
           </div>
         </div>
         <div :style="cardContentStyle" class="custom-scrollbar">
-          <div v-if="loading" style="padding: 20px; text-align: center; color: #999"><a-spin/></div>
+          <div v-if="loading" style="padding: 20px; text-align: center; color: #9AA0A6"><a-spin/></div>
           <div v-else-if="testTask" :style="markdownStyle as any" v-html="parsedDescription"></div>
         </div>
         <div :style="cardFooterStyle">
-          <a-button type="text" size="small" style="color: #666">
+          <a-button type="text" size="small" style="color: #5F6368">
             <template #icon><BulbOutlined /></template>
             提示
           </a-button>
@@ -368,12 +367,12 @@ function handleTabChange(tab: string) {
       <div :style="{ ...cardStyle, flex: testResult ? '1' : '0 0 auto', minHeight: '100px' } as any">
         <div :style="cardHeaderStyle">
           <div style="display:flex; align-items:center; gap:8px">
-            <CodeOutlined style="color: #722ed1"/>
+            <CodeOutlined style="color: #4285F4"/>
             <span>运行结果</span>
           </div>
         </div>
         <div :style="cardContentStyle" class="custom-scrollbar">
-          <div v-if="!testResult" style="height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#bfbfbf">
+          <div v-if="!testResult" style="height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#9AA0A6">
             <InfoCircleOutlined style="font-size: 24px; margin-bottom: 8px"/>
             <span style="font-size: 12px">点击运行查看结果</span>
           </div>
@@ -385,27 +384,27 @@ function handleTabChange(tab: string) {
                border: `1px solid ${testResult.passed ? statusColors.successBorder : statusColors.errorBorder}`,
                display: 'flex', alignItems: 'flex-start', gap: '10px'
              }">
-              <CheckCircleFilled v-if="testResult.passed" style="color: #52c41a; font-size: 18px; margin-top: 2px"/>
-              <CloseCircleFilled v-else style="color: #ff4d4f; font-size: 18px; margin-top: 2px"/>
+              <CheckCircleFilled v-if="testResult.passed" style="color: #34A853; font-size: 18px; margin-top: 2px"/>
+              <CloseCircleFilled v-else style="color: #EA4335; font-size: 18px; margin-top: 2px"/>
               <div>
-                <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px; color: #333">
+                <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px; color: #202124">
                   {{ testResult.passed ? '测试通过' : '测试失败' }}
                 </div>
-                <div style="font-size: 13px; color: #666; line-height: 1.5">
+                <div style="font-size: 13px; color: #5F6368; line-height: 1.5">
                   {{ testResult.message }}
                 </div>
               </div>
             </div>
 
             <div v-if="testResult.details?.length" style="margin-top: 12px; padding-left: 4px">
-              <div v-for="(d, i) in testResult.details" :key="i" style="font-size: 12px; color: #666; margin-bottom: 4px; display:flex; gap: 6px">
-                <span style="color: #ff4d4f">•</span> {{ d }}
+              <div v-for="(d, i) in testResult.details" :key="i" style="font-size: 12px; color: #5F6368; margin-bottom: 4px; display:flex; gap: 6px">
+                <span style="color: #EA4335">•</span> {{ d }}
               </div>
             </div>
           </div>
         </div>
         <div v-if="showAskAI" :style="cardFooterStyle">
-          <a-button type="primary" ghost size="small" style="border-radius: 16px">
+          <a-button type="primary" ghost size="small" style="border-radius: 4px">
             <template #icon><RobotOutlined /></template>
             AI 帮我分析
           </a-button>
@@ -423,8 +422,8 @@ function handleTabChange(tab: string) {
                  cursor: 'pointer',
                  fontSize: '13px',
                  fontWeight: 500,
-                 color: activeTab === tab ? '#1677ff' : '#666',
-                 borderBottom: activeTab === tab ? '2px solid #1677ff' : '2px solid transparent',
+                 color: activeTab === tab ? '#4285F4' : '#5F6368',
+                 borderBottom: activeTab === tab ? '2px solid #4285F4' : '2px solid transparent',
                  transition: 'all 0.2s'
                }">
             {{ tab.toUpperCase() }}
@@ -440,7 +439,7 @@ function handleTabChange(tab: string) {
       </div>
 
       <div :style="{ ...cardFooterStyle, height: '56px' }">
-        <span v-if="submitting" style="margin-right: auto; font-size: 12px; color: #999">正在运行测试用例...</span>
+        <span v-if="submitting" style="margin-right: auto; font-size: 12px; color: #9AA0A6">正在运行测试用例...</span>
         <a-button @click="() => initializePage()" :disabled="submitting">重置</a-button>
         <a-button type="primary" @click="submitCode" :loading="submitting" :disabled="!hasCodeContent">
           <template #icon><PlayCircleOutlined /></template>
@@ -459,11 +458,11 @@ function handleTabChange(tab: string) {
   height: 6px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #e5e7eb;
+  background: #BDC1C6;
   border-radius: 3px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #d1d5db;
+  background: #9AA0A6;
 }
 
 #DefaultPage {

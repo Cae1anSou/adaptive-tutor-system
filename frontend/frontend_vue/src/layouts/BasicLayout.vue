@@ -46,14 +46,14 @@ const footerText = 'Copyright © 2025 syncPBL by 宋曹卢余蔡吴林';
 </template>
 
 <style scoped lang="less">
+/* Google/Meta 极简蓝色调 */
 #BasicLayout {
   min-height: 100vh;
-  background-color: #f8fafc;
-  transition: background 0.5s ease;
+  background-color: #FFFFFF;
 }
 
 #BasicLayout.is-login {
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  background: #FFFFFF;
 }
 
 .layout-wrapper {
@@ -72,15 +72,14 @@ const footerText = 'Copyright © 2025 syncPBL by 宋曹卢余蔡吴林';
   height: 64px;
   padding: 0;
   line-height: 64px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  background: #FFFFFF;
+  border-bottom: 1px solid #E8EAED;
+  box-shadow: none;
 
   .header-inner {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 32px;
+    padding: 0 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -92,40 +91,23 @@ const footerText = 'Copyright © 2025 syncPBL by 宋曹卢余蔡吴林';
     gap: 10px;
 
     .logo-text {
-      font-size: 20px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      font-size: 22px;
+      font-weight: 400;
+      color: #202124;
       letter-spacing: -0.5px;
     }
 
     .logo-icon {
-      font-size: 24px;
-      animation: float 3s ease-in-out infinite;
+      font-size: 20px;
     }
   }
 
   .nav-area {
     .user-greeting {
-      color: #64748b;
+      color: #5F6368;
       font-size: 14px;
-      padding: 8px 16px;
-      background: #f1f5f9;
-      border-radius: 20px;
-      transition: all 0.3s ease;
-
-      &:hover {
-        background: #e2e8f0;
-      }
     }
   }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
 }
 
 /* 内容区域 */
@@ -151,13 +133,14 @@ const footerText = 'Copyright © 2025 syncPBL by 宋曹卢余蔡吴林';
 .content-wrapper {
   width: 100%;
   max-width: 1200px;
-  background: #fff;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  background: #FFFFFF;
+  border-radius: 8px;
+  padding: 0;
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.1);
   min-height: 280px;
   position: relative;
   transition: all 0.5s ease;
+  border: 1px solid #E8EAED;
 }
 
 /* 登录页面特殊处理 */
@@ -167,32 +150,31 @@ const footerText = 'Copyright © 2025 syncPBL by 宋曹卢余蔡吴林';
   border-radius: 0;
   padding: 0;
   box-shadow: none;
+  border: none;
   min-height: auto;
 }
 
 /* 底部设计 */
 .layout-footer {
   text-align: center;
-  color: #94a3b8;
+  color: #9AA0A6;
   font-size: 13px;
-  padding: 20px 0;
+  padding: 24px 0;
   background: transparent;
 }
 
 /* 页面切换动画 */
 .fade-slide-enter-active,
 .fade-slide-leave-active {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
 }
 
 .fade-slide-enter-from {
   opacity: 0;
-  transform: translateY(20px);
 }
 
 .fade-slide-leave-to {
   opacity: 0;
-  transform: translateY(-10px);
 }
 
 /* 移动端适配 */
@@ -200,12 +182,12 @@ const footerText = 'Copyright © 2025 syncPBL by 宋曹卢余蔡吴林';
   .layout-header {
     padding: 0;
     .header-inner {
-      padding: 0 20px;
+      padding: 0 16px;
     }
   }
 
   .layout-content {
-    padding-top: 80px;
+    padding-top: 72px;
     padding-left: 16px;
     padding-right: 16px;
   }
@@ -215,8 +197,9 @@ const footerText = 'Copyright © 2025 syncPBL by 宋曹卢余蔡吴林';
   }
 
   .content-wrapper {
-    padding: 24px;
-    border-radius: 12px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
   }
 
   .content-wrapper.is-login {

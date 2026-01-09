@@ -1086,19 +1086,20 @@ const BASE_EDGE_WIDTH = 5;
   display: flex;
   flex-direction: column;
   position: relative;
+  background-color: #FFFFFF;
 }
 
 .graph-container {
   flex: 1;
   position: relative;
-  min-height: 0; /* 重要：允许flex子项收缩 */
+  min-height: 0;
 }
 
 #mynetwork {
   width: 100%;
   height: 100%;
-  border: 1px solid lightgray;
-  background-color: #f7f7f7;
+  border: 1px solid #E8EAED;
+  background-color: #FFFFFF;
   position: absolute;
   top: 0;
   left: 0;
@@ -1107,13 +1108,13 @@ const BASE_EDGE_WIDTH = 5;
 .legend {
   display: flex;
   justify-content: center;
-  gap: 20px;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background-color: #f9f9f9;
+  gap: 24px;
+  padding: 12px 20px;
+  border: 1px solid #E8EAED;
+  border-radius: 8px;
+  background-color: #FFFFFF;
   position: absolute;
-  bottom: -4%;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -1122,26 +1123,28 @@ const BASE_EDGE_WIDTH = 5;
 .legend-item {
   display: flex;
   align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #5F6368;
 }
 
 .legend-color {
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  margin-right: 5px;
-  border: 1px solid #666;
+  border: 1px solid #BDC1C6;
 }
 
 .learned {
-  background-color: #4CAF50;
+  background-color: #34A853;
 }
 
 .unlocked {
-  background-color: #4a90e2;
+  background-color: #4285F4;
 }
 
 .locked {
-  background-color: #cccccc;
+  background-color: #BDC1C6;
 }
 
 .modal-buttons {

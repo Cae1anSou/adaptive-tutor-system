@@ -42,7 +42,8 @@ const handleStart = async () => {
       theme: formState.theme
     } as any)
     if (res.data && (res.data.code === 200 || res.data.code === 201)) {
-      const pid = res.data.data?.participant_id || res.data.participant_id
+      const resData = res.data as any
+      const pid = res.data.data?.participant_id || resData.participant_id || ''
       if (pid) {
         userStore.setSession(pid, formState.nickname, formState.theme)
         message.success('启动成功')
@@ -65,36 +66,28 @@ const handleStart = async () => {
 <template>
   <div class="login-page">
     <!-- 背景装饰 -->
-    <div class="bg-decoration">
-      <div class="blob blob-1"></div>
-      <div class="blob blob-2"></div>
-      <div class="blob blob-3"></div>
-      <div class="grid-pattern"></div>
-    </div>
+    <div class="bg-pattern"></div>
 
     <!-- 主要内容区 -->
     <div class="main-content">
-      <!-- 欢迎区域 -->
-      <div class="welcome-section">
-        <div class="logo-wrapper">
-          <div class="logo-ring"></div>
-          <div class="logo-icon">🤖</div>
-        </div>
+      <!-- Logo区 -->
+      <div class="logo-section">
+        <div class="logo-icon">🌐</div>
         <h1 class="title">
           <span class="title-primary">和AI一起学</span>
           <span class="title-highlight">HTML</span>
         </h1>
-        <p class="subtitle">选择你喜欢的主题，让学习更有趣 ✨</p>
+        <p class="subtitle">选择你喜欢的主题，开始学习之旅</p>
       </div>
 
-      <!-- 表单区域 -->
-      <div class="form-card" :class="{'has-focused': isFocused}">
-        <div class="input-wrapper" :class="{focused: isFocused === 'nickname'}">
-          <span class="input-icon">👤</span>
+      <!-- 表单卡片 -->
+      <div class="form-card">
+        <div class="input-group">
+          <label class="input-label">昵称</label>
           <input
             v-model="formState.nickname"
             type="text"
-            placeholder="输入你的昵称"
+            placeholder="给自己起个名字"
             maxlength="20"
             @focus="isFocused = 'nickname'"
             @blur="isFocused = null"
@@ -103,23 +96,20 @@ const handleStart = async () => {
           <span v-if="formState.nickname" class="char-count">{{ formState.nickname.length }}/20</span>
         </div>
 
-        <div class="input-wrapper" :class="{focused: isFocused === 'theme'}">
-          <span class="input-icon">🎯</span>
-          <div class="theme-selector">
+        <div class="input-group">
+          <label class="input-label">学习主题</label>
+          <div class="select-wrapper">
             <select
               v-model="formState.theme"
               @focus="isFocused = 'theme'"
               @blur="isFocused = null"
             >
-              <option :value="undefined" disabled>选择学习主题</option>
+              <option :value="undefined" disabled>选择一个感兴趣的主题</option>
               <option v-for="t in themes" :key="t.value" :value="t.value">
                 {{ t.label }}
               </option>
             </select>
-            <div class="select-arrow">▼</div>
-          </div>
-          <div v-if="formState.theme" class="selected-theme-badge">
-            {{ themes.find(t => t.value === formState.theme)?.label?.split(' ')[0] }}
+            <span class="select-arrow">▼</span>
           </div>
         </div>
 
@@ -128,12 +118,8 @@ const handleStart = async () => {
           :disabled="loading || !formState.nickname || !formState.theme"
           @click="handleStart"
         >
-          <span class="btn-bg"></span>
-          <span class="btn-content">
-            <span v-if="loading" class="loading-spinner"></span>
-            <span v-else>🚀</span>
-            <span>{{ loading ? '启动中...' : '开始学习' }}</span>
-          </span>
+          <span v-if="loading" class="btn-loading"></span>
+          <span>{{ loading ? '启动中...' : '开始学习' }}</span>
         </button>
       </div>
 
@@ -144,20 +130,19 @@ const handleStart = async () => {
 </template>
 
 <style scoped>
-/* CSS变量 */
+/* Google Blue 配色 + 视觉层次 */
 :root {
-  --primary: #6366f1;
-  --primary-dark: #4f46e5;
-  --primary-light: #818cf8;
-  --accent: #f59e0b;
-  --accent-light: #fbbf24;
-  --bg-dark: #0f172a;
-  --bg-card: rgba(255, 255, 255, 0.95);
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --border: #e2e8f0;
-  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
-  --shadow-hover: 0 8px 30px rgba(99, 102, 241, 0.25);
+  --google-blue: #4285F4;
+  --google-blue-hover: #3367D6;
+  --google-blue-light: #E8F0FE;
+  --text-primary: #202124;
+  --text-secondary: #5F6368;
+  --border: #DADCE0;
+  --border-focus: #4285F4;
+  --bg-page: #F8F9FA;
+  --shadow-sm: 0 1px 2px rgba(60, 64, 67, 0.1);
+  --shadow-md: 0 1px 3px rgba(60, 64, 67, 0.15);
+  --shadow-lg: 0 2px 8px rgba(60, 64, 67, 0.2);
 }
 
 .login-page {
@@ -165,337 +150,192 @@ const handleStart = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--bg-page);
+  font-family: 'Google Sans', 'Product Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   position: relative;
-  overflow: hidden;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, sans-serif;
 }
 
-/* 背景装饰 */
-.bg-decoration {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  z-index: 0;
-}
-
-.blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.5;
-  animation: float 20s ease-in-out infinite;
-}
-
-.blob-1 {
-  width: 400px;
-  height: 400px;
-  background: linear-gradient(135deg, #818cf8, #c084fc);
-  top: -100px;
-  right: -100px;
-  animation-delay: 0s;
-}
-
-.blob-2 {
-  width: 300px;
-  height: 300px;
-  background: linear-gradient(135deg, #67e8f9, #6366f1);
-  bottom: -50px;
-  left: -50px;
-  animation-delay: -7s;
-}
-
-.blob-3 {
-  width: 250px;
-  height: 250px;
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  animation-delay: -14s;
-}
-
-.grid-pattern {
+/* 背景图案 */
+.bg-pattern {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
-  background-size: 50px 50px;
-}
-
-@keyframes float {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(20px, -20px) scale(1.05); }
-  50% { transform: translate(-10px, 10px) scale(0.95); }
-  75% { transform: translate(15px, 15px) scale(1.02); }
+    radial-gradient(circle at 20% 80%, rgba(66, 133, 244, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(66, 133, 244, 0.06) 0%, transparent 50%);
+  pointer-events: none;
 }
 
 /* 主内容区 */
 .main-content {
-  position: relative;
-  z-index: 1;
   width: 100%;
   max-width: 420px;
-  padding: 24px;
+  padding: 40px 24px;
+  position: relative;
+  z-index: 1;
 }
 
-/* 欢迎区域 */
-.welcome-section {
+/* Logo区 */
+.logo-section {
   text-align: center;
   margin-bottom: 32px;
 }
 
-.logo-wrapper {
-  position: relative;
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 20px;
-}
-
-.logo-ring {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 3px solid transparent;
-  border-top-color: #6366f1;
-  border-right-color: #6366f1;
-  animation: rotate 3s linear infinite;
-}
-
 .logo-icon {
-  position: absolute;
-  inset: 8px;
   font-size: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: bounce 2s ease-in-out infinite;
-}
-
-@keyframes rotate {
-  to { transform: rotate(360deg); }
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  margin-bottom: 16px;
+  display: inline-block;
 }
 
 .title {
   font-size: 32px;
-  font-weight: 700;
+  font-weight: 400;
   margin: 0 0 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
+  letter-spacing: -0.5px;
 }
 
 .title-primary {
-  color: #1e293b;
+  color: var(--text-primary);
 }
 
 .title-highlight {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  position: relative;
-}
-
-.title-highlight::after {
-  content: '';
-  position: absolute;
-  bottom: 2px;
-  left: 0;
-  right: 0;
-  height: 8px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3));
-  z-index: -1;
-  border-radius: 4px;
+  color: var(--google-blue);
+  font-weight: 500;
 }
 
 .subtitle {
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 15px;
   margin: 0;
+  font-weight: 400;
 }
 
 /* 表单卡片 */
 .form-card {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(20px);
-  border-radius: 24px;
+  background: #FFFFFF;
+  border: 1px solid #E8EAED;
+  border-radius: 12px;
   padding: 28px;
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(255, 255, 255, 0.5);
-  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.1);
 }
 
-.form-card:hover {
-  box-shadow:
-    0 8px 30px rgba(99, 102, 241, 0.15),
-    0 0 0 1px rgba(255, 255, 255, 0.8);
-}
-
-.form-card.has-focused {
-  box-shadow:
-    0 12px 40px rgba(99, 102, 241, 0.2),
-    0 0 0 1px rgba(99, 102, 241, 0.1);
-}
-
-.input-wrapper {
+/* 输入组 */
+.input-group {
   position: relative;
-  margin-bottom: 16px;
-  transition: all 0.3s ease;
+  margin-bottom: 20px;
 }
 
-.input-wrapper.focused {
-  transform: translateX(4px);
+.input-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
 }
 
-.input-icon {
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 18px;
-  z-index: 2;
-  transition: all 0.3s ease;
-}
-
-.input-wrapper.focused .input-icon {
-  transform: translateY(-50%) scale(1.1);
-}
-
-.input-wrapper input,
-.theme-selector {
+.input-group input,
+.select-wrapper select {
   width: 100%;
-  padding: 16px 16px 16px 48px;
-  font-size: 16px;
-  border: 2px solid #e2e8f0;
-  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 15px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
   outline: none;
-  background: #f8fafc;
-  transition: all 0.3s ease;
-  color: #1e293b;
-}
-
-.input-wrapper input:hover,
-.theme-selector:hover {
-  border-color: #cbd5e1;
-}
-
-.input-wrapper input:focus,
-.theme-selector:focus-within {
-  border-color: #6366f1;
-  background: white;
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-}
-
-.theme-selector {
-  position: relative;
-  padding-right: 48px;
-  cursor: pointer;
+  background: #FFFFFF;
+  transition: all 0.2s ease;
+  color: var(--text-primary);
+  font-family: inherit;
   appearance: none;
+  -webkit-appearance: none;
 }
 
-.select-arrow {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 10px;
-  color: #94a3b8;
-  transition: transform 0.3s ease;
-  pointer-events: none;
+.input-group input::placeholder {
+  color: #9AA0A6;
 }
 
-.theme-selector:focus-within .select-arrow {
-  transform: translateY(-50%) rotate(180deg);
-  color: #6366f1;
+.input-group input:hover,
+.select-wrapper select:hover {
+  border-color: #BDC1C6;
+}
+
+.input-group input:focus,
+.select-wrapper select:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
 }
 
 .char-count {
   position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
+  right: 14px;
+  top: 42px;
   font-size: 12px;
-  color: #94a3b8;
+  color: #9AA0A6;
   pointer-events: none;
 }
 
-.selected-theme-badge {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 18px;
-  animation: popIn 0.3s ease;
+/* 下拉选择 */
+.select-wrapper {
+  position: relative;
 }
 
-@keyframes popIn {
-  0% { transform: translateY(-50%) scale(0); }
-  50% { transform: translateY(-50%) scale(1.2); }
-  100% { transform: translateY(-50%) scale(1); }
+.select-arrow {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: #9AA0A6;
+  pointer-events: none;
+}
+
+.select-wrapper select {
+  padding-right: 36px;
 }
 
 /* 开始按钮 */
 .start-btn {
   width: 100%;
-  padding: 4px;
-  font-size: 17px;
-  font-weight: 600;
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #222222;
+  background: var(--google-blue);
   border: none;
-  border-radius: 14px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
+  transition: all 0.2s ease;
   margin-top: 8px;
-}
-
-.btn-bg {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  border-radius: 12px;
-  transition: all 0.3s ease;
-}
-
-.start-btn:hover:not(:disabled) .btn-bg {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
-}
-
-.start-btn:active:not(:disabled) .btn-bg {
-  transform: scale(0.98);
-}
-
-.start-btn:disabled .btn-bg {
-  background: linear-gradient(135deg, #cbd5e1, #94a3b8);
-}
-
-.btn-content {
-  position: relative;
-  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 14px;
-  color: white;
 }
 
-.loading-spinner {
-  width: 18px;
-  height: 18px;
+.start-btn:hover:not(:disabled) {
+  background: var(--google-blue-hover);
+  box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
+}
+
+.start-btn:active:not(:disabled) {
+  background: var(--google-blue-hover);
+  transform: scale(0.98);
+}
+
+.start-btn:disabled {
+  background: #DADCE0;
+  color: #9AA0A6;
+  cursor: not-allowed;
+}
+
+.btn-loading {
+  width: 16px;
+  height: 16px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
+  border-top-color: #FFFFFF;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -508,8 +348,8 @@ const handleStart = async () => {
 .hint {
   text-align: center;
   font-size: 13px;
-  color: #94a3b8;
-  margin: 20px 0 0;
+  color: #9AA0A6;
+  margin: 24px 0 0;
 }
 
 /* 响应式 */
@@ -518,22 +358,16 @@ const handleStart = async () => {
     font-size: 26px;
   }
 
-  .logo-wrapper {
-    width: 70px;
-    height: 70px;
-  }
-
-  .logo-icon {
-    font-size: 42px;
-  }
-
   .form-card {
-    padding: 24px;
-    border-radius: 20px;
+    padding: 24px 20px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    box-shadow: none;
   }
 
   .main-content {
-    padding: 16px;
+    padding: 24px 0;
   }
 }
 </style>

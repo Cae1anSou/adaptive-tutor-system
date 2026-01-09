@@ -100,6 +100,11 @@ backend/celerybeat-schedule
 /Data_Analyze/DB/按id分.json
 sentiment_bert/
 
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+
 frontend/frontend_vue/node_modules
 /frontend/frontend_vue/yarn.lock
 /frontend/frontend_vue/yarn.lock
