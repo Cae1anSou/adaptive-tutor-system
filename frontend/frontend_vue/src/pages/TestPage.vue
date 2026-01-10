@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref, onMounted, onUnmounted, computed, nextTick, watch} from 'vue'
 import {useChatContextStore} from '@/stores/chatContext'
-import {useRoute, useRouter} from 'vue-router'
+import {useRoute} from 'vue-router'
 import {useActiveHint, type HintEventDetail} from '@/composables/useActiveHint'
 import {message} from 'ant-design-vue'
 import {
@@ -24,7 +24,6 @@ import {
 import websocket from '@/api/websocket'
 
 const route = useRoute()
-const router = useRouter()
 const chatStore = useChatContextStore()
 
 
@@ -250,7 +249,7 @@ onMounted(async () => {
 })
 onUnmounted(() => {
   websocket.unsubscribe('submission_result', handleSubmissionResult)
-  htmlEditor.value?.dispose(); cssEditor.value?.dispose(); jsEditor.value?.dispose()
+  // NOTE: Monaco dispose on route leave can hang the main thread; keep editors alive.
 })
 
 // 业务函数简化 (保持原有核心逻辑)

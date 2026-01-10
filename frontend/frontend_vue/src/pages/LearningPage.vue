@@ -373,11 +373,6 @@ function handleIframeLoad(event: Event) {
 
 function handleNavigateToTest() {
   if (!currentTopicId.value) return
-  const target = router.resolve({ name: 'test', params: { topicId: currentTopicId.value } })
-  if (typeof window !== 'undefined') {
-    window.location.assign(target.href)
-    return
-  }
   router.push({name: 'test', params: {topicId: currentTopicId.value}})
 }
 
