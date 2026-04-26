@@ -62,6 +62,7 @@ let knowledgeGraphInitialized = false;
 
 // 模块实例
 let knowledgeModule = null;
+const GENERATED_COURSE_STORAGE_KEY = 'generated_course_plan';
 
 // 统一的初始化状态管理
 const AppState = {
@@ -211,8 +212,26 @@ function getTopicIdFromURL() {
 // 更新页面标题
 function updatePageTitle(topicId) {
     const headerTitle = document.querySelector('.header-title');
+    const generatedCourse = getGeneratedCourseMeta();
+    const displayTitle = generatedCourse?.title
+        ? `${generatedCourse.title} · ${topicId}`
+        : `学习 - ${topicId}`;
+
     if (headerTitle) {
-        headerTitle.textContent = `学习 - ${topicId}`;
+        headerTitle.textContent = displayTitle;
+    }
+
+    document.title = `sync-PBL学习平台 - ${displayTitle}`;
+}
+
+function getGeneratedCourseMeta() {
+    const raw = sessionStorage.getItem(GENERATED_COURSE_STORAGE_KEY);
+    if (!raw) return null;
+    try {
+        return JSON.parse(raw);
+    } catch (error) {
+        console.warn('生成课程信息解析失败:', error);
+        return null;
     }
 }
 

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>sync-PBL学习平台 - 用户注册</title>
+  <title>sync-PBL学习平台 - 课程生成</title>
   <link rel="stylesheet" href="../css/styles.css">
   <!-- Iconify图标库 -->
   <script src="../js/modules/iconify-icon.min.js"></script>
@@ -37,8 +37,8 @@
             <!-- 欢迎区域 -->
             <div class="welcome-section">
               <iconify-icon icon="mdi:robot" width="64" height="64" class="welcome-icon"></iconify-icon>
-              <h2>和AI一起学HTML</h2>
-              <p>选择你喜欢的主题，让sync-PBL带你亲手打造第一个网站 ✨</p>
+              <h2>先生成你的专属课程</h2>
+              <p>输入你的学习偏好，AI 将先生成课程方案，再带你进入学习环节。</p>
             </div>
 
             <!-- 表单区域 -->
@@ -59,9 +59,54 @@
                 </div>
               </div>
 
-              <button id="start-button" class="start-button" disabled>
-                <iconify-icon icon="mdi:play" width="20" height="20"></iconify-icon>
-                开始学习
+              <div class="input-row">
+                <div class="input-group">
+                  <iconify-icon icon="mdi:target" width="20" height="20"></iconify-icon>
+                  <input type="text" id="goal-input" placeholder="输入学习目标（可选）" maxlength="60" />
+                </div>
+                <div class="select-group">
+                  <iconify-icon icon="mdi:run-fast" width="20" height="20"></iconify-icon>
+                  <select id="pace-selector">
+                    <option value="standard">标准节奏（推荐）</option>
+                    <option value="light">轻松节奏</option>
+                    <option value="intensive">冲刺节奏</option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="course-preview" class="course-preview" hidden>
+                <h3>
+                  <iconify-icon icon="mdi:book-open-page-variant" width="18" height="18"></iconify-icon>
+                  已生成课程方案
+                </h3>
+                <p id="course-title" class="course-title"></p>
+                <p id="course-summary" class="course-summary"></p>
+                <ul id="course-outline" class="course-outline"></ul>
+                <button id="regenerate-button" type="button" class="secondary-button">重新生成</button>
+              </div>
+
+              <div id="generation-status" class="generation-status" hidden>
+                <div class="generation-title">
+                  <iconify-icon icon="mdi:brain" width="18" height="18"></iconify-icon>
+                  <span id="generation-title-text">正在初始化生成引擎...</span>
+                </div>
+                <div class="generation-progress-track" aria-hidden="true">
+                  <div id="generation-progress-fill" class="generation-progress-fill"></div>
+                </div>
+                <div id="generation-progress-text" class="generation-progress-text">0%</div>
+                <ul id="generation-steps" class="generation-steps">
+                  <li data-step-id="0">收集学习者画像</li>
+                  <li data-step-id="1">分析目标与学习节奏</li>
+                  <li data-step-id="2">匹配知识图谱节点</li>
+                  <li data-step-id="3">编排课程模块与顺序</li>
+                  <li data-step-id="4">校验难度曲线与完整性</li>
+                </ul>
+                <div id="generation-log" class="generation-log"></div>
+              </div>
+
+              <button id="start-button" type="button" class="start-button" disabled>
+                <iconify-icon icon="mdi:sparkles" width="20" height="20"></iconify-icon>
+                生成课程
               </button>
             </div>
           </div>
