@@ -13,20 +13,20 @@ class Settings(BaseSettings):
     BACKEND_PORT: int = 8000
 
     # OpenAI (for chat completions)
-    TUTOR_OPENAI_API_KEY: str = "ms-6dd28633-156b-41d3-9b05-95ae310dfd60"
-    TUTOR_OPENAI_MODEL: str = "deepseek-ai/DeepSeek-V3.1"
-    TUTOR_OPENAI_API_BASE: str = "https://api-inference.modelscope.cn/v1"
+    TUTOR_OPENAI_API_KEY: str = "sk-cp-P1ERPl57-inhu_21U6MdMcPDBpddr3Nmmf8RpGfV2q_FslCDAPCGRaJbqMPjmgaRHjPS5TC7PZJsap8c35p-FsIML9dRSYJN7oUjsUyDG_-9HPE97KAVVVY"
+    TUTOR_OPENAI_MODEL: str = "minimax-m2.7"
+    TUTOR_OPENAI_API_BASE: str = "https://api.minimaxi.com/v1"
 
 
     # Embedding API (can be different from OpenAI)
-    TUTOR_EMBEDDING_API_KEY: str = "ms-e9cb1ee1-d248-4f05-87d1-fbc2083c41ae"
-    TUTOR_EMBEDDING_API_BASE: str = "https://ms-fc-1d889e1e-d2ad.api-inference.modelscope.cn/v1"
-    TUTOR_EMBEDDING_MODEL: str = "Qwen/Qwen3-Embedding-4B-GGUF"
+    TUTOR_EMBEDDING_API_KEY: str = "sk-cp-P1ERPl57-inhu_21U6MdMcPDBpddr3Nmmf8RpGfV2q_FslCDAPCGRaJbqMPjmgaRHjPS5TC7PZJsap8c35p-FsIML9dRSYJN7oUjsUyDG_-9HPE97KAVVVY"
+    TUTOR_EMBEDDING_API_BASE: str = "minimax-m2.7"
+    TUTOR_EMBEDDING_MODEL: str = "https://api.minimaxi.com/v1"
 
     # Translation API (can be different from OpenAI)
-    TUTOR_TRANSLATION_API_KEY: str = "ms-e9cb1ee1-d248-4f05-87d1-fbc2083c41ae"
-    TUTOR_TRANSLATION_API_BASE: str = "https://api-inference.modelscope.cn/v1"
-    TUTOR_TRANSLATION_MODEL: str = "Qwen/Qwen3-30B-A3B-Instruct-2507"
+    TUTOR_TRANSLATION_API_KEY: str = "sk-cp-P1ERPl57-inhu_21U6MdMcPDBpddr3Nmmf8RpGfV2q_FslCDAPCGRaJbqMPjmgaRHjPS5TC7PZJsap8c35p-FsIML9dRSYJN7oUjsUyDG_-9HPE97KAVVVY"
+    TUTOR_TRANSLATION_API_BASE: str = "https://api.minimaxi.com/v1"
+    TUTOR_TRANSLATION_MODEL: str = "minimax-m2.7"
 
 
     # Model configuration tells Pydantic where to find the .env file.
@@ -61,9 +61,9 @@ class Settings(BaseSettings):
     LLM_TEMPERATURE: float = 0.7
 
     # Module enable/disable flags
-    ENABLE_RAG_SERVICE: bool = True
-    ENABLE_SENTIMENT_ANALYSIS: bool = True
-    ENABLE_CLUSTERING_SERVICE: bool = True
+    ENABLE_RAG_SERVICE: bool = False
+    ENABLE_SENTIMENT_ANALYSIS: bool = False
+    ENABLE_CLUSTERING_SERVICE: bool = False
     ENABLE_TRANSLATION_SERVICE: bool = False
     
     # Redis 配置

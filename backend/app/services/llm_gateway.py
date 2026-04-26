@@ -6,6 +6,68 @@ from openai import OpenAI
 from app.core.config import settings
 
 
+class _ThinkTagFilter:
+    """过滤模型输出中的 <think>...</think> 内容，支持流式分片。"""
+
+    START_TAG = "<think>"
+    END_TAG = "</think>"
+
+    def __init__(self):
+        self._inside_think = False
+        self._carry = ""
+
+    @staticmethod
+    def _suffix_overlap(text: str, tag: str) -> int:
+        """返回 text 末尾与 tag 前缀重叠的最大长度（不含完整 tag）。"""
+        max_overlap = min(len(tag) - 1, len(text))
+        for size in range(max_overlap, 0, -1):
+            if text.endswith(tag[:size]):
+                return size
+        return 0
+
+    def feed(self, text: str) -> str:
+        if not text:
+            return ""
+
+        data = self._carry + text
+        self._carry = ""
+        output = []
+        idx = 0
+
+        while idx < len(data):
+            if self._inside_think:
+                end_idx = data.find(self.END_TAG, idx)
+                if end_idx == -1:
+                    # 在思考段内，保留尾部用于跨 chunk 匹配结束标签。
+                    keep = max(idx, len(data) - len(self.END_TAG) + 1)
+                    self._carry = data[keep:]
+                    return "".join(output)
+                self._inside_think = False
+                idx = end_idx + len(self.END_TAG)
+                continue
+
+            start_idx = data.find(self.START_TAG, idx)
+            if start_idx == -1:
+                visible = data[idx:]
+                overlap = self._suffix_overlap(visible, self.START_TAG)
+                if overlap:
+                    self._carry = visible[-overlap:]
+                    visible = visible[:-overlap]
+                output.append(visible)
+                return "".join(output)
+
+            output.append(data[idx:start_idx])
+            self._inside_think = True
+            idx = start_idx + len(self.START_TAG)
+
+        return "".join(output)
+
+    def finalize(self) -> str:
+        # 仅清理状态，不输出残留（残留通常是未闭合 think 内容或不完整标签）。
+        self._carry = ""
+        return ""
+
+
 class LLMGateway:
     """LLM网关服务"""
     
@@ -25,6 +87,15 @@ class LLMGateway:
         )
         # 最近一次调用的token用量
         self.last_usage: Optional[dict] = None
+
+    @staticmethod
+    def _strip_think_blocks(text: Optional[str]) -> str:
+        if not text:
+            return ""
+        filter_ = _ThinkTagFilter()
+        cleaned = filter_.feed(text)
+        cleaned += filter_.finalize()
+        return cleaned
     
     def get_completion_sync(
         self, 
@@ -77,7 +148,11 @@ class LLMGateway:
                 self.last_usage = None
 
             if response.choices and len(response.choices) > 0:
-                return response.choices[0].message.content
+                raw_content = response.choices[0].message.content or ""
+                content = self._strip_think_blocks(raw_content)
+                if content.strip():
+                    return content
+                return "I apologize, but I couldn't generate a response at this time."
             else:
                 return "I apologize, but I couldn't generate a response at this time."
                 
@@ -121,12 +196,18 @@ class LLMGateway:
                 stream=True,
             )
             
-            # 流式返回内容
+            # 流式返回内容（过滤 <think>...</think>）
+            think_filter = _ThinkTagFilter()
             for chunk in response:
                 if chunk.choices and len(chunk.choices) > 0:
                     delta = chunk.choices[0].delta
                     if delta.content:
-                        yield delta.content
+                        visible = think_filter.feed(delta.content)
+                        if visible:
+                            yield visible
+            tail = think_filter.finalize()
+            if tail:
+                yield tail
             
         except Exception as e:
             print(f"Error calling LLM API: {e}")
@@ -171,12 +252,18 @@ class LLMGateway:
                 stream=True,
             )
             #return response
-            # 流式返回内容
+            # 流式返回内容（过滤 <think>...</think>）
+            think_filter = _ThinkTagFilter()
             for chunk in response:
                 if chunk.choices and len(chunk.choices) > 0:
                     delta = chunk.choices[0].delta
                     if delta.content:
-                        yield delta.content
+                        visible = think_filter.feed(delta.content)
+                        if visible:
+                            yield visible
+            tail = think_filter.finalize()
+            if tail:
+                yield tail
             
             '''
             # 直接异步流式

@@ -9,7 +9,6 @@ from app.services.user_state_service import UserStateService
 from app.services.rag_service import RAGService
 from app.services.prompt_generator import PromptGenerator
 from app.services.llm_gateway import LLMGateway
-from app.services.translation_llm_gateway import translate
 from app.services.content_loader import load_json_content  # 导入content_loader
 from app.crud.crud_event import event as crud_event
 from app.crud.crud_chat_history import chat_history as crud_chat_history
@@ -76,7 +75,7 @@ class DynamicController:
         Returns:
             ChatResponse: AI回复
         """
-        logger.info(f"开始进行翻译...{request.user_message}")
+        logger.info(f"开始处理AI对话请求...{request.user_message}")
         try:
           
             # 步骤1: 获取或创建用户档案（使用UserStateService）
@@ -97,14 +96,8 @@ class DynamicController:
 
             # 暂不构建用户状态摘要，等待内容加载后递增提问计数
 
-            # 步骤3: RAG检索
+            # 步骤3: 为演示链路跳过RAG检索，直接走LLM
             retrieved_knowledge = []
-            if self.rag_service:
-                try:
-                    retrieved_knowledge = self.rag_service.retrieve(request.user_message)
-                except Exception as e:
-                    print(f"⚠️ RAG检索失败，使用空知识内容: {e}")
-                    retrieved_knowledge = []
 
             # 步骤4: 加载内容（学习内容或测试任务）
             content_title = None
@@ -140,8 +133,8 @@ class DynamicController:
                 # 计数递增失败不影响主流程
                 pass
 
-            # 步骤4.5: 进度聚类分析（在构建用户状态摘要前）
-            if request.conversation_history:
+            # 步骤4.5: 进度聚类分析（演示链路默认关闭；仅在显式注入聚类服务时启用）
+            if request.conversation_history and self.clustering_service:
                 # 将ConversationMessage转换为字典格式用于聚类分析
                 conversation_for_clustering = []
                 for msg in request.conversation_history:
@@ -173,6 +166,8 @@ class DynamicController:
                         print(f"⚠️ 进度聚类分析失败，继续正常流程: {e}")
                 else:
                     print(f"🚦 聚类分析节流：跳过此次请求（消息数未达到步长8或时间间隔不足）")
+            elif request.conversation_history:
+                logger.info("聚类服务已关闭，跳过进度聚类分析")
 
             # 现在构建用户状态摘要（包含最新行为计数、情感和聚类结果）
             user_state_summary = self._build_user_state_summary(profile, sentiment_result)
@@ -403,18 +398,8 @@ class DynamicController:
         """
         
         try:
-            # 创建翻译缓存避免重复翻译
-            translation_cache = {}
-            
-            def get_translation(text):
-                """获取翻译结果，使用缓存避免重复翻译"""
-                if text not in translation_cache:
-                    translation_cache[text] = translate(text)
-                return translation_cache[text]
-            
-            logger.info(f"翻译前：{request.user_message}")
-            translated_message = get_translation(request.user_message)
-            logger.info(f"翻译后：{translated_message}")
+            # 为演示链路跳过翻译，直接使用用户原始输入
+            translated_message = request.user_message
             # 步骤1: 获取或创建用户档案（使用UserStateService）
             profile, _ = self.user_state_service.get_or_create_profile(request.participant_id, db)
             # 步骤2: 情感分析
@@ -431,14 +416,8 @@ class DynamicController:
                     details={}
                 )
             # 暂不构建用户状态摘要，等待内容加载后递增提问计数
-            # 步骤3: RAG检索
+            # 步骤3: 为演示链路跳过RAG检索，直接走LLM
             retrieved_knowledge = []
-            if self.rag_service:
-                try:
-                    retrieved_knowledge = self.rag_service.retrieve(request.user_message)
-                except Exception as e:
-                    print(f"⚠️ RAG检索失败，使用空知识内容: {e}")
-                    retrieved_knowledge = []
             # 步骤4: 加载内容（学习内容或测试任务）
             content_title = None
             loaded_content_json = None
@@ -470,11 +449,10 @@ class DynamicController:
             except Exception as _:
                 pass
 
-            # 步骤4.5: 进度聚类分析（在构建用户状态摘要前）
-            if request.conversation_history:
+            # 步骤4.5: 进度聚类分析（演示链路默认关闭；仅在显式注入聚类服务时启用）
+            if request.conversation_history and self.clustering_service:
                 # 将ConversationMessage转换为字典格式用于聚类分析
                 conversation_for_clustering = []
-                trans_history = []
                 for msg in request.conversation_history:
                     conversation_for_clustering.append({
                         'role': msg.role,
@@ -486,17 +464,10 @@ class DynamicController:
                 should_cluster = self.user_state_service._should_perform_clustering(profile,conversation_for_clustering)
                 if should_cluster:
                     try:
-                        for msg in request.conversation_history:
-                            if msg.role == 'user':
-                                trans_history.append({
-                                    'role': msg.role,
-                                    'content': get_translation(msg.content)
-                                })
-                                logger.info(f"翻译历史：{trans_history}")
                         # 触发聚类分析：使用注入的聚类服务
                         clustering_result = self.user_state_service.update_progress_clustering(
                             request.participant_id, 
-                            trans_history,
+                            conversation_for_clustering,
                             clustering_service=self.clustering_service
                         )
                         
@@ -512,6 +483,8 @@ class DynamicController:
                         print(f"⚠️ 进度聚类分析失败 (同步)，继续正常流程: {e}")
                 else:
                     print(f"🚦 聚类分析节流 (同步)：跳过此次请求（消息数未达到步长8或时间间隔不足）")
+            elif request.conversation_history:
+                logger.info("聚类服务已关闭，跳过进度聚类分析")
 
             # 现在构建用户状态摘要（包含最新行为计数、情感和聚类结果）
             user_state_summary = self._build_user_state_summary(profile, sentiment_result)
