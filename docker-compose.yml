@@ -1,4 +1,26 @@
 
+x-backend-common-env: &backend-common-env
+  BACKEND_PORT: ${BACKEND_PORT:-8000}
+  REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+  REDIS_HOST: ${REDIS_HOST:-redis}
+  REDIS_PORT: ${REDIS_PORT:-6379}
+  DATABASE_URL: ${DATABASE_URL:-sqlite:///./app/db/database.db}
+  TUTOR_OPENAI_API_KEY: ${TUTOR_OPENAI_API_KEY:-}
+  TUTOR_OPENAI_API_BASE: ${TUTOR_OPENAI_API_BASE:-}
+  TUTOR_OPENAI_MODEL: ${TUTOR_OPENAI_MODEL:-}
+  TUTOR_EMBEDDING_API_KEY: ${TUTOR_EMBEDDING_API_KEY:-}
+  TUTOR_EMBEDDING_API_BASE: ${TUTOR_EMBEDDING_API_BASE:-}
+  TUTOR_EMBEDDING_MODEL: ${TUTOR_EMBEDDING_MODEL:-}
+  TUTOR_TRANSLATION_API_KEY: ${TUTOR_TRANSLATION_API_KEY:-}
+  TUTOR_TRANSLATION_API_BASE: ${TUTOR_TRANSLATION_API_BASE:-}
+  TUTOR_TRANSLATION_MODEL: ${TUTOR_TRANSLATION_MODEL:-}
+  LLM_MAX_TOKENS: ${LLM_MAX_TOKENS:-65535}
+  LLM_TEMPERATURE: ${LLM_TEMPERATURE:-0.7}
+  ENABLE_RAG_SERVICE: ${ENABLE_RAG_SERVICE:-false}
+  ENABLE_SENTIMENT_ANALYSIS: ${ENABLE_SENTIMENT_ANALYSIS:-false}
+  ENABLE_CLUSTERING_SERVICE: ${ENABLE_CLUSTERING_SERVICE:-false}
+  ENABLE_TRANSLATION_SERVICE: ${ENABLE_TRANSLATION_SERVICE:-false}
+
 services:
   # Redis服务
   redis:
@@ -18,12 +40,7 @@ services:
     container_name: ats-exp-backend
     ports:
       - "8000:8000"
-    environment:
-      - BACKEND_PORT=8000
-      - REDIS_URL=redis://redis:6379/0
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - DATABASE_URL=sqlite:///./app/db/database.db
+    environment: *backend-common-env
 
     volumes:
       - ./backend:/app/backend
@@ -39,11 +56,7 @@ services:
       dockerfile: Dockerfile.backend
     container_name: ats-exp-celery-chat-worker
     command: celery -A app.celery_app worker -l info -Q chat_queue --pool=prefork -n ai_worker@%h -c 2
-    environment:
-      - REDIS_URL=redis://redis:6379/0
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - DATABASE_URL=sqlite:///./app/db/database.db
+    environment: *backend-common-env
 
     volumes:
       - ./backend:/app/backend
@@ -59,11 +72,7 @@ services:
       dockerfile: Dockerfile.backend
     container_name: ats-exp-celery-submit-worker
     command: celery -A app.celery_app worker -l info -Q submit_queue --pool=prefork -n submit_worker@%h -c 2
-    environment:
-      - REDIS_URL=redis://redis:6379/0
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - DATABASE_URL=sqlite:///./app/db/database.db
+    environment: *backend-common-env
 
     volumes:
       - ./backend:/app/backend
@@ -79,11 +88,7 @@ services:
       dockerfile: Dockerfile.backend
     container_name: ats-exp-celery-db-worker
     command: celery -A app.celery_app worker -l info -Q db_writer_queue --pool=gevent -n db_worker@%h -c 10
-    environment:
-      - REDIS_URL=redis://redis:6379/0
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - DATABASE_URL=sqlite:///./app/db/database.db
+    environment: *backend-common-env
 
     volumes:
       - ./backend:/app/backend
@@ -99,11 +104,7 @@ services:
       dockerfile: Dockerfile.backend
     container_name: ats-exp-celery-behavior-worker
     command: celery -A app.celery_app worker -l info -Q behavior_queue --pool=prefork -n behavior_worker@%h -c 2
-    environment:
-      - REDIS_URL=redis://redis:6379/0
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - DATABASE_URL=sqlite:///./app/db/database.db
+    environment: *backend-common-env
 
     volumes:
       - ./backend:/app/backend
@@ -119,11 +120,7 @@ services:
       dockerfile: Dockerfile.backend
     container_name: ats-exp-celery-beat
     command: celery -A app.celery_app beat -l info
-    environment:
-      - REDIS_URL=redis://redis:6379/0
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - DATABASE_URL=sqlite:///./app/db/database.db
+    environment: *backend-common-env
 
     volumes:
       - ./backend:/app/backend

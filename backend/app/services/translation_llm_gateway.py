@@ -11,9 +11,9 @@ class TranslationLLMGateway:
     
     def __init__(self):
         # 从环境变量或配置中获取API配置
-        self.api_key = "ms-1c965a0c-71c0-43c0-90cd-1ff89a09b701"
-        self.api_base = "https://api-inference.modelscope.cn/v1/"
-        self.model = "Qwen/Qwen2.5-7B-Instruct"
+        self.api_key = os.getenv("TUTOR_TRANSLATION_API_KEY", settings.TUTOR_TRANSLATION_API_KEY)
+        self.api_base = os.getenv("TUTOR_TRANSLATION_API_BASE", settings.TUTOR_TRANSLATION_API_BASE)
+        self.model = os.getenv("TUTOR_TRANSLATION_MODEL", settings.TUTOR_TRANSLATION_MODEL)
 
         self.max_tokens = 8192
         self.temperature = 0.7

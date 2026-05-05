@@ -23,6 +23,16 @@ let hasTriggeredAssistanceAfterSubmission = false;
 tracker.init({
     user_idle: true,
     page_click: true,
+    // 演示模式：降低“代码修改主动提示”触发门槛
+    hintConfig: {
+        hintThreshold: 2,
+        cooldownPeriod: 10000
+    },
+    codeMonitoringConfig: {
+        minChangeThreshold: 5,
+        meaningfulEditTimeout: 800,
+        problemDetectionThreshold: 2
+    }
 });
 // 初始化函数
 async function initializePage() {

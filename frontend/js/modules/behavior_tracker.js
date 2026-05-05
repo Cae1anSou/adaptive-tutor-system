@@ -111,6 +111,14 @@ class BehaviorTracker {
 
   init(config = {}) {
     this._enabledEvents = config;
+    // 允许外部覆盖“代码修改主动提示”阈值
+    if (config.hintConfig) {
+      this.hintConfig = { ...this.hintConfig, ...config.hintConfig };
+    }
+    // 允许外部覆盖“代码修改检测”参数
+    if (config.codeMonitoringConfig) {
+      this.codeMonitoringConfig = { ...this.codeMonitoringConfig, ...config.codeMonitoringConfig };
+    }
     // 允许外部覆盖空闲提示配置
     if (config.idleHintConfig) {
       this.idleHintConfig = { ...this.idleHintConfig, ...config.idleHintConfig };
@@ -298,14 +306,14 @@ class BehaviorTracker {
 
       console.log(`[${editorType}] 完成修改周期: 删除${deletedChars}字符, 新增${addedChars}字符, 总共修改${totalModifiedChars}字符, 净变化: ${netChange}字符`);
       
-      // 只有当连续编辑次数超过阈值并且净变化不为0时才记录问题事件
-      if (state.consecutiveEdits >= this.codeMonitoringConfig.problemDetectionThreshold && Math.abs(netChange) > 5) {
+      // 连续编辑达到阈值即记录问题事件（不再依赖净变化，避免“改了很多但长度相近”时不触发）
+      if (state.consecutiveEdits >= this.codeMonitoringConfig.problemDetectionThreshold) {
         this._recordProblemEvent(editorType, state.consecutiveEdits, timestamp);
       }
       
       const unsubmittedEdits = this.significantEdits.filter(edit => !edit.submitted);
       if (unsubmittedEdits.length >= 5 ||
-        (state.consecutiveEdits >= this.codeMonitoringConfig.problemDetectionThreshold && Math.abs(netChange) > 5)) {
+        (state.consecutiveEdits >= this.codeMonitoringConfig.problemDetectionThreshold)) {
         this._submitSignificantEdits();
       }
     }

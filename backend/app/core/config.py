@@ -13,18 +13,18 @@ class Settings(BaseSettings):
     BACKEND_PORT: int = 8000
 
     # OpenAI (for chat completions)
-    TUTOR_OPENAI_API_KEY: str = "sk-cp-P1ERPl57-inhu_21U6MdMcPDBpddr3Nmmf8RpGfV2q_FslCDAPCGRaJbqMPjmgaRHjPS5TC7PZJsap8c35p-FsIML9dRSYJN7oUjsUyDG_-9HPE97KAVVVY"
+    TUTOR_OPENAI_API_KEY: str = ""
     TUTOR_OPENAI_MODEL: str = "minimax-m2.7"
     TUTOR_OPENAI_API_BASE: str = "https://api.minimaxi.com/v1"
 
 
     # Embedding API (can be different from OpenAI)
-    TUTOR_EMBEDDING_API_KEY: str = "sk-cp-P1ERPl57-inhu_21U6MdMcPDBpddr3Nmmf8RpGfV2q_FslCDAPCGRaJbqMPjmgaRHjPS5TC7PZJsap8c35p-FsIML9dRSYJN7oUjsUyDG_-9HPE97KAVVVY"
-    TUTOR_EMBEDDING_API_BASE: str = "minimax-m2.7"
-    TUTOR_EMBEDDING_MODEL: str = "https://api.minimaxi.com/v1"
+    TUTOR_EMBEDDING_API_KEY: str = ""
+    TUTOR_EMBEDDING_API_BASE: str = "https://api.minimaxi.com/v1"
+    TUTOR_EMBEDDING_MODEL: str = "minimax-m2.7"
 
     # Translation API (can be different from OpenAI)
-    TUTOR_TRANSLATION_API_KEY: str = "sk-cp-P1ERPl57-inhu_21U6MdMcPDBpddr3Nmmf8RpGfV2q_FslCDAPCGRaJbqMPjmgaRHjPS5TC7PZJsap8c35p-FsIML9dRSYJN7oUjsUyDG_-9HPE97KAVVVY"
+    TUTOR_TRANSLATION_API_KEY: str = ""
     TUTOR_TRANSLATION_API_BASE: str = "https://api.minimaxi.com/v1"
     TUTOR_TRANSLATION_MODEL: str = "minimax-m2.7"
 

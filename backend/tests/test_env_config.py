@@ -11,7 +11,11 @@ from app.core.config import settings
 
 def test_settings_are_loaded_correctly():
     """
-    测试关键配置项是否从 .env 或环境变量中正确加载到 settings 对象
+    测试关键配置项在 settings 对象中可访问。
+
+    说明：
+    1. 项目采用“密钥由外部环境注入”的方式，仓库中不再要求默认密钥非空。
+    2. 因此这里只校验字段存在，不强制校验值非空。
     """
     required_attributes = [
         "TUTOR_OPENAI_API_KEY",
@@ -21,17 +25,14 @@ def test_settings_are_loaded_correctly():
         "TUTOR_TRANSLATION_API_KEY",
     ]
 
-    missing_or_empty_settings = []
+    missing_settings = []
     for attr in required_attributes:
-        # Pydantic v2: required fields without defaults will raise error on instantiation if missing.
-        # This test is an extra safeguard, especially for fields that might have defaults but shouldn't be empty.
         value = getattr(settings, attr, None)
-        if not value:
-            missing_or_empty_settings.append(attr)
+        if value is None:
+            missing_settings.append(attr)
 
-    assert not missing_or_empty_settings, (
-        f"The following required settings are missing or empty in your configuration "
-        f"(check .env file or environment variables): {missing_or_empty_settings}"
+    assert not missing_settings, (
+        f"The following required settings are missing in your configuration: {missing_settings}"
     )
 
 if __name__ == "__main__":

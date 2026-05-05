@@ -99,3 +99,12 @@ sentiment_bert/
 frontend/frontend_vue/node_modules
 .gemini/
 gha-creds-*.json
+competition_submission/.env.template
+competition_submission/CONFIDENTIALITY_NOTICE.md
+competition_submission/docker-compose.submission.yml
+competition_submission/ENVIRONMENT_VARIABLES.md
+competition_submission/README.md
+competition_submission/artifacts/adaptive-tutor-system_backend_competition-v1.tar
+competition_submission/artifacts/adaptive-tutor-system_frontend_competition-v1.tar
+competition_submission/artifacts/README.md
+competition_submission/artifacts/SHA256SUMS

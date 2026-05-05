@@ -36,3 +36,8 @@ docker-compose.yml
 docs/
 *.md
 CLAUDE.local.md
+
+# Secrets and local env files
+.env
+.env.*
+!.env.example
